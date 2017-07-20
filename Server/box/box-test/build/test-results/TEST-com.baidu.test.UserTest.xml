@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.baidu.test.UserTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2016-03-25T04:04:09" hostname="D4106E9DB2589B6" time="0.127">
+  <properties/>
+  <testcase name="signin" classname="com.baidu.test.UserTest" time="0.127"/>
+  <system-out><![CDATA[null
+]]></system-out>
+  <system-err><![CDATA[ERROR StatusLogger No log4j2 configuration file found. Using default configuration: logging only errors to the console.
+]]></system-err>
+</testsuite>

@@ -1,0 +1,47 @@
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# IDE file
+*.iml
+
+#folder
+Server/box/.gradle/
+Server/box/.idea/
+Server/box/build/
+Server/box/log/
+Server/box/box-api/
+!Server/box/box-api/src/
+!Server/box/box-api/pom.xml
+Server/box/box-context/
+!Server/box/box-context/src/
+!Server/box/box-context/pom.xml
+Server/box/box-impl/
+!Server/box/box-impl/src/
+!Server/box/box-impl/pom.xml
+Server/box/box-test/
+!Server/box/box-test/src/
+!Server/box/box-test/pom.xml
+Server/box/box-web/
+!Server/box/box-web/src/
+!Server/box/box-web/pom.xml
+
+
+
+
