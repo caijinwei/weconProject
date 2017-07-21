@@ -42,6 +42,13 @@ Server/box/box-web/
 !Server/box/box-web/src/
 !Server/box/box-web/pom.xml
 
+Server/common-util/.idea/
+Server/common-util/build/
+Server/common-util/target/
+Server/restful-core/.idea/
+Server/restful-core/build/
+Server/restful-core/target/
+
 
 
 
