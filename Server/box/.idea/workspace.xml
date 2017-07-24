@@ -118,8 +118,8 @@
       <file leaf-file-name="mqtttest.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/box-web/src/main/webapp/web/html/mqtttest.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.5358779">
-              <caret line="160" column="32" selection-start-line="160" selection-start-column="32" selection-end-line="160" selection-end-column="32" />
+            <state vertical-scroll-proportion="0.8259542">
+              <caret line="202" column="7" selection-start-line="202" selection-start-column="7" selection-end-line="202" selection-end-column="7" />
               <folding>
                 <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
               </folding>
@@ -1602,16 +1602,16 @@
       <workItem from="1500525255233" duration="1446000" />
       <workItem from="1500528742788" duration="4546000" />
       <workItem from="1500535912185" duration="3902000" />
-      <workItem from="1500607669216" duration="11941000" />
+      <workItem from="1500607669216" duration="12117000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="54463000" />
+    <option name="totallyTimeSpent" value="54639000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1" y="0" width="1918" height="998" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -2061,8 +2061,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/box-web/src/main/webapp/web/html/mqtttest.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5358779">
-          <caret line="160" column="32" selection-start-line="160" selection-start-column="32" selection-end-line="160" selection-end-column="32" />
+        <state vertical-scroll-proportion="0.8259542">
+          <caret line="202" column="7" selection-start-line="202" selection-start-column="7" selection-end-line="202" selection-end-column="7" />
           <folding>
             <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
           </folding>
