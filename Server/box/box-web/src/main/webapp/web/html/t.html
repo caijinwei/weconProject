@@ -10,64 +10,112 @@
 <body ng-controller="infoController" ng-init="onInit()">
 <div class="container">
     <div class="row form-horizontal" style="margin: 10px 0 0 0;">
-        <div  class="col-xs-8 col-sm-8 col-md-8">
+        <div class="col-xs-8 col-sm-8 col-md-8">
             <h4>测试工具
             </h4>
         </div>
-        <div  class="col-xs-3 col-sm-3 col-md-3 pull-right">
+        <div class="col-xs-3 col-sm-3 col-md-3 pull-right">
         </div>
-        <div  class="col-xs-1 col-sm-1 col-md-1">
+        <div class="col-xs-1 col-sm-1 col-md-1">
         </div>
     </div>
     <ul class="nav nav-tabs" id="myTab">
         <li class="active"><a href="#baseinfo" data-toggle="tab" id="tabedit">接口测试</a></li>
-        <li><a href="#baseinfo2" data-toggle="tab" id="tabedit2">Redis测试</a></li>
-        <li><a href="#baseinfo3" data-toggle="tab" id="tabedit3">Mqtt测试</a></li>
+        <li><a href="#baseinfo2" data-toggle="tab" id="tabedit2">Mqtt测试</a></li>
+        <li><a href="#baseinfo3" data-toggle="tab" id="tabedit3" style="display:none;">Mqtt-mosquitto测试</a></li>
         <li><a href="#baseinfo4" data-toggle="tab" id="tabedit4">其他</a></li>
     </ul>
     <div id="infotab" class="tab-content form-horizontal" style="margin-top: 10px;">
         <div class="tab-pane active" id="baseinfo">
             <div class="row form-group">
                 <label class="col-sm-2 col-md-2 col-xs-2 control-label" for="act_url">接口url</label>
+
                 <div class="col-sm-9 col-md-9 col-xs-9">
-                    <input type="text" class="form-control" id="act_url" name="act_url" placeholder="接口url" value="testact/gd" >
+                    <input type="text" class="form-control" id="act_url" name="act_url" placeholder="接口url"
+                           value="testact/gd">
                 </div>
                 <div class="col-sm-1 col-md-1 col-xs-1"></div>
             </div>
             <div class="row form-group">
                 <label class="col-xs-2 col-sm-2 col-md-2 control-label" for="act_params">请求参数</label>
+
                 <div class="col-xs-9 col-sm-9 col-md-9">
-                    <textarea class="form-control" id="act_params" name="act_params" rows="2" placeholder="请求参数">{}</textarea>
+                    <textarea class="form-control" id="act_params" name="act_params" rows="2"
+                              placeholder="请求参数">{}</textarea>
                 </div>
             </div>
             <div class="row form-group">
                 <label class="col-xs-2 col-sm-2 col-md-2 control-label"></label>
+
                 <div class="col-xs-9 col-sm-9 col-md-9">
-                    <button type="button" class="btn btn-primary" ng-click="act_submit()"> 提 交 </button>
+                    <button type="button" class="btn btn-primary" ng-click="act_submit()"> 提 交</button>
                 </div>
             </div>
             <div class="row form-group">
                 <label class="col-xs-2 col-sm-2 col-md-2 control-label" for="act_ret">返回结果</label>
+
                 <div class="col-xs-9 col-sm-9 col-md-9">
                     <textarea class="form-control" id="act_ret" name="act_ret" rows="5" placeholder="返回结果"></textarea>
                 </div>
             </div>
             <div class="row form-group">
                 <label class="col-xs-2 col-sm-2 col-md-2 control-label"></label>
+
                 <div class="col-xs-9 col-sm-9 col-md-9">
                 </div>
             </div>
         </div>
         <div class="tab-pane" id="baseinfo2">
             <div class="row form-group">
+                <label class="col-sm-2 col-md-2 col-xs-2 control-label" for="mqtt_host">host</label>
+
+                <div class="col-sm-9 col-md-9 col-xs-9">
+                    <input type="text" class="form-control" id="mqtt_host" placeholder="host"
+                           value="tcp://192.168.29.186:1883">
+                </div>
+                <div class="col-sm-1 col-md-1 col-xs-1"></div>
+            </div>
+            <div class="row form-group">
+                <label class="col-sm-2 col-md-2 col-xs-2 control-label" for="mqtt_username">user name</label>
+
+                <div class="col-sm-9 col-md-9 col-xs-9">
+                    <input type="text" class="form-control" id="mqtt_username" placeholder="user name" value="admin">
+                </div>
+                <div class="col-sm-1 col-md-1 col-xs-1"></div>
+            </div>
+            <div class="row form-group">
+                <label class="col-sm-2 col-md-2 col-xs-2 control-label" for="mqtt_pwd">password</label>
+
+                <div class="col-sm-9 col-md-9 col-xs-9">
+                    <input type="text" class="form-control" id="mqtt_pwd" placeholder="password" value="password">
+                </div>
+                <div class="col-sm-1 col-md-1 col-xs-1"></div>
+            </div>
+            <div class="row form-group">
+                <label class="col-xs-2 col-sm-2 col-md-2 control-label" for="mqtt_topics">Topic</label>
+
+                <div class="col-xs-9 col-sm-9 col-md-9">
+                    <textarea class="form-control" id="mqtt_topics" rows="2" placeholder="主题(每行一个主题)">box/12345/receiver-server/sender-client</textarea>
+                </div>
+            </div>
+            <div class="row form-group">
                 <label class="col-xs-2 col-sm-2 col-md-2 control-label"></label>
+
+                <div class="col-xs-9 col-sm-9 col-md-9">
+                    <button type="button" class="btn btn-primary" ng-click="act_submit()"> 发送</button>
+                </div>
+            </div>
+            <div class="row form-group">
+                <label class="col-xs-2 col-sm-2 col-md-2 control-label"></label>
+
                 <div class="col-xs-9 col-sm-9 col-md-9">
                 </div>
             </div>
         </div>
-        <div class="tab-pane" id="baseinfo3">
+        <div class="tab-pane" id="baseinfo3"  style="display:none;">
             <div class="row form-group">
                 <label class="col-xs-2 col-sm-2 col-md-2 control-label"></label>
+
                 <div class="col-xs-9 col-sm-9 col-md-9">
                 </div>
             </div>
