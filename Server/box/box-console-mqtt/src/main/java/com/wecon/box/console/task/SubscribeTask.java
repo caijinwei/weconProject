@@ -18,5 +18,6 @@ public class SubscribeTask extends Thread{
         applicationContext = new ClassPathXmlApplicationContext("spring.xml");
 
         System.out.println(MqttConfigContext.mqttConfig.getHost());
+        System.out.println(MqttConfigContext.mqttConfig.getUsername());
     }
 }
