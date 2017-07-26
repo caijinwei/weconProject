@@ -1,0 +1,3 @@
+com\wecon\box\console\task\PublishTask.class
+com\wecon\box\console\task\SubscribeTask.class
+com\wecon\box\console\config\MqttConfig.class

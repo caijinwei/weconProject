@@ -36,23 +36,23 @@ public class RedisManagerTest
     @Test
     public void testRedisManagerNoPassword()
     {
-//        RedisManager redisManager = new RedisManager();
-//
-//        Map<String, RedisConfig> configMap = new HashMap<>();
-//        RedisConfig configPassword = new RedisConfig();
-//        configPassword.setHost("172.17.156.139");
-//        configPassword.setPort("6379");
+        RedisManager redisManager = new RedisManager();
+
+        Map<String, RedisConfig> configMap = new HashMap<>();
+        RedisConfig configPassword = new RedisConfig();
+        configPassword.setHost("caijinwei.win");
+        configPassword.setPort("6379");
 //        //configPassword.setPassword("n66j!rVM");
 //
-//        configMap.put("nopassword", configPassword);
-//
-//        redisManager.setRedisConfig(configMap);
-//
-//        RedisManager.set("nopassword", "testRedisManagerNoPassword", "11111", 3);
-//
-//        String value = RedisManager.get("nopassword", "testRedisManagerNoPassword");
-//        System.out.println("value =" + value);
-//
+        configMap.put("nopassword", configPassword);
+        redisManager.setRedisConfig(configMap);
+
+//        RedisManager.set("nopassword", "testRedisManagerNoPassword", "11111", 0);
+
+        String value = RedisManager.get("nopassword", "mykey");//testRedisManagerNoPassword
+
+        System.out.println("value =" + value);
+
 //        String pushKey = "testPush";
 //        byte[][] xxx = new byte[3][];
 //        xxx[0] = "aaaa".getBytes();

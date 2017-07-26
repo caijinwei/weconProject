@@ -13,11 +13,8 @@ import java.util.Set;
 
 /**
  * redis管理
- *
- * @author zengzhipeng
  */
-public class RedisManager
-{
+public class RedisManager {
     private static Map<String, RedisConfig> redisConfig;
     private static Map<String, JedisPool> redisPool = new HashMap<>();
 
@@ -27,14 +24,11 @@ public class RedisManager
      * @param group redis别名
      * @return
      */
-    private static synchronized Jedis getJedis(String group)
-    {
+    private static synchronized Jedis getJedis(String group) {
         JedisPool pool = redisPool.get(group);
-        if (pool == null)
-        {
+        if (pool == null) {
             RedisConfig cfg = redisConfig.get(group);
-            if (cfg == null)
-            {
+            if (cfg == null) {
                 throw new RuntimeException("redis配置" + group + "不存在");
             }
 
@@ -44,12 +38,9 @@ public class RedisManager
             poolconfig.setMaxWaitMillis(100000L);
             poolconfig.setTestOnBorrow(true);
 
-            if (StringUtil.isNullOrEmpty(cfg.getPassword()))
-            {
+            if (StringUtil.isNullOrEmpty(cfg.getPassword())) {
                 pool = new JedisPool(poolconfig, cfg.getHost(), Integer.parseInt(cfg.getPort()));
-            }
-            else
-            {
+            } else {
                 pool = new JedisPool(poolconfig, cfg.getHost(), Integer.parseInt(cfg.getPort()), 0, cfg.getPassword());
             }
 
@@ -63,300 +54,220 @@ public class RedisManager
      *
      * @param jedis
      */
-    private static void returnJedis(Jedis jedis)
-    {
-        if (jedis != null)
-        {
+    private static void returnJedis(Jedis jedis) {
+        if (jedis != null) {
             jedis.close();
         }
     }
 
-    public void setRedisConfig(Map<String, RedisConfig> redisConfig)
-    {
+    public void setRedisConfig(Map<String, RedisConfig> redisConfig) {
         RedisManager.redisConfig = redisConfig;
     }
 
-    public static List<byte[]> mget(String group, byte[]... keys)
-    {
-        if (keys == null || keys.length == 0)
-        {
+    public static List<byte[]> mget(String group, byte[]... keys) {
+        if (keys == null || keys.length == 0) {
             return null;
         }
         Jedis jedis = getJedis(group);
-        try
-        {
+        try {
             return jedis.mget(keys);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
 
-    public static String get(String group, String key)
-    {
+    public static String get(String group, String key) {
         String value = null;
-        if (key == null || key.isEmpty())
-        {
+        if (key == null || key.isEmpty()) {
             return value;
         }
         Jedis jedis = getJedis(group);
-        try
-        {
+        try {
             return jedis.get(key);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static byte[] get(String group, byte[] key)
-    {
+    public static byte[] get(String group, byte[] key) {
         byte[] value = null;
-        if (key == null)
-        {
+        if (key == null) {
             return value;
         }
         Jedis jedis = getJedis(group);
-        try
-        {
+        try {
             return jedis.get(key);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static boolean set(String group, String key, String value, int seconds)
-    {
+    public static boolean set(String group, String key, String value, int seconds) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             jedis.set(key, value);
-            if (seconds > 0)
-            {
+            if (seconds > 0) {
                 jedis.expire(key, seconds);
             }
             return true;
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static boolean set(String group, byte[] key, byte[] value, int seconds)
-    {
+    public static boolean set(String group, byte[] key, byte[] value, int seconds) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             jedis.set(key, value);
-            if (seconds > 0)
-            {
+            if (seconds > 0) {
                 jedis.expire(key, seconds);
             }
             return true;
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static boolean del(String group, String key)
-    {
+    public static boolean del(String group, String key) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             jedis.del(key);
             return true;
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static boolean del(String group, String... keys)
-    {
+    public static boolean del(String group, String... keys) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             jedis.del(keys);
             return true;
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static boolean rpush(String group, byte[] key, byte[] value)
-    {
+    public static boolean rpush(String group, byte[] key, byte[] value) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             jedis.rpush(key, value);
             return true;
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static boolean lpush(String group, byte[] key, int seconds, byte[]... value)
-    {
+    public static boolean lpush(String group, byte[] key, int seconds, byte[]... value) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             jedis.lpush(key, value);
-            if (seconds > 0)
-            {
+            if (seconds > 0) {
                 jedis.expire(key, seconds);
             }
             return true;
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static List<String> lrange(String group, String key, int start, int end)
-    {
+    public static List<String> lrange(String group, String key, int start, int end) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             return jedis.lrange(key, start, end);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
 
-    public static byte[] lpop(String group, byte[] key)
-    {
+    public static byte[] lpop(String group, byte[] key) {
         // byte[] value = null;
-        if (key == null)
-        {
+        if (key == null) {
             return null;
         }
 
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             return jedis.lpop(key);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static boolean incr(String group, String key, int seconds)
-    {
+    public static boolean incr(String group, String key, int seconds) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             jedis.incr(key);
-            if (seconds > 0)
-            {
+            if (seconds > 0) {
                 jedis.expire(key, seconds);
             }
             return true;
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static boolean expire(String group, String key, int seconds)
-    {
+    public static boolean expire(String group, String key, int seconds) {
         Jedis jedis = null;
-        try
-        {
-            if (seconds > 0)
-            {
+        try {
+            if (seconds > 0) {
                 jedis = getJedis(group);
                 jedis.expire(key, seconds);
             }
             return true;
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static boolean sismember(String group, String key, String member)
-    {
+    public static boolean sismember(String group, String key, String member) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             return jedis.sismember(key, member);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static long sadd(String group, String key, String... members)
-    {
+    public static long sadd(String group, String key, String... members) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             return jedis.sadd(key, members);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static long srem(String group, String key, String... members)
-    {
+    public static long srem(String group, String key, String... members) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             return jedis.srem(key, members);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
     //返回集合key中的所有成员
-    public static Set<String> smembers(String group, String key)
-    {
+    public static Set<String> smembers(String group, String key) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             return jedis.smembers(key);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
@@ -372,198 +283,145 @@ public class RedisManager
      * @param seconds
      * @return
      */
-    public static boolean hincrby(String group, String key, String field, long value, int seconds)
-    {
+    public static boolean hincrby(String group, String key, String field, long value, int seconds) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             jedis.hincrBy(key, field, value);
-            if (seconds > 0)
-            {
+            if (seconds > 0) {
                 jedis.expire(key, seconds);
             }
             return true;
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
 
-    public static Long hset(String group, String key, String field, String value, int seconds)
-    {
+    public static Long hset(String group, String key, String field, String value, int seconds) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             long redisValue = jedis.hset(key, field, value);
-            if (seconds > 0)
-            {
+            if (seconds > 0) {
                 jedis.expire(key, seconds);
             }
             return redisValue;
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static String hmset(String group, String key, Map<String, String> hash, int seconds)
-    {
+    public static String hmset(String group, String key, Map<String, String> hash, int seconds) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             String redisValue = jedis.hmset(key, hash);
-            if (seconds > 0)
-            {
+            if (seconds > 0) {
                 jedis.expire(key, seconds);
             }
             return redisValue;
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static Long hdel(String group, String key, String... field)
-    {
+    public static Long hdel(String group, String key, String... field) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             return jedis.hdel(key, field);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static String hget(String group, String key, String field)
-    {
+    public static String hget(String group, String key, String field) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             return jedis.hget(key, field);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static Map<String, String> hgetAll(String group, String key)
-    {
+    public static Map<String, String> hgetAll(String group, String key) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             return jedis.hgetAll(key);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static List<String> hmget(String group, String key, String... field)
-    {
+    public static List<String> hmget(String group, String key, String... field) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             return jedis.hmget(key, field);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static Set<String> hkeys(String group, String key)
-    {
+    public static Set<String> hkeys(String group, String key) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             return jedis.hkeys(key);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static long zadd(String group, String key, String member, double score)
-    {
+    public static long zadd(String group, String key, String member, double score) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             return jedis.zadd(key, score, member);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
-    public static long zrem(String group, String key, String member)
-    {
+
+    public static long zrem(String group, String key, String member) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             return jedis.zrem(key, member);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
-    public static Set<String> zrange(String group, String key, int start, int end)
-    {
+
+    public static Set<String> zrange(String group, String key, int start, int end) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             return jedis.zrange(key, start, end);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static Set<String> zrevrange(String group, String key, int start, int end)
-    {
+    public static Set<String> zrevrange(String group, String key, int start, int end) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             return jedis.zrevrange(key, start, end);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
-    public static Long zrank(String group, String key, String member)
-    {
+    public static Long zrank(String group, String key, String member) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             return jedis.zrank(key, member);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
@@ -575,16 +433,12 @@ public class RedisManager
      * @param jedisPubSub
      * @param channel
      */
-    public static void subscribe(String group, JedisPubSub jedisPubSub, String channel)
-    {
+    public static void subscribe(String group, JedisPubSub jedisPubSub, String channel) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             jedis.subscribe(jedisPubSub, channel);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
@@ -596,35 +450,27 @@ public class RedisManager
      * @param channel
      * @param message
      */
-    public static void publish(String group, String channel, String message)
-    {
+    public static void publish(String group, String channel, String message) {
         Jedis jedis = null;
-        try
-        {
+        try {
             jedis = getJedis(group);
             jedis.publish(channel, message);
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }
 
 
-    public static long ttl(String group, String key)
-    {
+    public static long ttl(String group, String key) {
         Jedis jedis = null;
-        try
-        {
+        try {
             long time = 0;
 
             jedis = getJedis(group);
             time = jedis.ttl(key);
 
             return time;
-        }
-        finally
-        {
+        } finally {
             returnJedis(jedis);
         }
     }

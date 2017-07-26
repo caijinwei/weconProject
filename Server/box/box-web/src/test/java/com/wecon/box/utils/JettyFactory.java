@@ -5,11 +5,7 @@
  */
 package com.wecon.box.utils;
 
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.*;
 //import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.webapp.WebAppClassLoader;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -33,12 +29,13 @@ public class JettyFactory {
         // 设置在JVM退出时关闭Jetty的钩子。
         server.setStopAtShutdown(true);
 
+
 //		SelectChannelConnector connector = new SelectChannelConnector();
         HttpConfiguration config = new HttpConfiguration();
         ServerConnector connector = new ServerConnector(server, new HttpConnectionFactory(config));
         connector.setReuseAddress(true);
         connector.setIdleTimeout(30000);
-        
+
         connector.setPort(port);
         // 解决Windows下重复启动Jetty居然不报告端口冲突的问题.
         connector.setReuseAddress(false);

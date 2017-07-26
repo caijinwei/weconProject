@@ -23,6 +23,7 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="box-api" />
+        <module name="box-console-mqtt" />
         <module name="box-context" />
         <module name="box-test" />
         <module name="box-web" />
@@ -38,6 +39,7 @@
     <bytecodeTargetLevel>
       <module name="box" target="1.5" />
       <module name="box-api" target="1.5" />
+      <module name="box-console-mqtt" target="1.5" />
       <module name="box-context" target="1.5" />
       <module name="box-framework" target="1.5" />
       <module name="box-impl" target="1.6" />

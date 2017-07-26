@@ -13,6 +13,7 @@
         <module>box-test</module>
         <module>box-api</module>
         <module>box-impl</module>
+        <module>box-console-mqtt</module>
     </modules>
 
 

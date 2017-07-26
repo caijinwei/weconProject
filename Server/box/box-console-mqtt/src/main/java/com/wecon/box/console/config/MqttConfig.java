@@ -1,18 +1,13 @@
-package com.wecon.common.redis;
+package com.wecon.box.console.config;
 
 /**
- * Redis的连接配置信息
+ * mqtt配置信息
+ * Created by zengzhipeng on 2017/7/25.
  */
-public class RedisConfig {
-    //redis服务器地址（单个ip）
+public class MqttConfig {
     private String host;
-
-    //连接的端口（单个端口）
-    private String port;
-
-    //redis服务器密码
+    private String username;
     private String password;
-
 
     public String getHost() {
         return host;
@@ -22,12 +17,12 @@ public class RedisConfig {
         this.host = host;
     }
 
-    public String getPort() {
-        return port;
+    public String getUsername() {
+        return username;
     }
 
-    public void setPort(String port) {
-        this.port = port;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
