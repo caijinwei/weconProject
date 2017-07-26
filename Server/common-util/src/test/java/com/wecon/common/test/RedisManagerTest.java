@@ -9,11 +9,9 @@ import java.util.*;
 /**
  * Created by zengzhipeng on 2016/2/15.
  */
-public class RedisManagerTest
-{
+public class RedisManagerTest {
     @Test
-    public void testRedisManagerForPassword()
-    {
+    public void testRedisManagerForPassword() {
        /* RedisManager redisManager = new RedisManager();
 
         Map<String, RedisConfig> configMap = new HashMap<>();
@@ -34,8 +32,7 @@ public class RedisManagerTest
     }
 
     @Test
-    public void testRedisManagerNoPassword()
-    {
+    public void testRedisManagerNoPassword() {
         RedisManager redisManager = new RedisManager();
 
         Map<String, RedisConfig> configMap = new HashMap<>();
@@ -49,9 +46,38 @@ public class RedisManagerTest
 
 //        RedisManager.set("nopassword", "testRedisManagerNoPassword", "11111", 0);
 
-        String value = RedisManager.get("nopassword", "mykey");//testRedisManagerNoPassword
+//        String value = RedisManager.get("nopassword", "mykey");//testRedisManagerNoPassword
+//        System.out.println("value =" + value);
 
-        System.out.println("value =" + value);
+
+
+
+        byte[][] idsBytes = new byte[2][];
+        String redisKey = "pibox:112";
+        idsBytes[0] = redisKey.getBytes();
+        redisKey = "pibox:123";
+        idsBytes[1] = redisKey.getBytes();
+        List<byte[]> listVals = RedisManager.mget("nopassword", idsBytes);
+
+        if (listVals != null) {
+            for (byte[] value : listVals) {
+                if (value != null) {
+                    try {
+                        String str = new String(value);
+                        System.out.println(str);
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+        }
+
+
+        List<String> vals = RedisManager.lrange("nopassword", "pibox:",0,10);
+        System.out.println(vals.size());
+        for (String v : vals) {
+            System.out.println("v =" + v);
+        }
 
 //        String pushKey = "testPush";
 //        byte[][] xxx = new byte[3][];
@@ -74,13 +100,12 @@ public class RedisManagerTest
     }
 
     @Test
-    public void testS()
-    {
+    public void testS() {
         /*RedisManager redisManager = new RedisManager();
 
         Map<String, RedisConfig> configMap = new HashMap<>();
         RedisConfig configPassword = new RedisConfig();
-        configPassword.setHost("172.17.149.92");
+        configPassword.setHost("caijinwei.win");
         configPassword.setPort("6379");
         //configPassword.setPassword("n66j!rVM");
 
@@ -88,7 +113,7 @@ public class RedisManagerTest
 
         redisManager.setRedisConfig(configMap);
 
-        RedisManager.del("nopassword", "test_hset_sort");*/
+        RedisManager.del("nopassword", "test_hset_sort");
 
 //        RedisManager.hset("nopassword", "test_hset_sort", "10075152", "0", 300);
 //        RedisManager.hset("nopassword", "test_hset_sort", "10075150", "0", 300);
@@ -112,7 +137,7 @@ public class RedisManagerTest
 //        boolean bval = RedisManager.sismember("nopassword", "test_list_sort", "10075154");
 //        System.out.println(bval);
 
-        /*RedisManager.zadd("nopassword", "test_sortset_sort", "10075152", 305);
+        RedisManager.zadd("nopassword", "test_sortset_sort", "10075152", 305);
         RedisManager.zadd("nopassword", "test_sortset_sort", "10075150", 301);
         RedisManager.zadd("nopassword", "test_sortset_sort", "10075154", 302);
 

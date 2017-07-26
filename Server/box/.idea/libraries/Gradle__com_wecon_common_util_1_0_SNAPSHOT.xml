@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: com.wecon:common-util:1.0-SNAPSHOT">
-    <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/com/wecon/common-util/1.0-SNAPSHOT/common-util-1.0-SNAPSHOT.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
