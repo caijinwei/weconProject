@@ -1,15 +1,13 @@
 package com.wecon.box.action;
 
 import com.alibaba.fastjson.JSONObject;
-import com.wecon.box.utils.api.ItemsApi;
-import com.wecon.box.utils.entity.Items;
+import com.wecon.box.api.ItemsApi;
+import com.wecon.box.entity.Items;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.Output;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Date;
 
 /**
  * Created by zengzp on 2017/7/18.

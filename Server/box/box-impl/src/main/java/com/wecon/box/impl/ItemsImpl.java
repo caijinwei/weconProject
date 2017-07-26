@@ -1,7 +1,7 @@
 package com.wecon.box.impl;
 
-import com.wecon.box.utils.api.ItemsApi;
-import com.wecon.box.utils.entity.Items;
+import com.wecon.box.api.ItemsApi;
+import com.wecon.box.entity.Items;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
