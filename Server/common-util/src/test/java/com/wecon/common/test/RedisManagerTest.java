@@ -37,22 +37,24 @@ public class RedisManagerTest {
 
         Map<String, RedisConfig> configMap = new HashMap<>();
         RedisConfig configPassword = new RedisConfig();
-        configPassword.setHost("caijinwei.win");
+        configPassword.setHost("192.168.29.186");
         configPassword.setPort("6379");
 //        //configPassword.setPassword("n66j!rVM");
 //
         configMap.put("nopassword", configPassword);
         redisManager.setRedisConfig(configMap);
 
-//        RedisManager.set("nopassword", "testRedisManagerNoPassword", "11111", 0);
+        String redisKey="pibox:actdata:1000";
+        String jsonStr="{\"act_time_data_list\":[{\"addr_list\":[{\"addr\":\"10\",\"value\":\"0.256\"}],\"com\":\"1\"}],\"machine_code\":\"1000\",\"time\":\"2017-07-26 10:20:11\"}";
+        RedisManager.set("nopassword", redisKey,jsonStr, 0);
 
-//        String value = RedisManager.get("nopassword", "mykey");//testRedisManagerNoPassword
-//        System.out.println("value =" + value);
+        String value = RedisManager.get("nopassword", redisKey);//testRedisManagerNoPassword
+        System.out.println("value =" + value);
 
 
 
 
-        byte[][] idsBytes = new byte[2][];
+        /*byte[][] idsBytes = new byte[2][];
         String redisKey = "pibox:112";
         idsBytes[0] = redisKey.getBytes();
         redisKey = "pibox:123";
@@ -77,7 +79,7 @@ public class RedisManagerTest {
         System.out.println(vals.size());
         for (String v : vals) {
             System.out.println("v =" + v);
-        }
+        }*/
 
 //        String pushKey = "testPush";
 //        byte[][] xxx = new byte[3][];
