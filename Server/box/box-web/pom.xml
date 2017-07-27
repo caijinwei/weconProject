@@ -31,7 +31,7 @@
       <groupId>org.eclipse.jetty.aggregate</groupId>
       <artifactId>jetty-all</artifactId>
       <version>9.4.6.v20170531</version>
-      <scope>test</scope>
+      <type>pom</type>
     </dependency>
   </dependencies>
 
