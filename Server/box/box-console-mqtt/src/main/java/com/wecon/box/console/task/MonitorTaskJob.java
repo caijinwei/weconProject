@@ -123,10 +123,10 @@ public class MonitorTaskJob implements Job {
 //						
 //					}
 					System.out.println(
-							"redisPiBoxActData.getAct_time_data_list()==" + redisPiBoxActData.getAct_time_data_list());
-					System.out.println("redisPiBoxActData.getTime()=" + redisPiBoxActData.getTime());
+							"redisPiBoxActData.getAct_time_data_list()==" + redisPiBoxActData.act_time_data_list);
+					System.out.println("redisPiBoxActData.getTime()=" + redisPiBoxActData.time);
 					
-					System.out.println("redisPiBoxActData.getMachine_code()==" + redisPiBoxActData.getMachine_code());
+					System.out.println("redisPiBoxActData.getMachine_code()==" + redisPiBoxActData.machine_code);
 
 				}
 
