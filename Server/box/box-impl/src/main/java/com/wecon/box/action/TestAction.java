@@ -2,12 +2,11 @@ package com.wecon.box.action;
 
 import com.alibaba.fastjson.JSONObject;
 import com.sun.javafx.scene.control.skin.VirtualFlow;
-import com.wecon.box.api.ItemsApi;
 import com.wecon.box.api.RedisPiBoxApi;
-import com.wecon.box.entity.Items;
 import com.wecon.box.entity.PiBoxCom;
 import com.wecon.box.entity.PiBoxComAddr;
 import com.wecon.box.entity.RedisPiBoxActData;
+import com.wecon.box.param.StcOperateData;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.Output;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import org.springframework.context.annotation.Description;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by zengzp on 2017/7/18.
@@ -22,8 +22,6 @@ import java.util.ArrayList;
 @RestController
 @RequestMapping("testact")
 public class TestAction {
-    @Autowired
-    private ItemsApi itemsApi;
 
     @Autowired
     private RedisPiBoxApi redisPiBoxApi;
@@ -50,11 +48,18 @@ public class TestAction {
         JSONObject data = new JSONObject();
         data.put("d1", 123);
         data.put("d2", 0);
-        Items it = new Items();
-        it.setId(100);
-        data.put("items", it);
         data.put("reids", redisPiBoxApi.getRedisPiBoxActData("1000"));
 
+        return new Output(data);
+    }
+
+    @Description("向盒子发送消息")
+    @RequestMapping(value = "/sendboxmsg")
+    @WebApi(forceAuth = false, master = true)
+    public Output sendBoxMsgTest() {
+        List<PiBoxCom> operate_data_list = new ArrayList<PiBoxCom>();
+
+        JSONObject data = new JSONObject();
         return new Output(data);
     }
 
