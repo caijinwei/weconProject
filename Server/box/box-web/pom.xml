@@ -18,7 +18,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
-      <version>4.0.5.RELEASE</version>
+      <version>4.2.1.RELEASE</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -36,6 +36,30 @@
     </dependency>
   </dependencies>
 
+  <build>
+    <finalName>box-web</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.1.1</version>
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+          <webResources>
+            <webResource>
+              <directory>src/main/webapp/WEB-INF</directory>
+              <includes>
+                <include>web.xml</include>
+              </includes>
+              <filtering>true</filtering>
+              <targetPath>WEB-INF</targetPath>
+            </webResource>
+          </webResources>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
   <profiles>
     <profile>
       <id>test</id>
@@ -46,32 +70,8 @@
         </property>
       </activation>
       <properties>
-        <env>test</env>
-        <apphost>192.168.29.186:8484</apphost>
+        <mvn.env>test</mvn.env>
       </properties>
-      <build>
-        <finalName>box-web</finalName>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
-            <version>2.1.1</version>
-            <configuration>
-              <failOnMissingWebXml>false</failOnMissingWebXml>
-              <webResources>
-                <webResource>
-                  <directory>src/main/webapp/WEB-INF</directory>
-                  <includes>
-                    <include>web.xml</include>
-                  </includes>
-                  <filtering>true</filtering>
-                  <targetPath>WEB-INF</targetPath>
-                </webResource>
-              </webResources>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
     <profile>
       <id>server</id>
@@ -82,32 +82,8 @@
         </property>
       </activation>
       <properties>
-        <env>server</env>
-        <apphost>localhost:8080</apphost>
+        <mvn.env>server</mvn.env>
       </properties>
-      <build>
-        <finalName>box-web</finalName>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
-            <version>2.1.1</version>
-            <configuration>
-              <failOnMissingWebXml>false</failOnMissingWebXml>
-              <webResources>
-                <webResource>
-                  <directory>src/main/webapp/WEB-INF</directory>
-                  <includes>
-                    <include>web.xml</include>
-                  </includes>
-                  <filtering>true</filtering>
-                  <targetPath>WEB-INF</targetPath>
-                </webResource>
-              </webResources>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
     <profile>
       <id>product</id>
@@ -118,35 +94,10 @@
         </property>
       </activation>
       <properties>
-        <env>product</env>
-        <apphost>box.wecon.com</apphost>
+        <mvn.env>product</mvn.env>
       </properties>
-      <build>
-        <finalName>box-web</finalName>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
-            <version>2.1.1</version>
-            <configuration>
-              <failOnMissingWebXml>false</failOnMissingWebXml>
-              <webResources>
-                <webResource>
-                  <directory>src/main/webapp/WEB-INF</directory>
-                  <includes>
-                    <include>web.xml</include>
-                  </includes>
-                  <filtering>true</filtering>
-                  <targetPath>WEB-INF</targetPath>
-                </webResource>
-              </webResources>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
   </profiles>
-
 
 
 </project>
