@@ -17,9 +17,15 @@ import org.eclipse.jetty.webapp.WebAppContext;
  */
 public class JettyFactory {
 
+<<<<<<< HEAD
     private static final String DEFAULT_WEBAPP_PATH = "E:/weconproject/PIBox/Server/box/box-web/src/main/webapp";//src/main/webapp
     //private static final String WINDOWS_WEBDEFAULT_PATH = "jetty/webdefault-windows.xml";
     private static final String WINDOWS_WEBDEFAULT_PATH = "E:/weconproject/PIBox/Server/box/box-web/src/main/webapp/WEB-INF/web-test.xml";//src/main/webapp/WEB-INF/web-test.xml
+=======
+    private static final String DEFAULT_WEBAPP_PATH = "E:/PIBox/Server/box/box-web/src/main/webapp";//src/main/webapp
+    //private static final String WINDOWS_WEBDEFAULT_PATH = "jetty/webdefault-windows.xml";
+    private static final String WINDOWS_WEBDEFAULT_PATH = "E:/PIBox/Server/box/box-web/src/main/webapp/WEB-INF/web-test.xml";//src/main/webapp/WEB-INF/web-test.xml
+>>>>>>> cf51b9ff1e3a859f1ec8ef20aef177a3efd76a3f
 
     /**
      * 创建用于开发运行调试的Jetty Server, 以src/main/webapp为Web应用目录.

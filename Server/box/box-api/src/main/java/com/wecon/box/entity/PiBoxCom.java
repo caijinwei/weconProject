@@ -9,4 +9,5 @@ import java.util.List;
 public class PiBoxCom {
     public String com;
     public List<PiBoxComAddr> addr_list;
+    
 }
