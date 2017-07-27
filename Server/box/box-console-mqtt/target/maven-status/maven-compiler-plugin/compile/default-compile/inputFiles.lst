@@ -1,6 +1,9 @@
-E:\PIBox\Server\box\box-console-mqtt\src\main\java\com\wecon\box\console\task\PublishTask.java
+E:\PIBox\Server\box\box-console-mqtt\src\main\java\com\wecon\box\console\config\ConnectOptions.java
+E:\PIBox\Server\box\box-console-mqtt\src\main\java\com\wecon\box\console\task\MonitorTaskJob.java
+E:\PIBox\Server\box\box-console-mqtt\src\main\java\com\wecon\box\console\task\StartTimeTask.java
 E:\PIBox\Server\box\box-console-mqtt\src\main\java\com\wecon\box\console\task\SubscribeTask.java
+E:\PIBox\Server\box\box-console-mqtt\src\main\java\com\wecon\box\console\task\TestTask.java
+E:\PIBox\Server\box\box-console-mqtt\src\main\java\com\wecon\box\console\task\PublishTask.java
 E:\PIBox\Server\box\box-console-mqtt\src\main\java\com\wecon\box\console\util\MqttConfigContext.java
 E:\PIBox\Server\box\box-console-mqtt\src\main\java\com\wecon\box\console\config\MqttConfig.java
-E:\PIBox\Server\box\box-console-mqtt\src\main\java\com\wecon\box\console\main\Program.java
-E:\PIBox\Server\box\box-console-mqtt\src\main\java\com\wecon\box\console\task\TestTask.java
+E:\PIBox\Server\box\box-console-mqtt\src\main\java\com\wecon\box\console\main\MqttManager.java
