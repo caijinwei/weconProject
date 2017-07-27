@@ -56,12 +56,14 @@ public class TestAction {
     @Description("向盒子发送消息")
     @RequestMapping(value = "/sendboxmsg")
     @WebApi(forceAuth = false, master = true)
-    public Output sendBoxMsgTest() {
+    public Output sendBoxMsgTest(@RequestParam("machine_code") String machine_code) {
         List<PiBoxCom> operate_data_list = new ArrayList<PiBoxCom>();
 
         JSONObject data = new JSONObject();
         return new Output(data);
     }
+
+
 
 
 }
