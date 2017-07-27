@@ -3,7 +3,6 @@ package com.wecon.box.console.main;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 /**
  * Created by zengzhipeng on 2017/7/25.
  */
@@ -19,9 +18,10 @@ public class MqttManager {
 		logger.info("run profile:" + profile);
 		System.setProperty("spring.profiles.active", profile);
 		ApplicationContext applicationContext = new ClassPathXmlApplicationContext("spring.xml");
+//		RedisPiBoxApi redisPiBoxApi = applicationContext.getBean(RedisPiBoxApi.class);
 		/*
 		 * TestTask taskTest = new TestTask(); taskTest.start();
-		 */
+		 */ 
 	}
 
 }

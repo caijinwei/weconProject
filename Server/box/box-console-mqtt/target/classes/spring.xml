@@ -13,6 +13,34 @@
 	<context:component-scan base-package="com.wecon.box" />
 	<context:component-scan base-package="com.wecon.restful" />
 
+	<!-- 框架配置 -->
+	<bean id="config" class="com.wecon.restful.core.Config">
+		<property name="signKey" value="5cee621329f24e5cbdc43daa959ce9a1" />
+	</bean>
+	<bean id="authority" class="com.wecon.restful.authotiry.RightsHelper">
+		<property name="sysMap">
+			<map key-type="java.lang.Integer">
+				<entry key="12" value="ad803a8a-1cf2-46d1-ae0d-90fde8239885" />
+			</map>
+		</property>
+	</bean>
+
+	<!-- redis集群配置 -->
+	<bean id="pibox-redis" class="com.wecon.common.redis.RedisConfig">
+		<property name="host" value="${redisconnect.host}" />
+		<property name="port" value="${redisconnect.port}" />
+	</bean>
+	<bean id="redis-cluster" class="com.wecon.common.redis.RedisManager">
+		<property name="redisConfig">
+			<map key-type="java.lang.String">
+				<entry key="pibox" value-ref="pibox-redis" />
+			</map>
+		</property>
+	</bean>
+
+	<!-- 启动定时任务 -->
+	<bean id="monitorTask" class="com.wecon.box.console.task.StartTimeTask"
+		init-method="init" />
 	<!--mqtt配置 -->
 	<bean id="mqttConfig" class="com.wecon.box.console.config.MqttConfig">
 		<property name="host" value="${host}" />
@@ -23,31 +51,7 @@
 		<property name="mqttConfig" ref="mqttConfig" />
 	</bean>
 
-	<!-- 框架配置 -->
-	<bean id="config" class="com.wecon.restful.core.Config">
-		<property name="signKey" value="5cee621329f24e5cbdc43daa995ce9a1" />
-	</bean>
 
-	<!-- redis集群配置 -->
-	<bean id="session-redis" class="com.wecon.common.redis.RedisConfig">
-		<property name="host" value="${redisconnect.host}" />
-		<property name="port" value="${redisconnect.port}" />
-	</bean>
-	<bean id="news-redis" class="com.wecon.common.redis.RedisConfig">
-		<property name="host" value="${newsredisconnect.host}" />
-		<property name="port" value="${newsredisconnect.port}" />
-	</bean>
-	<bean id="redis-cluster" class="com.wecon.common.redis.RedisManager">
-		<property name="redisConfig">
-			<map key-type="java.lang.String">
-				<entry key="session" value-ref="session-redis" />
-				<entry key="news" value-ref="news-redis" />
-			</map>
-		</property>
-	</bean>
-	<!-- 启动定时任务 -->
-	<bean id="monitorTask" class="com.wecon.box.console.task.StartTimeTask"
-		init-method="init" />
 	<!-- 数据源定义 -->
 	<bean id="ds-master" class="org.apache.commons.dbcp.BasicDataSource">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
@@ -55,7 +59,26 @@
 		<property name="username" value="${datasource.master.user}" />
 		<property name="password" value="${datasource.master.passwd}" />
 	</bean>
+	<bean id="ds-slave1" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="${datasource.slave.url}" />
+		<property name="username" value="${datasource.slave.user}" />
+		<property name="password" value="${datasource.slave.passwd}" />
+	</bean>
 
+	<bean id="dataSourceSpider"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="${datasource.spider.url}" />
+		<property name="username" value="${datasource.spider.user}" />
+		<property name="password" value="${datasource.spider.passwd}" />
+	</bean>
+
+	<!-- <bean id="dataSource" class="com.felink.restful.core.RoutingDatasource"> 
+		<property name="targetDataSources"> <map key-type="java.lang.String"> <entry 
+		key="master" value-ref="ds-master" /> <entry key="slave1" value-ref="ds-slave1" 
+		/> </map> </property> <property name="defaultTargetDataSource" ref="ds-master" 
+		/> </bean> -->
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
@@ -63,6 +86,7 @@
 		<property name="username" value="${datasource.master.user}" />
 		<property name="password" value="${datasource.master.passwd}" />
 	</bean>
+
 	<!-- jdbc注入 -->
 	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<property name="dataSource">
@@ -73,6 +97,13 @@
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource">
 			<ref bean="dataSource" />
+		</property>
+	</bean>
+
+	<!-- jdbc注入 -->
+	<bean id="jdbcTemplateSpider" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource">
+			<ref bean="dataSourceSpider" />
 		</property>
 	</bean>
 
@@ -99,15 +130,11 @@
 	</mvc:annotation-driven>
 
 	<!-- 环境配置 -->
-	<!-- 正式 -->
-	<beans profile="product">
-		<context:property-placeholder location="classpath*:spring-product.properties" />
-	</beans>
-	<!-- 外测 -->
+	<!-- 内测 -->
 	<beans profile="server">
 		<context:property-placeholder location="classpath*:spring-server.properties" />
 	</beans>
-	<!-- 内测 -->
+	<!-- 外测 -->
 	<beans profile="test">
 		<context:property-placeholder location="classpath*:spring-test.properties" />
 	</beans>

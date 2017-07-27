@@ -4,17 +4,12 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
 	version="3.0">
 
-<<<<<<< HEAD
+
 	<listener>
 		<listener-class>com.wecon.restful.core.RestfulContextListener</listener-class>
-		
+
 	</listener>
-=======
-    <listener>
-        <!--<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>-->
-        <listener-class>com.wecon.restful.core.RestfulContextListener</listener-class>
-    </listener>
->>>>>>> 45379cb59a4f9b3dcbe21d0c83a870ca7875658f
+
 
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
