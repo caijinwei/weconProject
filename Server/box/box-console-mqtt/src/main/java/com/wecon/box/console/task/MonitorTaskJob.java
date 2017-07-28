@@ -63,7 +63,7 @@ public class MonitorTaskJob implements Job {
 
 
             // 订阅盒子的所有发送主题
-            client.subscribe("pibox/cts/1870011603240285dd4dc845fb4");//("pibox/cts/#");
+            client.subscribe("pibox/cts/#");//("pibox/cts/1870011603240285dd4dc845fb4");//
             client.setCallback(new MqttCallback() {
 
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
