@@ -18,9 +18,9 @@ import org.eclipse.jetty.webapp.WebAppContext;
 public class JettyFactory {
 
 
-    private static final String DEFAULT_WEBAPP_PATH = "E:/weconproject/PIBox/Server/box/box-web/src/main/webapp";//src/main/webapp
+    private static final String DEFAULT_WEBAPP_PATH = "E:/Site/gitSite/PIBox/Server/box/box-web/src/main/webapp";//src/main/webapp
     //private static final String WINDOWS_WEBDEFAULT_PATH = "jetty/webdefault-windows.xml";
-    private static final String WINDOWS_WEBDEFAULT_PATH = "E:/weconproject/PIBox/Server/box/box-web/src/main/webapp/WEB-INF/web-test.xml";//src/main/webapp/WEB-INF/web-test.xml
+    private static final String WINDOWS_WEBDEFAULT_PATH = "E:/Site/gitSite/PIBox/Server/box/box-web/src/main/webapp/WEB-INF/web-test.xml";//src/main/webapp/WEB-INF/web-test.xml
 
 
     /**
