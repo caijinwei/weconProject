@@ -15,6 +15,7 @@
                                     {
                                         Usercenter: "http://${apphost}/usercenter-web/api/",
                                         WeconBox: "http://localhost:8080/wecon-box/api/"
+                                        //WeconBox: "http://192.168.29.186:8686/box-web/api/"
                                     },
                             api:
                                     {

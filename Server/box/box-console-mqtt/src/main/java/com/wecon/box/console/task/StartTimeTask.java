@@ -27,7 +27,7 @@ public class StartTimeTask {
 				try {
 		        	//延迟5秒
 					Thread.sleep(5000);
-					System.out.println("qqqqqqqqqq");
+//					System.out.println("qqqqqqqqqq");
 					//任务管理
 //					String sw=SystemConfig.getProperty("switch",null,"sw");
 //					if("1".equals(sw)){
