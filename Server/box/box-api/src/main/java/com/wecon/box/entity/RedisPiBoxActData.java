@@ -10,6 +10,4 @@ public class RedisPiBoxActData {
 	public String time;
 	public List<PiBoxCom> act_time_data_list;
 
-
-
 }

@@ -27,12 +27,13 @@ public class StartTimeTask {
 				try {
 		        	//延迟5秒
 					Thread.sleep(5000);
+//					System.out.println("qqqqqqqqqq");
 					//任务管理
 //					String sw=SystemConfig.getProperty("switch",null,"sw");
 //					if("1".equals(sw)){
 						//实时监控是否连接上mqtt代理服务器
 						Scheduler scheduler=QuartzManage.getScheduler();
-						Trigger trigger=TimeTriggerUtil.getTrigger(MQTT_JOB,"1",5);
+						Trigger trigger=TimeTriggerUtil.getTrigger(MQTT_JOB,"2",10);
 						QuartzManage.createJob(scheduler, trigger, MQTT_JOB,null,null,MonitorTaskJob.class);
 						
 //					}
