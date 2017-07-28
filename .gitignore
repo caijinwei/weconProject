@@ -28,27 +28,35 @@ Server/box/.gradle/
 Server/box/.idea/
 Server/box/build/
 Server/box/log/
+Server/box/box-api/.settings/
 Server/box/box-api/build/
 Server/box/box-api/target/
 
+Server/box/box-context/.settings/
 Server/box/box-context/build/
 Server/box/box-context/target/
 
+Server/box/box-console-mqtt/.settings/
 Server/box/box-console-mqtt/build/
 Server/box/box-console-mqtt/target/
 
+Server/box/box-impl/.settings/
 Server/box/box-impl/build/
 Server/box/box-impl/target/
 
+Server/box/box-test/.settings/
 Server/box/box-test/build/
 Server/box/box-test/target/
 
+Server/box/box-web/.settings/
 Server/box/box-web/build/
 Server/box/box-web/target/
 
+Server/common-util/.settings/
 Server/common-util/.idea/
 Server/common-util/build/
 Server/common-util/target/
+Server/restful-core/.settings/
 Server/restful-core/.idea/
 Server/restful-core/build/
 Server/restful-core/target/
