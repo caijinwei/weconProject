@@ -97,7 +97,7 @@ public class TestAction {
     * */
     @Description("mosquito消息的推送测试")
     @RequestMapping(value="/putMess")
-    public Output putMQTTMess(@RequestParam("machine_code")String machine_code,@RequestParam("com")String com,@RequestParam("addr")String addr,@RequestParam("value")String value) throws MqttException {
+    public Output putMQTTMess(@RequestParam("machine_code")String machine_code,@RequestParam("com")String com,@RequestParam("addr")String addr,@RequestParam("value")String value,@RequestParam("addr_id")String addr_id) throws MqttException {
         ServerMqtt server = new ServerMqtt();
         server.message = new MqttMessage();
         server.message.setQos(1);
@@ -124,7 +124,7 @@ public class TestAction {
         String message=jsonObject.toJSONString();
         System.out.println(message);
         server.message.setPayload((message).getBytes());
-        server.topic11 = server.client.getTopic("pibox/stc"+machine_code);
+        server.topic11 = server.client.getTopic("pibox/stc/"+machine_code);
 
         server.publish(server.topic11 , server.message);
         System.out.println(server.message.isRetained() + "------ratained状态");

@@ -81,6 +81,7 @@ public class ServerMqtt {
         server.message.setPayload("hello,topic11".getBytes());
         server.topic11 = server.client.getTopic("pibox");
         server.publish(server.topic11 , server.message);
-        System.out.println(server.message.isRetained() + "------ratained状态");
+
+        server.client.close();
     }
 }
