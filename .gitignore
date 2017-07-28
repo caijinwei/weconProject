@@ -20,6 +20,8 @@
 
 # IDE file
 *.iml
+*.project
+*.classpath
 
 #folder
 Server/box/.gradle/
