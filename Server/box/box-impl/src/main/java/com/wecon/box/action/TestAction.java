@@ -124,7 +124,7 @@ public class TestAction {
         String message=jsonObject.toJSONString();
         System.out.println(message);
         server.message.setPayload((message).getBytes());
-        server.topic11 = server.client.getTopic("pibox/stc"+machine_code);
+        server.topic11 = server.client.getTopic("pibox/stc/"+machine_code);
 
         server.publish(server.topic11 , server.message);
         System.out.println(server.message.isRetained() + "------ratained状态");
