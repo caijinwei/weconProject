@@ -11,12 +11,12 @@ public class MqttManager {
 	
 
 	public static void main(String[] args) throws InterruptedException {
-		String profile = "test";
-		if (args.length > 0) {
-			profile = args[0];
-		}
-		logger.info("run profile:" + profile);
-		System.setProperty("spring.profiles.active", profile);
+//		String profile = "dev";
+//		if (args.length > 0) {
+//			profile = args[0];
+//		}
+//		logger.info("run profile:" + profile);
+//		System.setProperty("spring.profiles.active", profile);
 		ApplicationContext applicationContext = new ClassPathXmlApplicationContext("spring.xml");
 //		RedisPiBoxApi redisPiBoxApi = applicationContext.getBean(RedisPiBoxApi.class);
 		/*
