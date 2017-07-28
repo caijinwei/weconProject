@@ -4,6 +4,8 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         $scope.act_submit();
     }
 
+    var t;
+
     /**
      * 提交接口请求
      */
@@ -15,11 +17,19 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 
         T.common.ajax.request("WeconBox", "testact/getActDate", params, function (data, code, msg) {
             if (code == 200) {
+                if (data.piBoxActDateMode == null) {
+                    alert("查不到此机器码数据");
+                    $scope.actDatas = null;
+                    $scope.act_time_data_list = null;
+                    $scope.addr_list = null;
+                    $scope.$apply();
+                    return;
+                }
                 $scope.actDatas = data.piBoxActDateMode;
                 $scope.act_time_data_list = data.piBoxActDateMode.act_time_data_list;
                 $scope.addr_list = data.piBoxActDateMode.act_time_data_list.addr_list;
                 $scope.$apply();
-                setTimeout(act_submit, 1000);
+                t = setTimeout(act_submit, 3000);
             }
             else {
 
@@ -28,6 +38,10 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         }, function () {
             alert("ajax error");
         });
+    }
+
+    $scope.mc_change = function () {
+        clearTimeout(t);
     }
 
     $scope.putMess = function () {

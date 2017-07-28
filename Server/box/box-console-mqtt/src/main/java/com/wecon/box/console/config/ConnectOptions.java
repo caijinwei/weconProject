@@ -1,16 +1,12 @@
 package com.wecon.box.console.config;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class ConnectOptions {
-//	public static ApplicationContext applicationContext;
 	public static MqttConnectOptions options = null;
 
 	public static MqttConnectOptions getConnectOptions(String username, String password) {
 		try {
-//			applicationContext = new ClassPathXmlApplicationContext("spring.xml");
 			// MQTT的连接设置
 			options = new MqttConnectOptions();
 			// 设置是否清空session,这里如果设置为false表示服务器会保留客户端的连接记录，这里设置为true表示每次连接到服务器都以新的身份连接

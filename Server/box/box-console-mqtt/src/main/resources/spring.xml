@@ -37,7 +37,9 @@
 			</map>
 		</property>
 	</bean>
-
+	<!-- 注放ApplicationContext实例 -->
+	<bean id="springContextHolder" class="com.wecon.box.console.util.SpringContextHolder"
+		lazy-init="false" />
 	<!-- 启动定时任务 -->
 	<bean id="monitorTask" class="com.wecon.box.console.task.StartTimeTask"
 		init-method="init" />
