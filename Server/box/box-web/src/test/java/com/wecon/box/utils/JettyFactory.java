@@ -17,61 +17,55 @@ import org.eclipse.jetty.webapp.WebAppContext;
  */
 public class JettyFactory {
 
-<<<<<<< HEAD
-    private static final String DEFAULT_WEBAPP_PATH = "E:/weconproject/PIBox/Server/box/box-web/src/main/webapp";//src/main/webapp
-    //private static final String WINDOWS_WEBDEFAULT_PATH = "jetty/webdefault-windows.xml";
-    private static final String WINDOWS_WEBDEFAULT_PATH = "E:/weconproject/PIBox/Server/box/box-web/src/main/webapp/WEB-INF/web-test.xml";//src/main/webapp/WEB-INF/web-test.xml
-=======
-    private static final String DEFAULT_WEBAPP_PATH = "E:/PIBox/Server/box/box-web/src/main/webapp";//src/main/webapp
-    //private static final String WINDOWS_WEBDEFAULT_PATH = "jetty/webdefault-windows.xml";
-    private static final String WINDOWS_WEBDEFAULT_PATH = "E:/PIBox/Server/box/box-web/src/main/webapp/WEB-INF/web-test.xml";//src/main/webapp/WEB-INF/web-test.xml
->>>>>>> cf51b9ff1e3a859f1ec8ef20aef177a3efd76a3f
+	private static final String DEFAULT_WEBAPP_PATH = "E:/PIBox/Server/box/box-web/src/main/webapp";// src/main/webapp
+	// private static final String WINDOWS_WEBDEFAULT_PATH =
+	// "jetty/webdefault-windows.xml";
+	private static final String WINDOWS_WEBDEFAULT_PATH = "E:/PIBox/Server/box/box-web/src/main/webapp/WEB-INF/web-test.xml";// src/main/webapp/WEB-INF/web-test.xml
 
-    /**
-     * 创建用于开发运行调试的Jetty Server, 以src/main/webapp为Web应用目录.
-     */
-    public static Server createServerInSource(int port, String contextPath) {
-        Server server = new Server();
-        // 设置在JVM退出时关闭Jetty的钩子。
-        server.setStopAtShutdown(true);
+	/**
+	 * 创建用于开发运行调试的Jetty Server, 以src/main/webapp为Web应用目录.
+	 */
+	public static Server createServerInSource(int port, String contextPath) {
+		Server server = new Server();
+		// 设置在JVM退出时关闭Jetty的钩子。
+		server.setStopAtShutdown(true);
 
+		// SelectChannelConnector connector = new SelectChannelConnector();
+		HttpConfiguration config = new HttpConfiguration();
+		ServerConnector connector = new ServerConnector(server, new HttpConnectionFactory(config));
+		connector.setReuseAddress(true);
+		connector.setIdleTimeout(30000);
 
-//		SelectChannelConnector connector = new SelectChannelConnector();
-        HttpConfiguration config = new HttpConfiguration();
-        ServerConnector connector = new ServerConnector(server, new HttpConnectionFactory(config));
-        connector.setReuseAddress(true);
-        connector.setIdleTimeout(30000);
+		connector.setPort(port);
+		// 解决Windows下重复启动Jetty居然不报告端口冲突的问题.
+		connector.setReuseAddress(false);
+		server.setConnectors(new Connector[] { connector });
 
-        connector.setPort(port);
-        // 解决Windows下重复启动Jetty居然不报告端口冲突的问题.
-        connector.setReuseAddress(false);
-        server.setConnectors(new Connector[]{connector});
+		WebAppContext webContext = new WebAppContext(DEFAULT_WEBAPP_PATH, contextPath);
+		// 修改webdefault.xml，解决Windows下Jetty Lock住静态文件的问题.
+		// webContext.setDefaultsDescriptor(WINDOWS_WEBDEFAULT_PATH);
+		webContext.setDescriptor(WINDOWS_WEBDEFAULT_PATH);
+		server.setHandler(webContext);
 
-        WebAppContext webContext = new WebAppContext(DEFAULT_WEBAPP_PATH, contextPath);
-        // 修改webdefault.xml，解决Windows下Jetty Lock住静态文件的问题.
-//		webContext.setDefaultsDescriptor(WINDOWS_WEBDEFAULT_PATH);
-        webContext.setDescriptor(WINDOWS_WEBDEFAULT_PATH);
-        server.setHandler(webContext);
+		return server;
+	}
 
-        return server;
-    }
+	/**
+	 * 快速重新启动application，重载target/classes与target/test-classes.
+	 */
+	public static void reloadContext(Server server) throws Exception {
+		WebAppContext context = (WebAppContext) server.getHandler();
 
-    /**
-     * 快速重新启动application，重载target/classes与target/test-classes.
-     */
-    public static void reloadContext(Server server) throws Exception {
-        WebAppContext context = (WebAppContext) server.getHandler();
+		System.out.println("[INFO] Application reloading");
+		context.stop();
 
-        System.out.println("[INFO] Application reloading");
-        context.stop();
+		WebAppClassLoader classLoader = new WebAppClassLoader(context);
+		classLoader.addClassPath("build/classes/main");
+		classLoader.addClassPath("build/classes/test");
+		context.setClassLoader(classLoader);
 
-        WebAppClassLoader classLoader = new WebAppClassLoader(context);
-        classLoader.addClassPath("build/classes/main");
-        classLoader.addClassPath("build/classes/test");
-        context.setClassLoader(classLoader);
+		context.start();
 
-        context.start();
-
-        System.out.println("[INFO] Application reloaded");
-    }
+		System.out.println("[INFO] Application reloaded");
+	}
 }
