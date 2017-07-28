@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/box.iml" filepath="$PROJECT_DIR$/box.iml" />
+      <module fileurl="file://$PROJECT_DIR$/box-api/box-api.iml" filepath="$PROJECT_DIR$/box-api/box-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/box-console-mqtt/box-console-mqtt.iml" filepath="$PROJECT_DIR$/box-console-mqtt/box-console-mqtt.iml" />
+      <module fileurl="file://$PROJECT_DIR$/box-context/box-context.iml" filepath="$PROJECT_DIR$/box-context/box-context.iml" />
+      <module fileurl="file://$PROJECT_DIR$/box-impl/box-impl.iml" filepath="$PROJECT_DIR$/box-impl/box-impl.iml" />
+      <module fileurl="file://$PROJECT_DIR$/box-test/box-test.iml" filepath="$PROJECT_DIR$/box-test/box-test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/box-web/box-web.iml" filepath="$PROJECT_DIR$/box-web/box-web.iml" />
+    </modules>
+  </component>
+</project>

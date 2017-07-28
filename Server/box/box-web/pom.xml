@@ -7,7 +7,39 @@
 	<artifactId>box-web</artifactId>
 	<version>1.0-SNAPSHOT</version>
 
+<<<<<<< HEAD
+  <packaging>war</packaging>
+  
+  <dependencies>
+    <dependency>
+      <groupId>com.wecon.box</groupId>
+      <artifactId>box-impl</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <version>4.2.1.RELEASE</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>1.9.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.aggregate</groupId>
+      <artifactId>jetty-all</artifactId>
+      <version>9.4.6.v20170531</version>
+      <type>pom</type>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+=======
 	<packaging>war</packaging>
+>>>>>>> cf51b9ff1e3a859f1ec8ef20aef177a3efd76a3f
 
 	<dependencies>
 		<dependency>

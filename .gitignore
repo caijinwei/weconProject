@@ -22,6 +22,7 @@
 *.iml
 
 #folder
+Server/cai/
 Server/box/.gradle/
 Server/box/.idea/
 Server/box/build/
