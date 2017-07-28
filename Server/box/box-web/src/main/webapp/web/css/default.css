@@ -287,3 +287,11 @@ p {
 .img-selected {
     box-shadow: 0 0 0 5px #00b7ee;
 }
+
+.table>tbody>tr>td
+{
+    padding: 8px;
+    line-height: 1.42857143;
+    vertical-align: middle;
+    border-top: 1px solid #ddd;
+}

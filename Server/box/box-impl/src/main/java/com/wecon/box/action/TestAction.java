@@ -97,7 +97,7 @@ public class TestAction {
     * */
     @Description("mosquito消息的推送测试")
     @RequestMapping(value="/putMess")
-    public Output putMQTTMess(@RequestParam("machine_code")String machine_code,@RequestParam("com")String com,@RequestParam("addr")String addr,@RequestParam("value")String value) throws MqttException {
+    public Output putMQTTMess(@RequestParam("machine_code")String machine_code,@RequestParam("com")String com,@RequestParam("addr")String addr,@RequestParam("value")String value,@RequestParam("addr_id")String addr_id) throws MqttException {
         ServerMqtt server = new ServerMqtt();
         server.message = new MqttMessage();
         server.message.setQos(1);
