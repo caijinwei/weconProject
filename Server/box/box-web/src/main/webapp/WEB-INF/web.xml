@@ -15,7 +15,7 @@
     </context-param>
     <context-param>
         <param-name>spring.profiles.active</param-name>
-        <param-value>>${mvn.env}</param-value>
+        <param-value>${mvn.env}</param-value>
     </context-param>
 
     <servlet>
