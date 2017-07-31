@@ -128,6 +128,7 @@ public class TestAction {
 
         server.publish(server.topic11 , server.message);
         System.out.println(server.message.isRetained() + "------ratained状态");
+        server.client.disconnect();
         return new Output();
     }
 }
