@@ -61,6 +61,8 @@ Server/restful-core/.idea/
 Server/restful-core/build/
 Server/restful-core/target/
 
-
+#ignore file 
+Server/box/box-web/src/test/java/com/wecon/box/utils/JettyFactory.java
+Server/box/box-web/src/main/webapp/web/lib/wecon-common.js
 
 
