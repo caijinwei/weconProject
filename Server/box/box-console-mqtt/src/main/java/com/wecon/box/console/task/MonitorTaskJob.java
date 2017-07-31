@@ -17,7 +17,6 @@ import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
@@ -47,12 +46,13 @@ public class MonitorTaskJob implements Job {
 	 * @param job
 	 */
 	public void execute(JobExecutionContext job) throws JobExecutionException {
+
 		try {
-			
 			if (client != null && client.isConnected()) {
 				System.out.println("The connection server is normal !");
 				return;
 			}
+
 			MqttConnectOptions options = ConnectOptions.getConnectOptions(MqttConfigContext.mqttConfig.getUsername(),
 					MqttConfigContext.mqttConfig.getPassword());
 			System.out.println("to connect mqtt......");
@@ -90,10 +90,17 @@ public class MonitorTaskJob implements Job {
 		String[] idexs = topic.split("/");
 		// 如果未获取到主题直接返回
 		if (null == idexs || idexs.length < 1) {
+			System.out.println("主题为空！");
 			return;
 		}
-		String boxMsg = new String(message.getPayload()).trim();
+		if (message.getPayload().length<1) {
+			System.out.println("消息为空！");
+			return;
+		}
+		String boxMsg = "";
 		try {
+
+			boxMsg = new String(message.getPayload(), "UTF-8").trim();
 			JSONObject jsonObject = JSONObject.parseObject(boxMsg);
 			System.out.println("jsonObject=" + jsonObject);
 			String machineCode = jsonObject.getString("machine_code");
