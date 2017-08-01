@@ -18,10 +18,15 @@ public class MqttManager {
 		logger.info("run profile:" + profile);
 		System.setProperty("spring.profiles.active", profile);
 		ApplicationContext applicationContext = new ClassPathXmlApplicationContext("spring.xml");
-//		RedisPiBoxApi redisPiBoxApi = applicationContext.getBean(RedisPiBoxApi.class);
+//		GetPublishClient getPublishClient=applicationContext.getBean(GetPublishClient.class);
+//		MqttClient client=getPublishClient.conMqtt();
+//		System.out.println(client);
+		
+		// RedisPiBoxApi redisPiBoxApi =
+		// applicationContext.getBean(RedisPiBoxApi.class);
 		/*
 		 * TestTask taskTest = new TestTask(); taskTest.start();
-		 */ 
+		 */
 	}
 
 }

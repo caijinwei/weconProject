@@ -34,7 +34,7 @@ import com.wecon.box.entity.RedisPiBoxActData;
 //import net.sf.json.JSONObject;
 
 public class MonitorTaskJob implements Job {
-	private static MqttClient client;
+	public static MqttClient client;
 	private final int BASE_DATA = 1000;
 	private final int REAL_DATA = 1001;
 	private final int HISTORY_DATA = 1002;
@@ -56,7 +56,7 @@ public class MonitorTaskJob implements Job {
 			MqttConnectOptions options = ConnectOptions.getConnectOptions(MqttConfigContext.mqttConfig.getUsername(),
 					MqttConfigContext.mqttConfig.getPassword());
 			System.out.println("to connect mqtt......");
-			client = new MqttClient(MqttConfigContext.mqttConfig.getHost(), "WeconSever!@#$%^&*",
+			client = new MqttClient(MqttConfigContext.mqttConfig.getHost(), "WECON_REVEIVE",
 					new MemoryPersistence());
 			client.connect(options);
 			// 订阅盒子的所有发送主题
@@ -79,6 +79,8 @@ public class MonitorTaskJob implements Job {
 
 		} catch (MqttException e) {
 			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 	}
@@ -93,7 +95,7 @@ public class MonitorTaskJob implements Job {
 			System.out.println("主题为空！");
 			return;
 		}
-		if (message.getPayload().length<1) {
+		if (message.getPayload().length < 1) {
 			System.out.println("消息为空！");
 			return;
 		}

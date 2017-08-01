@@ -31,7 +31,7 @@ public class StartTimeTask {
 					Scheduler scheduler = QuartzManage.getScheduler();
 					Trigger trigger = TimeTriggerUtil.getTrigger(MQTT_JOB, "2", 5);
 					QuartzManage.createJob(scheduler, trigger, MQTT_JOB, null, null, MonitorTaskJob.class);
-
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 					logger.error("启动定时任务失败，原因是：" + e.getMessage(), e);
