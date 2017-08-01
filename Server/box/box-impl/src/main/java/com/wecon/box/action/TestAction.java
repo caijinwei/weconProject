@@ -70,7 +70,7 @@ public class TestAction {
     * */
     @Description("根据获取的机器码向redis服务器请求数据")
     @RequestMapping(value = "/getActDate")
-    public Output getActDate(@RequestParam("machine_code")String machine_code){
+    public Output getActDate(@RequestParam("machine_code") String machine_code) {
         /*RedisPiBoxActData model = new RedisPiBoxActData();
         model.machine_code = "1001";
         model.time = "2017-07-26 10:20:11";
@@ -96,38 +96,41 @@ public class TestAction {
     *
     * */
     @Description("mosquito消息的推送测试")
-    @RequestMapping(value="/putMess")
-    public Output putMQTTMess(@RequestParam("machine_code")String machine_code,@RequestParam("com")String com,@RequestParam("addr")String addr,@RequestParam("value")String value,@RequestParam("addr_id")String addr_id) throws MqttException {
+    @RequestMapping(value = "/putMess")
+    public Output putMQTTMess(@RequestParam("machine_code") String machine_code, @RequestParam("com") String com, @RequestParam("addr") String addr, @RequestParam("value") String value, @RequestParam("addr_id") String addr_id) throws MqttException {
         ServerMqtt server = new ServerMqtt();
         server.message = new MqttMessage();
         server.message.setQos(1);
         server.message.setRetained(true);
 
-        PiBoxComAddr addr1=new PiBoxComAddr();
-        addr1.addr=addr;
-        addr1.addr_id=addr;
-        addr1.value=value;
+        PiBoxComAddr addr1 = new PiBoxComAddr();
+        addr1.addr = addr;
+        addr1.addr_id = addr;
+        addr1.value = value;
         List<PiBoxCom> operate_data_list = new ArrayList<PiBoxCom>();
-        PiBoxCom piBoxCom=new PiBoxCom();
-        List<PiBoxComAddr> piBoxComAddrs=new ArrayList<PiBoxComAddr>();
-        piBoxCom.com=com;
+        PiBoxCom piBoxCom = new PiBoxCom();
+        List<PiBoxComAddr> piBoxComAddrs = new ArrayList<PiBoxComAddr>();
+        piBoxCom.com = com;
         piBoxComAddrs.add(addr1);
-        piBoxCom.addr_list= piBoxComAddrs;
+        piBoxCom.addr_list = piBoxComAddrs;
         operate_data_list.add(piBoxCom);
 
 
-        JSONObject jsonObject =new JSONObject();
-        jsonObject.put("act",2000);
-        jsonObject.put("machine_code",machine_code);
-        jsonObject.put("data",operate_data_list);
-        jsonObject.put("feedback",0);
-        String message=jsonObject.toJSONString();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("act", 2000);
+        jsonObject.put("machine_code", machine_code);
+        JSONObject oplistObject = new JSONObject();
+        oplistObject.put("operate_data_list", operate_data_list);
+        jsonObject.put("data", oplistObject);
+        jsonObject.put("feedback", 0);
+        String message = jsonObject.toJSONString();
         System.out.println(message);
         server.message.setPayload((message).getBytes());
-        server.topic11 = server.client.getTopic("pibox/stc/"+machine_code);
+        server.topic11 = server.client.getTopic("pibox/stc/" + machine_code);
 
-        server.publish(server.topic11 , server.message);
+        server.publish(server.topic11, server.message);
         System.out.println(server.message.isRetained() + "------ratained状态");
+        server.client.disconnect();
         return new Output();
     }
 }

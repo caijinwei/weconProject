@@ -20,11 +20,6 @@
         }
     </style>
 
-    <script type="text/javascript">
-
-
-    </script>
-
 
 </head>
 <body ng-controller="infoController" ng-init="onInit()" ng-model="actDatas" ng-model="act_time_data_list"
@@ -60,11 +55,14 @@
                 </div>
             </div>
 
-            <table class="table table-bordered">
+
+
+            <table class="table table-bordered " >
                 <tr>
-                    <th class="col-md-3 text-center">机器码</th>
-                    <th class="col-md-3 text-center">采集时间</th>
+                    <th class="col-md-2 text-center">机器码</th>
+                    <th class="col-md-2 text-center">采集时间</th>
                     <th class="col-md-2 text-center">通讯口</th>
+                    <th class="col-md-2 text-center">地址序号</th>
                     <th class="col-md-2 text-center">地址</th>
                     <th class="col-md-2 text-center">值</th>
                 </tr>
@@ -73,18 +71,19 @@
                         {{actDatas.machine_code}}
                     </td>
                     <td> {{actDatas.time}}</td>
-                    <td colspan="3">
+                    <td colspan="4">
 
 
                         <!-- 这是后面嵌套第一层table-->
-                        <table class="table table-bordered" style="margin:0; padding:0;">
+                        <table class="table table-bordered " style="margin:0; padding:0; width:100%;height:100%">
                             <tr ng-repeat="x in act_time_data_list">
-                                <td class="col-md-4">{{x.com}}</td>
-                                <td class="col-md-8">
-                                    <table class="table table-bordered" style="margin:0; padding:0;">
+                                <td class="col-md-3">{{x.com}}</td>
+                                <td class="col-md-9">
+                                    <table class="table table-bordered " style="margin:0; padding:0;">
                                         <tr ng-repeat="y in x.addr_list">
-                                            <td class="col-md-6">{{y.addr}}</td>
-                                            <td class="col-md-6">{{y.value}}</td>
+                                            <td class="col-md-4">{{y.addr_id}}</td>
+                                            <td class="col-md-4">{{y.addr}}</td>
+                                            <td class="col-md-4">{{y.value}}</td>
                                         </tr>
                                     </table>
                                 </td>
@@ -124,6 +123,7 @@
                         <input type="text" class="form-control" id="addr_id"
                                placeholder="请地址序号">
                     </div>
+
                 </div>
                 <div class="form-group">
                     <label for="addr" class="col-sm-2 control-label">地址</label>

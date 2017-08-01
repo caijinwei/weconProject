@@ -51,23 +51,7 @@
         <property name="username" value="${datasource.slave.user}" />
         <property name="password" value="${datasource.slave.passwd}" />
     </bean>
-    
-    <bean id="dataSourceSpider" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-        <property name="url" value="${datasource.spider.url}"/>
-        <property name="username" value="${datasource.spider.user}"/>
-        <property name="password" value="${datasource.spider.passwd}"/>
-    </bean>
 
-    <!--    <bean id="dataSource" class="com.felink.restful.core.RoutingDatasource">
-        <property name="targetDataSources">
-            <map key-type="java.lang.String">
-                <entry key="master" value-ref="ds-master" />
-                <entry key="slave1" value-ref="ds-slave1" />
-            </map>
-        </property>
-        <property name="defaultTargetDataSource" ref="ds-master" />
-    </bean>-->
     <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
         <property name="url" value="${datasource.master.url}"/>
@@ -84,13 +68,6 @@
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource">
             <ref bean="dataSource" />
-        </property>
-    </bean>
-    
-    <!-- jdbc注入 -->
-    <bean id="jdbcTemplateSpider" class="org.springframework.jdbc.core.JdbcTemplate">
-        <property name="dataSource">
-            <ref bean="dataSourceSpider"/>
         </property>
     </bean>
 
