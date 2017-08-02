@@ -30,10 +30,15 @@
         <property name="host" value="${redisconnect.host}" />
         <property name="port" value="${redisconnect.port}" />
     </bean>
+    <bean id="session-redis" class="com.wecon.common.redis.RedisConfig">
+        <property name="host" value="${redisconnect.host}" />
+        <property name="port" value="${redisconnect.port}" />
+    </bean>
     <bean id="redis-cluster" class="com.wecon.common.redis.RedisManager">
         <property name="redisConfig">
             <map key-type="java.lang.String">
                 <entry key="pibox" value-ref="pibox-redis" />
+                <entry key="session" value-ref="session-redis" />
             </map>
         </property>
     </bean>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>维控盒子登录</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../../css/style.css" />
+    <link rel="stylesheet" href="../../lib/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="../../lib/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="form row">
+            <div class="col-md-4 col-xs-8 col-sm-6 col-md-offset-4 col-xs-offset-2 col-sm-offset-3 ">
+                <form>
+                    <div class="col-md-8 col-md-offset-2 col-xs-8 col-xs-offset-2 col-sm-8 col-sm-offset-2">
+                        <img src="../../image/wecon.png" class="wecon_logo img-responsive"/>
+                    </div>
+                    <div class="col-md-12 col-xs-12 col-sm-12">
+                        <div class="form-group">
+                            <i class="fa fa-user fa-lg icon"></i>
+                            <input type="text" class="form-control" placeholder="用户名/手机号/邮箱"/>
+                        </div>
+                        <div class="form-group">
+                            <i class="fa fa-lock fa-lg icon"></i>
+                            <input type="password" class="form-control" placeholder="密码"/>
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox" id="checkbox">
+                                <label>
+                                    <input type="checkbox" value="">
+                                    30天内记住登录状态
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="button"
+                                    class="btn btn-info btn-sm btn-block center-block"
+                                   id="login"
+                                   onclick="javascript:window.location.href='../main.html'"
+                                   value="登录 "/>
+                        </div>
+                        <hr />
+                        <a href="mailregister.html" id="register_btn" >注册</a>
+                        <a href="findpwd.html" id="findback_btn" class="befloat">忘记密码？</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="../../lib/jquery/jquery-3.2.1.min.js"></script>
+<script src="../../lib/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</html>

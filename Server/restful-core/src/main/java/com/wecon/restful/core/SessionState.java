@@ -9,7 +9,7 @@ public final class SessionState {
       com.google.protobuf.ExtensionRegistry registry) {
   }
   public interface UserInfoOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:com.felink.restful.core.UserInfo)
+      // @@protoc_insertion_point(interface_extends:com.wecon.restful.core.UserInfo)
       com.google.protobuf.MessageOrBuilder {
 
     /**
@@ -125,7 +125,7 @@ public final class SessionState {
         getAccountBytes();
   }
   /**
-   * Protobuf type {@code com.felink.restful.core.UserInfo}
+   * Protobuf type {@code com.wecon.restful.core.UserInfo}
    */
   public static final class UserInfo extends
       com.google.protobuf.GeneratedMessage implements
