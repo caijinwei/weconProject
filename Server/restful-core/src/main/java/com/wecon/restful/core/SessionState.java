@@ -125,7 +125,7 @@ public final class SessionState {
         getAccountBytes();
   }
   /**
-   * Protobuf type {@code com.felink.restful.core.UserInfo}
+   * Protobuf type {@code com.wecon.restful.core.UserInfo}
    */
   public static final class UserInfo extends
       com.google.protobuf.GeneratedMessage implements

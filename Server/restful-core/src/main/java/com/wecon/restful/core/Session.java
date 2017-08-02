@@ -139,7 +139,7 @@ public class Session {
      * 客户端认证
      *
      * @param client
-     * @param forceAuth
+     * @param api
      * @param skipSign
      * @param key
      * @throws IOException
