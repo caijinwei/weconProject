@@ -1,6 +1,5 @@
 package com.wecon.box.filter;
 
-import java.sql.Timestamp;
 
 /**
  * Created by zengzhipeng on 2017/8/1.

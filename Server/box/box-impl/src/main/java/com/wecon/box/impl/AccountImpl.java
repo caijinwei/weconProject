@@ -24,11 +24,11 @@ public class AccountImpl implements AccountApi {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    private final String SEL_COL = " ACCOUNT_ID,USERNAME,`PASSWORD`,PHONENUM,EMAIL,CREATE_DATE,`TYPE`,STATE,UPDATE_DATE ";
+    private final String SEL_COL = " account_id,username,`password`,phonenum,email,create_date,`type`,state,update_date ";
 
     @Override
     public long registerAccount(final Account model) {
-        String sql = "SELECT COUNT(1) FROM ACCOUNT WHERR USERNAME = ? OR EMAIL = ? OR PHONENUM = ?";
+        String sql = "select count(1) from account wherr username = ? or email = ? or phonenum = ?";
 
         int ret = jdbcTemplate.queryForObject(sql,
                 new Object[]{model.user_name, model.email, model.phone_num},
@@ -40,7 +40,7 @@ public class AccountImpl implements AccountApi {
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                PreparedStatement preState = con.prepareStatement("INSERT INTO ACCOUNT(USERNAME,`PASSWORD`,PHONENUM,EMAIL,CREATE_DATE,`TYPE`,STATE,UPDATE_DATE) VALUES (?,?,?,?,CURRENT_TIMESTAMP(),?,?,CURRENT_TIMESTAMP() );", Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement preState = con.prepareStatement("insert into account(username,`password`,phonenum,email,create_date,`type`,state,update_date) values (?,?,?,?,current_timestamp(),?,?,current_timestamp() );", Statement.RETURN_GENERATED_KEYS);
                 preState.setString(1, model.user_name);
                 preState.setString(2, model.password);
                 preState.setString(3, model.phone_num);
@@ -57,14 +57,14 @@ public class AccountImpl implements AccountApi {
 
     @Override
     public boolean updateAccount(Account model) {
-        String sql = "UPDATE ACCOUNT SET `PASSWORD`=?,PHONENUM=?,EMAIL=?,STATE=?,UPDATE_DATE=CURRENT_TIMESTAMP()  WHERE ACCOUNT_ID=?";
+        String sql = "update account set `password`=?,phonenum=?,email=?,state=?,update_date=current_timestamp()  where account_id=?";
         jdbcTemplate.update(sql, new Object[]{model.password, model.phone_num, model.email, model.state, model.account_id});
         return true;
     }
 
     @Override
     public Account getAccount(long account_id) {
-        String sql = "SELECT " + SEL_COL + " FROM ACCOUNT WHERE ACCOUNT_ID=?";
+        String sql = "select " + SEL_COL + " from account where account_id=?";
         List<Account> list = jdbcTemplate.query(sql,
                 new Object[]{account_id},
                 new DefaultAccountRowMapper());
@@ -76,32 +76,32 @@ public class AccountImpl implements AccountApi {
 
     @Override
     public Page<Account> getAccountList(AccountFilter filter, int pageIndex, int pageSize) {
-        String sqlCount = "SELECT count(0) FROM ACCOUNT WHERE 1=1";
-        String sql = "SELECT " + SEL_COL + " FROM ACCOUNT WHERE 1=1";
+        String sqlCount = "select count(0) from account where 1=1";
+        String sql = "select " + SEL_COL + " from account where 1=1";
         String condition = "";
         List<Object> params = new ArrayList<Object>();
         if (filter.account_id > 0) {
-            condition += " and ACCOUNT_ID = ? ";
+            condition += " and account_id = ? ";
             params.add(filter.account_id);
         }
         if (filter.user_name != null && !filter.user_name.isEmpty()) {
-            condition += " and USERNAME like ? ";
+            condition += " and username like ? ";
             params.add("%" + filter.user_name + "%");
         }
         if (filter.phone_num != null && !filter.phone_num.isEmpty()) {
-            condition += " and PHONENUM like ? ";
+            condition += " and phonenum like ? ";
             params.add("%" + filter.phone_num + "%");
         }
         if (filter.email != null && !filter.email.isEmpty()) {
-            condition += " and EMAIL like ? ";
+            condition += " and email like ? ";
             params.add("%" + filter.email + "%");
         }
         if (filter.type > -1) {
-            condition += " and TYPE = ? ";
+            condition += " and type = ? ";
             params.add(filter.type);
         }
         if (filter.state > -1) {
-            condition += " and STATE = ? ";
+            condition += " and state = ? ";
             params.add(filter.state);
         }
 
@@ -111,8 +111,8 @@ public class AccountImpl implements AccountApi {
                 params.toArray(),
                 Integer.class);
         Page<Account> page = new Page<Account>(pageIndex, pageSize, totalRecord);
-        String sort = " ORDER BY ACCOUNT_ID DESC";
-        sql += condition + sort + " LIMIT " + page.getStartIndex() + "," + page.getPageSize();
+        String sort = " order by account_id desc";
+        sql += condition + sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
         List<Account> list = jdbcTemplate.query(sql,
                 params.toArray(),
                 new DefaultAccountRowMapper());
@@ -125,15 +125,15 @@ public class AccountImpl implements AccountApi {
         @Override
         public Account mapRow(ResultSet rs, int i) throws SQLException {
             Account model = new Account();
-            model.account_id = rs.getLong("ACCOUNT_ID");
-            model.user_name = rs.getString("USERNAME");
-            model.password = rs.getString("PASSWORD");
-            model.phone_num = rs.getString("PHONENUM");
-            model.email = rs.getString("EMAIL");
-            model.type = rs.getInt("TYPE");
-            model.state = rs.getInt("STATE");
-            model.create_date = rs.getTimestamp("CREATE_DATE");
-            model.update_date = rs.getTimestamp("UPDATE_DATE");
+            model.account_id = rs.getLong("account_id");
+            model.user_name = rs.getString("username");
+            model.password = rs.getString("password");
+            model.phone_num = rs.getString("phonenum");
+            model.email = rs.getString("email");
+            model.type = rs.getInt("type");
+            model.state = rs.getInt("state");
+            model.create_date = rs.getTimestamp("create_date");
+            model.update_date = rs.getTimestamp("update_date");
 
             return model;
         }
