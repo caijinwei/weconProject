@@ -10,13 +10,30 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public interface AccountApi {
+
+
     /**
-     * 注册用户
+     * 邮箱注册
      *
-     * @param model
+     * @param username
+     * @param email
+     * @param password
      * @return
      */
-    public long registerAccount(Account model);
+    Account signupByEmail(String username, String email, String password);
+
+    /**
+     * 创建会话
+     *
+     * @param user
+     * @param productId
+     * @param fuid
+     * @param loginIp
+     * @param loginTime
+     * @param seconds
+     * @return
+     */
+    String createSession(Account user, int productId, String fuid, long loginIp, long loginTime, int seconds);
 
     /**
      * 更新用户信息
@@ -24,7 +41,7 @@ public interface AccountApi {
      * @param model
      * @return
      */
-    public boolean updateAccount(Account model);
+    boolean updateAccount(Account model);
 
     /**
      * 根据ID取帐号信息
@@ -32,7 +49,7 @@ public interface AccountApi {
      * @param account_id
      * @return
      */
-    public Account getAccount(long account_id);
+    Account getAccount(long account_id);
 
     /**
      * 获取用户的分页列表

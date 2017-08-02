@@ -3,7 +3,11 @@ package com.wecon.box.impl;
 import com.wecon.box.api.AccountApi;
 import com.wecon.box.entity.Account;
 import com.wecon.box.entity.Page;
+import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.filter.AccountFilter;
+import com.wecon.restful.core.BusinessException;
+import com.wecon.restful.core.SessionManager;
+import com.wecon.restful.core.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -15,6 +19,7 @@ import org.springframework.stereotype.Component;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by zengzhipeng on 2017/8/1.
@@ -27,32 +32,50 @@ public class AccountImpl implements AccountApi {
     private final String SEL_COL = " account_id,username,`password`,phonenum,email,create_date,`type`,state,update_date ";
 
     @Override
-    public long registerAccount(final Account model) {
-        String sql = "select count(1) from account wherr username = ? or email = ? or phonenum = ?";
+    public Account signupByEmail(final String username, final String email, final String password) {
+        String sql = "select count(1) from account where username = ? or email = ? ";
 
         int ret = jdbcTemplate.queryForObject(sql,
-                new Object[]{model.user_name, model.email, model.phone_num},
+                new Object[]{username, email},
                 Integer.class);
         if (ret > 0) {
-            return -1;
+            throw new BusinessException(ErrorCodeOption.AccountExisted.key, ErrorCodeOption.AccountExisted.value);
         }
+
         KeyHolder key = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                PreparedStatement preState = con.prepareStatement("insert into account(username,`password`,phonenum,email,create_date,`type`,state,update_date) values (?,?,?,?,current_timestamp(),?,?,current_timestamp() );", Statement.RETURN_GENERATED_KEYS);
-                preState.setString(1, model.user_name);
-                preState.setString(2, model.password);
-                preState.setString(3, model.phone_num);
-                preState.setString(4, model.email);
-                preState.setInt(5, model.type);
-                preState.setInt(6, model.state);
+                PreparedStatement preState = con.prepareStatement("insert into account(username,`password`,email,create_date,`type`,state,update_date) values (?,?,?,current_timestamp(),?,?,current_timestamp() );", Statement.RETURN_GENERATED_KEYS);
+                preState.setString(1, username);
+                preState.setString(2, password);
+                preState.setString(3, email);
+                preState.setInt(4, 1);//注册帐号为管理帐号
+                preState.setInt(5, 1);//默认为启用
 
                 return preState;
             }
         }, key);
         //从主键持有者中获得主键值
-        return key.getKey().longValue();
+        long account_id = key.getKey().longValue();
+        return getAccount(account_id);
+    }
+
+    @Override
+    public String createSession(Account user, int productId, String fuid, long loginIp, long loginTime, int seconds) {
+        SessionState.UserInfo.Builder builder = SessionState.UserInfo.newBuilder();
+        builder.setCuid(fuid);
+        builder.setProductId(productId);
+        builder.setLoginIp(loginIp);
+        builder.setLoginTime(loginTime);
+
+        builder.setUserID(user.account_id);
+        builder.setAccount(user.user_name);
+        SessionState.UserInfo builderUrser = builder.build();
+
+        String sid = UUID.randomUUID().toString().replace("-", "");
+        SessionManager.persistSession(sid, builderUrser, seconds);//3600 * 24 * 30
+        return sid;
     }
 
     @Override

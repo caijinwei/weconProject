@@ -9,7 +9,7 @@ public final class SessionState {
       com.google.protobuf.ExtensionRegistry registry) {
   }
   public interface UserInfoOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:com.felink.restful.core.UserInfo)
+      // @@protoc_insertion_point(interface_extends:com.wecon.restful.core.UserInfo)
       com.google.protobuf.MessageOrBuilder {
 
     /**
