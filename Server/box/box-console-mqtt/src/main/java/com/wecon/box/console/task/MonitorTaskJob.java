@@ -148,7 +148,7 @@ public class MonitorTaskJob implements Job {
 											PiBoxComAddr redisAddrIt = redisIt.addr_list.get(j);
 											if (newAddrIt.addr_id.equals(redisAddrIt.addr_id)) {
 												addrIsExit = true;
-												redisAddrIt.addr = newAddrIt.addr;
+												redisAddrIt.state = newAddrIt.state;
 												redisAddrIt.value = newAddrIt.value;
 												break;
 											}

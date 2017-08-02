@@ -6,6 +6,6 @@ package com.wecon.box.entity;
  */
 public class PiBoxComAddr {
     public String addr_id;
-    public String addr;
+    public String state;
     public String value;
 }
