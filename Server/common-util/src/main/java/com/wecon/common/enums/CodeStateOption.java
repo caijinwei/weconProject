@@ -2,10 +2,8 @@ package com.wecon.common.enums;
 
 /**
  * 接口业务返回状态码定义
- * Created by fengbing_dian91 on 2015/12/18.
  */
-public enum CodeStateOption
-{
+public enum CodeStateOption {
     Common_Success("成功", 200),
     Common_ParamIllegal("非法参数值", 400),
     Common_SessionIdInvalid("SessionID(用户的会话标识)无效", 403),
@@ -27,7 +25,7 @@ public enum CodeStateOption
     UserCenter_Bind_AccountHasBeenBoundError("该用户名已经被绑定", 1009),
     UserCenter_Bind_MobileHasBeenBoundError("该账号已经绑定手机", 1010),
     UserCenter_Bind_SocialChannelHasBeenBoundError("你已经绑定该社交渠道", 1011),
-    
+
     UserCenter_Bind_MobileExistsError("手机已经被绑定", 1012),
     UserCenter_Bind_SocialAccountExistsError("社交账号已经被绑定", 1013),
 
@@ -38,8 +36,7 @@ public enum CodeStateOption
     public int value;
     public String key;
 
-    CodeStateOption(String _key, int _value)
-    {
+    CodeStateOption(String _key, int _value) {
         this.key = _key;
         this.value = _value;
     }

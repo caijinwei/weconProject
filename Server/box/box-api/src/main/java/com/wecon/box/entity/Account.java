@@ -17,8 +17,9 @@ public class Account {
      */
     public int type;
     /**
-     * 状态 1：正常 0：禁止登录
+     * 状态 1：正常 0：禁止登录 -1:邮箱注册未激活
      */
     public int state;
     public Timestamp update_date;
+    public String secret_key;
 }

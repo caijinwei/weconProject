@@ -152,12 +152,13 @@ public class Session {
             }
             // 延长session时间
             else {
-                SessionManager.expireSid(client.sid, 3600 * 24 * 30);
+                SessionManager.expireSid(client.sid, 3600 * 12);// * 24 * 30
             }
         }
 
         // 生产和生产测试环境验证用户接口权限验证
-        if (RestfulContextListener.isServer()) {
+        /*需要等权限系统做完才能使用--zp 2017.08.03*/
+        /*if (RestfulContextListener.isServer()) {
             if (client.userId > 0 && api.authority.length > 0) {
                 boolean authpass = false;
                 for (String authority : api.authority) {
@@ -170,7 +171,7 @@ public class Session {
                     throw new DeniedException("access denied");
                 }
             }
-        }
+        }*/
 
         if (!skipSign) {
             try {

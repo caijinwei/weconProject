@@ -8,10 +8,10 @@ public final class SessionState {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  public interface UserInfoOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:com.wecon.restful.core.UserInfo)
-      com.google.protobuf.MessageOrBuilder {
+  public interface UserInfoOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
 
+    // required int64 userID = 1;
     /**
      * <code>required int64 userID = 1;</code>
      */
@@ -21,6 +21,7 @@ public final class SessionState {
      */
     long getUserID();
 
+    // required string cuid = 2;
     /**
      * <code>required string cuid = 2;</code>
      *
@@ -47,6 +48,7 @@ public final class SessionState {
     com.google.protobuf.ByteString
         getCuidBytes();
 
+    // required int32 productId = 3;
     /**
      * <code>required int32 productId = 3;</code>
      *
@@ -64,6 +66,7 @@ public final class SessionState {
      */
     int getProductId();
 
+    // required int64 loginTime = 4;
     /**
      * <code>required int64 loginTime = 4;</code>
      *
@@ -81,6 +84,7 @@ public final class SessionState {
      */
     long getLoginTime();
 
+    // optional int64 loginIp = 5;
     /**
      * <code>optional int64 loginIp = 5;</code>
      *
@@ -98,6 +102,7 @@ public final class SessionState {
      */
     long getLoginIp();
 
+    // optional string account = 6;
     /**
      * <code>optional string account = 6;</code>
      *
@@ -123,14 +128,31 @@ public final class SessionState {
      */
     com.google.protobuf.ByteString
         getAccountBytes();
+
+    // required int32 userType = 7;
+    /**
+     * <code>required int32 userType = 7;</code>
+     *
+     * <pre>
+     *用户类型
+     * </pre>
+     */
+    boolean hasUserType();
+    /**
+     * <code>required int32 userType = 7;</code>
+     *
+     * <pre>
+     *用户类型
+     * </pre>
+     */
+    int getUserType();
   }
   /**
    * Protobuf type {@code com.wecon.restful.core.UserInfo}
    */
   public static final class UserInfo extends
-      com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:com.felink.restful.core.UserInfo)
-      UserInfoOrBuilder {
+      com.google.protobuf.GeneratedMessage
+      implements UserInfoOrBuilder {
     // Use UserInfo.newBuilder() to construct.
     private UserInfo(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -158,6 +180,7 @@ public final class SessionState {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       initFields();
+      int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
@@ -181,9 +204,8 @@ public final class SessionState {
               break;
             }
             case 18: {
-              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000002;
-              cuid_ = bs;
+              cuid_ = input.readBytes();
               break;
             }
             case 24: {
@@ -202,9 +224,13 @@ public final class SessionState {
               break;
             }
             case 50: {
-              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000020;
-              account_ = bs;
+              account_ = input.readBytes();
+              break;
+            }
+            case 56: {
+              bitField0_ |= 0x00000040;
+              userType_ = input.readInt32();
               break;
             }
           }
@@ -221,14 +247,14 @@ public final class SessionState {
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return SessionState.internal_static_com_felink_restful_core_UserInfo_descriptor;
+      return com.wecon.restful.core.SessionState.internal_static_com_wecon_restful_core_UserInfo_descriptor;
     }
 
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return SessionState.internal_static_com_felink_restful_core_UserInfo_fieldAccessorTable
+      return com.wecon.restful.core.SessionState.internal_static_com_wecon_restful_core_UserInfo_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              SessionState.UserInfo.class, SessionState.UserInfo.Builder.class);
+              com.wecon.restful.core.SessionState.UserInfo.class, com.wecon.restful.core.SessionState.UserInfo.Builder.class);
     }
 
     public static com.google.protobuf.Parser<UserInfo> PARSER =
@@ -247,6 +273,7 @@ public final class SessionState {
     }
 
     private int bitField0_;
+    // required int64 userID = 1;
     public static final int USERID_FIELD_NUMBER = 1;
     private long userID_;
     /**
@@ -262,6 +289,7 @@ public final class SessionState {
       return userID_;
     }
 
+    // required string cuid = 2;
     public static final int CUID_FIELD_NUMBER = 2;
     private java.lang.Object cuid_;
     /**
@@ -316,6 +344,7 @@ public final class SessionState {
       }
     }
 
+    // required int32 productId = 3;
     public static final int PRODUCTID_FIELD_NUMBER = 3;
     private int productId_;
     /**
@@ -339,6 +368,7 @@ public final class SessionState {
       return productId_;
     }
 
+    // required int64 loginTime = 4;
     public static final int LOGINTIME_FIELD_NUMBER = 4;
     private long loginTime_;
     /**
@@ -362,6 +392,7 @@ public final class SessionState {
       return loginTime_;
     }
 
+    // optional int64 loginIp = 5;
     public static final int LOGINIP_FIELD_NUMBER = 5;
     private long loginIp_;
     /**
@@ -385,6 +416,7 @@ public final class SessionState {
       return loginIp_;
     }
 
+    // optional string account = 6;
     public static final int ACCOUNT_FIELD_NUMBER = 6;
     private java.lang.Object account_;
     /**
@@ -439,6 +471,30 @@ public final class SessionState {
       }
     }
 
+    // required int32 userType = 7;
+    public static final int USERTYPE_FIELD_NUMBER = 7;
+    private int userType_;
+    /**
+     * <code>required int32 userType = 7;</code>
+     *
+     * <pre>
+     *用户类型
+     * </pre>
+     */
+    public boolean hasUserType() {
+      return ((bitField0_ & 0x00000040) == 0x00000040);
+    }
+    /**
+     * <code>required int32 userType = 7;</code>
+     *
+     * <pre>
+     *用户类型
+     * </pre>
+     */
+    public int getUserType() {
+      return userType_;
+    }
+
     private void initFields() {
       userID_ = 0L;
       cuid_ = "";
@@ -446,12 +502,12 @@ public final class SessionState {
       loginTime_ = 0L;
       loginIp_ = 0L;
       account_ = "";
+      userType_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
+      if (isInitialized != -1) return isInitialized == 1;
 
       if (!hasUserID()) {
         memoizedIsInitialized = 0;
@@ -466,6 +522,10 @@ public final class SessionState {
         return false;
       }
       if (!hasLoginTime()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasUserType()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -493,6 +553,9 @@ public final class SessionState {
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         output.writeBytes(6, getAccountBytes());
+      }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        output.writeInt32(7, userType_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -527,6 +590,10 @@ public final class SessionState {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(6, getAccountBytes());
       }
+      if (((bitField0_ & 0x00000040) == 0x00000040)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(7, userType_);
+      }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
       return size;
@@ -539,53 +606,53 @@ public final class SessionState {
       return super.writeReplace();
     }
 
-    public static SessionState.UserInfo parseFrom(
+    public static com.wecon.restful.core.SessionState.UserInfo parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static SessionState.UserInfo parseFrom(
+    public static com.wecon.restful.core.SessionState.UserInfo parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static SessionState.UserInfo parseFrom(byte[] data)
+    public static com.wecon.restful.core.SessionState.UserInfo parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static SessionState.UserInfo parseFrom(
+    public static com.wecon.restful.core.SessionState.UserInfo parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static SessionState.UserInfo parseFrom(java.io.InputStream input)
+    public static com.wecon.restful.core.SessionState.UserInfo parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return PARSER.parseFrom(input);
     }
-    public static SessionState.UserInfo parseFrom(
+    public static com.wecon.restful.core.SessionState.UserInfo parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return PARSER.parseFrom(input, extensionRegistry);
     }
-    public static SessionState.UserInfo parseDelimitedFrom(java.io.InputStream input)
+    public static com.wecon.restful.core.SessionState.UserInfo parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return PARSER.parseDelimitedFrom(input);
     }
-    public static SessionState.UserInfo parseDelimitedFrom(
+    public static com.wecon.restful.core.SessionState.UserInfo parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return PARSER.parseDelimitedFrom(input, extensionRegistry);
     }
-    public static SessionState.UserInfo parseFrom(
+    public static com.wecon.restful.core.SessionState.UserInfo parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return PARSER.parseFrom(input);
     }
-    public static SessionState.UserInfo parseFrom(
+    public static com.wecon.restful.core.SessionState.UserInfo parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -594,7 +661,7 @@ public final class SessionState {
 
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(SessionState.UserInfo prototype) {
+    public static Builder newBuilder(com.wecon.restful.core.SessionState.UserInfo prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
@@ -606,25 +673,24 @@ public final class SessionState {
       return builder;
     }
     /**
-     * Protobuf type {@code com.felink.restful.core.UserInfo}
+     * Protobuf type {@code com.wecon.restful.core.UserInfo}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:com.felink.restful.core.UserInfo)
-        SessionState.UserInfoOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements com.wecon.restful.core.SessionState.UserInfoOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return SessionState.internal_static_com_felink_restful_core_UserInfo_descriptor;
+        return com.wecon.restful.core.SessionState.internal_static_com_wecon_restful_core_UserInfo_descriptor;
       }
 
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return SessionState.internal_static_com_felink_restful_core_UserInfo_fieldAccessorTable
+        return com.wecon.restful.core.SessionState.internal_static_com_wecon_restful_core_UserInfo_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                SessionState.UserInfo.class, SessionState.UserInfo.Builder.class);
+                com.wecon.restful.core.SessionState.UserInfo.class, com.wecon.restful.core.SessionState.UserInfo.Builder.class);
       }
 
-      // Construct using SessionState.UserInfo.newBuilder()
+      // Construct using com.wecon.restful.core.SessionState.UserInfo.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -656,6 +722,8 @@ public final class SessionState {
         bitField0_ = (bitField0_ & ~0x00000010);
         account_ = "";
         bitField0_ = (bitField0_ & ~0x00000020);
+        userType_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000040);
         return this;
       }
 
@@ -665,23 +733,23 @@ public final class SessionState {
 
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return SessionState.internal_static_com_felink_restful_core_UserInfo_descriptor;
+        return com.wecon.restful.core.SessionState.internal_static_com_wecon_restful_core_UserInfo_descriptor;
       }
 
-      public SessionState.UserInfo getDefaultInstanceForType() {
-        return SessionState.UserInfo.getDefaultInstance();
+      public com.wecon.restful.core.SessionState.UserInfo getDefaultInstanceForType() {
+        return com.wecon.restful.core.SessionState.UserInfo.getDefaultInstance();
       }
 
-      public SessionState.UserInfo build() {
-        SessionState.UserInfo result = buildPartial();
+      public com.wecon.restful.core.SessionState.UserInfo build() {
+        com.wecon.restful.core.SessionState.UserInfo result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
 
-      public SessionState.UserInfo buildPartial() {
-        SessionState.UserInfo result = new SessionState.UserInfo(this);
+      public com.wecon.restful.core.SessionState.UserInfo buildPartial() {
+        com.wecon.restful.core.SessionState.UserInfo result = new com.wecon.restful.core.SessionState.UserInfo(this);
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
@@ -708,22 +776,26 @@ public final class SessionState {
           to_bitField0_ |= 0x00000020;
         }
         result.account_ = account_;
+        if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
+          to_bitField0_ |= 0x00000040;
+        }
+        result.userType_ = userType_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
 
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof SessionState.UserInfo) {
-          return mergeFrom((SessionState.UserInfo)other);
+        if (other instanceof com.wecon.restful.core.SessionState.UserInfo) {
+          return mergeFrom((com.wecon.restful.core.SessionState.UserInfo)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(SessionState.UserInfo other) {
-        if (other == SessionState.UserInfo.getDefaultInstance()) return this;
+      public Builder mergeFrom(com.wecon.restful.core.SessionState.UserInfo other) {
+        if (other == com.wecon.restful.core.SessionState.UserInfo.getDefaultInstance()) return this;
         if (other.hasUserID()) {
           setUserID(other.getUserID());
         }
@@ -746,6 +818,9 @@ public final class SessionState {
           account_ = other.account_;
           onChanged();
         }
+        if (other.hasUserType()) {
+          setUserType(other.getUserType());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
@@ -767,6 +842,10 @@ public final class SessionState {
           
           return false;
         }
+        if (!hasUserType()) {
+          
+          return false;
+        }
         return true;
       }
 
@@ -774,11 +853,11 @@ public final class SessionState {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        SessionState.UserInfo parsedMessage = null;
+        com.wecon.restful.core.SessionState.UserInfo parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (SessionState.UserInfo) e.getUnfinishedMessage();
+          parsedMessage = (com.wecon.restful.core.SessionState.UserInfo) e.getUnfinishedMessage();
           throw e;
         } finally {
           if (parsedMessage != null) {
@@ -789,6 +868,7 @@ public final class SessionState {
       }
       private int bitField0_;
 
+      // required int64 userID = 1;
       private long userID_ ;
       /**
        * <code>required int64 userID = 1;</code>
@@ -821,6 +901,7 @@ public final class SessionState {
         return this;
       }
 
+      // required string cuid = 2;
       private java.lang.Object cuid_ = "";
       /**
        * <code>required string cuid = 2;</code>
@@ -842,12 +923,9 @@ public final class SessionState {
       public java.lang.String getCuid() {
         java.lang.Object ref = cuid_;
         if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          if (bs.isValidUtf8()) {
-            cuid_ = s;
-          }
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          cuid_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
@@ -921,6 +999,7 @@ public final class SessionState {
         return this;
       }
 
+      // required int32 productId = 3;
       private int productId_ ;
       /**
        * <code>required int32 productId = 3;</code>
@@ -969,6 +1048,7 @@ public final class SessionState {
         return this;
       }
 
+      // required int64 loginTime = 4;
       private long loginTime_ ;
       /**
        * <code>required int64 loginTime = 4;</code>
@@ -1017,6 +1097,7 @@ public final class SessionState {
         return this;
       }
 
+      // optional int64 loginIp = 5;
       private long loginIp_ ;
       /**
        * <code>optional int64 loginIp = 5;</code>
@@ -1065,6 +1146,7 @@ public final class SessionState {
         return this;
       }
 
+      // optional string account = 6;
       private java.lang.Object account_ = "";
       /**
        * <code>optional string account = 6;</code>
@@ -1086,12 +1168,9 @@ public final class SessionState {
       public java.lang.String getAccount() {
         java.lang.Object ref = account_;
         if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          if (bs.isValidUtf8()) {
-            account_ = s;
-          }
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          account_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
@@ -1165,7 +1244,56 @@ public final class SessionState {
         return this;
       }
 
-      // @@protoc_insertion_point(builder_scope:com.felink.restful.core.UserInfo)
+      // required int32 userType = 7;
+      private int userType_ ;
+      /**
+       * <code>required int32 userType = 7;</code>
+       *
+       * <pre>
+       *用户类型
+       * </pre>
+       */
+      public boolean hasUserType() {
+        return ((bitField0_ & 0x00000040) == 0x00000040);
+      }
+      /**
+       * <code>required int32 userType = 7;</code>
+       *
+       * <pre>
+       *用户类型
+       * </pre>
+       */
+      public int getUserType() {
+        return userType_;
+      }
+      /**
+       * <code>required int32 userType = 7;</code>
+       *
+       * <pre>
+       *用户类型
+       * </pre>
+       */
+      public Builder setUserType(int value) {
+        bitField0_ |= 0x00000040;
+        userType_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required int32 userType = 7;</code>
+       *
+       * <pre>
+       *用户类型
+       * </pre>
+       */
+      public Builder clearUserType() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        userType_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:com.wecon.restful.core.UserInfo)
     }
 
     static {
@@ -1173,14 +1301,14 @@ public final class SessionState {
       defaultInstance.initFields();
     }
 
-    // @@protoc_insertion_point(class_scope:com.felink.restful.core.UserInfo)
+    // @@protoc_insertion_point(class_scope:com.wecon.restful.core.UserInfo)
   }
 
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_com_felink_restful_core_UserInfo_descriptor;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_com_wecon_restful_core_UserInfo_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_com_felink_restful_core_UserInfo_fieldAccessorTable;
+      internal_static_com_wecon_restful_core_UserInfo_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -1190,30 +1318,31 @@ public final class SessionState {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\022SessionState.proto\022\027com.felink.restful" +
-      ".core\"p\n\010UserInfo\022\016\n\006userID\030\001 \002(\003\022\014\n\004cui" +
+      "\n\022SessionState.proto\022\026com.wecon.restful." +
+      "core\"\202\001\n\010UserInfo\022\016\n\006userID\030\001 \002(\003\022\014\n\004cui" +
       "d\030\002 \002(\t\022\021\n\tproductId\030\003 \002(\005\022\021\n\tloginTime\030" +
-      "\004 \002(\003\022\017\n\007loginIp\030\005 \001(\003\022\017\n\007account\030\006 \001(\tB" +
-      "\'\n\027com.felink.restful.coreB\014SessionState"
+      "\004 \002(\003\022\017\n\007loginIp\030\005 \001(\003\022\017\n\007account\030\006 \001(\t\022" +
+      "\020\n\010userType\030\007 \002(\005B&\n\026com.wecon.restful.c" +
+      "oreB\014SessionState"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
-          public com.google.protobuf.ExtensionRegistry assignDescriptors(
-              com.google.protobuf.Descriptors.FileDescriptor root) {
-            descriptor = root;
-            return null;
-          }
-        };
+      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
+        public com.google.protobuf.ExtensionRegistry assignDescriptors(
+            com.google.protobuf.Descriptors.FileDescriptor root) {
+          descriptor = root;
+          internal_static_com_wecon_restful_core_UserInfo_descriptor =
+            getDescriptor().getMessageTypes().get(0);
+          internal_static_com_wecon_restful_core_UserInfo_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_com_wecon_restful_core_UserInfo_descriptor,
+              new java.lang.String[] { "UserID", "Cuid", "ProductId", "LoginTime", "LoginIp", "Account", "UserType", });
+          return null;
+        }
+      };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
-    internal_static_com_felink_restful_core_UserInfo_descriptor =
-      getDescriptor().getMessageTypes().get(0);
-    internal_static_com_felink_restful_core_UserInfo_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_com_felink_restful_core_UserInfo_descriptor,
-        new java.lang.String[] { "UserID", "Cuid", "ProductId", "LoginTime", "LoginIp", "Account", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -2,6 +2,7 @@
  * Created by zengzhipeng on 2017/8/2.
  */
 $(function () {
+    T.common.user.checkAuth(2);
     $('#signup').bind('click', function () {
         $("#loadingModal").modal("show");
         var params =
@@ -25,6 +26,8 @@ $(function () {
             $("#loadingModal").modal("hide");
             if (code == 200) {
                 alert("注册成功");
+                T.common.user.setSid(data.sid);
+                location = "../main.html";
             }
             else {
                 alert(code + "-" + msg);

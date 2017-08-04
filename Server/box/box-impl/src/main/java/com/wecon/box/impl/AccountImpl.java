@@ -8,6 +8,7 @@ import com.wecon.box.filter.AccountFilter;
 import com.wecon.restful.core.BusinessException;
 import com.wecon.restful.core.SessionManager;
 import com.wecon.restful.core.SessionState;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -29,14 +30,14 @@ public class AccountImpl implements AccountApi {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    private final String SEL_COL = " account_id,username,`password`,phonenum,email,create_date,`type`,state,update_date ";
+    private final String SEL_COL = " account_id,username,`password`,phonenum,email,create_date,`type`,state,update_date,secret_key ";
 
     @Override
     public Account signupByEmail(final String username, final String email, final String password) {
-        String sql = "select count(1) from account where username = ? or email = ? ";
+        String sql = "select count(1) from account where username = ? or username = ? or email = ?  or email = ?  ";
 
         int ret = jdbcTemplate.queryForObject(sql,
-                new Object[]{username, email},
+                new Object[]{username, email, username, email},
                 Integer.class);
         if (ret > 0) {
             throw new BusinessException(ErrorCodeOption.AccountExisted.key, ErrorCodeOption.AccountExisted.value);
@@ -46,12 +47,14 @@ public class AccountImpl implements AccountApi {
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                PreparedStatement preState = con.prepareStatement("insert into account(username,`password`,email,create_date,`type`,state,update_date) values (?,?,?,current_timestamp(),?,?,current_timestamp() );", Statement.RETURN_GENERATED_KEYS);
+                PreparedStatement preState = con.prepareStatement("insert into account(username,`password`,email,secret_key,create_date,`type`,state,update_date) values (?,?,?,?,current_timestamp(),?,?,current_timestamp() );", Statement.RETURN_GENERATED_KEYS);
+                String secret_key=DigestUtils.md5Hex(UUID.randomUUID().toString());
                 preState.setString(1, username);
-                preState.setString(2, password);
+                preState.setString(2, DigestUtils.md5Hex(password + secret_key));
                 preState.setString(3, email);
-                preState.setInt(4, 1);//注册帐号为管理帐号
-                preState.setInt(5, 1);//默认为启用
+                preState.setString(4, secret_key);
+                preState.setInt(5, 1);//注册帐号为管理帐号
+                preState.setInt(6, 1);//默认为启用
 
                 return preState;
             }
@@ -59,6 +62,11 @@ public class AccountImpl implements AccountApi {
         //从主键持有者中获得主键值
         long account_id = key.getKey().longValue();
         return getAccount(account_id);
+    }
+
+    @Override
+    public void signout(String sid) {
+        SessionManager.deleteSession(sid);
     }
 
     @Override
@@ -71,10 +79,11 @@ public class AccountImpl implements AccountApi {
 
         builder.setUserID(user.account_id);
         builder.setAccount(user.user_name);
-        SessionState.UserInfo builderUrser = builder.build();
+        builder.setUserType(user.type);
+        SessionState.UserInfo builderUser = builder.build();
 
         String sid = UUID.randomUUID().toString().replace("-", "");
-        SessionManager.persistSession(sid, builderUrser, seconds);//3600 * 24 * 30
+        SessionManager.persistSession(sid, builderUser, seconds);//3600 * 24 * 30
         return sid;
     }
 
@@ -90,6 +99,18 @@ public class AccountImpl implements AccountApi {
         String sql = "select " + SEL_COL + " from account where account_id=?";
         List<Account> list = jdbcTemplate.query(sql,
                 new Object[]{account_id},
+                new DefaultAccountRowMapper());
+        if (!list.isEmpty()) {
+            return list.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public Account getAccount(String alias) {
+        String sql = "select " + SEL_COL + " from account where username=? or phonenum=? or email=?";
+        List<Account> list = jdbcTemplate.query(sql,
+                new Object[]{alias, alias, alias},
                 new DefaultAccountRowMapper());
         if (!list.isEmpty()) {
             return list.get(0);
@@ -157,6 +178,7 @@ public class AccountImpl implements AccountApi {
             model.state = rs.getInt("state");
             model.create_date = rs.getTimestamp("create_date");
             model.update_date = rs.getTimestamp("update_date");
+            model.secret_key=rs.getString("secret_key");
 
             return model;
         }

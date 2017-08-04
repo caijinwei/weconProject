@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Created by zengzhipeng
+ *
  */
 public class LoggerUtil {
 
