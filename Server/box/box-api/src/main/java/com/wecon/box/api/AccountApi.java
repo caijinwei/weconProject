@@ -23,6 +23,13 @@ public interface AccountApi {
     Account signupByEmail(String username, String email, String password);
 
     /**
+     * 退出登录
+     *
+     * @param sid
+     */
+    void signout(String sid);
+
+    /**
      * 创建会话
      *
      * @param user
@@ -50,6 +57,14 @@ public interface AccountApi {
      * @return
      */
     Account getAccount(long account_id);
+
+    /**
+     * 根据用户名或邮箱或电话获取用户信息
+     *
+     * @param alias
+     * @return
+     */
+    Account getAccount(String alias);
 
     /**
      * 获取用户的分页列表

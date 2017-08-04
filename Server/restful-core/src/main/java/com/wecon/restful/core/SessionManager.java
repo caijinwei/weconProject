@@ -25,12 +25,14 @@ public class SessionManager
 	{
 		if (userInfo != null)
 		{
+			// 先删除旧的sid信息，只让一个客户端在线
+			deleteUserSession(userInfo.getUserID());
 			// 1. sid -> userID
 			String sessionRedisKey = java.lang.String.format(RedisKey, sessionId);
 			RedisManager.set(RedisGroupName, sessionRedisKey.getBytes(), userInfo.toByteArray(), seconds);
 			// 2. userID - sid集合
 			String userSidGroupRedisKey = String.format(UserSidGroupKey, userInfo.getUserID());
-			RedisManager.sadd(RedisGroupName, userSidGroupRedisKey, sessionId);
+			RedisManager.sadd(RedisGroupName, userSidGroupRedisKey, sessionRedisKey);
 			return true;
 		}
 		return false;

@@ -29,7 +29,7 @@ public class TestAction {
 
     @Description("test")
     @RequestMapping(value = "/gd")
-    @WebApi(forceAuth = false, master = true)
+    @WebApi(forceAuth = true, master = true)
     public Output getD() {
         /*RedisPiBoxActData model = new RedisPiBoxActData();
         model.machine_code = "1001";

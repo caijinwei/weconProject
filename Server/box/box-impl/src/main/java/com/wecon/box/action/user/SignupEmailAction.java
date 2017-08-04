@@ -1,9 +1,13 @@
 package com.wecon.box.action.user;
 
 import com.alibaba.fastjson.JSONObject;
+import com.wecon.box.constant.ConstKey;
 import com.wecon.box.entity.Account;
+import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.box.util.CheckUtil;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
+import com.wecon.restful.core.BusinessException;
 import com.wecon.restful.core.Client;
 import com.wecon.restful.core.Output;
 import com.wecon.restful.doc.Label;
@@ -23,13 +27,17 @@ public class SignupEmailAction extends UserBaseAction {
     @RequestMapping("user/signupemail")
     @WebApi(forceAuth = false, master = true)
     public Output signupByEmail(@Valid SignupEmailParam param) {
+        if (!CheckUtil.isValidEmail(param.email)) {
+            throw new BusinessException(ErrorCodeOption.EmailErorr.key, ErrorCodeOption.EmailErorr.value);
+        }
+
         Client client = AppContext.getSession().client;
 
         Account user = accountApi.signupByEmail(param.username, param.email, param.password);
-        String sid = accountApi.createSession(user,client.appid, client.fuid, client.ip,client.timestamp, 3600 * 24 * 30);
+        String sid = accountApi.createSession(user, client.appid, client.fuid, client.ip, client.timestamp, ConstKey.SESSION_EXPIRE_TIME);
         JSONObject data = new JSONObject();
         data.put("sid", sid);
-        data.put("uid", user.account_id);
+//        data.put("uid", user.account_id);
         return new Output(data);
     }
 }

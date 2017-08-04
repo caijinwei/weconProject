@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.wecon.box.api.RedisPiBoxApi;
 import com.wecon.box.entity.RedisPiBoxActData;
-import com.wecon.box.redis.ConstKey;
+import com.wecon.box.constant.ConstKey;
 import com.wecon.common.redis.RedisManager;
 import org.springframework.stereotype.Component;
 
@@ -14,11 +14,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class RedisPiBoxImpl implements RedisPiBoxApi {
 
-    private final static String groupName = "pibox";
+    private final static String groupName = ConstKey.REDIS_GROUP_NAME;
 
     @Override
     public RedisPiBoxActData getRedisPiBoxActData(String machine_code) {
-        String redisKey = String.format(ConstKey.PIBOX_ACT_DATA_KEY, machine_code);
+        String redisKey = String.format(ConstKey.REDIS_PIBOX_ACT_DATA_KEY, machine_code);
         String jsonStr = RedisManager.get(groupName, redisKey);
         RedisPiBoxActData model = JSON.parseObject(jsonStr, new TypeReference<RedisPiBoxActData>() {
         });
@@ -31,7 +31,7 @@ public class RedisPiBoxImpl implements RedisPiBoxApi {
             return false;
         } else {
             String jsonStr = JSON.toJSONString(model);
-            String redisKey = String.format(ConstKey.PIBOX_ACT_DATA_KEY, model.machine_code);
+            String redisKey = String.format(ConstKey.REDIS_PIBOX_ACT_DATA_KEY, model.machine_code);
             RedisManager.set(groupName, redisKey, jsonStr, 0);
             return true;
         }
