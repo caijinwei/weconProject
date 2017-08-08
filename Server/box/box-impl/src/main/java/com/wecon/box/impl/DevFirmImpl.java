@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -14,11 +13,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-
 import com.wecon.box.api.DevFirmApi;
 import com.wecon.box.entity.DevFirm;
-import com.wecon.box.entity.Device;
-import com.wecon.box.impl.DeviceImpl.DefaultDeviceRowMapper;
 
 /**
  * @author lanpenghui 2017年8月4日上午11:21:26

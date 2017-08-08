@@ -31,7 +31,6 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-
 import com.wecon.box.api.AlarmCfgDataApi;
 import com.wecon.box.api.DevFirmApi;
 import com.wecon.box.api.DeviceApi;
@@ -320,6 +319,7 @@ public class MonitorTaskJob implements Job {
 
 				List<PiBoxComAddr> listPiBoxComAddr = listPiBoxCom.get(0).addr_list;
 				if (null == listPiBoxComAddr || listPiBoxComAddr.size() < 1) {
+					
 					return;
 				}
 				// 获取AlarmCfgDataApi对象
