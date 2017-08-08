@@ -9,6 +9,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         T.common.ajax.request('WeconBox', "user/userinfo", new Object(), function (data, code, msg) {
             if (code == 200) {
                 $scope.username = data.username;
+                $scope.type = data.type;
                 $scope.$apply();
             }
             else {
