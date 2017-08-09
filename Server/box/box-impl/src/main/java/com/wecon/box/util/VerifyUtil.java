@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 /**
  * Created by zengzhipeng on 2017/8/2.
  */
-public class CheckUtil {
+public class VerifyUtil {
     protected static Pattern regexValidEmail = Pattern.compile("^([a-z0-9A-Z]+[-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$");
 
     /**

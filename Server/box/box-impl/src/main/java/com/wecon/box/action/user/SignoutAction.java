@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SignoutAction extends UserBaseAction {
     @RequestMapping("user/signout")
-    @WebApi(forceAuth = false, master = true)
+    @WebApi(forceAuth = true, master = true)
     public Output signout(){
         accountApi.signout(AppContext.getSession().client.sid);
         return new Output();

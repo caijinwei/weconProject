@@ -25,12 +25,10 @@ $(function () {
         T.common.ajax.request("WeconBox", "user/signupemail", params, function (data, code, msg) {
             $("#loadingModal").modal("hide");
             if (code == 200) {
-                alert("注册成功");
-                T.common.user.setSid(data.sid);
-                location = "../main.html";
+                alert("注册成功,请去邮箱激活帐号");
             }
             else {
-                alert(code + "-" + msg);
+                alert( msg);
             }
         });
     })

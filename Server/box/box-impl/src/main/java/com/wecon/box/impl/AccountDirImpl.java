@@ -1,11 +1,10 @@
 package com.wecon.box.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
+import com.wecon.box.api.AccountDirApi;
+import com.wecon.box.entity.AccountDir;
+import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.restful.core.BusinessException;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -13,91 +12,127 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
-import com.wecon.box.api.AccountDirApi;
-import com.wecon.box.entity.Account;
-import com.wecon.box.entity.AccountDir;
+import java.sql.*;
+import java.util.List;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * @author lanpenghui 2017年8月7日上午11:21:11
+ * Created by zengzhipeng on 2017/8/8.
  */
 @Component
 public class AccountDirImpl implements AccountDirApi {
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-	private final String SEL_COL = "id,account_id,name,type,create_date,update_date";
+    @Autowired
+    public PlatformTransactionManager transactionManager;
 
-	@Override
-	public long SaveAccountDir(final AccountDir model) {
+    @Override
+    public long addAccountDir(final AccountDir model) {
+        //相同用户，相同类型，不允许重名
+        String sql = "select count(1) from account_dir where account_id = ? and `name` = ? and `type` = ?  ";
 
-		KeyHolder key = new GeneratedKeyHolder();
-		jdbcTemplate.update(new PreparedStatementCreator() {
-			@Override
-			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-				PreparedStatement preState = con.prepareStatement(
-						"insert into account_dir(account_id,`name`,type,create_date,update_date) values (?,?,?,current_timestamp(),current_timestamp());",
-						Statement.RETURN_GENERATED_KEYS);
-				preState.setLong(1, model.account_id);
-				preState.setString(2, model.name);
-				preState.setInt(3, model.type);
-				return preState;
-			}
-		}, key);
-		// 从主键持有者中获得主键值
-		return key.getKey().longValue();
+        int ret = jdbcTemplate.queryForObject(sql,
+                new Object[]{model.account_id, model.name, model.type},
+                Integer.class);
+        if (ret > 0) {
+            throw new BusinessException(ErrorCodeOption.CanAddTheSameGroup.key, ErrorCodeOption.CanAddTheSameGroup.value);
+        }
 
-	}
+        KeyHolder key = new GeneratedKeyHolder();
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement preState = con.prepareStatement("insert into account_dir(account_id,`name`,`type`,create_date,update_date) values (?,?,?,current_timestamp(),current_timestamp());", Statement.RETURN_GENERATED_KEYS);
+                String secret_key = DigestUtils.md5Hex(UUID.randomUUID().toString());
+                preState.setLong(1, model.account_id);
+                preState.setString(2, model.name);
+                preState.setInt(3, model.type);
 
-	@Override
-	public boolean updateAccountDir(AccountDir model) {
-		String sql = "update account_dir set account_id=?,name=?,type=?,update_date=current_timestamp() where id=?";
+                return preState;
+            }
+        }, key);
+        //从主键持有者中获得主键值
+        long dir_id = key.getKey().longValue();
+        return dir_id;
+    }
 
-		jdbcTemplate.update(sql, new Object[] { model.account_id, model.name, model.type, model.id });
-		return true;
-	}
+    @Override
+    public boolean updateAccountDir(AccountDir model) {
+        //只能更新分组名
+        String sql = "select count(1) from account_dir where account_id = ? and `name` = ? and `type` = ? and id <> ? ";
+        int ret = jdbcTemplate.queryForObject(sql,
+                new Object[]{model.account_id, model.name, model.type, model.id},
+                Integer.class);
+        if (ret > 0) {
+            throw new BusinessException(ErrorCodeOption.CanAddTheSameGroup.key, ErrorCodeOption.CanAddTheSameGroup.value);
+        }
+        sql = "update account_dir set `name` = ?,update_date=current_timestamp()  where id=?";
+        jdbcTemplate.update(sql, new Object[]{model.name, model.id});
+        return true;
+    }
 
-	@Override
-	public AccountDir getAccountDir(long id) {
-		String sql = "select " + SEL_COL + " from account_dir where id=?";
-		List<AccountDir> list = jdbcTemplate.query(sql, new Object[] { id }, new DefaultAccountDirRowMapper());
-		if (!list.isEmpty()) {
-			return list.get(0);
-		}
-		return null;
-	}
+    @Override
+    public boolean delAccountDir(final long id) {
+        TransactionTemplate tt = new TransactionTemplate(transactionManager);
+        try {
+            tt.execute(new TransactionCallback() {
+                @Override
+                public Object doInTransaction(TransactionStatus ts) {
+                    jdbcTemplate.update("DELETE FROM account_dir WHERE id=?;", new Object[]{id});
+                    jdbcTemplate.update("DELETE FROM account_dir_rel WHERE acc_dir_id=?;", new Object[]{id});
 
-	@Override
-	public List<AccountDir> getAccountDir(Account account) {
-		String sql = "select " + SEL_COL + " from account_dir where account_id=?";
-		List<AccountDir> list = jdbcTemplate.query(sql, new Object[] { account.account_id },
-				new DefaultAccountDirRowMapper());
-		if (!list.isEmpty()) {
-			return list;
-		}
-		return null;
-	}
+                    return true;
+                }
+            });
+        } catch (Exception e) {
+            Logger.getLogger(AccountImpl.class.getName()).log(Level.SEVERE, null, e);
+            throw new RuntimeException(e);
+        }
+        return true;
+    }
 
-	@Override
-	public void delAccountDir(long id) {
-		String sql = "delete from  account_dir  where id=?";
-		jdbcTemplate.update(sql, new Object[] { id });
+    @Override
+    public AccountDir getAccountDir(long id) {
+        String sql = "select * from account_dir where id = ? ";
+        List<AccountDir> list = jdbcTemplate.query(sql,
+                new Object[]{id},
+                new DefaultAccountDirRowMapper());
+        if (!list.isEmpty()) {
+            return list.get(0);
+        }
+        return null;
+    }
 
-	}
+    @Override
+    public List<AccountDir> getAccountDirList(long account_id, int type) {
+        String sql = "select * from account_dir where account_id = ? and `type` = ? ";
+        List<AccountDir> list = jdbcTemplate.query(sql,
+                new Object[]{account_id, type},
+                new DefaultAccountDirRowMapper());
+        return list;
+    }
 
-	public static final class DefaultAccountDirRowMapper implements RowMapper<AccountDir> {
+    public static final class DefaultAccountDirRowMapper implements RowMapper<AccountDir> {
 
-		@Override
-		public AccountDir mapRow(ResultSet rs, int i) throws SQLException {
-			AccountDir model = new AccountDir();
-			model.id = rs.getLong("id");
-			model.account_id = rs.getLong("account_id");
-			model.name = rs.getString("name");
-			model.type = rs.getInt("type");
-			model.create_date = rs.getTimestamp("create_date");
-			model.update_date = rs.getTimestamp("update_date");
-			return model;
-		}
-	}
+        @Override
+        public AccountDir mapRow(ResultSet rs, int i) throws SQLException {
+            AccountDir model = new AccountDir();
+            model.id = rs.getLong("id");
+            model.account_id = rs.getLong("account_id");
+            model.name = rs.getString("name");
+            model.type = rs.getInt("type");
+            model.create_date = rs.getTimestamp("create_date");
+            model.update_date = rs.getTimestamp("update_date");
 
+            return model;
+        }
+    }
 }

@@ -24,6 +24,14 @@
             </map>
         </property>
     </bean>
+
+    <!--boxweb配置 -->
+    <bean id="boxWebConfig" class="com.wecon.box.config.BoxWebConfig">
+        <property name="emailActiveUrl" value="${emailActiveUrl}" />
+    </bean>
+    <bean id="boxWebContext" class="com.wecon.box.util.BoxWebConfigContext">
+        <property name="boxWebConfig" ref="boxWebConfig" />
+    </bean>
     
      <!-- redis集群配置 -->
     <bean id="pibox-redis" class="com.wecon.common.redis.RedisConfig">

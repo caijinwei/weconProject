@@ -145,12 +145,23 @@ input[type="submit"]{
     border-radius:0;
 }
 #btn-setting{
+    border-radius:0;
+}
+#btn-viewaccount{
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
-.glyphicon-ok{
+/*.glyphicon-ok{
     color: #2889d0;
+}*/
+.container-fluid table tbody tr td a{
+    text-decoration: none;
 }
+.container-fluid table tbody tr td a span{
+    color:#2889d0;
+    margin:10px;
+}
+
 
 /* 小屏幕（平板，大于等于768px） */
 @media (min-width: 768px) {

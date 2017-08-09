@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.constant.ConstKey;
 import com.wecon.box.entity.Account;
 import com.wecon.box.enums.ErrorCodeOption;
-import com.wecon.box.util.CheckUtil;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.BusinessException;
@@ -35,6 +34,11 @@ public class SigninAction extends UserBaseAction {
         if (user == null) {
             throw new BusinessException(ErrorCodeOption.Login_NotAccount.key, ErrorCodeOption.Login_NotAccount.value);
         }
+        if (user.state == -1) {
+            throw new BusinessException(ErrorCodeOption.Login_NotActive.key, ErrorCodeOption.Login_NotActive.value);
+        } else if (user.state == 0) {
+            throw new BusinessException(ErrorCodeOption.Login_NotAllow.key, ErrorCodeOption.Login_NotAllow.value);
+        }
         String pwd = DigestUtils.md5Hex(param.password + user.secret_key);
         if (!pwd.equals(user.password)) {
             throw new BusinessException(ErrorCodeOption.Login_PwdError.key, ErrorCodeOption.Login_PwdError.value);
@@ -61,7 +65,7 @@ class SigninParam {
     @NotNull
     @Length(max = 32, min = 32)
     public String password;
-    @Label("是否记住密码")
+    @Label("是否记住登录状态30天")
     @NotNull
     @Range(min = 0, max = 1)
     public Integer isremeber;

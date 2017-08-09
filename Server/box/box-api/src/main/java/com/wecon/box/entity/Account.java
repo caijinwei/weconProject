@@ -7,9 +7,9 @@ import java.sql.Timestamp;
  */
 public class Account {
     public long account_id;
-    public String user_name;
+    public String username;
     public String password;
-    public String phone_num;
+    public String phonenum;
     public String email;
     public Timestamp create_date;
     /**
