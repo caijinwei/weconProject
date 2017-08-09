@@ -134,6 +134,7 @@
 			<artifactId>javax.mail-api</artifactId>
 			<version>1.6.0-rc2</version>
 		</dependency>
+	
 	</dependencies>
 
 

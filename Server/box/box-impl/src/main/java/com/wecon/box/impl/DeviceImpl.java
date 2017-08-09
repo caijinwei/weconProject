@@ -61,7 +61,7 @@ public class DeviceImpl implements DeviceApi {
 		String sql = "update device set machine_code=?,password=?,dev_model=?,name=?,remark=?,map=?,state=?,dir_id=?,update_date=current_timestamp() where device_id=?";
 
 		jdbcTemplate.update(sql, new Object[] { model.machine_code, model.password, model.dev_model, model.name,
-				model.remark, model.map, model.state, model.dir_id ,model.device_id});
+				model.remark, model.map, model.state, model.dir_id, model.device_id });
 		return true;
 	}
 
@@ -98,7 +98,7 @@ public class DeviceImpl implements DeviceApi {
 		String sql = "select " + SEL_COL + " from device where 1=1";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
-		if (!CommonUtils.isNullOrEmpty(filter.device_id)) {
+		if (filter.device_id>0) {
 			condition.append(" and device_id = ? ");
 			params.add(filter.device_id);
 		}
@@ -122,11 +122,11 @@ public class DeviceImpl implements DeviceApi {
 			condition.append(" and map like ? ");
 			params.add("%" + filter.map + "%");
 		}
-		if (!CommonUtils.isNullOrEmpty(filter.state)) {
+		if (filter.state>-1) {
 			condition.append(" and state = ? ");
 			params.add(filter.state);
 		}
-		if (!CommonUtils.isNullOrEmpty(filter.dir_id)) {
+		if (filter.dir_id>0) {
 			condition.append(" and dir_id = ? ");
 			params.add(filter.dir_id);
 		}

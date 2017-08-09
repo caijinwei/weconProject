@@ -100,24 +100,23 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	}
 
 	@Override
-	public Page<RealHisCfg> getRealHisCfgList(RealHisCfgFilter filter, int pageIndex, int pageSize) {
-		String sqlCount = "select count(0) from real_his_cfg where 1=1";
+	public List<RealHisCfg> getRealHisCfg(RealHisCfgFilter filter) {
 		String sql = "select " + SEL_COL + " from real_his_cfg where 1=1";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
-		if (!CommonUtils.isNullOrEmpty(filter.id)) {
+		if (filter.id>0) {
 			condition.append(" and id = ? ");
 			params.add(filter.id);
 		}
-		if (!CommonUtils.isNullOrEmpty(filter.data_id)) {
+		if (filter.data_id>0) {
 			condition.append(" and data_id = ? ");
 			params.add(filter.data_id);
 		}
-		if (!CommonUtils.isNullOrEmpty(filter.account_id)) {
+		if (filter.account_id>0) {
 			condition.append(" and account_id = ? ");
 			params.add(filter.account_id);
 		}
-		if (!CommonUtils.isNullOrEmpty(filter.plc_id)) {
+		if (filter.plc_id>0) {
 			condition.append(" and plc_id = ? ");
 			params.add(filter.plc_id);
 		}
@@ -129,7 +128,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			condition.append(" and addr like ? ");
 			params.add("%" + filter.addr + "%");
 		}
-		if (!CommonUtils.isNullOrEmpty(filter.addr_type)) {
+		if (filter.addr_type>-1) {
 			condition.append(" and addr_type = ? ");
 			params.add(filter.addr_type);
 		}
@@ -147,17 +146,84 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			params.add("%" + filter.data_limit + "%");
 		}
 
-		if (!CommonUtils.isNullOrEmpty(filter.his_cycle)) {
+		if (filter.his_cycle>-1) {
 			condition.append(" and his_cycle = ? ");
 			params.add(filter.his_cycle);
 		}
-		if (!CommonUtils.isNullOrEmpty(filter.data_type)) {
+		if (filter.data_type>-1) {
 			condition.append(" and data_type = ? ");
 			params.add(filter.data_type);
 		}
-		if (!CommonUtils.isNullOrEmpty(filter.state)) {
+		if (filter.state>-1) {
 			condition.append(" and state = ? ");
 			params.add(filter.state);
+
+		}
+		sql+=condition;
+		List<RealHisCfg> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgRowMapper());
+		return list;
+	}
+
+	@Override
+	public Page<RealHisCfg> getRealHisCfgList(RealHisCfgFilter filter, int pageIndex, int pageSize) {
+		String sqlCount = "select count(0) from real_his_cfg where 1=1";
+		String sql = "select " + SEL_COL + " from real_his_cfg where 1=1";
+		StringBuffer condition = new StringBuffer("");
+		List<Object> params = new ArrayList<Object>();
+		if (filter.id>0) {
+			condition.append(" and id = ? ");
+			params.add(filter.id);
+		}
+		if (filter.data_id>0) {
+			condition.append(" and data_id = ? ");
+			params.add(filter.data_id);
+		}
+		if (filter.account_id>0) {
+			condition.append(" and account_id = ? ");
+			params.add(filter.account_id);
+		}
+		if (filter.plc_id>0) {
+			condition.append(" and plc_id = ? ");
+			params.add(filter.plc_id);
+		}
+		if (!CommonUtils.isNullOrEmpty(filter.name)) {
+			condition.append(" and name like ? ");
+			params.add("%" + filter.name + "%");
+		}
+		if (!CommonUtils.isNullOrEmpty(filter.addr)) {
+			condition.append(" and addr like ? ");
+			params.add("%" + filter.addr + "%");
+		}
+		if (filter.addr_type>-1) {
+			condition.append(" and addr_type = ? ");
+			params.add(filter.addr_type);
+		}
+
+		if (!CommonUtils.isNullOrEmpty(filter.describe)) {
+			condition.append(" and describe like ? ");
+			params.add("%" + filter.describe + "%");
+		}
+		if (!CommonUtils.isNullOrEmpty(filter.digit_count)) {
+			condition.append(" and digit_count like ? ");
+			params.add("%" + filter.digit_count + "%");
+		}
+		if (!CommonUtils.isNullOrEmpty(filter.data_limit)) {
+			condition.append(" and data_limit like ? ");
+			params.add("%" + filter.data_limit + "%");
+		}
+
+		if (filter.his_cycle>-1) {
+			condition.append(" and his_cycle = ? ");
+			params.add(filter.his_cycle);
+		}
+		if (filter.data_type>-1) {
+			condition.append(" and data_type = ? ");
+			params.add(filter.data_type);
+		}
+		if (filter.state>-1) {
+			condition.append(" and state = ? ");
+			params.add(filter.state);
+
 		}
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);

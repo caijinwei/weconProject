@@ -43,12 +43,12 @@ public class PlcInfo {
 	public String port;
 	public int comtype;
 	public String baudrate;
-	public int  stop_bir;
+	public int  stop_bit;
 	public int  data_length;
 	public String  check_bit;
 	public int  retry_times;
 	public int  wait_timeout;
-	public int  dev_timeout;
+	public int  rev_timeout;
 	public int  com_stepinterval;
 	public int  com_iodelaytime;
 	public int retry_timeout;

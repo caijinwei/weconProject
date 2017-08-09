@@ -40,7 +40,7 @@ public interface RealHisCfgDataApi {
 	 * @param real_his_cfg_id
 	 * @return
 	 */
-	public List<RealHisCfgData> getRealHisCfgData(long real_his_cfg_id);
+	public List<RealHisCfgData> getRealHisCfgData(RealHisCfgDataFilter filter);
 	
 
 	/**

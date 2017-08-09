@@ -86,20 +86,45 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 	}
 
 	@Override
-	public List<RealHisCfgData> getRealHisCfgData(long real_his_cfg_id) {
-		String sql = "select " + SEL_COL + " from real_his_cfg_data where real_his_cfg_id=?";
-		List<RealHisCfgData> list = jdbcTemplate.query(sql, new Object[] { real_his_cfg_id },
-				new DefaultRealHisCfgDataRowMapper());
-		if (!list.isEmpty()) {
-			return list;
+	public List<RealHisCfgData> getRealHisCfgData(RealHisCfgDataFilter filter) {
+		String sql = "select " + SEL_COL + " from real_his_cfg_data where 1=1";
+		StringBuffer condition = new StringBuffer("");
+		List<Object> params = new ArrayList<Object>();
+		if (filter.real_his_cfg_id > 0) {
+			condition.append(" and real_his_cfg_id = ? ");
+			params.add(filter.real_his_cfg_id);
 		}
+		if (!CommonUtils.isNullOrEmpty(filter.value)) {
+			condition.append(" and value like ? ");
+			params.add("%" + filter.value + "%");
+		}
+		if (filter.state > -1) {
+			condition.append(" and state = ? ");
+			params.add(filter.state);
+		}
+		// 操作时间起
+		if (!CommonUtils.isNullOrEmpty(filter.start_date)) {
+			condition.append(" and date_format(real_his_cfg_data.monitor_time,'%Y-%m-%d %H:%i') >= ");
+			condition.append(" date_format(str_to_date(?,'%Y-%m-%d %H:%i'),'%Y-%m-%d %H:%i') ");
+			params.add(CommonUtils.trim(filter.start_date));
 
-		return null;
+		}
+		// 操作时间止
+		if (!CommonUtils.isNullOrEmpty(filter.end_date)) {
+			condition.append(" and date_format(real_his_cfg_data.monitor_time,'%Y-%m-%d %H:%i') <=  ");
+			condition.append(" date_format(str_to_date(?,'%Y-%m-%d %H:%i'),'%Y-%m-%d %H:%i') ");
+			params.add(CommonUtils.trim(filter.end_date));
+
+		}
+		sql += condition;
+
+		List<RealHisCfgData> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgDataRowMapper());
+		return list;
 	}
 
 	@Override
 	public void delRealHisCfgData(long real_his_cfg_id) {
-		String sql = "delete from  real_his_cfg_data  where real_his_cfg_data=?";
+		String sql = "delete from  real_his_cfg_data  where real_his_cfg_id=?";
 		jdbcTemplate.update(sql, new Object[] { real_his_cfg_id });
 	}
 
@@ -109,29 +134,29 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 		String sql = "select " + SEL_COL + " from real_his_cfg_data where 1=1";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
-		if (!CommonUtils.isNullOrEmpty(filter.real_his_cgg_id)) {
-			condition.append(" and real_his_cgg_id = ? ");
-			params.add(filter.real_his_cgg_id);
+		if (filter.real_his_cfg_id > 0) {
+			condition.append(" and real_his_cfg_id = ? ");
+			params.add(filter.real_his_cfg_id);
 		}
 		if (!CommonUtils.isNullOrEmpty(filter.value)) {
 			condition.append(" and value like ? ");
 			params.add("%" + filter.value + "%");
 		}
-		if (!CommonUtils.isNullOrEmpty(filter.state)) {
+		if (filter.state > -1) {
 			condition.append(" and state = ? ");
 			params.add(filter.state);
 		}
 		// 操作时间起
 		if (!CommonUtils.isNullOrEmpty(filter.start_date)) {
-			condition.append(" and date_format(real_his_cfg_data.monitor_time,'%Y-%m-%d') >= ");
-			condition.append(" date_format(str_to_date(?,'%Y-%m-%d'),'%Y-%m-%d') ");
+			condition.append(" and date_format(real_his_cfg_data.monitor_time,'%Y-%m-%d %H:%i') >= ");
+			condition.append(" date_format(str_to_date(?,'%Y-%m-%d %H:%i'),'%Y-%m-%d %H:%i') ");
 			params.add(CommonUtils.trim(filter.start_date));
 
 		}
 		// 操作时间止
 		if (!CommonUtils.isNullOrEmpty(filter.end_date)) {
-			condition.append(" and date_format(real_his_cfg_data.monitor_time,'%Y-%m-%d') >= ");
-			condition.append(" date_format(str_to_date(?,'%Y-%m-%d'),'%Y-%m-%d') ");
+			condition.append(" and date_format(real_his_cfg_data.monitor_time,'%Y-%m-%d %H:%i') <= ");
+			condition.append(" date_format(str_to_date(?,%Y-%m-%d %H:%i'),'%Y-%m-%d %H:%i') ");
 			params.add(CommonUtils.trim(filter.end_date));
 
 		}
