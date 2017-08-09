@@ -15,7 +15,7 @@ public interface DevBindUserApi {
 	 * @param model
 	 * @return
 	 */
-	public long SaveDevBindUser(DevBindUser model);
+	public long saveDevBindUser(DevBindUser model);
 
 	/**
 	 * 更新用户关联设备
@@ -40,4 +40,9 @@ public interface DevBindUserApi {
 	 * @param device_id
 	 */
 	public void delDevBindUser(long account_id,long device_id);
+
+	/*
+	* 根据设备号查询记录
+	* */
+	public int findByDevId(long device_id);
 }

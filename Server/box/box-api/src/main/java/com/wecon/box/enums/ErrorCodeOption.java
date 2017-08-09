@@ -10,7 +10,11 @@ public enum ErrorCodeOption {
     AccountExisted("用户已经存在,不能注册", 11000),
     EmailErorr("邮箱格式有错", 11001),
     Login_NotAccount("登录帐号不存在", 11002),
-    Login_PwdError("密码错误", 11003);
+    Login_PwdError("密码错误", 11003),
+
+    Account_Permissions_No("账户权限不足，无法新增盒子", 30001),
+    Device_NotFound("该设备不存在",30002),
+    Device_AlreadyBind("该设备已经被别的用户绑定",300023);
 
 
     public int value;

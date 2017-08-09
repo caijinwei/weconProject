@@ -15,7 +15,7 @@ public interface AccountDirRelApi {
 	 * @param model
 	 * @return
 	 */
-	public long SaveAccountDirRel(AccountDirRel model);
+	public long saveAccountDirRel(AccountDirRel model);
 
 	/**
 	 * 更新分组所关联的监控点
@@ -39,4 +39,12 @@ public interface AccountDirRelApi {
 	 * @param ref_id
 	 */
 	public void delAccountDir(long acc_dir_id,long ref_id);
+
+/*
+*查询是否有分组记录
+* @param acc_dir_id
+*
+* */
+	public int findRecordingByAccDirid(long acc_dir_id);
+
 }
