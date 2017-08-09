@@ -16,27 +16,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 alert(code + " " + msg);
             }
         });
-
-        //获取分组信息
-        var params = {
-            type: "0"
-        }
-        T.common.ajax.request('WeconBox', "userdiract/getuserdirs", params, function (data, code, msg) {
-            if (code == 200) {
-                $scope.grouplist = data.list;
-                $scope.$apply();
-                $('.collapse').on('show.bs.collapse',function () {
-                    $(this).prev('div').find('span').removeClass('glyphicon-folder-close');
-                    $(this).prev('div').find('span').addClass('glyphicon-folder-open');
-                }).on('hide.bs.collapse',function () {
-                    $(this).prev('div').find('span').removeClass('glyphicon-folder-open');
-                    $(this).prev('div').find('span').addClass('glyphicon-folder-close');
-                })
-            }
-            else {
-                alert(code + " " + msg);
-            }
-        });
     }
 
     $scope.logout = function () {
@@ -49,5 +28,42 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             }
         });
     }
+
+
+    /*
+     * 添加盒子
+     *  1）判定条件：
+     *           1。盒子序列号 密码 别名 是否存在
+     *           2.是否是管理员
+     *           3.改盒子是否已经绑定了盒子
+     *           4.如果有选择盒子就添加到表acoount_dir_rel中
+     *               -如果没有就放在默认分组中
+     *
+     * */
+    $scope.boundBox = function () {
+        if ($("#ref_id").val() == "" || $("#machine_code").val() == "" || $("#dev_password").val() == "") {
+            alert("必填参数没有填写完整");
+            return;
+        }
+        var params =
+        {
+            ref_id: $("#ref_id").val(),
+            machine_code: $("#machine_code").val(),
+            name: $("#dev_name").val(),
+            password: $("#dev_password").val()
+        }
+        T.common.ajax.request('WeconBox', "baseInfoAction/boundBox", params, function (data, code, msg) {
+            if (code == 200) {
+                alert("PIBox绑定成功");
+            }
+            else {
+                alert(code + "-" + msg);
+            }
+        }, function () {
+            alert("ajax error");
+
+        });
+    }
+
 
 })

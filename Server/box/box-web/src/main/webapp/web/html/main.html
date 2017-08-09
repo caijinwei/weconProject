@@ -95,124 +95,113 @@
                             <div class="row">
                                 <div class="form-group">
                                     <i class="fa fa-code icon"></i>
-                                    <input type="text" class="form-control" placeholder="PIBox序列号"/>
+                                    <input type="text" class="form-control" id="machine_code" placeholder="PIBox机器码"/>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group">
                                     <i class="fa fa-lock fa-lg icon"></i>
-                                    <input type="password" class="form-control" placeholder="PIBox密码"/>
+                                    <input type="text" class="form-control" id="dev_password" placeholder="PIBox密码"/>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group">
                                     <i class="fa fa-user fa-lg icon"></i>
-                                    <input type="text" class="form-control" placeholder="PIBox别名"/>
+                                    <input type="text" class="form-control" id="dev_name" placeholder="PIBox别名"/>
                                 </div>
                             </div>
                             <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
-                                <select id="groupSelect" class=" form-control form-inline">
-                                    <option>默认分组</option>
-                                    <option>分组1</option>
-                                    <option>分组2</option>
-                                    <option>分组3</option>
+                                <select id="ref_id" class=" form-control form-inline" >
+                                    <option value="0">默认分组</option>
+                                    <option value="1">分组1</option>
+                                    <option value="2">分组2</option>
+                                    <option value="3">分组3</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-info">添加</button>
+                        <button type="button" class="btn btn-info" ng-click="boundBox()">添加</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                     </div>
                 </div>
             </div>
         </div>
-        <!--<ul id="side_nav">
+        <ul id="side_nav">
             <li>
                 <a href="#">
-                    <span class="glyphicon glyphicon-folder-open "> 默认分组</span>
+                    <span class="glyphicon glyphicon-folder-open "> 分组1</span>
                 </a>
                 <ul style="display: block;">
                     <a href="pibox.html" class="list-group-item" target="content_frame">盒子1-0</a>
                     <a href="pibox.html" class="list-group-item" target="content_frame">盒子1-1</a>
                 </ul>
             </li>
-            <li ng-repeat="x in grouplist">
+            <li>
                 <a href="#">
-                    <span class="glyphicon glyphicon-folder-close"> {{x.name}}</span>
+                    <span class="glyphicon glyphicon-folder-close"> 分组2</span>
                 </a>
-                <ul style="display: block;">
+                <ul>
                     <a href="pibox.html" class="list-group-item" target="content_frame">盒子2-0</a>
                     <a href="pibox.html" class="list-group-item" target="content_frame">盒子2-1</a>
                 </ul>
             </li>
-        </ul>-->
-        <div class="accordion" id="accordion" style="margin-top: 20px;margin-left: 10px;">
-            <div class="accordion-group">
-                <div class="accordion-heading">
-                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" >
-                        <span class="glyphicon glyphicon-folder-open" style="margin: 15px auto;width: 100%;color: #828e9a;"> 默认分组</span>
-                    </a>
-                </div>
-                <div id="collapseOne" class="accordion-body collapse in">
-                    <div class="accordion-inner">
-                        <ul style="list-style-type: none">
-                            <a href="pibox.html" class="list-group-item" target="content_frame" style="text-decoration: none;">盒子1-0</a>
-                            <a href="pibox.html" class="list-group-item" target="content_frame" style="text-decoration: none;">盒子1-1</a>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="accordion-group" ng-repeat="x in grouplist">
-                <div class="accordion-heading">
-                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse_{{x.id}}" >
-                        <span class="glyphicon glyphicon-folder-close" style="margin: 15px auto;width: 100%;color: #828e9a;"> {{x.name}}</span>
-                    </a>
-                </div>
-                <div id="collapse_{{x.id}}" class="accordion-body collapse">
-                    <div class="accordion-inner">
-                        <ul style="list-style-type: none">
-                            <a href="pibox.html" class="list-group-item" target="content_frame" style="text-decoration: none;">盒子2-0</a>
-                            <a href="pibox.html" class="list-group-item" target="content_frame" style="text-decoration: none;">盒子2-1</a>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
+            <li>
+                <a href="#">
+                    <span class="glyphicon glyphicon-folder-close"> 分组3</span>
+                </a>
+                <ul>
+                    <a href="pibox.html" class="list-group-item" target="content_frame">盒子3-0</a>
+                </ul>
+            </li>
+        </ul>
     </div>
     <div id="right" class="col-xs-9 col-sm-9 col-md-10 col-lg-10">
         <iframe src="overview.html" name="content_frame" frameborder="0"></iframe>
     </div>
 </div>
 <script src="../lib/jquery/jquery-3.2.1.min.js"></script>
-<script src="../lib/bootstrap/collapse/bootstrap-collapse.js"></script>
-<script src="../lib/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script>
-    /*$(function(){
-        $(".accordion-toggle").bind("click",function(){
-            chgIcon();
-        });
-        function chgIcon(){
-            console.log($(this).find('span'));
-            console.log($(this).find('span').text());
-            if($(this).find('span').attr("class")=="glyphicon glyphicon-folder-close"){
-                $(this).find('span').css("class","glyphicon glyphicon-folder-open");
-
-            }else{
-                $(this).find('span').css("class","glyphicon glyphicon-folder-close");
-            }
+<script type="text/javascript">
+    //        切换展开不同分组
+    (function () {
+        var navWrap = document.getElementById("side_nav");
+        var nav1s = navWrap.getElementsByTagName("span");
+        var nav2s = navWrap.getElementsByTagName("ul");
+        for (var i = 0, len = nav1s.length; i < len; i++) {
+            nav1s[i].onclick = (function (i) {
+                return function () {
+//                        for(var j=0;j<len;j++){
+//                            nav2s[j].style.display="none";
+//                        }
+                    if (nav2s[i].style.display == "none") {
+                        nav2s[i].style.display = "block";
+                        nav1s[i].className = "glyphicon glyphicon-folder-open";
+                    } else {
+                        nav2s[i].style.display = "none";
+                        nav1s[i].className = "glyphicon glyphicon-folder-close";
+                    }
+                }
+            })(i)
         }
-    })*/
-    /*$('.collapse').on('shown.bs.collapse',function () {
-        $(this).prev('div').find('span').removeClass('glyphicon-folder-close');
-        $(this).prev('div').find('span').addClass('glyphicon-folder-open');
-    }).on('hidden.bs.collapse',function () {
-        $(this).prev('div').find('span').removeClass('glyphicon-folder-open');
-        $(this).prev('div').find('span').addClass('glyphicon-folder-close');
-    })*/
+    })()
+    //        切换左侧列表项选中状态
+    $(function () {
+        $(".list-group-item").click(function () {
+            $(".list-group-item").removeClass("active box-item-active");
+            $(this).addClass("active box-item-active");
+        });
+    });
+
+    //        提示工具的显示
+    $(function () {
+        $("[data-toggle='tooltip']").tooltip();
+    })
 </script>
+</body>
+
+<script src="../lib/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="../lib/angular/angular.min.js" type="text/javascript"></script>
 <script src="../lib/wecon-common.js" type="text/javascript"></script>
 <script src="../js/main.js" type="text/javascript"></script>
-</body>
+
 </html>

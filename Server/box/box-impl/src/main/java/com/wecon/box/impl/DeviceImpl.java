@@ -1,12 +1,10 @@
 package com.wecon.box.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
+import com.wecon.box.api.DeviceApi;
+import com.wecon.box.entity.Device;
+import com.wecon.box.entity.Page;
+import com.wecon.box.filter.DeviceFilter;
+import com.wecon.common.util.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -14,11 +12,10 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import com.wecon.box.api.DeviceApi;
-import com.wecon.box.entity.Device;
-import com.wecon.box.entity.Page;
-import com.wecon.box.filter.DeviceFilter;
-import com.wecon.common.util.CommonUtils;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author lanpenghui 2017年8月4日上午10:01:01
@@ -61,7 +58,7 @@ public class DeviceImpl implements DeviceApi {
 		String sql = "update device set machine_code=?,password=?,dev_model=?,name=?,remark=?,map=?,state=?,dir_id=?,update_date=current_timestamp() where device_id=?";
 
 		jdbcTemplate.update(sql, new Object[] { model.machine_code, model.password, model.dev_model, model.name,
-				model.remark, model.map, model.state, model.dir_id ,model.device_id});
+				model.remark, model.map, model.state, model.dir_id, model.device_id });
 		return true;
 	}
 
@@ -89,7 +86,6 @@ public class DeviceImpl implements DeviceApi {
 	public void delDevice(long device_id) {
 		String sql = "delete from  device  where device_id=?";
 		jdbcTemplate.update(sql, new Object[] { device_id });
-
 	}
 
 	@Override
@@ -98,7 +94,7 @@ public class DeviceImpl implements DeviceApi {
 		String sql = "select " + SEL_COL + " from device where 1=1";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
-		if (!CommonUtils.isNullOrEmpty(filter.device_id)) {
+		if (filter.device_id>0) {
 			condition.append(" and device_id = ? ");
 			params.add(filter.device_id);
 		}
@@ -122,11 +118,11 @@ public class DeviceImpl implements DeviceApi {
 			condition.append(" and map like ? ");
 			params.add("%" + filter.map + "%");
 		}
-		if (!CommonUtils.isNullOrEmpty(filter.state)) {
+		if (filter.state>-1) {
 			condition.append(" and state = ? ");
 			params.add(filter.state);
 		}
-		if (!CommonUtils.isNullOrEmpty(filter.dir_id)) {
+		if (filter.dir_id>0) {
 			condition.append(" and dir_id = ? ");
 			params.add(filter.dir_id);
 		}
@@ -142,7 +138,6 @@ public class DeviceImpl implements DeviceApi {
 	}
 
 	public static final class DefaultDeviceRowMapper implements RowMapper<Device> {
-
 		@Override
 		public Device mapRow(ResultSet rs, int i) throws SQLException {
 			Device model = new Device();

@@ -12,6 +12,6 @@ public class DevBindUser {
 	 */
 	public long account_id;
 	public long device_id;
-	public Timestamp create_time;
+	public Timestamp create_date;
 
 }

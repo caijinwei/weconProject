@@ -109,7 +109,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 		String sql = "select " + SEL_COL + " from alarm_cfg_data where 1=1";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
-		if (!CommonUtils.isNullOrEmpty(filter.alarm_cfg_id)) {
+		if (filter.alarm_cfg_id>0) {
 			condition.append(" and alarm_cfg_id = ? ");
 			params.add(filter.alarm_cfg_id);
 		}
@@ -117,21 +117,21 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 			condition.append(" and value like ? ");
 			params.add("%" + filter.value + "%");
 		}
-		if (!CommonUtils.isNullOrEmpty(filter.state)) {
+		if (filter.state>-1) {
 			condition.append(" and state = ? ");
 			params.add(filter.state);
 		}
 		// 操作时间起
 		if (!CommonUtils.isNullOrEmpty(filter.start_date)) {
-			condition.append(" and date_format(alarm_cfg_data.monitor_time,'%Y-%m-%d') >= ");
-			condition.append(" date_format(str_to_date(?,'%Y-%m-%d'),'%Y-%m-%d') ");
+			condition.append(" and date_format(alarm_cfg_data.monitor_time,'%Y-%m-%d %H:%i') >= ");
+			condition.append(" date_format(str_to_date(?,'%Y-%m-%d %H:%i'),'%Y-%m-%d %H:%i') ");
 			params.add(CommonUtils.trim(filter.start_date));
 
 		}
 		// 操作时间止
 		if (!CommonUtils.isNullOrEmpty(filter.end_date)) {
-			condition.append(" and date_format(alarm_cfg_data.monitor_time,'%Y-%m-%d') >= ");
-			condition.append(" date_format(str_to_date(?,'%Y-%m-%d'),'%Y-%m-%d') ");
+			condition.append(" and date_format(alarm_cfg_data.monitor_time,'%Y-%m-%d %H:%i') <= ");
+			condition.append(" date_format(str_to_date(?,'%Y-%m-%d %H:%i'),'%Y-%m-%d %H:%i') ");
 			params.add(CommonUtils.trim(filter.end_date));
 
 		}
