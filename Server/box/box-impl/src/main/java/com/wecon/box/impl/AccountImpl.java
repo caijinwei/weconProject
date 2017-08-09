@@ -16,11 +16,17 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by zengzhipeng on 2017/8/1.
@@ -29,6 +35,9 @@ import java.util.UUID;
 public class AccountImpl implements AccountApi {
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public PlatformTransactionManager transactionManager;
 
     private final String SEL_COL = " account_id,username,`password`,phonenum,email,create_date,`type`,state,update_date,secret_key ";
 
@@ -48,13 +57,13 @@ public class AccountImpl implements AccountApi {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement preState = con.prepareStatement("insert into account(username,`password`,email,secret_key,create_date,`type`,state,update_date) values (?,?,?,?,current_timestamp(),?,?,current_timestamp() );", Statement.RETURN_GENERATED_KEYS);
-                String secret_key=DigestUtils.md5Hex(UUID.randomUUID().toString());
+                String secret_key = DigestUtils.md5Hex(UUID.randomUUID().toString());
                 preState.setString(1, username);
                 preState.setString(2, DigestUtils.md5Hex(password + secret_key));
                 preState.setString(3, email);
                 preState.setString(4, secret_key);
                 preState.setInt(5, 1);//注册帐号为管理帐号
-                preState.setInt(6, 1);//默认为启用
+                preState.setInt(6, -1);//未激活
 
                 return preState;
             }
@@ -78,7 +87,7 @@ public class AccountImpl implements AccountApi {
         builder.setLoginTime(loginTime);
 
         builder.setUserID(user.account_id);
-        builder.setAccount(user.user_name);
+        builder.setAccount(user.username);
         builder.setUserType(user.type);
         SessionState.UserInfo builderUser = builder.build();
 
@@ -89,8 +98,25 @@ public class AccountImpl implements AccountApi {
 
     @Override
     public boolean updateAccount(Account model) {
-        String sql = "update account set `password`=?,phonenum=?,email=?,state=?,update_date=current_timestamp()  where account_id=?";
-        jdbcTemplate.update(sql, new Object[]{model.password, model.phone_num, model.email, model.state, model.account_id});
+        String sql = "update account set phonenum=?,email=?,state=?,update_date=current_timestamp()  where account_id=?";
+        jdbcTemplate.update(sql, new Object[]{model.phonenum, model.email, model.state, model.account_id});
+        return true;
+    }
+
+    @Override
+    public boolean updateAccountPwd(long account_id, String oldpwd, String newpwd) {
+        Account model = getAccount(account_id);
+        if (model == null) {
+            throw new BusinessException(ErrorCodeOption.AccountNotExisted.key, ErrorCodeOption.AccountNotExisted.value);
+        }
+        String pwd = DigestUtils.md5Hex(oldpwd + model.secret_key);
+        if (!pwd.equals(model.password)) {
+            throw new BusinessException(ErrorCodeOption.OldPwdError.key, ErrorCodeOption.OldPwdError.value);
+        }
+        pwd = DigestUtils.md5Hex(newpwd + model.secret_key);
+        String sql = "update account set password=?,update_date=current_timestamp()  where account_id=?";
+        jdbcTemplate.update(sql, new Object[]{pwd, model.account_id});
+
         return true;
     }
 
@@ -128,13 +154,13 @@ public class AccountImpl implements AccountApi {
             condition += " and account_id = ? ";
             params.add(filter.account_id);
         }
-        if (filter.user_name != null && !filter.user_name.isEmpty()) {
+        if (filter.username != null && !filter.username.isEmpty()) {
             condition += " and username like ? ";
-            params.add("%" + filter.user_name + "%");
+            params.add("%" + filter.username + "%");
         }
-        if (filter.phone_num != null && !filter.phone_num.isEmpty()) {
+        if (filter.phonenum != null && !filter.phonenum.isEmpty()) {
             condition += " and phonenum like ? ";
-            params.add("%" + filter.phone_num + "%");
+            params.add("%" + filter.phonenum + "%");
         }
         if (filter.email != null && !filter.email.isEmpty()) {
             condition += " and email like ? ";
@@ -164,21 +190,93 @@ public class AccountImpl implements AccountApi {
         return page;
     }
 
+    @Override
+    public Page<Account> getViewAccountList(long managerId, int pageIndex, int pageSize) {
+        String sqlCount = "SELECT count(1) FROM account a " +
+                "INNER JOIN account_relation b on b.view_id=a.account_id ";
+        String sql = "SELECT  a.* FROM account a " +
+                "INNER JOIN account_relation b on b.view_id=a.account_id ";
+        String condition = "WHERE b.manager_id=?";
+        List<Object> params = new ArrayList<Object>();
+        params.add(managerId);
+        sqlCount += condition;
+        int totalRecord = jdbcTemplate.queryForObject(sqlCount,
+                params.toArray(),
+                Integer.class);
+        Page<Account> page = new Page<Account>(pageIndex, pageSize, totalRecord);
+        String sort = " order by a.account_id desc";
+        sql += condition + sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
+        List<Account> list = jdbcTemplate.query(sql,
+                params.toArray(),
+                new DefaultAccountRowMapper());
+        page.setList(list);
+        return page;
+    }
+
+    @Override
+    public boolean addViewAccount(final long managerId, final Account viewAccount) {
+        TransactionTemplate tt = new TransactionTemplate(transactionManager);
+        try {
+            tt.execute(new TransactionCallback() {
+                @Override
+                public Object doInTransaction(TransactionStatus ts) {
+                    //视图帐号，只能管理员用用户名注册
+                    String sql = "select count(1) from account where username = ? or email = ?  or phonenum = ?  ";
+
+                    int ret = jdbcTemplate.queryForObject(sql,
+                            new Object[]{viewAccount.username, viewAccount.username, viewAccount.username},
+                            Integer.class);
+                    if (ret > 0) {
+                        throw new BusinessException(ErrorCodeOption.AccountExisted.key, ErrorCodeOption.AccountExisted.value);
+                    }
+
+                    KeyHolder key = new GeneratedKeyHolder();
+                    jdbcTemplate.update(new PreparedStatementCreator() {
+                        @Override
+                        public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                            PreparedStatement preState = con.prepareStatement("insert into account(username,`password`,secret_key,create_date,`type`,state,update_date) values (?,?,?,current_timestamp(),?,?,current_timestamp() );", Statement.RETURN_GENERATED_KEYS);
+                            String secret_key = DigestUtils.md5Hex(UUID.randomUUID().toString());
+                            preState.setString(1, viewAccount.username);
+                            preState.setString(2, DigestUtils.md5Hex(viewAccount.password + secret_key));
+                            preState.setString(3, secret_key);
+                            preState.setInt(4, 2);//视图帐号
+                            preState.setInt(5, viewAccount.state);
+
+                            return preState;
+                        }
+                    }, key);
+                    //从主键持有者中获得主键值
+                    long view_id = key.getKey().longValue();
+
+                    //增加关联
+                    jdbcTemplate.update("insert into account_relation(manager_id,view_id) values (?,?);", new Object[]{managerId, view_id});
+
+                    return true;
+                }
+            });
+        } catch (Exception e) {
+            Logger.getLogger(AccountImpl.class.getName()).log(Level.SEVERE, null, e);
+            throw new BusinessException(ErrorCodeOption.AccountExisted.key, ErrorCodeOption.AccountExisted.value);
+//            throw new RuntimeException(e);
+        }
+        return true;
+    }
+
     public static final class DefaultAccountRowMapper implements RowMapper<Account> {
 
         @Override
         public Account mapRow(ResultSet rs, int i) throws SQLException {
             Account model = new Account();
             model.account_id = rs.getLong("account_id");
-            model.user_name = rs.getString("username");
+            model.username = rs.getString("username");
             model.password = rs.getString("password");
-            model.phone_num = rs.getString("phonenum");
+            model.phonenum = rs.getString("phonenum");
             model.email = rs.getString("email");
             model.type = rs.getInt("type");
             model.state = rs.getInt("state");
             model.create_date = rs.getTimestamp("create_date");
             model.update_date = rs.getTimestamp("update_date");
-            model.secret_key=rs.getString("secret_key");
+            model.secret_key = rs.getString("secret_key");
 
             return model;
         }

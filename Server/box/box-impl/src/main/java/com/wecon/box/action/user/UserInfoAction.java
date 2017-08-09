@@ -20,7 +20,7 @@ public class UserInfoAction extends UserBaseAction {
     public Output getUserInfo() {
         JSONObject data = new JSONObject();
         data.put("username", AppContext.getSession().client.account);
-//        data.put("uid", AppContext.getSession().client.userId);
+        data.put("type", AppContext.getSession().client.userInfo.getUserType());
         return new Output(data);
     }
 

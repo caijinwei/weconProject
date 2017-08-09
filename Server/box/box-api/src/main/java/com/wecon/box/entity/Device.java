@@ -1,6 +1,7 @@
 package com.wecon.box.entity;
 
 import java.sql.Timestamp;
+import java.util.List;
 /**
  * @author lanpenghui
  * 2017年8月1日
@@ -30,4 +31,5 @@ public class Device {
 	public long dir_id;
 	public Timestamp create_date;
 	public Timestamp update_date;
+	public List<PlcInfo> plcInfo;
 }

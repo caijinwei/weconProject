@@ -172,6 +172,25 @@ public class Session {
                 }
             }
         }*/
+        //-------->改成固定三类权限：帐号类型 0：超级管理员1：管理者帐号  2：视图帐号
+        //-------->根据client.userInfo.getUserType()的值判断有没有权限
+        if (client.userId > 0 && api.authority.length > 0) {
+            try {
+                boolean authpass = false;
+                for (String authority : api.authority) {
+                    int it = Integer.valueOf(authority);
+                    if (client.userInfo.getUserType() == it) {
+                        authpass = true;
+                        break;
+                    }
+                }
+                if (!authpass) {
+                    throw new DeniedException("access denied");
+                }
+            } catch (Throwable e) {
+                throw new DeniedException("access is error");
+            }
+        }
 
         if (!skipSign) {
             try {

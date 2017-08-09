@@ -51,6 +51,16 @@ public interface AccountApi {
     boolean updateAccount(Account model);
 
     /**
+     * 更新密码
+     *
+     * @param account_id
+     * @param oldpwd
+     * @param newpwd
+     * @return
+     */
+    boolean updateAccountPwd(long account_id, String oldpwd, String newpwd);
+
+    /**
      * 根据ID取帐号信息
      *
      * @param account_id
@@ -75,4 +85,23 @@ public interface AccountApi {
      * @return
      */
     Page<Account> getAccountList(AccountFilter filter, int pageIndex, int pageSize);
+
+    /**
+     * 获取视图帐号列表
+     *
+     * @param managerId
+     * @param pageIndex
+     * @param pageSize
+     * @return
+     */
+    Page<Account> getViewAccountList(long managerId, int pageIndex, int pageSize);
+
+    /**
+     * 新增视图帐号
+     *
+     * @param managerId
+     * @param viewAccount
+     * @return
+     */
+    boolean addViewAccount(long managerId, Account viewAccount);
 }

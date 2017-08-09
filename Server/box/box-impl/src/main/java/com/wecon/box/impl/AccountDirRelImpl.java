@@ -4,46 +4,77 @@ import com.wecon.box.api.AccountDirRelApi;
 import com.wecon.box.entity.AccountDirRel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
+import java.sql.*;
+import java.util.List;
+
 /**
- * Created by caijinw on 2017/8/9.
+ * @author lanpenghui 2017年8月7日下午1:51:25
  */
 @Component
-public class AccountDirRelImpl implements AccountDirRelApi
-{
-    @Autowired
-    JdbcTemplate jdbcTemplate;
+public class AccountDirRelImpl implements AccountDirRelApi {
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 
-    @Override
-    public long saveAccountDirRel(AccountDirRel model) {
-        String sql="INSERT INTO account_dir_rel (acc_dir_id,ref_id,create_date) VALUES(?,?,NOW())";
-        Object[] args=new Object[]{model.acc_dir_id,model.ref_id};
-        return jdbcTemplate.update(sql,args);
-    }
+	private final String SEL_COL = "acc_dir_id,ref_id,ref_alais,create_date";
 
-    @Override
-    public boolean updateAccountDirRel(AccountDirRel model) {
-        return false;
-    }
+	@Override
+	public long saveAccountDirRel(final AccountDirRel model) {
+		KeyHolder key = new GeneratedKeyHolder();
+		jdbcTemplate.update(new PreparedStatementCreator() {
+			@Override
+			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+				PreparedStatement preState = con.prepareStatement(
+						"insert into account_dir_rel(acc_dir_id,ref_id,ref_alais,create_date) values (?,?,?current_timestamp());",
+						Statement.RETURN_GENERATED_KEYS);
+				preState.setLong(1, model.acc_dir_id);
+				preState.setLong(1, model.ref_id);
+				preState.setString(2, model.ref_alais);
+				return preState;
+			}
+		}, key);
+		// 从主键持有者中获得主键值
+		return key.getKey().longValue();
+	}
 
-    @Override
-    public AccountDirRel getAccountDirRel(long acc_dir_id, long ref_id) {
-        return null;
-    }
+	@Override
+	public AccountDirRel getAccountDirRel(long acc_dir_id, long ref_id) {
+		
+		String sql = "select " + SEL_COL + " from account_dir where id=?";
+		List<AccountDirRel> list = jdbcTemplate.query(sql, new Object[] { acc_dir_id,ref_id }, new DefaultAccountDirRelRowMapper());
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+		return null;
+		
+		
+	}
 
-    @Override
-    public void delAccountDir(long acc_dir_id, long ref_id) {
-    }
+	@Override
+	public void delAccountDir(long acc_dir_id, long ref_id) {
+		
+			String sql = "delete from  account_dir  where acc_dir_id=? and ref_id=?";
+			jdbcTemplate.update(sql, new Object[] { acc_dir_id,ref_id });
 
-    @Override
-    public int findRecordingByAccDirid(long acc_dir_id)
-    {
-        Object[] args=new Object[]{acc_dir_id};
-        String sql="SELECT COUNT(*) FROM account_dir_rel WHERE acc_dir_id=?";
-        return jdbcTemplate.queryForObject(sql,args,Integer.class);
+		
 
-    }
+	}
+	public static final class DefaultAccountDirRelRowMapper implements RowMapper<AccountDirRel> {
 
+		@Override
+		public AccountDirRel mapRow(ResultSet rs, int i) throws SQLException {
+			AccountDirRel model = new AccountDirRel();
+			model.acc_dir_id = rs.getLong("acc_dir_id");
+			model.ref_id = rs.getLong("ref_id");
+			model.ref_alais = rs.getString("ref_alais");
+			model.create_date = rs.getTimestamp("create_date");
+			return model;
+		}
+	}
 
 }

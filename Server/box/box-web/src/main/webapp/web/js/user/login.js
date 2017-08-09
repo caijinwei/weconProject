@@ -28,9 +28,16 @@ $(function () {
                 location = "../main.html";
             }
             else {
-                alert(code + " " + msg);
+                alert( msg);
             }
         });
 
     });
+
+    document.onkeydown = function (event) {
+        var e = event || window.event || arguments.callee.caller.arguments[0];
+        if (e && e.keyCode == 13) {
+            $("#login").click();
+        }
+    };
 })
