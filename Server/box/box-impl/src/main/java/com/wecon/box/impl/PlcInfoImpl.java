@@ -1,40 +1,97 @@
 package com.wecon.box.impl;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
+import com.wecon.box.api.PlcInfoApi;
+import com.wecon.box.entity.PlcInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
-import com.wecon.box.api.PlcInfoApi;
-import com.wecon.box.entity.PlcInfo;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
- * @author lanpenghui 2017年8月7日下午3:39:13
+ * Created by caijinw on 2017/8/5.
  */
 @Component
-public class PlcInfoImpl implements PlcInfoApi {
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
-	private final String SEL_COL = "plc_id,device_id,type,driver,box_stat_no,plc_stat_no,port,comtype,baudrate,stop_bit,data_length,check_bit,retry_times,wait_timeout,rev_timeout,com_stepinterval,com_iodelaytime,retry_timeout,net_port,net_type,net_isbroadcast,net_broadcastaddr,net_ipaddr,state,create_date,update_date";
+public class PlcInfoImpl implements PlcInfoApi{
 
-	@Override
-	public long savePlcInfo(PlcInfo model) {
-		return 0;
-	}
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+private final String SEL_COL = "plc_id,device_id,type,driver,box_stat_no,plc_stat_no,port,comtype,baudrate,stop_bit,data_length,check_bit,retry_times,wait_timeout,rev_timeout,com_stepinterval,com_iodelaytime,retry_timeout,net_port,net_type,net_isbroadcast,net_broadcastaddr,net_ipaddr,state,create_date,update_date";
 
-	@Override
-	public boolean updatePlcInfo(PlcInfo model) {
-		return false;
-	}
+    /*
 
-	@Override
-	public PlcInfo getPlcInfo(long plc_id) {
+    通讯口配置
+    * */
+    @Override
+    public long SavePlcInfo(PlcInfo model) {
 
-		return null;
-	}
+        System.out.println("通讯口配置获取到的model值是"+model);
+        /*
+        * INSERT INTO plc_info (device_id,type,driver,box_stat_no,plc_stat_no,port,comtype,baudrate,stop_bit,
+            data_length,check_bit,retry_times,wait_timeout,rev_timeout,com_stepinterval,com_iodelaytime,retry_timeout,net_port,net_type,net_isbroadcast,net_broadcastaddr
+            ,net_ipaddr,state,create_date,update_date) VALUES("1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1","1",
+            "1","1","1",NOW(),NOW());
+*/
+
+        String sql="INSERT INTO plc_info (device_id,type,driver,box_stat_no,plc_stat_no,port,comtype,baudrate,stop_bit,\n" +
+                "data_length,check_bit,retry_times,wait_timeout,rev_timeout,com_stepinterval,com_iodelaytime,retry_timeout,net_port,net_type,net_isbroadcast,net_broadcastaddr\n" +
+                ",net_ipaddr,state,create_date,update_date) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())";
+
+        Object args[] = {model.device_id,model.type,model.driver,model.box_stat_no,model.plc_stat_no,model.port,model.comtype,model.baudrate,model.stop_bit,model.data_length,model.check_bit,
+        model.retry_times,model.wait_timeout,model.rev_timeout,model.com_stepinterval,model.com_iodelaytime,model.rev_timeout,model.net_port,model.net_type,model.net_isbroadcast,model.net_broadcastaddr,
+        model.net_ipaddr,model.state};
+        return  jdbcTemplate.update(sql, args);
+
+    }
+
+    /*
+    * 展示所有通讯口部分信息
+    * */
+    public List<PlcInfo> showAllPlcInfoByDeviceId(Integer deviceId)
+    {
+        Object args[]={deviceId};
+        String sql="SELECT plc_id,port,comtype,type FROM plc_info WHERE device_id=?";
+        return jdbcTemplate.query(sql,args,new RowMapper(){
+            @Override
+            public Object mapRow(ResultSet resultSet, int i) throws SQLException {
+                PlcInfo model=new PlcInfo();
+                model.plc_id=resultSet.getLong("plc_id");
+                model.port=resultSet.getString("port");
+                model.comtype=resultSet.getInt("comtype");
+                model.type=resultSet.getString("type");
+                return model;
+            }
+        });
+
+    }
+
+    @Override
+    public boolean updatePlcInfo(PlcInfo model) {
+
+        String sql="UPDATE plc_info SET" +
+                "device_id=?,type,driver=?,box_stat_no=?,plc_stat_no=?,port=?,comtype=?,baudrate=?,stop_bit=?," +
+                "data_length=?,check_bit=?,retry_times=?,wait_timeout=?,rev_timeout=?,com_stepinterval=?,com_iodelaytime=?," +
+                "retry_timeout=?,net_port=?,net_type=?,net_isbroadcast=?,net_broadcastaddr=?,net_ipaddr=?,state=?,update_date=NOW()" +
+                "WHERE plc_id=?";
+        Object args[] = {model.device_id,model.type,model.driver,model.box_stat_no,model.plc_stat_no,model.port,model.comtype,model.baudrate,model.stop_bit,model.data_length,model.check_bit,
+                model.retry_times,model.wait_timeout,model.rev_timeout,model.com_stepinterval,model.com_iodelaytime,model.rev_timeout,model.net_port,model.net_type,model.net_isbroadcast,model.net_broadcastaddr,
+                model.net_ipaddr,model.state,model.plc_id};
+    
+        return true;
+    }
+
+    @Override
+    public PlcInfo getPlcInfo(long plc_id) {
+        return null;
+    }
+
+    @Override
+    public void delPlcInfo(long plc_id) {
+
+    }
 
 	@Override
 	public List<PlcInfo> getListPlcInfo(long device_id) {
@@ -47,12 +104,8 @@ public class PlcInfoImpl implements PlcInfoApi {
 		return null;
 	}
 
-	@Override
-	public void delPlcInfo(long plc_id) {
 
-	}
-
-	public static final class DefaultPlcInfoRowMapper implements RowMapper<PlcInfo> {
+public static final class DefaultPlcInfoRowMapper implements RowMapper<PlcInfo> {
 
 		@Override
 		public PlcInfo mapRow(ResultSet rs, int i) throws SQLException {
@@ -86,5 +139,4 @@ public class PlcInfoImpl implements PlcInfoApi {
 			return model;
 		}
 	}
-
 }

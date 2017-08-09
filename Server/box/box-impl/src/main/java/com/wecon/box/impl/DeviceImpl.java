@@ -1,12 +1,10 @@
 package com.wecon.box.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
+import com.wecon.box.api.DeviceApi;
+import com.wecon.box.entity.Device;
+import com.wecon.box.entity.Page;
+import com.wecon.box.filter.DeviceFilter;
+import com.wecon.common.util.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -14,11 +12,10 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import com.wecon.box.api.DeviceApi;
-import com.wecon.box.entity.Device;
-import com.wecon.box.entity.Page;
-import com.wecon.box.filter.DeviceFilter;
-import com.wecon.common.util.CommonUtils;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author lanpenghui 2017年8月4日上午10:01:01
@@ -89,7 +86,6 @@ public class DeviceImpl implements DeviceApi {
 	public void delDevice(long device_id) {
 		String sql = "delete from  device  where device_id=?";
 		jdbcTemplate.update(sql, new Object[] { device_id });
-
 	}
 
 	@Override
@@ -142,7 +138,6 @@ public class DeviceImpl implements DeviceApi {
 	}
 
 	public static final class DefaultDeviceRowMapper implements RowMapper<Device> {
-
 		@Override
 		public Device mapRow(ResultSet rs, int i) throws SQLException {
 			Device model = new Device();

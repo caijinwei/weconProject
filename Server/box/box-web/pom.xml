@@ -34,6 +34,11 @@
       <type>pom</type>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlet</artifactId>
+      <version>9.4.6.v20170531</version>
+    </dependency>
   </dependencies>
 
   <build>

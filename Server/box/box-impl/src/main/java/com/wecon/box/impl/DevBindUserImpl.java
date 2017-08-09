@@ -1,12 +1,8 @@
 package com.wecon.box.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
+import com.wecon.box.api.DevBindUserApi;
+import com.wecon.box.entity.DevBindUser;
+import com.wecon.box.filter.DevBindUserFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -15,10 +11,9 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import com.wecon.box.api.DevBindUserApi;
-import com.wecon.box.entity.DevBindUser;
-import com.wecon.box.filter.DevBindUserFilter;
-import com.wecon.common.util.CommonUtils;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author lanpenghui 2017年8月7日下午3:20:16
@@ -40,7 +35,7 @@ public class DevBindUserImpl implements DevBindUserApi {
 						"insert into dev_bind_user (account_id,device_id,create_date)values(?,?,current_timestamp());",
 						Statement.RETURN_GENERATED_KEYS);
 				preState.setLong(1, model.account_id);
-				preState.setLong(1, model.device_id);
+				preState.setLong(2, model.device_id);
 
 				return preState;
 			}
@@ -78,6 +73,11 @@ public class DevBindUserImpl implements DevBindUserApi {
 	@Override
 	public void delDevBindUser(long account_id, long device_id) {
 
+	}
+
+	@Override
+	public int findByDevId(long device_id) {
+		return 0;
 	}
 
 	public static final class DefaultDevBindUserRowMapper implements RowMapper<DevBindUser> {

@@ -41,6 +41,7 @@ public class PlcInfo {
 	public int box_stat_no;
 	public int plc_stat_no;
 	public String port;
+	//默认 1为RS232   2为RS432 3为485
 	public int comtype;
 	public String baudrate;
 	public int  stop_bit;
@@ -60,5 +61,36 @@ public class PlcInfo {
 	public int state;
 	public Timestamp create_date;
 	public Timestamp update_date;
-	
+
+	@Override
+	public String toString() {
+		return "PlcInfo{" +
+				"plc_id=" + plc_id +
+				", device_id=" + device_id +
+				", type='" + type + '\'' +
+				", driver='" + driver + '\'' +
+				", box_stat_no=" + box_stat_no +
+				", plc_stat_no=" + plc_stat_no +
+				", port='" + port + '\'' +
+				", comtype=" + comtype +
+				", baudrate='" + baudrate + '\'' +
+				", stop_bit=" + stop_bit +
+				", data_length=" + data_length +
+				", check_bit='" + check_bit + '\'' +
+				", retry_times=" + retry_times +
+				", wait_timeout=" + wait_timeout +
+				", rev_timeout=" + rev_timeout +
+				", com_stepinterval=" + com_stepinterval +
+				", com_iodelaytime=" + com_iodelaytime +
+				", retry_timeout=" + retry_timeout +
+				", net_port=" + net_port +
+				", net_type=" + net_type +
+				", net_isbroadcast=" + net_isbroadcast +
+				", net_broadcastaddr=" + net_broadcastaddr +
+				", net_ipaddr='" + net_ipaddr + '\'' +
+				", state=" + state +
+				", create_date=" + create_date +
+				", update_date=" + update_date +
+				'}';
+	}
 }

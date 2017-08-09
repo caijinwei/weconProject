@@ -1,13 +1,10 @@
 package com.wecon.box.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
+import com.wecon.box.api.RealHisCfgDataApi;
+import com.wecon.box.entity.Page;
+import com.wecon.box.entity.RealHisCfgData;
+import com.wecon.box.filter.RealHisCfgDataFilter;
+import com.wecon.common.util.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,11 +13,11 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import com.wecon.box.api.RealHisCfgDataApi;
-import com.wecon.box.entity.Page;
-import com.wecon.box.entity.RealHisCfgData;
-import com.wecon.box.filter.RealHisCfgDataFilter;
-import com.wecon.common.util.CommonUtils;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * @author lanpenghui 2017年8月2日

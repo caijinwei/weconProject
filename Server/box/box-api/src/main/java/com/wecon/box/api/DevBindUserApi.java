@@ -34,4 +34,9 @@ public interface DevBindUserApi {
 	 * @param device_id
 	 */
 	public void delDevBindUser(long account_id,long device_id);
+
+	/*
+	* 根据设备号查询记录
+	* */
+	public int findByDevId(long device_id);
 }
