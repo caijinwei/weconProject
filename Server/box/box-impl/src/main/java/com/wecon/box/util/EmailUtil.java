@@ -1,14 +1,10 @@
 package com.wecon.box.util;
 
-import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
-import com.wecon.restful.core.Session;
-
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.net.PasswordAuthentication;
 import java.util.Date;
 import java.util.Properties;
-
 
 /**
  * Created by zengzhipeng on 2017/8/4.

@@ -24,12 +24,12 @@
         </caption>
         <thead>
         <tr>
-            <th class="col-md-2">用户名</th>
-            <th class="col-md-2">邮箱</th>
-            <th class="col-md-2">手机号</th>
-            <th class="col-md-1">启用</th>
-            <th class="col-md-2">创建时间</th>
-            <th class="col-md-3">操作</th>
+            <th>用户名</th>
+            <th>邮箱</th>
+            <th>手机号</th>
+            <th>启用</th>
+            <th>创建时间</th>
+            <th>操作</th>
         </tr>
         </thead>
         <tbody>
@@ -45,8 +45,11 @@
                 <button class="btn {{x.state?'btn-danger':'btn-success'}} btn-xs {{x.state?'glyphicon glyphicon-remove':'glyphicon glyphicon-ok'}}"
                         ng-click="methods.updstate(x)">{{x.state?'禁用':'启用'}}
                 </button>
-                <button class="btn btn-primary btn-xs glyphicon glyphicon-list-alt" ng-click="methods.viewpoint(x)">
-                    查看监控点
+                <button class="btn btn-primary btn-xs glyphicon glyphicon-eye-open" ng-click="methods.viewpoint0(x)">实时监控点
+                </button>
+                <button class="btn btn-primary btn-xs glyphicon glyphicon-stats" ng-click="methods.viewpoint1(x)">历史监控点
+                </button>
+                <button class="btn btn-primary btn-xs glyphicon glyphicon-warning-sign" ng-click="methods.viewpointalarm(x)">报警监控点
                 </button>
             </td>
         </tr>

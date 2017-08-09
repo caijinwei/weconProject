@@ -120,8 +120,14 @@ appModule.controller("listController", function ($scope, $http, $compile) {
                 });
             }
         },
-        viewpoint: function (model) {
-            location = "viewpoint.html?viewid=" + model.account_id + "&name=" + model.username;
+        viewpoint0: function (model) {
+            location = "viewpoint.html?type=0&viewid=" + model.account_id + "&name=" + model.username;
+        },
+        viewpoint1: function (model) {
+            location = "viewpoint.html?type=1&viewid=" + model.account_id + "&name=" + model.username;
+        },
+        viewpointalarm:function (model) {
+            location = "viewpointalarm.html?viewid=" + model.account_id + "&name=" + model.username;
         }
     }
 })
