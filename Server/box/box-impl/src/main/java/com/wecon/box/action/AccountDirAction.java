@@ -72,6 +72,25 @@ public class AccountDirAction {
         }
         return new Output();
     }
+
+    @Description("获取首页盒子分组列表（包含绑定的盒子）")
+    @RequestMapping(value = "/getmainboxs")
+    @WebApi(forceAuth = true, master = true, authority = {"1", "2"})
+    public Output getMainBoxs() {
+        if (AppContext.getSession().client.userInfo.getUserType() == 1) {
+            //管理帐号直接根据绑定盒子展示
+            //1.默认分组获取所有绑定的盒子
+
+            //2.根据分组，获取各个分组的绑定的盒子
+
+        } else if (AppContext.getSession().client.userInfo.getUserType() == 2) {
+            //视图帐号，根据拥有的监控点权限去获取盒子列表
+
+        }
+
+
+        return new Output();
+    }
 }
 
 class UserDirParam {

@@ -30,11 +30,11 @@ public class AccountDirRelImpl implements AccountDirRelApi {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
 				PreparedStatement preState = con.prepareStatement(
-						"insert into account_dir_rel(acc_dir_id,ref_id,ref_alais,create_date) values (?,?,?current_timestamp());",
+						"insert into account_dir_rel(acc_dir_id,ref_id,ref_alais,create_date) values (?,?,?,current_timestamp());",
 						Statement.RETURN_GENERATED_KEYS);
 				preState.setLong(1, model.acc_dir_id);
-				preState.setLong(1, model.ref_id);
-				preState.setString(2, model.ref_alais);
+				preState.setLong(2, model.ref_id);
+				preState.setString(3, model.ref_alais);
 				return preState;
 			}
 		}, key);
