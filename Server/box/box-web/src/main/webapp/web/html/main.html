@@ -111,25 +111,12 @@
                                 </div>
                             </div>
                             <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
-                                <div class="dropdown">
-                                    <button type="button" class="btn btn-default dropdown-toggle"
-                                            style="width: 100%;text-align: left" id="myDropdownMenu"
-                                            data-toggle="dropdown">
-                                        选择分组
-                                        <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu" role="menu" aria-labelledby="myDropdownMenu">
-                                        <li class="presentation">
-                                            <a href="#" tabindex="-1" role="menuitem">分组一</a>
-                                        </li>
-                                        <li class="presentation">
-                                            <a href="#" tabindex="-1" role="menuitem">分组二</a>
-                                        </li>
-                                        <li class="presentation">
-                                            <a href="#" tabindex="-1" role="menuitem">分组三</a>
-                                        </li>
-                                    </ul>
-                                </div>
+                                <select id="groupSelect" class=" form-control form-inline">
+                                    <option>默认分组</option>
+                                    <option>分组1</option>
+                                    <option>分组2</option>
+                                    <option>分组3</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -140,81 +127,92 @@
                 </div>
             </div>
         </div>
-        <ul id="side_nav">
+        <!--<ul id="side_nav">
             <li>
                 <a href="#">
-                    <span class="glyphicon glyphicon-folder-open "> 分组1</span>
+                    <span class="glyphicon glyphicon-folder-open "> 默认分组</span>
                 </a>
                 <ul style="display: block;">
                     <a href="pibox.html" class="list-group-item" target="content_frame">盒子1-0</a>
                     <a href="pibox.html" class="list-group-item" target="content_frame">盒子1-1</a>
                 </ul>
             </li>
-            <li>
+            <li ng-repeat="x in grouplist">
                 <a href="#">
-                    <span class="glyphicon glyphicon-folder-close"> 分组2</span>
+                    <span class="glyphicon glyphicon-folder-close"> {{x.name}}</span>
                 </a>
-                <ul>
+                <ul style="display: block;">
                     <a href="pibox.html" class="list-group-item" target="content_frame">盒子2-0</a>
                     <a href="pibox.html" class="list-group-item" target="content_frame">盒子2-1</a>
                 </ul>
             </li>
-            <li>
-                <a href="#">
-                    <span class="glyphicon glyphicon-folder-close"> 分组3</span>
-                </a>
-                <ul>
-                    <a href="pibox.html" class="list-group-item" target="content_frame">盒子3-0</a>
-                </ul>
-            </li>
-        </ul>
+        </ul>-->
+        <div class="accordion" id="accordion" style="margin-top: 20px;margin-left: 10px;">
+            <div class="accordion-group">
+                <div class="accordion-heading">
+                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" >
+                        <span class="glyphicon glyphicon-folder-open" style="margin: 15px auto;width: 100%;color: #828e9a;"> 默认分组</span>
+                    </a>
+                </div>
+                <div id="collapseOne" class="accordion-body collapse in">
+                    <div class="accordion-inner">
+                        <ul style="list-style-type: none">
+                            <a href="pibox.html" class="list-group-item" target="content_frame" style="text-decoration: none;">盒子1-0</a>
+                            <a href="pibox.html" class="list-group-item" target="content_frame" style="text-decoration: none;">盒子1-1</a>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-group" ng-repeat="x in grouplist">
+                <div class="accordion-heading">
+                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse_{{x.id}}" >
+                        <span class="glyphicon glyphicon-folder-close" style="margin: 15px auto;width: 100%;color: #828e9a;"> {{x.name}}</span>
+                    </a>
+                </div>
+                <div id="collapse_{{x.id}}" class="accordion-body collapse">
+                    <div class="accordion-inner">
+                        <ul style="list-style-type: none">
+                            <a href="pibox.html" class="list-group-item" target="content_frame" style="text-decoration: none;">盒子2-0</a>
+                            <a href="pibox.html" class="list-group-item" target="content_frame" style="text-decoration: none;">盒子2-1</a>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div id="right" class="col-xs-9 col-sm-9 col-md-10 col-lg-10">
         <iframe src="overview.html" name="content_frame" frameborder="0"></iframe>
     </div>
 </div>
 <script src="../lib/jquery/jquery-3.2.1.min.js"></script>
-<script type="text/javascript">
-    //        切换展开不同分组
-    (function () {
-        var navWrap = document.getElementById("side_nav");
-        var nav1s = navWrap.getElementsByTagName("span");
-        var nav2s = navWrap.getElementsByTagName("ul");
-        for (var i = 0, len = nav1s.length; i < len; i++) {
-            nav1s[i].onclick = (function (i) {
-                return function () {
-//                        for(var j=0;j<len;j++){
-//                            nav2s[j].style.display="none";
-//                        }
-                    if (nav2s[i].style.display == "none") {
-                        nav2s[i].style.display = "block";
-                        nav1s[i].className = "glyphicon glyphicon-folder-open";
-                    } else {
-                        nav2s[i].style.display = "none";
-                        nav1s[i].className = "glyphicon glyphicon-folder-close";
-                    }
-                }
-            })(i)
-        }
-    })()
-    //        切换左侧列表项选中状态
-    $(function () {
-        $(".list-group-item").click(function () {
-            $(".list-group-item").removeClass("active box-item-active");
-            $(this).addClass("active box-item-active");
-        });
-    });
-
-    //        提示工具的显示
-    $(function () {
-        $("[data-toggle='tooltip']").tooltip();
-    })
-</script>
-</body>
-
+<script src="../lib/bootstrap/collapse/bootstrap-collapse.js"></script>
 <script src="../lib/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+    /*$(function(){
+        $(".accordion-toggle").bind("click",function(){
+            chgIcon();
+        });
+        function chgIcon(){
+            console.log($(this).find('span'));
+            console.log($(this).find('span').text());
+            if($(this).find('span').attr("class")=="glyphicon glyphicon-folder-close"){
+                $(this).find('span').css("class","glyphicon glyphicon-folder-open");
+
+            }else{
+                $(this).find('span').css("class","glyphicon glyphicon-folder-close");
+            }
+        }
+    })*/
+    /*$('.collapse').on('shown.bs.collapse',function () {
+        $(this).prev('div').find('span').removeClass('glyphicon-folder-close');
+        $(this).prev('div').find('span').addClass('glyphicon-folder-open');
+    }).on('hidden.bs.collapse',function () {
+        $(this).prev('div').find('span').removeClass('glyphicon-folder-open');
+        $(this).prev('div').find('span').addClass('glyphicon-folder-close');
+    })*/
+</script>
 <script src="../lib/angular/angular.min.js" type="text/javascript"></script>
 <script src="../lib/wecon-common.js" type="text/javascript"></script>
 <script src="../js/main.js" type="text/javascript"></script>
-
+</body>
 </html>
