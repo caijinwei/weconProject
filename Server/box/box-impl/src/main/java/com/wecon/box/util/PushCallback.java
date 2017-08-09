@@ -1,4 +1,4 @@
-package com.wecon.box.action;
+package com.wecon.box.util;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;

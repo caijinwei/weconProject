@@ -19,8 +19,11 @@ public enum ErrorCodeOption {
     EmailIsSame("邮箱没有变化", 11009),
     CanAddTheSameGroup("分组命名不能重复", 11010),
     UserGroupTypeIsUndefined("分组类型未定义", 11011),
-    OnlyOperateOneselfGroup("只能操作自己创建的分组", 11012);
+    OnlyOperateOneselfGroup("只能操作自己创建的分组", 11012),
 
+    Account_Permissions_No("账户权限不足，无法新增盒子", 30001),
+    Device_NotFound("该设备不存在",30002),
+    Device_AlreadyBind("该设备已经被别的用户绑定",300023);
     public int value;
     public String key;
 

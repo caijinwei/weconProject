@@ -1,12 +1,15 @@
 package com.wecon.box.api;
 
+import com.wecon.box.entity.DevBindUser;
+import com.wecon.box.filter.DevBindUserFilter;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+
 /**
  * @author lanpenghui
  * 2017年8月1日
  */
-
-import com.wecon.box.entity.DevBindUser;
 @Component
 public interface DevBindUserApi {
 	/**
@@ -15,24 +18,15 @@ public interface DevBindUserApi {
 	 * @param model
 	 * @return
 	 */
-	public long SaveDevBindUser(DevBindUser model);
+	public void saveDevBindUser(DevBindUser model);
 
-	/**
-	 * 更新用户关联设备
-	 *
-	 * @param model
-	 * @return
-	 */
-	public boolean updateDevBindUser(DevBindUser model);
 
-	
 	/**
 	 * 查询某条用户关联设备信息
-	 * @param account_id
-	 * @param device_id
+	 * @param devBindUser
 	 * @return
 	 */
-	public DevBindUser getDevBindUser(long account_id,long device_id);
+	public List<DevBindUser> getDevBindUser(DevBindUserFilter devBindUser);
 
 	/**
 	 * 删除某条用户关联设备信息
@@ -40,4 +34,9 @@ public interface DevBindUserApi {
 	 * @param device_id
 	 */
 	public void delDevBindUser(long account_id,long device_id);
+
+	/*
+	* 根据设备号查询记录
+	* */
+	public int findByDevId(long device_id);
 }

@@ -61,7 +61,7 @@
             </div>
             <div class="btn-group" data-toggle="tooltip">
                 <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addPIBox"
-                        data-placement="bottom" title="添加盒子">
+                        data-placement="bottom" title="添加盒子"  ng-click="getRefList()">
                     <span class="glyphicon glyphicon-plus btn-item"></span>
                 </button>
             </div>
@@ -83,7 +83,7 @@
 
         </div>
         <!--添加盒子对话框-->
-        <div class="modal" id="addPIBox" tabindex="-1" data-backdrop="false">
+        <div class="modal" id="addPIBox" tabindex="-1" data-backdrop="false" >
             <div class="modal-dialog modal-sm">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -95,47 +95,32 @@
                             <div class="row">
                                 <div class="form-group">
                                     <i class="fa fa-code icon"></i>
-                                    <input type="text" class="form-control" placeholder="PIBox序列号"/>
+                                    <input type="text" class="form-control" id="machine_code" placeholder="PIBox机器码"/>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group">
                                     <i class="fa fa-lock fa-lg icon"></i>
-                                    <input type="password" class="form-control" placeholder="PIBox密码"/>
+                                    <input type="text" class="form-control" id="dev_password" placeholder="PIBox密码"/>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group">
                                     <i class="fa fa-user fa-lg icon"></i>
-                                    <input type="text" class="form-control" placeholder="PIBox别名"/>
+                                    <input type="text" class="form-control" id="dev_name" placeholder="PIBox别名"/>
                                 </div>
                             </div>
                             <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
-                                <div class="dropdown">
-                                    <button type="button" class="btn btn-default dropdown-toggle"
-                                            style="width: 100%;text-align: left" id="myDropdownMenu"
-                                            data-toggle="dropdown">
-                                        选择分组
-                                        <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu" role="menu" aria-labelledby="myDropdownMenu">
-                                        <li class="presentation">
-                                            <a href="#" tabindex="-1" role="menuitem">分组一</a>
-                                        </li>
-                                        <li class="presentation">
-                                            <a href="#" tabindex="-1" role="menuitem">分组二</a>
-                                        </li>
-                                        <li class="presentation">
-                                            <a href="#" tabindex="-1" role="menuitem">分组三</a>
-                                        </li>
-                                    </ul>
-                                </div>
+                                <select id="acc_dir_id" class=" form-control form-inline" >
+                                    <option value="0">默认分组</option>
+                                    <option ng-repeat="x in refList" value="{{x.id}}" >{{x.name}}</option>
+                                </select>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-info">添加</button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-info" ng-click="boundBox()">添加</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="clearInput()">取消</button>
                     </div>
                 </div>
             </div>
