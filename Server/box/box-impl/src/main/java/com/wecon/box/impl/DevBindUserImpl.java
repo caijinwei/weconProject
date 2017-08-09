@@ -5,13 +5,11 @@ import com.wecon.box.entity.DevBindUser;
 import com.wecon.box.filter.DevBindUserFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,24 +23,9 @@ public class DevBindUserImpl implements DevBindUserApi {
     private final String SEL_COL = "account_id,device_id,create_date";
 
     @Override
-    public long saveDevBindUser(final DevBindUser model) {
-
-        KeyHolder key = new GeneratedKeyHolder();
-        jdbcTemplate.update(new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                PreparedStatement preState = con.prepareStatement(
-                        "insert into dev_bind_user (account_id,device_id,create_date)values(?,?,current_timestamp());",
-                        Statement.RETURN_GENERATED_KEYS);
-                preState.setLong(1, model.account_id);
-                preState.setLong(2, model.device_id);
-
-                return preState;
-            }
-        }, key);
-        // 从主键持有者中获得主键值
-        return key.getKey().longValue();
-
+    public void saveDevBindUser(final DevBindUser model) {
+        String sql="insert into dev_bind_user (account_id,device_id,create_date)values(?,?,current_timestamp())";
+        jdbcTemplate.update(sql,new Object[]{model.account_id,model.device_id});
     }
 
     @Override

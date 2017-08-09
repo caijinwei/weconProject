@@ -61,7 +61,7 @@
             </div>
             <div class="btn-group" data-toggle="tooltip">
                 <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addPIBox"
-                        data-placement="bottom" title="添加盒子">
+                        data-placement="bottom" title="添加盒子"  ng-click="getRefList()">
                     <span class="glyphicon glyphicon-plus btn-item"></span>
                 </button>
             </div>
@@ -83,7 +83,7 @@
 
         </div>
         <!--添加盒子对话框-->
-        <div class="modal" id="addPIBox" tabindex="-1" data-backdrop="false">
+        <div class="modal" id="addPIBox" tabindex="-1" data-backdrop="false" >
             <div class="modal-dialog modal-sm">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -111,18 +111,16 @@
                                 </div>
                             </div>
                             <div class="row" style="margin-top: 20px;margin-bottom: 20px;">
-                                <select id="ref_id" class=" form-control form-inline" >
+                                <select id="acc_dir_id" class=" form-control form-inline" >
                                     <option value="0">默认分组</option>
-                                    <option value="1">分组1</option>
-                                    <option value="2">分组2</option>
-                                    <option value="3">分组3</option>
+                                    <option ng-repeat="x in refList" value="{{x.id}}" >{{x.name}}</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-info" ng-click="boundBox()">添加</button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="clearInput()">取消</button>
                     </div>
                 </div>
             </div>

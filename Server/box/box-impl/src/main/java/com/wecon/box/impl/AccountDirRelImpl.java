@@ -4,13 +4,11 @@ import com.wecon.box.api.AccountDirRelApi;
 import com.wecon.box.entity.AccountDirRel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -24,22 +22,11 @@ public class AccountDirRelImpl implements AccountDirRelApi {
 	private final String SEL_COL = "acc_dir_id,ref_id,ref_alais,create_date";
 
 	@Override
-	public long saveAccountDirRel(final AccountDirRel model) {
-		KeyHolder key = new GeneratedKeyHolder();
-		jdbcTemplate.update(new PreparedStatementCreator() {
-			@Override
-			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-				PreparedStatement preState = con.prepareStatement(
-						"insert into account_dir_rel(acc_dir_id,ref_id,ref_alais,create_date) values (?,?,?,current_timestamp());",
-						Statement.RETURN_GENERATED_KEYS);
-				preState.setLong(1, model.acc_dir_id);
-				preState.setLong(2, model.ref_id);
-				preState.setString(3, model.ref_alais);
-				return preState;
-			}
-		}, key);
-		// 从主键持有者中获得主键值
-		return key.getKey().longValue();
+	public void saveAccountDirRel(final AccountDirRel model) {
+
+		String sql="insert into account_dir_rel(acc_dir_id,ref_id,ref_alais,create_date) values (?,?,?,current_timestamp())";
+		Object[] args=new Object[]{model.acc_dir_id,model.ref_id,model.ref_alais};
+		jdbcTemplate.update(sql,args);
 	}
 
 	@Override
