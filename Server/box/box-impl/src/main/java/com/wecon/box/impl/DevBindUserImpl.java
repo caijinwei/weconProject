@@ -72,16 +72,12 @@ public class DevBindUserImpl implements DevBindUserApi {
 
 	@Override
 	public void delDevBindUser(long account_id, long device_id) {
-
 	}
-
 	@Override
 	public int findByDevId(long device_id) {
 		return 0;
 	}
-
 	public static final class DefaultDevBindUserRowMapper implements RowMapper<DevBindUser> {
-
 		@Override
 		public DevBindUser mapRow(ResultSet rs, int i) throws SQLException {
 			DevBindUser model = new DevBindUser();

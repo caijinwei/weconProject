@@ -5,7 +5,6 @@ var appModule = angular.module('weconweb', []);
 appModule.controller("infoController", function ($scope, $http, $compile) {
     $scope.onInit = function () {
         T.common.user.checkAuth();
-
         T.common.ajax.request('WeconBox', "user/userinfo", new Object(), function (data, code, msg) {
             if (code == 200) {
                 $scope.username = data.username;
@@ -17,7 +16,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             }
         });
     }
-
     $scope.logout = function () {
         T.common.ajax.request('WeconBox', "user/signout", new Object(), function (data, code, msg) {
             if (code == 200) {
@@ -28,9 +26,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             }
         });
     }
-
-
-
     /*
     * 添加盒子
     *  1）判定条件：
@@ -46,6 +41,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         if($("#ref_id").val()==""||$("#machine_code").val()==""||$("#dev_password").val()=="")
         {
             alert("必填参数没有填写完整");
+            return;
         }
         var params=
         {
@@ -53,7 +49,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             machine_code:$("#machine_code").val(),
             name:$("#dev_name").val(),
             password:$("#dev_password").val()
-        }
+            }
         T.common.ajax.request('WeconBox', "baseInfoAction/boundBox", params,function (data, code, msg) {
             if (code == 200) {
                alert("PIbox绑定成功");
@@ -63,7 +59,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             }
         }, function () {
             alert("ajax error");
-
         });
     }
 })
