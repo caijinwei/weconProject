@@ -15,7 +15,7 @@ public interface ConfiginfoApi {
 	 * @param model
 	 * @return
 	 */
-	public long SaveConfiginfo(Configinfo model);
+	public long saveConfiginfo(Configinfo model);
 
 	/**
 	 * 更新配置信息

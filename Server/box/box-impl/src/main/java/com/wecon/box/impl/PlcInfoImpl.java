@@ -21,7 +21,7 @@ public class PlcInfoImpl implements PlcInfoApi {
 	private final String SEL_COL = "plc_id,device_id,type,driver,box_stat_no,plc_stat_no,port,comtype,baudrate,stop_bit,data_length,check_bit,retry_times,wait_timeout,rev_timeout,com_stepinterval,com_iodelaytime,retry_timeout,net_port,net_type,net_isbroadcast,net_broadcastaddr,net_ipaddr,state,create_date,update_date";
 
 	@Override
-	public long SavePlcInfo(PlcInfo model) {
+	public long savePlcInfo(PlcInfo model) {
 		return 0;
 	}
 

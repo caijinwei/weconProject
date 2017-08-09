@@ -32,7 +32,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 	private final String SEL_COL = "alarm_cfg_id,monitor_time,`value`,create_date,state";
 
 	@Override
-	public long SaveAlarmCfgData(final AlarmCfgData model) {
+	public long saveAlarmCfgData(final AlarmCfgData model) {
 		KeyHolder key = new GeneratedKeyHolder();
 		jdbcTemplate.update(new PreparedStatementCreator() {
 			@Override

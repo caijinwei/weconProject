@@ -15,7 +15,7 @@ public interface AlarmTriggerApi {
 	 * @param model
 	 * @return
 	 */
-	public long SaveAlarmTrigger(AlarmTrigger model);
+	public long saveAlarmTrigger(AlarmTrigger model);
 
 	/**
 	 * 更新报警触发条件

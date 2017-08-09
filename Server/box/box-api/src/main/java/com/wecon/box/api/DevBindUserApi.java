@@ -18,7 +18,7 @@ public interface DevBindUserApi {
 	 * @param model
 	 * @return
 	 */
-	public long SaveDevBindUser(DevBindUser model);
+	public long saveDevBindUser(DevBindUser model);
 
 
 	/**

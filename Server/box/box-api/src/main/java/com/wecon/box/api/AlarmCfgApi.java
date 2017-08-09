@@ -16,7 +16,7 @@ public interface AlarmCfgApi {
 	 * @param model
 	 * @return
 	 */
-	public long SaveAlarmCfg(AlarmCfg model);
+	public long saveAlarmCfg(AlarmCfg model);
 
 	/**
 	 * 更新报警数据配置

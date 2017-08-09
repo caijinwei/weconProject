@@ -29,7 +29,7 @@ public class AccountDirRelImpl implements AccountDirRelApi {
 	private final String SEL_COL = "acc_dir_id,ref_id,ref_alais,create_date";
 
 	@Override
-	public long SaveAccountDirRel(final AccountDirRel model) {
+	public long saveAccountDirRel(final AccountDirRel model) {
 		KeyHolder key = new GeneratedKeyHolder();
 		jdbcTemplate.update(new PreparedStatementCreator() {
 			@Override
@@ -38,8 +38,8 @@ public class AccountDirRelImpl implements AccountDirRelApi {
 						"insert into account_dir_rel(acc_dir_id,ref_id,ref_alais,create_date) values (?,?,?current_timestamp());",
 						Statement.RETURN_GENERATED_KEYS);
 				preState.setLong(1, model.acc_dir_id);
-				preState.setLong(1, model.ref_id);
-				preState.setString(2, model.ref_alais);
+				preState.setLong(2, model.ref_id);
+				preState.setString(3, model.ref_alais);
 				return preState;
 			}
 		}, key);

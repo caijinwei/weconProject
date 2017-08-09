@@ -19,7 +19,7 @@ public interface AlarmCfgDataApi {
 	 * @param model
 	 * @return
 	 */
-	public long SaveAlarmCfgData(AlarmCfgData model);
+	public long saveAlarmCfgData(AlarmCfgData model);
 
 	/**
 	 * 批量保存报警数据

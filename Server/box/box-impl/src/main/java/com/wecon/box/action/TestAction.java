@@ -20,6 +20,7 @@ import com.wecon.box.entity.RedisPiBoxActData;
 import com.wecon.box.filter.DevBindUserFilter;
 import com.wecon.box.filter.RealHisCfgDataFilter;
 import com.wecon.box.filter.RealHisCfgFilter;
+import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.Output;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -265,13 +266,11 @@ public class TestAction {
 	@RequestMapping(value = "/getHisData")
 	public Output getHisData(@RequestParam("real_his_cfg_id") String real_his_cfg_id,
 			@RequestParam("start_date") String start_date, @RequestParam("end_date") String end_date) {
-
-		System.out.println(real_his_cfg_id);
-		System.out.println(start_date);
-		System.out.println(end_date);
-
+       
 		RealHisCfgDataFilter realHisCfgDataFilter = new RealHisCfgDataFilter();
-		realHisCfgDataFilter.real_his_cfg_id = Long.parseLong(real_his_cfg_id);
+		if(!CommonUtils.isNullOrEmpty(real_his_cfg_id)){
+			realHisCfgDataFilter.real_his_cfg_id = Long.parseLong(real_his_cfg_id);
+		}
 		realHisCfgDataFilter.start_date = start_date;
 		realHisCfgDataFilter.end_date = end_date;
 		realHisCfgDataFilter.state = 1;
@@ -282,6 +281,22 @@ public class TestAction {
 		return new Output(data);
 
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	/*
 	 * 这边写mosquito的发送请求

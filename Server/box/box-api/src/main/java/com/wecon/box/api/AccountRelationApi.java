@@ -15,7 +15,7 @@ public interface AccountRelationApi {
 	 * @param model
 	 * @return
 	 */
-	public long SaveAccountRelation(AccountRelation model);
+	public long saveAccountRelation(AccountRelation model);
 
 	/**
 	 * 更新帐号之间关系描述

@@ -30,7 +30,7 @@ public class DevBindUserImpl implements DevBindUserApi {
 	private final String SEL_COL = "account_id,device_id,create_date";
 
 	@Override
-	public long SaveDevBindUser(final DevBindUser model) {
+	public long saveDevBindUser(final DevBindUser model) {
 
 		KeyHolder key = new GeneratedKeyHolder();
 		jdbcTemplate.update(new PreparedStatementCreator() {

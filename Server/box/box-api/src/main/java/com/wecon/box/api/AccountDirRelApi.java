@@ -15,7 +15,7 @@ public interface AccountDirRelApi {
 	 * @param model
 	 * @return
 	 */
-	public long SaveAccountDirRel(AccountDirRel model);
+	public long saveAccountDirRel(AccountDirRel model);
 
 
 	/**
