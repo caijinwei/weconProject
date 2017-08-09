@@ -41,13 +41,13 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      *
      * */
     $scope.boundBox = function () {
-        if ($("#ref_id").val() == "" || $("#machine_code").val() == "" || $("#dev_password").val() == "") {
+        if ($("#acc_dir_id").val() == "" || $("#machine_code").val() == "" || $("#dev_password").val() == "") {
             alert("必填参数没有填写完整");
             return;
         }
         var params =
         {
-            ref_id: $("#ref_id").val(),
+            acc_dir_id: $("#acc_dir_id").val(),
             machine_code: $("#machine_code").val(),
             name: $("#dev_name").val(),
             password: $("#dev_password").val()
@@ -55,15 +55,43 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         T.common.ajax.request('WeconBox', "baseInfoAction/boundBox", params, function (data, code, msg) {
             if (code == 200) {
                 alert("PIBox绑定成功");
+                $("#addPIBox").modal("hide");
+                clearInput();
             }
             else {
                 alert(code + "-" + msg);
             }
         }, function () {
             alert("ajax error");
-
         });
     }
 
+    /*
+    * 绑定PIBox表单中展示几个分组
+    * */
+    $scope.getRefList = function () {
+        var params = {
+            type: "0"
+        }
+        T.common.ajax.request("WeconBox", "userdiract/getuserdirs", params, function (data, code, msg) {
+            if (code == 200) {
+                $scope.refList = data.list;
+                $scope.$apply();
+            }
+            else {
+                alert(code + " " + msg);
+            }
+        }, function () {
+            alert("ajax error");
+        });
+    }
 
-})
+    $scope.clearInput=function() {
+        $("#machine_code").val("") ;
+        $("#dev_password").val("");
+        $("#dev_name").val("");
+    }
+
+
+    })
+

@@ -1,15 +1,15 @@
 package com.wecon.box.api;
 
+import com.wecon.box.entity.DevBindUser;
+import com.wecon.box.filter.DevBindUserFilter;
+import org.springframework.stereotype.Component;
+
 import java.util.List;
 
-import org.springframework.stereotype.Component;
 /**
  * @author lanpenghui
  * 2017年8月1日
  */
-
-import com.wecon.box.entity.DevBindUser;
-import com.wecon.box.filter.DevBindUserFilter;
 @Component
 public interface DevBindUserApi {
 	/**
@@ -18,7 +18,7 @@ public interface DevBindUserApi {
 	 * @param model
 	 * @return
 	 */
-	public long saveDevBindUser(DevBindUser model);
+	public void saveDevBindUser(DevBindUser model);
 
 
 	/**

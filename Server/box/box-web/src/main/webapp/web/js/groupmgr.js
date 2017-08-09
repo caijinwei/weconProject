@@ -26,7 +26,6 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             alert("ajax error");
         });
     }
-
     /**
      * 打开新增窗口
      */

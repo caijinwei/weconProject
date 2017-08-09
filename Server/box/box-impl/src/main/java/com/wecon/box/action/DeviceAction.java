@@ -5,7 +5,6 @@ import com.wecon.box.api.AccountApi;
 import com.wecon.box.api.AccountDirRelApi;
 import com.wecon.box.api.DevBindUserApi;
 import com.wecon.box.api.DeviceApi;
-import com.wecon.box.entity.Account;
 import com.wecon.box.entity.AccountDirRel;
 import com.wecon.box.entity.DevBindUser;
 import com.wecon.box.entity.Device;
@@ -62,7 +61,7 @@ public class DeviceAction {
     * */
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping(value = "/boundBox")
-    public Output boundBox(@RequestParam("machine_code") String machine_code, @RequestParam("password") String password, @RequestParam("name") String name, @RequestParam("ref_id") Integer ref_id) {
+    public Output boundBox(@RequestParam("machine_code") String machine_code, @RequestParam("password") String password, @RequestParam("name") String name, @RequestParam("acc_dir_id") Integer acc_dir_id) {
 
         /*
         *验证是否该盒子是否存在
@@ -79,24 +78,23 @@ public class DeviceAction {
         *该设备没有被别的用户绑定过
         * */
         if (devBindUserApi.findByDevId(device_id) != 0) {
-
             throw new BusinessException(ErrorCodeOption.Device_AlreadyBind.key, ErrorCodeOption.Device_AlreadyBind.value);
         }
 
         DevBindUser model = new DevBindUser();
         model.account_id = AppContext.getSession().client.userId;
         model.device_id = device_id;
+        System.out.println("执行到这边  设备号ID是"+device_id);
         devBindUserApi.saveDevBindUser(model);
-
         /*
         * 有选择分组操作
         * 默认分组 ref_id=0
         *
         * */
-        if (ref_id != 0) {
+        if (acc_dir_id != 0) {
             AccountDirRel accountDirRel = new AccountDirRel();
-            accountDirRel.ref_id = ref_id;
-            accountDirRel.acc_dir_id = device_id;
+            accountDirRel.ref_id = device_id;
+            accountDirRel.acc_dir_id = acc_dir_id;
             accountDirRelApi.saveAccountDirRel(accountDirRel);
         }
         return new Output();
