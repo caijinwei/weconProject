@@ -40,23 +40,6 @@
             </tr>
             </thead>
             <tbody>
-
-            <tr >
-                <td>1</td>
-                <td>PIBOX1</td>
-                <td>地址1</td>
-                <td>启动</td>
-                <td>
-                   写
-                </td>
-                <td>
-                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModal" >修改状态</button>
-                    <a href="#" data-toggle="modal" data-target="#realunbind">
-                        <button type="button" class="btn btn-danger">解除关联</button>
-                    </a>
-                </td>
-            </tr>
-
             <tr ng-repeat="x in realpointDatas">
                 <td>{{x.id}}</td>
                 <td>{{x.name}}</td>
@@ -66,17 +49,17 @@
                     {{x.role_type==0?'无权限':(x.role_type==1?'只读':(x.role_type==2?'只写':'读写'))}}
                 </td>
                 <td>
-                    <button type="button" class="btn btn-info">修改状态</button>
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#updateRoleSyle" >修改状态</button>
                     <a href="#" data-toggle="modal" data-target="#realunbind">
-                        <button type="button" class="btn btn-danger">解除关联</button>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delectOpint">解除关联</button>
                     </a>
                 </td>
             </tr>
             </tbody>
         </table>
     </div>
-    <!-- 模态框（Modal） -->
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <!-- 修改权限模态框（Modal） -->
+    <div class="modal fade" id="updateRoleSyle" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -89,10 +72,58 @@
                 </div>
                 <div class="modal-body">
                     <table class="table table-bordered" >
-                        <tr><td>监控点状态:</td><td></td></tr>
-                        <tr><td>监控点权限:</td><td></td></tr>
+                        <tr><td>监控点状态:</td>
+                            <td> <label class="radio-inline">
+                                    <input type="radio" name="optionsRadiosinline"  value="option1" checked> 启用
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="optionsRadiosinline"   value="option2"> 未启用
+                                </label>
+                            </td>
+                        </tr>
+                        <tr><td>监控点权限:</td>
+                            <td>
+                                <label class="radio-inline">
+                                    <input type="radio" name="optionsRadiosinline" value="option1" checked>无权限
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="optionsRadiosinline"  value="option2"> 只读
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="optionsRadiosinline"  value="option2"> 只写
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="optionsRadiosinline"  value="option2"> 读写
+                                </label>
+                            </td>
+                        </tr>
                     </table>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                    </button>
+                    <button type="button" class="btn btn-primary">
+                        提交更改
+                    </button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+
+    <!-- 解除关联模态框（Modal） -->
+    <div class="modal fade" id="delectOpint" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" >
+                        确定解除关联！
+                    </h4>
+                </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭
                     </button>
