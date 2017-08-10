@@ -34,13 +34,6 @@ public interface RealHisCfgDataApi {
 	 * @return
 	 */
 	public RealHisCfgData getRealHisCfgData(long real_his_cfg_id,Timestamp monitor_time);
-	/**
-	 * 获取集合历史（实时）数据信息
-	 * 
-	 * @param real_his_cfg_id
-	 * @return
-	 */
-	public List<RealHisCfgData> getRealHisCfgData(RealHisCfgDataFilter filter);
 	
 
 	/**

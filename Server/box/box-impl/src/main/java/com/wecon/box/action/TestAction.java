@@ -276,19 +276,20 @@ public class TestAction {
 	@RequestMapping(value = "/getHisData")
 	public Output getHisData(@RequestParam("real_his_cfg_id") String real_his_cfg_id,
 			@RequestParam("start_date") String start_date, @RequestParam("end_date") String end_date) {
+				return null;
 
-		RealHisCfgDataFilter realHisCfgDataFilter = new RealHisCfgDataFilter();
-		if (!CommonUtils.isNullOrEmpty(real_his_cfg_id)) {
-			realHisCfgDataFilter.real_his_cfg_id = Long.parseLong(real_his_cfg_id);
-		}
-		realHisCfgDataFilter.start_date = start_date;
-		realHisCfgDataFilter.end_date = end_date;
-		realHisCfgDataFilter.state = 1;
-
-		List<RealHisCfgData> realHisCfgDataList = realHisCfgDataApi.getRealHisCfgData(realHisCfgDataFilter);
-		JSONObject data = new JSONObject();
-		data.put("realHisCfgDataList", realHisCfgDataList);
-		return new Output(data);
+//		RealHisCfgDataFilter realHisCfgDataFilter = new RealHisCfgDataFilter();
+//		if (!CommonUtils.isNullOrEmpty(real_his_cfg_id)) {
+//			realHisCfgDataFilter.real_his_cfg_id = Long.parseLong(real_his_cfg_id);
+//		}
+//		realHisCfgDataFilter.start_date = start_date;
+//		realHisCfgDataFilter.end_date = end_date;
+//		realHisCfgDataFilter.state = 1;
+//
+//		List<RealHisCfgData> realHisCfgDataList = realHisCfgDataApi.getRealHisCfgData(realHisCfgDataFilter);
+//		JSONObject data = new JSONObject();
+//		data.put("realHisCfgDataList", realHisCfgDataList);
+//		return new Output(data);
 
 	}
 
