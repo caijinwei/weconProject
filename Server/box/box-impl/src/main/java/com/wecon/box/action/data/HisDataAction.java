@@ -15,7 +15,11 @@ import com.wecon.box.entity.RealHisCfgData;
 import com.wecon.box.entity.RealHisCfgDevice;
 import com.wecon.box.filter.RealHisCfgDataFilter;
 import com.wecon.box.filter.RealHisCfgFilter;
+import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.common.util.CommonUtils;
+import com.wecon.restful.annotation.WebApi;
+import com.wecon.restful.core.AppContext;
+import com.wecon.restful.core.Client;
 import com.wecon.restful.core.Output;
 
 /**
@@ -29,79 +33,58 @@ public class HisDataAction {
 	@Autowired
 	private RealHisCfgDataApi realHisCfgDataApi;
 
-	// @WebApi(forceAuth = true, master = true)
+	@WebApi(forceAuth = true, master = true)
 	@Description("获取改账户下的plc和对应的监控点")
 	@RequestMapping(value = "/getComMonitor")
 	public Output getComMonitor() {
 
-		// 获取绑定的盒子
-		// DevBindUserFilter devBindUserFilter = new DevBindUserFilter();
-		// devBindUserFilter.account_id = 1000002;
-		// devBindUserFilter.device_id = 1;
-
-		// 获取历史数据配置信息
-		RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
-		realHisCfgFilter.account_id = 1000002;
-		realHisCfgFilter.addr_type = -1;
-		realHisCfgFilter.data_type = 1;
-		realHisCfgFilter.his_cycle = -1;
-		realHisCfgFilter.state = 1;
-
-		List<RealHisCfgDevice> realHisCfgList = realHisCfgApi.getRealHisCfg(realHisCfgFilter);
+		Client client = AppContext.getSession().client;
 		JSONObject json = new JSONObject();
 		JSONArray arr = new JSONArray();
 		JSONObject data = null;
+		List<RealHisCfgDevice> realHisCfgDeviceList = null;
+		/** 超级管理 **/
+		if (client.userInfo.getUserType() == 0) {
+			// 获取实时数据配置信息
+			RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
+			realHisCfgFilter.addr_type = -1;
+			realHisCfgFilter.data_type = 1;
+			realHisCfgFilter.his_cycle = -1;
+			realHisCfgFilter.state = 1;
+		} else if (client.userInfo.getUserType() == 1) {
+			/** 管理 **/
+			// 获取实时数据配置信息
+			RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
+			realHisCfgFilter.addr_type = -1;
+			realHisCfgFilter.data_type = 1;
+			realHisCfgFilter.his_cycle = -1;
+			realHisCfgFilter.state = 1;
+			realHisCfgFilter.account_id = client.userId;
+			realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(realHisCfgFilter);
+		} else if (client.userInfo.getUserType() == 2) {
+			/** 视图 **/
+			// 通过视图获取配置信息
+			ViewAccountRoleFilter viewAccountRoleFilter = new ViewAccountRoleFilter();
+			viewAccountRoleFilter.view_id = client.userId;
+			viewAccountRoleFilter.cfg_type = 1;
+			viewAccountRoleFilter.data_type = 1;
+			viewAccountRoleFilter.role_type = -1;
+			realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(viewAccountRoleFilter);
 
-		for (int a = 0; a < realHisCfgList.size(); a++) {
-			RealHisCfg realHisCfg = realHisCfgList.get(a);
+		}
+		// 如果该账号下无历史数据配置文件直接返回空
+		if (realHisCfgDeviceList == null || realHisCfgDeviceList.size() < 1) {
+			return new Output(json);
+		}
+
+		for (int a = 0; a < realHisCfgDeviceList.size(); a++) {
+			RealHisCfg realHisCfg = realHisCfgDeviceList.get(a);
 			data = new JSONObject();
 			data.put("monitorid", realHisCfg.id);
 			data.put("monitordata", realHisCfg.name);
 			arr.add(data);
 		}
 
-		// 获取用户绑定的机器
-		// List<DevBindUser> devBindUserList =
-		// devBindUserApi.getDevBindUser(devBindUserFilter);
-		//
-		// JSONObject json = new JSONObject();
-		// JSONArray arr = new JSONArray();
-		// JSONArray arrmonitors = null;
-		// JSONObject data = null;
-		// JSONObject datamonitors = null;
-		// for (int i = 0; i < devBindUserList.size(); i++) {
-		// DevBindUser devBindUser = devBindUserList.get(0);
-		// Device device = deviceApi.getDevice(devBindUser.device_id);
-		// // 获取device下的所有plc
-		// List<PlcInfo> plcInfoList =
-		// plcInfoApi.getListPlcInfo(device.device_id);
-		// for (int j = 0; j < plcInfoList.size(); j++) {
-		// PlcInfo plcInfo = plcInfoList.get(j);
-		//
-		// realHisCfgFilter.plc_id = plcInfo.plc_id;
-		// List<RealHisCfg> realHisCfgList =
-		// realHisCfgApi.getRealHisCfg(realHisCfgFilter);
-		// // 如果该plc下没有实时数据配置，直接进行下个plc判断
-		// if (realHisCfgList == null || realHisCfgList.size() < 1) {
-		// continue;
-		// }
-		// data = new JSONObject();
-		// arrmonitors = new JSONArray();
-		// data.put("com", plcInfo.port);
-		// data.put("plc_id", plcInfo.plc_id);
-		// for (int a = 0; a < realHisCfgList.size(); a++) {
-		// RealHisCfg realHisCfg = realHisCfgList.get(a);
-		// // 获取plc下的每个监控点
-		// datamonitors = new JSONObject();
-		// datamonitors.put("monitorid", realHisCfg.id);
-		// datamonitors.put("monitordata", realHisCfg.name);
-		// arrmonitors.add(datamonitors);
-		// }
-		// data.put("arrmonitors", arrmonitors);
-		// arr.add(data);
-		// }
-		//
-		// }
 		json.put("monitors", arr);
 		return new Output(json);
 
@@ -112,7 +95,7 @@ public class HisDataAction {
 	 * 
 	 * @return
 	 */
-	// @WebApi(forceAuth = true, master = true)
+	@WebApi(forceAuth = true, master = true)
 	@Description("获取历史数据")
 	@RequestMapping(value = "/getHisData")
 	public Output getHisData(@RequestParam("real_his_cfg_id") String real_his_cfg_id,
