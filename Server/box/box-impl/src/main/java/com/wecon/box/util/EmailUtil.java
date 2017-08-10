@@ -6,7 +6,6 @@ import javax.mail.internet.MimeMessage;
 import java.util.Date;
 import java.util.Properties;
 
-
 /**
  * Created by zengzhipeng on 2017/8/4.
  */

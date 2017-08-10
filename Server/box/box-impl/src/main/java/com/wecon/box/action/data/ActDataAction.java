@@ -9,22 +9,12 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.AccountApi;
 import com.wecon.box.api.AccountRelationApi;
-import com.wecon.box.api.DevBindUserApi;
-import com.wecon.box.api.DeviceApi;
-import com.wecon.box.api.PlcInfoApi;
 import com.wecon.box.api.RealHisCfgApi;
 import com.wecon.box.api.RedisPiBoxApi;
-import com.wecon.box.entity.Account;
-import com.wecon.box.entity.AccountRelation;
-import com.wecon.box.entity.DevBindUser;
-import com.wecon.box.entity.Device;
 import com.wecon.box.entity.PiBoxCom;
 import com.wecon.box.entity.PiBoxComAddr;
-import com.wecon.box.entity.PlcInfo;
-import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.entity.RealHisCfgDevice;
 import com.wecon.box.entity.RedisPiBoxActData;
-import com.wecon.box.filter.DevBindUserFilter;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.restful.annotation.WebApi;
@@ -42,13 +32,7 @@ public class ActDataAction {
 	@Autowired
 	private RedisPiBoxApi redisPiBoxApi;
 	@Autowired
-	private DeviceApi deviceApi;
-	@Autowired
-	private DevBindUserApi devBindUserApi;
-	@Autowired
 	private RealHisCfgApi realHisCfgApi;
-	@Autowired
-	private PlcInfoApi plcInfoApi;
 	@Autowired
 	AccountApi accountApi;
 	@Autowired
@@ -102,6 +86,8 @@ Client client=AppContext.getSession().client;
 			List<PiBoxCom> act_time_data_list = redisPiBoxActData.act_time_data_list;
 
 			data = new JSONObject();
+			
+			data.put("id", realHisCfgDevice.id);
 			data.put("state", realHisCfgDevice.state);
 			data.put("addr_type", realHisCfgDevice.addr_type);
 			data.put("addr", realHisCfgDevice.addr);
