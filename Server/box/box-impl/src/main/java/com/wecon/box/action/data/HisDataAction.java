@@ -10,6 +10,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.RealHisCfgApi;
 import com.wecon.box.api.RealHisCfgDataApi;
+import com.wecon.box.entity.Page;
 import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.entity.RealHisCfgData;
 import com.wecon.box.entity.RealHisCfgDevice;
@@ -99,7 +100,8 @@ public class HisDataAction {
 	@Description("获取历史数据")
 	@RequestMapping(value = "/getHisData")
 	public Output getHisData(@RequestParam("real_his_cfg_id") String real_his_cfg_id,
-			@RequestParam("start_date") String start_date, @RequestParam("end_date") String end_date) {
+			@RequestParam("start_date") String start_date, @RequestParam("end_date") String end_date,
+			@RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
 
 		RealHisCfgDataFilter realHisCfgDataFilter = new RealHisCfgDataFilter();
 		if (!CommonUtils.isNullOrEmpty(real_his_cfg_id)) {
@@ -108,8 +110,9 @@ public class HisDataAction {
 		realHisCfgDataFilter.start_date = start_date;
 		realHisCfgDataFilter.end_date = end_date;
 		realHisCfgDataFilter.state = 1;
+		
 
-		List<RealHisCfgData> realHisCfgDataList = realHisCfgDataApi.getRealHisCfgData(realHisCfgDataFilter);
+		Page<RealHisCfgData> realHisCfgDataList = realHisCfgDataApi.getRealHisCfgDataList(realHisCfgDataFilter,pageIndex,pageSize);
 		JSONObject data = new JSONObject();
 		data.put("realHisCfgDataList", realHisCfgDataList);
 		return new Output(data);
