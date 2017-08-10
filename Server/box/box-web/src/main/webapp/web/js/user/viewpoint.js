@@ -12,6 +12,31 @@ appModule.controller("listController", function ($scope, $http, $compile) {
         } else if (type == 1) {
             $scope.title = "历史监控点权限列表";
         }
+        $scope.showRealPoint(type,viewid);
     }
+
+
+    $scope.showRealPoint=function (type,view_id)
+    {
+
+        var params=
+        {
+
+            view_id:view_id,
+            type:type
+        }
+            T.common.ajax.request("WeconBox", "Viewpoint/showReal", params, function (data, code, msg) {
+                if (code == 200) {
+                    $scope.realpointDatas=data.list;
+                    $scope.$apply();
+                }
+                else {
+                    alert(code + "-" + msg);
+                }
+            }, function () {
+                alert("ajax error");
+            });
+
+        }
 
 })

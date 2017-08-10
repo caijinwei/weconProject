@@ -67,4 +67,4 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     }
 
 
-})
+});
