@@ -30,12 +30,12 @@ public interface AlarmCfgDataApi {
 	public void SaveAlarmCfgData(List<AlarmCfgData> listmodel);
 
 	/**
-	 * 根据alarm_cfg_id取列表报警数据
+	 * 根据filter取列表报警数据
 	 *
-	 * @param alarm_cfg_id
+	 * @param filter
 	 * @return
 	 */
-	public List<AlarmCfgData> getAlarmCfgData(long alarm_cfg_id);
+	public List<AlarmCfgData> getAlarmCfgData(AlarmCfgDataFilter filter);
 
 	/**
 	 * 根据alarm_cfg_id,monitor_time取某个报警数据配置

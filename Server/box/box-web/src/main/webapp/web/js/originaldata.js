@@ -9,15 +9,15 @@ appModule.controller("infoController", function($scope, $http, $compile) {
 	 * 提交接口请求
 	 */
 	$scope.commointor_submit = function() {
-		T.common.ajax.request("WeconBox", "testact/getComMonitor",
+		T.common.ajax.request("WeconBox", "hisDataAction/getComMonitor",
 				new Object(), function(data, code, msg) {
 					if (code == 200) {
-						$scope.commonitors = data.comMonitor;
+						$scope.commonitors = data.monitors;
 						$scope.$apply();
-						$scope.change();
-						$("#comid").change(function() {
-							$scope.change();
-						})
+						// $scope.change();
+						// $("#comid").change(function() {
+						// $scope.change();
+						// })
 					} else {
 
 						alert(code + "-" + msg);
@@ -26,17 +26,17 @@ appModule.controller("infoController", function($scope, $http, $compile) {
 					alert("ajax error");
 				});
 	}
-	$scope.change = function() {
-		angular.forEach($scope.commonitors, function(data, index, array) {
-			console.log($("#comid").val());
-			if ($("#comid").val() == data.plc_id) {
-				console.log(data.com + '=' + array[index].com);
-				$scope.commonitors_item = data.arrmonitors;
-				$scope.$apply();
-			}
-		});
-
-	}
+	// $scope.change = function() {
+	// angular.forEach($scope.commonitors, function(data, index, array) {
+	// console.log($("#comid").val());
+	// if ($("#comid").val() == data.plc_id) {
+	// console.log(data.com + '=' + array[index].com);
+	// $scope.commonitors_item = data.arrmonitors;
+	// $scope.$apply();
+	// }
+	// });
+	//
+	// }
 	$scope.searchHisData = function() {
 		var params = {
 			real_his_cfg_id : $("#monitorid").val(),
@@ -44,7 +44,7 @@ appModule.controller("infoController", function($scope, $http, $compile) {
 			end_date : $("#enddateid").val(),
 
 		};
-		T.common.ajax.request("WeconBox", "testact/getHisData", params,
+		T.common.ajax.request("WeconBox", "hisDataAction/getHisData", params,
 				function(data, code, msg) {
 					if (code == 200) {
 						$scope.Hisdatas = data.realHisCfgDataList;

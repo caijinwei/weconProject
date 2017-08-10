@@ -18,7 +18,7 @@ public class AlarmTrigger {
 	public long alarmcfg_id;
 	public int type;
 	public String value;
-	public Timestamp create_data;
-	public Timestamp update_data;
+	public Timestamp create_date;
+	public Timestamp update_date;
 	
 }

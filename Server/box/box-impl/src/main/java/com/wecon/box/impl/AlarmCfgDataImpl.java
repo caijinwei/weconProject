@@ -73,15 +73,47 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 	}
 
 	@Override
-	public List<AlarmCfgData> getAlarmCfgData(long alarm_cfg_id) {
-		String sql = "select " + SEL_COL + " from alarm_cfg_data where alarm_cfg_id=?";
-		List<AlarmCfgData> list = jdbcTemplate.query(sql, new Object[] { alarm_cfg_id },
-				new DefaultAlarmCfgDataRowMapper());
-		if (!list.isEmpty()) {
-			return list;
-		}
+	public List<AlarmCfgData> getAlarmCfgData(AlarmCfgDataFilter filter) {
 
-		return null;
+		String sql = "select " + SEL_COL + " from alarm_cfg_data where 1=1";
+		String alarmcfgsql="select name from ";
+		StringBuffer condition = new StringBuffer("");
+		List<Object> params = new ArrayList<Object>();
+		if (filter.alarm_cfg_id > 0) {
+			condition.append(" and alarm_cfg_id = ? ");
+			params.add(filter.alarm_cfg_id);
+		}
+		if (!CommonUtils.isNullOrEmpty(filter.value)) {
+			condition.append(" and value like ? ");
+			params.add("%" + filter.value + "%");
+		}
+		if (filter.state > -1) {
+			condition.append(" and state = ? ");
+			params.add(filter.state);
+		}
+//		if(CommonUtils.isNullOrEmpty(filter.name)){
+////			condition.append(" and name like ? ");
+////			params.add("%" + filter.name + "%");
+//			
+//		}
+		// 操作时间起
+		if (!CommonUtils.isNullOrEmpty(filter.start_date)) {
+			condition.append(" and date_format(alarm_cfg_data.monitor_time,'%Y-%m-%d %H:%i') >= ");
+			condition.append(" date_format(str_to_date(?,'%Y-%m-%d %H:%i'),'%Y-%m-%d %H:%i') ");
+			params.add(CommonUtils.trim(filter.start_date));
+
+		}
+		// 操作时间止
+		if (!CommonUtils.isNullOrEmpty(filter.end_date)) {
+			condition.append(" and date_format(alarm_cfg_data.monitor_time,'%Y-%m-%d %H:%i') <= ");
+			condition.append(" date_format(str_to_date(?,'%Y-%m-%d %H:%i'),'%Y-%m-%d %H:%i') ");
+			params.add(CommonUtils.trim(filter.end_date));
+
+		}
+		sql += condition;
+		List<AlarmCfgData> list = jdbcTemplate.query(sql, params.toArray(), new DefaultAlarmCfgDataRowMapper());
+
+		return list;
 
 	}
 
@@ -109,7 +141,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 		String sql = "select " + SEL_COL + " from alarm_cfg_data where 1=1";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
-		if (filter.alarm_cfg_id>0) {
+		if (filter.alarm_cfg_id > 0) {
 			condition.append(" and alarm_cfg_id = ? ");
 			params.add(filter.alarm_cfg_id);
 		}
@@ -117,7 +149,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 			condition.append(" and value like ? ");
 			params.add("%" + filter.value + "%");
 		}
-		if (filter.state>-1) {
+		if (filter.state > -1) {
 			condition.append(" and state = ? ");
 			params.add(filter.state);
 		}

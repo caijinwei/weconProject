@@ -4,18 +4,15 @@ appModule.controller("infoController", function($scope, $http, $compile) {
 		$scope.act_submit();
 	}
 
-	var t;
-
 	/**
 	 * 提交接口请求
 	 */
 	$scope.act_submit = function act_submit() {
-		T.common.ajax.request("WeconBox", "actDataAction/getActData", new Object(),
-				function(data, code, msg) {
+		T.common.ajax.request("WeconBox", "alarmDataAction/getNowAlarmData",
+				new Object(), function(data, code, msg) {
 					if (code == 200) {
-						$scope.actDatas = data.piBoxActDateMode;
+						$scope.alarmDatas = data.alarmData;
 						$scope.$apply();
-						t = setTimeout(act_submit, 3000);
 					} else {
 
 						alert(code + "-" + msg);
@@ -23,10 +20,6 @@ appModule.controller("infoController", function($scope, $http, $compile) {
 				}, function() {
 					alert("ajax error");
 				});
-	}
-
-	$scope.mc_change = function() {
-		clearTimeout(t);
 	}
 
 })

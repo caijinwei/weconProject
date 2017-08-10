@@ -4,10 +4,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.wecon.box.entity.Account;
 import com.wecon.box.entity.Page;
 import com.wecon.box.entity.RealHisCfg;
+import com.wecon.box.entity.RealHisCfgDevice;
 import com.wecon.box.filter.RealHisCfgFilter;
+import com.wecon.box.filter.ViewAccountRoleFilter;
 
 /**
  * @author lanpenghui 2017年8月1日
@@ -40,12 +41,19 @@ public interface RealHisCfgApi {
 	public RealHisCfg getRealHisCfg(long id);
 
 	/**
-	 * 获取历史（实时）数据配置信息列表
+	 * 通过filter获取历史（实时）数据配置信息列表
 	 * 
 	 * @param account
 	 * @return
 	 */
-	public List<RealHisCfg> getRealHisCfg(RealHisCfgFilter filter);
+	public List<RealHisCfgDevice> getRealHisCfg(RealHisCfgFilter filter);
+	/**
+	 * 通过filter获取历史（实时）数据配置信息列表
+	 * 
+	 * @param filter
+	 * @return
+	 */
+	public List<RealHisCfgDevice> getRealHisCfg(ViewAccountRoleFilter filter);
 
 	/**
 	 * 通过通讯口id和启用状态获取列表历史（实时）数据配置信息

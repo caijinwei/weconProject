@@ -9,5 +9,5 @@ import java.util.List;
  */
 public class PiBoxHisCom {
 	public String com;
-	public List<PiBoxHisComAddr> dat_list;
+	public List<PiBoxHisComAddr> addr_list;
 }

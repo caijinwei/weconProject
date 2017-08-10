@@ -22,17 +22,12 @@
 <body ng-controller="infoController" ng-init="onInit()">
 	<div class="container-fluid" style="margin-top: 20px;">
 		<div class="row">
-			<div>
-				<span class="col-md-1" style="height: 30px; line-height: 30px;">通道</span>
-				<select id="comid" class="col-md-3" style="height: 35px;">
-					<option ng-repeat="x in commonitors" value={{x.plc_id}}>{{x.com}}</option>
-				</select>
-			</div>
+			
 			<div>
 				<span class="col-md-1"
-					style="height: 30px; line-height: 30px; margin-left: 30px">监控点</span>
+					style="height: 30px; line-height: 30px; ">监控点</span>
 				<select id="monitorid" class="col-md-3" style="height: 35px;">
-					<option ng-repeat="x in commonitors_item" value={{x.monitorid}}>{{x.monitordata}}</option>
+					<option ng-repeat="x in commonitors" value={{x.monitorid}}>{{x.monitordata}}</option>
 				</select>
 			</div>
 			<div class="btn-group" style="margin-left: 20px;">

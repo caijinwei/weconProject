@@ -119,142 +119,151 @@ public class TestAction {
 	@RequestMapping(value = "/getActData")
 	public Output getActData() {
 		// 获取机器码
-		DevBindUserFilter devBindUserFilter = new DevBindUserFilter();
-		devBindUserFilter.account_id = 1000002;
-		devBindUserFilter.device_id = 1;
-
-		// 获取实时数据配置信息
-		RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
-		realHisCfgFilter.account_id = 1000002;
-		realHisCfgFilter.addr_type = -1;
-		realHisCfgFilter.data_type = 0;
-		realHisCfgFilter.his_cycle = -1;
-
-		// 获取绑定的盒子
-		List<DevBindUser> devBindUserList = devBindUserApi.getDevBindUser(devBindUserFilter);
-
-		JSONObject json = new JSONObject();
-		JSONArray arr = new JSONArray();
-		JSONObject data = null;
-		for (int y = 0; y < devBindUserList.size(); y++) {
-			DevBindUser devBindUser = devBindUserList.get(y);
-			Device device = deviceApi.getDevice(devBindUser.device_id);
-			String device_machine = device.machine_code;
-			// 通过机器码去redis中获取数据
-			RedisPiBoxActData redisPiBoxActData = redisPiBoxApi.getRedisPiBoxActData(device_machine);
-			List<PiBoxCom> act_time_data_list = redisPiBoxActData.act_time_data_list;
-
-			// 获取device下的所有plc
-			List<PlcInfo> plcInfoList = plcInfoApi.getListPlcInfo(device.device_id);
-
-			for (int a = 0; a < plcInfoList.size(); a++) {
-				PlcInfo plcInfo = plcInfoList.get(a);
-				// 输出该plc下的所有实时数据配置
-				realHisCfgFilter.plc_id = plcInfo.plc_id;
-				List<RealHisCfg> realHisCfgList = realHisCfgApi.getRealHisCfg(realHisCfgFilter);
-				// 如果该plc下没有实时数据配置，直接进行下个plc判断
-				if (realHisCfgList == null || realHisCfgList.size() < 1) {
-					continue;
-				}
-				for (int i = 0; i < realHisCfgList.size(); i++) {
-					RealHisCfg realHisCfg = realHisCfgList.get(i);
-					data = new JSONObject();
-					data.put("state", realHisCfg.state);
-					data.put("addr_type", realHisCfg.addr_type);
-					data.put("addr", realHisCfg.addr);
-					data.put("name", realHisCfg.name);
-					data.put("describe", realHisCfg.describe);
-					for (int j = 0; j < act_time_data_list.size(); j++) {
-						PiBoxCom piBoxCom = act_time_data_list.get(j);
-
-						if (plcInfo.plc_id == Long.parseLong(piBoxCom.com)) {
-
-							List<PiBoxComAddr> addr_list = piBoxCom.addr_list;
-							for (int x = 0; x < addr_list.size(); x++) {
-								PiBoxComAddr piBoxComAddr = addr_list.get(x);
-
-								if (realHisCfg.id == Long.parseLong(piBoxComAddr.addr_id)) {
-
-									data.put("state", piBoxComAddr.state);
-									data.put("value", piBoxComAddr.value);
-
-								}
-
-							}
-
-						}
-
-					}
-
-					arr.add(data);
-
-				}
-
-			}
-
-		}
-		json.put("piBoxActDateMode", arr);
-		return new Output(json);
-
+		// DevBindUserFilter devBindUserFilter = new DevBindUserFilter();
+		// devBindUserFilter.account_id = 1000002;
+		// devBindUserFilter.device_id = 1;
+		//
+		// // 获取实时数据配置信息
+		// RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
+		// realHisCfgFilter.account_id = 1000002;
+		// realHisCfgFilter.addr_type = -1;
+		// realHisCfgFilter.data_type = 0;
+		// realHisCfgFilter.his_cycle = -1;
+		//
+		// // 获取绑定的盒子
+		// List<DevBindUser> devBindUserList =
+		// devBindUserApi.getDevBindUser(devBindUserFilter);
+		//
+		// JSONObject json = new JSONObject();
+		// JSONArray arr = new JSONArray();
+		// JSONObject data = null;
+		// for (int y = 0; y < devBindUserList.size(); y++) {
+		// DevBindUser devBindUser = devBindUserList.get(y);
+		// Device device = deviceApi.getDevice(devBindUser.device_id);
+		// String device_machine = device.machine_code;
+		// // 通过机器码去redis中获取数据
+		// RedisPiBoxActData redisPiBoxActData =
+		// redisPiBoxApi.getRedisPiBoxActData(device_machine);
+		// List<PiBoxCom> act_time_data_list =
+		// redisPiBoxActData.act_time_data_list;
+		//
+		// // 获取device下的所有plc
+		// List<PlcInfo> plcInfoList =
+		// plcInfoApi.getListPlcInfo(device.device_id);
+		//
+		// for (int a = 0; a < plcInfoList.size(); a++) {
+		// PlcInfo plcInfo = plcInfoList.get(a);
+		// // 输出该plc下的所有实时数据配置
+		// realHisCfgFilter.plc_id = plcInfo.plc_id;
+		// List<RealHisCfg> realHisCfgList =
+		// realHisCfgApi.getRealHisCfg(realHisCfgFilter);
+		// // 如果该plc下没有实时数据配置，直接进行下个plc判断
+		// if (realHisCfgList == null || realHisCfgList.size() < 1) {
+		// continue;
+		// }
+		// for (int i = 0; i < realHisCfgList.size(); i++) {
+		// RealHisCfg realHisCfg = realHisCfgList.get(i);
+		// data = new JSONObject();
+		// data.put("state", realHisCfg.state);
+		// data.put("addr_type", realHisCfg.addr_type);
+		// data.put("addr", realHisCfg.addr);
+		// data.put("name", realHisCfg.name);
+		// data.put("describe", realHisCfg.describe);
+		// for (int j = 0; j < act_time_data_list.size(); j++) {
+		// PiBoxCom piBoxCom = act_time_data_list.get(j);
+		//
+		// if (plcInfo.plc_id == Long.parseLong(piBoxCom.com)) {
+		//
+		// List<PiBoxComAddr> addr_list = piBoxCom.addr_list;
+		// for (int x = 0; x < addr_list.size(); x++) {
+		// PiBoxComAddr piBoxComAddr = addr_list.get(x);
+		//
+		// if (realHisCfg.id == Long.parseLong(piBoxComAddr.addr_id)) {
+		//
+		// data.put("state", piBoxComAddr.state);
+		// data.put("value", piBoxComAddr.value);
+		//
+		// }
+		//
+		// }
+		//
+		// }
+		//
+		// }
+		//
+		// arr.add(data);
+		//
+		// }
+		//
+		// }
+		//
+		// }
+		// json.put("piBoxActDateMode", arr);
+		// return new Output(json);
+		return null;
 	}
 
 	@Description("获取改账户下的plc和对应的监控点")
 	@RequestMapping(value = "/getComMonitor")
 	public Output getComMonitor() {
 		// 获取绑定的盒子
-		DevBindUserFilter devBindUserFilter = new DevBindUserFilter();
-		devBindUserFilter.account_id = 1000002;
-		devBindUserFilter.device_id = 1;
-
-		// 获取历史数据配置信息
-		RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
-		realHisCfgFilter.account_id = 1000002;
-		realHisCfgFilter.addr_type = -1;
-		realHisCfgFilter.data_type = 1;
-		realHisCfgFilter.his_cycle = -1;
-		realHisCfgFilter.state = 1;
-
-		// 获取用户绑定的机器
-		List<DevBindUser> devBindUserList = devBindUserApi.getDevBindUser(devBindUserFilter);
-
-		JSONObject json = new JSONObject();
-		JSONArray arr = new JSONArray();
-		JSONArray arrmonitors = null;
-		JSONObject data = null;
-		JSONObject datamonitors = null;
-		for (int i = 0; i < devBindUserList.size(); i++) {
-			DevBindUser devBindUser = devBindUserList.get(0);
-			Device device = deviceApi.getDevice(devBindUser.device_id);
-			// 获取device下的所有plc
-			List<PlcInfo> plcInfoList = plcInfoApi.getListPlcInfo(device.device_id);
-			for (int j = 0; j < plcInfoList.size(); j++) {
-				PlcInfo plcInfo = plcInfoList.get(j);
-
-				realHisCfgFilter.plc_id = plcInfo.plc_id;
-				List<RealHisCfg> realHisCfgList = realHisCfgApi.getRealHisCfg(realHisCfgFilter);
-				// 如果该plc下没有实时数据配置，直接进行下个plc判断
-				if (realHisCfgList == null || realHisCfgList.size() < 1) {
-					continue;
-				}
-				data = new JSONObject();
-				arrmonitors = new JSONArray();
-				data.put("com", plcInfo.port);
-				data.put("plc_id", plcInfo.plc_id);
-				for (int a = 0; a < realHisCfgList.size(); a++) {
-					RealHisCfg realHisCfg = realHisCfgList.get(a);
-					// 获取plc下的每个监控点
-					datamonitors = new JSONObject();
-					datamonitors.put("monitorid", realHisCfg.id);
-					datamonitors.put("monitordata", realHisCfg.name);
-					arrmonitors.add(datamonitors);
-				}
-				data.put("arrmonitors", arrmonitors);
-				arr.add(data);
-			}
-
-		}
-		json.put("comMonitor", arr);
-		return new Output(json);
+		// DevBindUserFilter devBindUserFilter = new DevBindUserFilter();
+		// devBindUserFilter.account_id = 1000002;
+		// devBindUserFilter.device_id = 1;
+		//
+		// // 获取历史数据配置信息
+		// RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
+		// realHisCfgFilter.account_id = 1000002;
+		// realHisCfgFilter.addr_type = -1;
+		// realHisCfgFilter.data_type = 1;
+		// realHisCfgFilter.his_cycle = -1;
+		// realHisCfgFilter.state = 1;
+		//
+		// // 获取用户绑定的机器
+		// List<DevBindUser> devBindUserList =
+		// devBindUserApi.getDevBindUser(devBindUserFilter);
+		//
+		// JSONObject json = new JSONObject();
+		// JSONArray arr = new JSONArray();
+		// JSONArray arrmonitors = null;
+		// JSONObject data = null;
+		// JSONObject datamonitors = null;
+		// for (int i = 0; i < devBindUserList.size(); i++) {
+		// DevBindUser devBindUser = devBindUserList.get(0);
+		// Device device = deviceApi.getDevice(devBindUser.device_id);
+		// // 获取device下的所有plc
+		// List<PlcInfo> plcInfoList =
+		// plcInfoApi.getListPlcInfo(device.device_id);
+		// for (int j = 0; j < plcInfoList.size(); j++) {
+		// PlcInfo plcInfo = plcInfoList.get(j);
+		//
+		// realHisCfgFilter.plc_id = plcInfo.plc_id;
+		// List<RealHisCfg> realHisCfgList =
+		// realHisCfgApi.getRealHisCfg(realHisCfgFilter);
+		// // 如果该plc下没有实时数据配置，直接进行下个plc判断
+		// if (realHisCfgList == null || realHisCfgList.size() < 1) {
+		// continue;
+		// }
+		// data = new JSONObject();
+		// arrmonitors = new JSONArray();
+		// data.put("com", plcInfo.port);
+		// data.put("plc_id", plcInfo.plc_id);
+		// for (int a = 0; a < realHisCfgList.size(); a++) {
+		// RealHisCfg realHisCfg = realHisCfgList.get(a);
+		// // 获取plc下的每个监控点
+		// datamonitors = new JSONObject();
+		// datamonitors.put("monitorid", realHisCfg.id);
+		// datamonitors.put("monitordata", realHisCfg.name);
+		// arrmonitors.add(datamonitors);
+		// }
+		// data.put("arrmonitors", arrmonitors);
+		// arr.add(data);
+		// }
+		//
+		// }
+		// json.put("comMonitor", arr);
+		// return new Output(json);
+		return null;
 
 	}
 
@@ -267,9 +276,9 @@ public class TestAction {
 	@RequestMapping(value = "/getHisData")
 	public Output getHisData(@RequestParam("real_his_cfg_id") String real_his_cfg_id,
 			@RequestParam("start_date") String start_date, @RequestParam("end_date") String end_date) {
-       
+
 		RealHisCfgDataFilter realHisCfgDataFilter = new RealHisCfgDataFilter();
-		if(!CommonUtils.isNullOrEmpty(real_his_cfg_id)){
+		if (!CommonUtils.isNullOrEmpty(real_his_cfg_id)) {
 			realHisCfgDataFilter.real_his_cfg_id = Long.parseLong(real_his_cfg_id);
 		}
 		realHisCfgDataFilter.start_date = start_date;
@@ -282,22 +291,6 @@ public class TestAction {
 		return new Output(data);
 
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 
 	/*
 	 * 这边写mosquito的发送请求
