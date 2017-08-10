@@ -26,7 +26,7 @@ public class DevFirmImpl implements DevFirmApi {
 	private final String SEL_COL = "f_id,device_id,f_name,f_ver,create_date,update_date";
 
 	@Override
-	public long SaveDevFirm(final DevFirm model) {
+	public long saveDevFirm(final DevFirm model) {
 		KeyHolder key = new GeneratedKeyHolder();
 		jdbcTemplate.update(new PreparedStatementCreator() {
 			@Override

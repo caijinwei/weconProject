@@ -26,7 +26,7 @@ private final String SEL_COL = "plc_id,device_id,type,driver,box_stat_no,plc_sta
     通讯口配置
     * */
     @Override
-    public long SavePlcInfo(PlcInfo model) {
+    public long savePlcInfo(PlcInfo model) {
 
         System.out.println("通讯口配置获取到的model值是"+model);
         /*

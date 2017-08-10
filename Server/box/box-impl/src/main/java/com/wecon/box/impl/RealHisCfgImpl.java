@@ -17,7 +17,9 @@ import org.springframework.stereotype.Component;
 import com.wecon.box.api.RealHisCfgApi;
 import com.wecon.box.entity.Page;
 import com.wecon.box.entity.RealHisCfg;
+import com.wecon.box.entity.RealHisCfgDevice;
 import com.wecon.box.filter.RealHisCfgFilter;
+import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.common.util.CommonUtils;
 
 /**
@@ -27,7 +29,7 @@ import com.wecon.common.util.CommonUtils;
 public class RealHisCfgImpl implements RealHisCfgApi {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	private final String SEL_COL = "id,data_id,account_id,plc_id,`name`,addr,addr_type,`describe`,digit_count,data_limit,his_cycle,data_type,state,create_date,update_date";
+	private final String SEL_COL = "r.id,r.data_id,r.account_id,r.plc_id,r.name,r.addr,r.addr_type,r.describe,r.digit_count,r.data_limit,r.his_cycle,r.data_type,r.state,r.create_date,r.update_date";
 
 	@Override
 	public long saveRealHisCfg(final RealHisCfg model) {
@@ -72,7 +74,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	@Override
 	public RealHisCfg getRealHisCfg(long id) {
 
-		String sql = "select " + SEL_COL + " from real_his_cfg where id=?";
+		String sql = "select " + SEL_COL + " from real_his_cfg r where r.id=?";
 		List<RealHisCfg> list = jdbcTemplate.query(sql, new Object[] { id }, new DefaultRealHisCfgRowMapper());
 		if (!list.isEmpty()) {
 			return list.get(0);
@@ -83,7 +85,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 	@Override
 	public List<RealHisCfg> getRealHisCfg(long plc_id, int state) {
-		String sql = "select " + SEL_COL + " from real_his_cfg where plc_id=? and state=?";
+		String sql = "select " + SEL_COL + " from real_his_cfg r where r.plc_id=? and r.state=?";
 		List<RealHisCfg> list = jdbcTemplate.query(sql, new Object[] { plc_id, state },
 				new DefaultRealHisCfgRowMapper());
 		if (!list.isEmpty()) {
@@ -95,94 +97,122 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 	@Override
 	public void delRealHisCfg(long id) {
-		String sql = "delete from  real_his_cfg  where id=?";
+		String sql = "delete from  real_his_cfg r where r.id=?";
 		jdbcTemplate.update(sql, new Object[] { id });
 	}
 
 	@Override
-	public List<RealHisCfg> getRealHisCfg(RealHisCfgFilter filter) {
-		String sql = "select " + SEL_COL + " from real_his_cfg where 1=1";
+	public List<RealHisCfgDevice> getRealHisCfg(RealHisCfgFilter filter) {
+		String sql = "select " + SEL_COL + ",d.machine_code"
+				+ " from real_his_cfg r ,device d,plc_info p where 1=1 and p.`plc_id`=r.plc_id and p.`device_id`=d.device_id";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
-		if (filter.id>0) {
-			condition.append(" and id = ? ");
+		if (filter.id > 0) {
+			condition.append(" and r.id = ? ");
 			params.add(filter.id);
 		}
-		if (filter.data_id>0) {
-			condition.append(" and data_id = ? ");
+		if (filter.data_id > 0) {
+			condition.append(" and r.data_id = ? ");
 			params.add(filter.data_id);
 		}
-		if (filter.account_id>0) {
-			condition.append(" and account_id = ? ");
+		if (filter.account_id > 0) {
+			condition.append(" and r.account_id = ? ");
 			params.add(filter.account_id);
 		}
-		if (filter.plc_id>0) {
-			condition.append(" and plc_id = ? ");
+		if (filter.plc_id > 0) {
+			condition.append(" and r.plc_id = ? ");
 			params.add(filter.plc_id);
 		}
 		if (!CommonUtils.isNullOrEmpty(filter.name)) {
-			condition.append(" and name like ? ");
+			condition.append(" and r.name like ? ");
 			params.add("%" + filter.name + "%");
 		}
 		if (!CommonUtils.isNullOrEmpty(filter.addr)) {
-			condition.append(" and addr like ? ");
+			condition.append(" and r.addr like ? ");
 			params.add("%" + filter.addr + "%");
 		}
-		if (filter.addr_type>-1) {
-			condition.append(" and addr_type = ? ");
+		if (filter.addr_type > -1) {
+			condition.append(" and r.addr_type = ? ");
 			params.add(filter.addr_type);
 		}
 
 		if (!CommonUtils.isNullOrEmpty(filter.describe)) {
-			condition.append(" and describe like ? ");
+			condition.append(" and r.describe like ? ");
 			params.add("%" + filter.describe + "%");
 		}
 		if (!CommonUtils.isNullOrEmpty(filter.digit_count)) {
-			condition.append(" and digit_count like ? ");
+			condition.append(" and r.digit_count like ? ");
 			params.add("%" + filter.digit_count + "%");
 		}
 		if (!CommonUtils.isNullOrEmpty(filter.data_limit)) {
-			condition.append(" and data_limit like ? ");
+			condition.append(" and r.data_limit like ? ");
 			params.add("%" + filter.data_limit + "%");
 		}
 
-		if (filter.his_cycle>-1) {
-			condition.append(" and his_cycle = ? ");
+		if (filter.his_cycle > -1) {
+			condition.append(" and r.his_cycle = ? ");
 			params.add(filter.his_cycle);
 		}
-		if (filter.data_type>-1) {
-			condition.append(" and data_type = ? ");
+		if (filter.data_type > -1) {
+			condition.append(" and r.data_type = ? ");
 			params.add(filter.data_type);
 		}
-		if (filter.state>-1) {
-			condition.append(" and state = ? ");
+		if (filter.state > -1) {
+			condition.append(" and r.state = ? ");
 			params.add(filter.state);
 
 		}
-		sql+=condition;
-		List<RealHisCfg> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgRowMapper());
+		sql += condition;
+		List<RealHisCfgDevice> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgDeviceRowMapper());
+		return list;
+	}
+
+	@Override
+	public List<RealHisCfgDevice> getRealHisCfg(ViewAccountRoleFilter filter) {
+		String sql = "select " + SEL_COL + ",d.machine_code"
+				+ " from   real_his_cfg r , device d,plc_info p, view_account_role v where 1=1 and  p.plc_id=r.plc_id and p.device_id=d.device_id and v.cfg_id=r.id and v.cfg_type=1";
+		StringBuffer condition = new StringBuffer("");
+		List<Object> params = new ArrayList<Object>();
+
+		if (filter.view_id > 0) {
+			condition.append(" and v.view_id = ? ");
+			params.add(filter.view_id);
+		}
+		if (filter.role_type > -1) {
+			condition.append(" and v.role_type = ? ");
+			params.add(filter.role_type);
+		}
+		if (filter.data_type > -1) {
+			condition.append(" and r.data_type = ? ");
+			params.add(filter.data_type);
+		}
+
+		sql += condition;
+		List<RealHisCfgDevice> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgDeviceRowMapper());
 		return list;
 	}
 
 	@Override
 	public Page<RealHisCfg> getRealHisCfgList(RealHisCfgFilter filter, int pageIndex, int pageSize) {
-		String sqlCount = "select count(0) from real_his_cfg where 1=1";
-		String sql = "select " + SEL_COL + " from real_his_cfg where 1=1";
+		String sqlCount = "select count(0) from real_his_cfg r ,device d,plc_info p where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id";
+		// String sql = "select " + SEL_COL + " from real_his_cfg where 1=1";
+		String sql = "select " + SEL_COL
+				+ " from real_his_cfg r ,device d,plc_info p where 1=1 adn  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
-		if (filter.id>0) {
+		if (filter.id > 0) {
 			condition.append(" and id = ? ");
 			params.add(filter.id);
 		}
-		if (filter.data_id>0) {
+		if (filter.data_id > 0) {
 			condition.append(" and data_id = ? ");
 			params.add(filter.data_id);
 		}
-		if (filter.account_id>0) {
+		if (filter.account_id > 0) {
 			condition.append(" and account_id = ? ");
 			params.add(filter.account_id);
 		}
-		if (filter.plc_id>0) {
+		if (filter.plc_id > 0) {
 			condition.append(" and plc_id = ? ");
 			params.add(filter.plc_id);
 		}
@@ -194,7 +224,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			condition.append(" and addr like ? ");
 			params.add("%" + filter.addr + "%");
 		}
-		if (filter.addr_type>-1) {
+		if (filter.addr_type > -1) {
 			condition.append(" and addr_type = ? ");
 			params.add(filter.addr_type);
 		}
@@ -212,15 +242,15 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			params.add("%" + filter.data_limit + "%");
 		}
 
-		if (filter.his_cycle>-1) {
+		if (filter.his_cycle > -1) {
 			condition.append(" and his_cycle = ? ");
 			params.add(filter.his_cycle);
 		}
-		if (filter.data_type>-1) {
+		if (filter.data_type > -1) {
 			condition.append(" and data_type = ? ");
 			params.add(filter.data_type);
 		}
-		if (filter.state>-1) {
+		if (filter.state > -1) {
 			condition.append(" and state = ? ");
 			params.add(filter.state);
 
@@ -257,6 +287,31 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.create_date = rs.getTimestamp("create_date");
 			model.update_date = rs.getTimestamp("update_date");
 
+			return model;
+		}
+	}
+
+	public static final class DefaultRealHisCfgDeviceRowMapper implements RowMapper<RealHisCfgDevice> {
+
+		@Override
+		public RealHisCfgDevice mapRow(ResultSet rs, int i) throws SQLException {
+			RealHisCfgDevice model = new RealHisCfgDevice();
+			model.id = rs.getLong("id");
+			model.data_id = rs.getLong("data_id");
+			model.account_id = rs.getLong("account_id");
+			model.plc_id = rs.getLong("plc_id");
+			model.name = rs.getString("name");
+			model.addr = rs.getString("addr");
+			model.addr_type = rs.getInt("addr_type");
+			model.describe = rs.getString("describe");
+			model.digit_count = rs.getString("digit_count");
+			model.data_limit = rs.getString("data_limit");
+			model.his_cycle = rs.getInt("his_cycle");
+			model.data_type = rs.getInt("data_type");
+			model.state = rs.getInt("state");
+			model.create_date = rs.getTimestamp("create_date");
+			model.update_date = rs.getTimestamp("update_date");
+			model.machine_code = rs.getString("machine_code");
 			return model;
 		}
 	}

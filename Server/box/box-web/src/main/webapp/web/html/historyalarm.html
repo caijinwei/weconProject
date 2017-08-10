@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../css/style.css" />
+    <link rel="stylesheet" href="../lib/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="../lib/jquery/jquery-3.2.1.min.js"></script>
+    <script src="../lib/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../lib/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!--日期选择器需要用到下列文件-->
+    <!--日期控件参考文档地址：www.bootcss.com/p/bootstrap-datetimepicker/index.htm-->
+    <!--github地址：https://github.com/smalot/bootstrap-datetimepicker-->
+    <link rel="stylesheet" href="../lib/bootstrap/datetimepicker/css/bootstrap-datetimepicker.min.css">
+    <script src="../lib/bootstrap/datetimepicker/js/bootstrap-datetimepicker.js"></script>
+</head>
+<body>
+    <div class="container-fluid" style="margin-top: 20px;">
+        <div class="row">
+            <span class="col-md-1" style="height: 30px;line-height: 30px;">编码</span>
+            <input class="col-md-3" type="text" style="padding-left: 5px;height:35px;"/>
+            <span class="col-md-1" style="height: 30px;line-height:30px;margin-left: 30px">名称</span>
+            <input class="col-md-3" type="text" style="padding-left: 5px;height:35px;"/>
+        </div>
+        <div class="row" style="margin-top: 20px;">
+            <div style="display: inline-block;margin-left: -15px;" class="col-md-4">
+                <span class="col-md-3" style="height: 30px;line-height:30px;">起始日期</span>
+                <div class="input-group date form_datetime col-md-9" data-date="1979-09-16T05:25:07Z" data-date-format="yyyy-mm-dd hh:ii">
+                    <input class="form-control" size="16" type="text" value="" readonly>
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                </div>
+            </div>
+            <div style="float: left;display: inline-block;margin-left: 35px;" class="col-md-4">
+                <span class="col-md-3" style="height: 30px;line-height:30px;">结束日期</span>
+                <div class="input-group date form_datetime col-md-9" data-date="1979-09-16T05:25:07Z" data-date-format="yyyy-mm-dd hh:ii">
+                    <input class="form-control" size="16" type="text" value="" readonly>
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary" style="margin-left: 20px;">
+                <span class="glyphicon glyphicon-search"></span>
+            </button>
+            <button type="button" class="btn btn-primary">
+                <span class="glyphicon glyphicon-share"></span>
+            </button>
+        </div>
+        <table class="table table-bordered" style="margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th class="col-md-1">编码</th>
+                    <th class="col-md-1">名称</th>
+                    <th class="col-md-3">信息</th>
+                    <th class="col-md-2">状态</th>
+                    <th class="col-md-2">值</th>
+                    <th class="col-md-3">时间</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <script>
+        $('.form_datetime').datetimepicker({
+            weekStart: 1,
+            todayBtn:  1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 2,
+            forceParse: 0,
+            showMeridian: 1,
+            pickerPosition: "bottom-left"
+        }).on('changeDate',function (ev) {      //当日期被改变时触发
+//            alert("当前日期是：" + ev.date.valueOf());
+        });
+    </script>
+</body>
+
+
+</html>

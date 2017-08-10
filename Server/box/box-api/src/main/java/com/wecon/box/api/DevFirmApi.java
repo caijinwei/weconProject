@@ -16,7 +16,7 @@ public interface DevFirmApi {
 	 * @param model
 	 * @return
 	 */
-	public long SaveDevFirm(DevFirm model);
+	public long saveDevFirm(DevFirm model);
 
 	/**
 	 * 更新设备固件版本信息

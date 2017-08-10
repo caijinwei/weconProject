@@ -1,10 +1,10 @@
 package com.wecon.box.api;
 
-import com.wecon.box.entity.ViewAccountRoleView;
-import org.springframework.stereotype.Component;
 import com.wecon.box.entity.Page;
 import com.wecon.box.entity.ViewAccountRole;
+import com.wecon.box.entity.ViewAccountRoleView;
 import com.wecon.box.filter.ViewAccountRoleFilter;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public interface ViewAccountRoleApi {
 	 * @param model
 	 * @return
 	 */
-	public long SaveViewAccountRole(ViewAccountRole model);
+	public long saveViewAccountRole(ViewAccountRole model);
 
 	/**
 	 * 更新视图账号
@@ -67,7 +67,8 @@ public interface ViewAccountRoleApi {
     * data_type
     *           0：实时监控点
     *           1：历史监控点
-    * */
+    **/
 	public List<ViewAccountRoleView> getViewAccountRoleViewByViewID(Integer data_type, long view_id);
+
 
 }

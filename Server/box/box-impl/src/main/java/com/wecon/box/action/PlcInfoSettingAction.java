@@ -59,7 +59,7 @@ public class PlcInfoSettingAction
 
         // 驱动文件夹 没有不能输入  这里写默认值
         plcInfo.driver="驱动文件名（测试）Action 这边先写";
-        plcInfoApi.SavePlcInfo(plcInfo);
+        plcInfoApi.savePlcInfo(plcInfo);
         return new Output();
     }
 

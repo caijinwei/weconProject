@@ -19,7 +19,7 @@ public interface PlcInfoApi {
 	 * @param model
 	 * @return
 	 */
-	public long SavePlcInfo(PlcInfo model);
+	public long savePlcInfo(PlcInfo model);
 
 	/**
 	 * 更新通讯口信息

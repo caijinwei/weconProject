@@ -7,38 +7,14 @@ import org.springframework.stereotype.Component;
  */
 
 import com.wecon.box.entity.AccountRelation;
+
 @Component
 public interface AccountRelationApi {
-	/**
-	 * 创建帐号之间关系描述
-	 *
-	 * @param model
-	 * @return
-	 */
-	public long SaveAccountRelation(AccountRelation model);
+/**
+ * 根据视图id,获取管理者id
+ * @param view_id
+ * @return
+ */
+	public AccountRelation getAccountRelation(long view_id);
 
-	/**
-	 * 更新帐号之间关系描述
-	 *
-	 * @param model
-	 * @return
-	 */
-	public boolean updateAccountRelation(AccountRelation model);
-
-	/**
-	 * 根据manager_id取某个帐号之间关系描述
-	 * 
-	 * @param manager_id
-	 * @param view_id
-	 * @return
-	 */
-	public AccountRelation getAccountRelation(long manager_id, long view_id);
-
-	/**
-	 * 根据manager_id删除某个帐号之间关系描述
-	 * 
-	 * @param manager_id
-	 * @param view_id
-	 */
-	public void delAccountRelation(long manager_id, long view_id);
 }

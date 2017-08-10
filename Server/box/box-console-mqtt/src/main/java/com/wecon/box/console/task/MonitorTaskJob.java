@@ -183,7 +183,7 @@ public class MonitorTaskJob implements Job {
 							devFirmApi.updateDevFirm(newdevFirm);
 						} else {
 							// 固件保存
-							devFirmApi.SaveDevFirm(newdevFirm);
+							devFirmApi.saveDevFirm(newdevFirm);
 						}
 					}
 				}
@@ -251,7 +251,7 @@ public class MonitorTaskJob implements Job {
 				if (listpiBoxHisCom == null) {
 					return;
 				}
-				if (listpiBoxHisCom.get(0).dat_list == null || listpiBoxHisCom.get(0).dat_list.size() < 1) {
+				if (listpiBoxHisCom.get(0).addr_list == null || listpiBoxHisCom.get(0).addr_list.size() < 1) {
 					return;
 				}
 				// 得到上报的串口ID
@@ -264,7 +264,7 @@ public class MonitorTaskJob implements Job {
 					if (listrealHisCfg == null || listrealHisCfg.size() < 1) {
 						return;
 					}
-					List<PiBoxHisComAddr> listPiBoxHisComAddr = listpiBoxHisCom.get(0).dat_list;
+					List<PiBoxHisComAddr> listPiBoxHisComAddr = listpiBoxHisCom.get(0).addr_list;
 					// 保存历史数据列表
 					List<RealHisCfgData> listInsertRealHisCfgData = new ArrayList<RealHisCfgData>();
 

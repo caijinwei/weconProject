@@ -16,19 +16,20 @@
 <body ng-controller="infoController" ng-init="onInit()" >
 <div class="conatiner-fluid">
     <table class="table table-bordered" style="margin-top: 20px;">
-        <caption>
+        <!-- <caption>
             <button type="button" class="btn btn-primary" data-toggle="modal"  data-target="#addpoint">
                 <span class="glyphicon glyphicon-plus"></span> 添加监控点
             </button>
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addpoint">
                 <span class="glyphicon glyphicon-list" style="margin-left: 15px;"></span> 批量添加
             </button>
-        </caption>
+        </caption> -->
         <thead>
         <tr>
+            <th class="col-md-1">ID</th>
             <th class="col-md-1">状态</th>
-            <th class="col-md-2">名称</th>
-            <th class="col-md-2">数值</th>
+            <th class="col-md-1">名称</th>
+            <th class="col-md-1">数值</th>
             <th class="col-md-2">地址</th>
             <th class="col-md-2">地址类型</th>
             <th class="col-md-2">描述</th>
@@ -37,6 +38,7 @@
         </thead>
         <tbody>
         <tr ng-repeat="x in actDatas">
+            <td>{{x.id}}</td>
             <td>{{x.state==0?"超时":"在线"}}</td>
             <td>{{x.name}}</td>
             <td>{{x.value}}</td>

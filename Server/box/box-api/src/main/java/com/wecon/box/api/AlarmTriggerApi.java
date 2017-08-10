@@ -1,5 +1,7 @@
 package com.wecon.box.api;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 /**
  * @author lanpenghui
@@ -7,37 +9,17 @@ import org.springframework.stereotype.Component;
  */
 
 import com.wecon.box.entity.AlarmTrigger;
+import com.wecon.box.filter.AlarmTriggerFilter;
+
 @Component
 public interface AlarmTriggerApi {
-	/**
-	 * 保存报警触发条件
-	 *
-	 * @param model
-	 * @return
-	 */
-	public long SaveAlarmTrigger(AlarmTrigger model);
 
 	/**
-	 * 更新报警触发条件
-	 *
-	 * @param model
-	 * @return
-	 */
-	public boolean updateAlarmTrigger(AlarmTrigger model);
-
-	/**
-	 * 根据alarmtrig_id取某个报警触发条件
-	 *
-	 * @param alarmtrig_id
-	 * @return
-	 */
-	public AlarmTrigger getAlarmTrigger(long alarmtrig_id);
-
-	/**
-	 * 根据alarmtrig_id删除某个报警触发条件
+	 * 根据filter取报警触发条件
 	 * 
-	 * @param alarmtrig_id
-	 * 
+	 * @param filter
+	 * @return
 	 */
-	public void delAlarmTrigger(long alarmtrig_id);
+	public List<AlarmTrigger> getAlarmTrigger(AlarmTriggerFilter filter);
+
 }

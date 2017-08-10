@@ -13,15 +13,4 @@ public class ViewAccountRoleView extends RealHisCfg {
     public Timestamp create_date;
     public Timestamp update_date;
 
-    @Override
-    public String toString() {
-        return "ViewAccountRoleView{" +
-                "view_id=" + view_id +
-                ", cfg_type=" + cfg_type +
-                ", cfg_id=" + cfg_id +
-                ", role_type=" + role_type +
-                ", create_date=" + create_date +
-                ", update_date=" + update_date +
-                '}';
-    }
 }
