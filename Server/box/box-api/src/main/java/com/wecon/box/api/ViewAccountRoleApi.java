@@ -1,6 +1,7 @@
 package com.wecon.box.api;
 
 import com.wecon.box.entity.Page;
+import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.entity.ViewAccountRole;
 import com.wecon.box.entity.ViewAccountRoleView;
 import com.wecon.box.filter.ViewAccountRoleFilter;
@@ -30,13 +31,14 @@ public interface ViewAccountRoleApi {
 	 */
 	public boolean updateViewAccountRole(ViewAccountRole model);
 
-	/**
-	 * 根据view_id取某个视图账号
-	 *
-	 * @param view_id
-	 * @return
-	 */
-	public ViewAccountRole getViewAccountRole(long view_id);
+	/*
+* @Param view_id      account_id      pageIndex    pageSize
+* 		视图账号ID  管理员账户ID       当前页       每页显示条数
+*
+*  获取 该视图账户中未有的监控点
+*  	需要分页
+* */
+	public List<RealHisCfg> getViewRealHisCfgByViewAndAccId(long view_id, long account_id, Integer pageIndex, Integer pageSize);
 
 	/**
 	 * 根据view_id删除某个视图账号

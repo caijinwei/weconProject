@@ -2,8 +2,10 @@ package com.wecon.box.action;
 
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.ViewAccountRoleApi;
+import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.entity.ViewAccountRoleView;
 import com.wecon.restful.annotation.WebApi;
+import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.Output;
 import com.wecon.restful.doc.Label;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,7 @@ public class ViewpointAction {
     @Autowired
     ViewAccountRoleApi viewAccountRoleApi;
 
-    @Label("实时监控点")
+    @Label("实时历史监控点")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping("showReal")
     public Output showRealpoint(@RequestParam("view_id") Integer viewId,@RequestParam("type") Integer type)
@@ -37,6 +39,22 @@ public class ViewpointAction {
         JSONObject data=new JSONObject();
         data.put("list",list);
         System.out.println(data);
+        return new Output(data);
+    }
+
+    /*
+    *管理用户分配监控点展示（未分配）
+    * */
+
+    @Label("未分配实时历史监控点展示")
+    @WebApi(forceAuth = true,master = true,authority = {"1"})
+    @RequestMapping(value="showRealHiss")
+    public Output showRealHiss(@RequestParam("view_id") Integer viewId,@RequestParam("type") Integer type,@RequestParam("pageIndex") Integer pageIndex,@RequestParam("pageSize") Integer pageSize)
+    {
+        long userId=AppContext.getSession().client.userId;
+        List<RealHisCfg> list=viewAccountRoleApi.getViewRealHisCfgByViewAndAccId(viewId,userId,pageIndex,pageSize);
+        JSONObject data=new JSONObject();
+        data.put("list",list);
         return new Output(data);
     }
 }
