@@ -20,6 +20,7 @@
         <li><a href="#history-data" onclick="showPage('history-data','historydata.html')">历史数据</a></li>
         <li><a href="#remote-download" onclick="showPage('remote-download','remotedownload.html')">远程下载</a></li>
         <li><a href="#base-config" onclick="showPage('base-config','baseconfig.html')">基本配置</a></li>
+        <li><a href="#test" onclick="showPage('test','groupmgr.html')">test</a></li>
     </ul>
     <hr>
     <div class="tab-content">
@@ -29,6 +30,7 @@
         <div class="tab-pane" id="history-data"></div>
         <div class="tab-pane" id="remote-download"></div>
         <div class="tab-pane" id="base-config"></div>
+        <div class="tab-pane" id="test"></div>
     </div>
 </div>
 <script src="../lib/jquery/jquery-3.2.1.min.js"></script>
@@ -42,7 +44,17 @@
     })
     function showPage(tabId, url) {
         $('#overviewtab a[href="#' + tabId + '"]').tab("show");//显示点击的页面
-        $('#' + tabId).load(url);
+//        $('#' + tabId).load(url);
+        $.ajax({
+            url: url, //这里是静态页的地址
+            type: "GET", //静态页用get方法，否则服务器会抛出405错误
+            dataType: "html",
+            async: false,
+            success: function (data) {
+//                var result = $(data).find("body");
+                $('#' + tabId).html(data);
+            }
+        });
     }
 </script>
 </body>

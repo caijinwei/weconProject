@@ -299,7 +299,7 @@ public class TestAction {
 	@Description("mosquito消息的推送测试")
 	@RequestMapping(value = "/putMess")
 	public Output putMQTTMess(@RequestParam("machine_code") String machine_code, @RequestParam("com") String com,
-			@RequestParam("state") String state, @RequestParam("value") String value,
+			 @RequestParam("value") String value,
 			@RequestParam("addr_id") String addr_id) throws MqttException {
 		ServerMqtt server = new ServerMqtt();
 		server.message = new MqttMessage();
@@ -307,7 +307,7 @@ public class TestAction {
 		server.message.setRetained(true);
 
 		PiBoxComAddr addr1 = new PiBoxComAddr();
-		addr1.state = state;
+//		addr1.state = state;
 		addr1.addr_id = addr_id;
 		addr1.value = value;
 		List<PiBoxCom> operate_data_list = new ArrayList<PiBoxCom>();
