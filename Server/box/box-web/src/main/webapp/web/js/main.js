@@ -56,7 +56,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             if (code == 200) {
                 alert("PIBox绑定成功");
                 $("#addPIBox").modal("hide");
-                clearInput();
+                $scope.clearInput();
             }
             else {
                 alert(code + "-" + msg);
@@ -86,12 +86,9 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         });
     }
 
-    $scope.clearInput=function() {
+    $scope.clearInput=function(){
         $("#machine_code").val("") ;
         $("#dev_password").val("");
         $("#dev_name").val("");
     }
-
-
     })
-
