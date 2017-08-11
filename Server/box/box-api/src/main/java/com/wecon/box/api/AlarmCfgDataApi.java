@@ -56,4 +56,6 @@ public interface AlarmCfgDataApi {
 	 * @return
 	 */
 	Page<AlarmCfgDataAlarmCfg> getRealHisCfgDataList(AlarmCfgDataFilter filter, int pageIndex, int pageSize);
+	
+	Page<AlarmCfgDataAlarmCfg> getViewRealHisCfgDataList(AlarmCfgDataFilter filter, int pageIndex, int pageSize);
 }

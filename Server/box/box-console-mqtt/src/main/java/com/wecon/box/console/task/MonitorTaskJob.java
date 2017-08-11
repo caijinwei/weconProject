@@ -347,7 +347,7 @@ public class MonitorTaskJob implements Job {
 
 					try {
 						// 批量保存报警数据成功
-						alarmCfgDataApi.SaveAlarmCfgData(listInsertAlarmCfgData);
+						alarmCfgDataApi.saveAlarmCfgData(listInsertAlarmCfgData);
 						System.out.println("alarmCfgData add success !");
 						// 反馈成功消息给盒子
 						MqttMessage boxmessage = new MqttMessage();

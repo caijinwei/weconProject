@@ -104,10 +104,11 @@ public class HisDataAction {
 			@RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
 
 		JSONObject data = new JSONObject();
+		Page<RealHisCfgData> realHisCfgDataList = null;
 
 		RealHisCfgDataFilter realHisCfgDataFilter = new RealHisCfgDataFilter();
 		if (CommonUtils.isNullOrEmpty(real_his_cfg_id)) {
-			data.put("realHisCfgDataList", "");
+			data.put("realHisCfgDataList", realHisCfgDataList);
 			return new Output(data);
 
 		}
@@ -116,7 +117,7 @@ public class HisDataAction {
 		realHisCfgDataFilter.end_date = end_date;
 		realHisCfgDataFilter.state = 1;
 
-		Page<RealHisCfgData> realHisCfgDataList = realHisCfgDataApi.getRealHisCfgDataList(realHisCfgDataFilter,
+		 realHisCfgDataList = realHisCfgDataApi.getRealHisCfgDataList(realHisCfgDataFilter,
 				pageIndex, pageSize);
 
 		data.put("realHisCfgDataList", realHisCfgDataList);
