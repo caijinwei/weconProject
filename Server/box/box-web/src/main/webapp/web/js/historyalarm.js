@@ -13,11 +13,23 @@ appModule
 							rememberPerPage : 'perPageItems',
 							onChange : function() {
 								if (this.currentPage != 0) {
-									$scope.alarm_submit(this.currentPage,
+									$scope.hisalarm_submit(this.currentPage,
 											this.itemsPerPage);
 								}
 							}
 						}
+						$('.form_datetime').datetimepicker({
+							weekStart : 1,
+							todayBtn : 1,
+							autoclose : 1,
+							todayHighlight : 1,
+							startView : 2,
+							forceParse : 0,
+							showMeridian : 1,
+							pickerPosition : "bottom-left"
+						}).on('changeDate', function(ev) { // 当日期被改变时触发
+							// alert("当前日期是：" + ev.date.valueOf());
+						});
 
 					}
 
@@ -27,11 +39,15 @@ appModule
 					/**
 					 * 提交接口请求
 					 */
-					$scope.alarm_submit = function(pageIndex, pageSize) {
+					$scope.hisalarm_submit = function(pageIndex, pageSize) {
 						$("#loadingModal").modal("show");
 						if (pageIndex == 0)
 							pageIndex = 1;
 						var params = {
+							alarm_cfg_id : $("#alarmcfgid").val(),
+							name : $("#alarmcfgname").val(),
+							start_date : $("#startdateid").val(),
+							end_date : $("#enddateid").val(),
 							pageIndex : pageIndex,
 							pageSize : pageSize
 						};
@@ -39,12 +55,12 @@ appModule
 						T.common.ajax
 								.request(
 										"WeconBox",
-										"alarmDataAction/getNowAlarmData",
+										"alarmDataAction/getHisAlarmData",
 										params,
 										function(data, code, msg) {
 											if (code == 200) {
-												$scope.alarmDatas = data.alarmData.list;
-												$scope.paginationConf.totalItems = data.alarmData.totalRecord;
+												$scope.alarmHisDatas = data.alarmHisData.list;
+												$scope.paginationConf.totalItems = data.alarmHisData.totalRecord;
 												$scope.$apply();
 												$("#loadingModal")
 														.modal("hide");
