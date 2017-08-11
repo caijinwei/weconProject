@@ -20,4 +20,7 @@ public interface AlarmCfgApi {
 	 * @return
 	 */
 	public List<AlarmCfg> getAlarmCfg(long account_id);
+
+	
+
 }

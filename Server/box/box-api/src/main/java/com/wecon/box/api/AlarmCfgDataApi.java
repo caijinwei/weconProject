@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 import com.wecon.box.entity.AlarmCfgData;
+import com.wecon.box.entity.AlarmCfgDataAlarmCfg;
 import com.wecon.box.entity.Page;
 import com.wecon.box.filter.AlarmCfgDataFilter;
 
@@ -13,13 +14,6 @@ import com.wecon.box.filter.AlarmCfgDataFilter;
  */
 @Component
 public interface AlarmCfgDataApi {
-	/**
-	 * 保存报警数据
-	 *
-	 * @param model
-	 * @return
-	 */
-	public long saveAlarmCfgData(AlarmCfgData model);
 
 	/**
 	 * 批量保存报警数据
@@ -27,7 +21,7 @@ public interface AlarmCfgDataApi {
 	 * @param listmodel
 	 * @return
 	 */
-	public void SaveAlarmCfgData(List<AlarmCfgData> listmodel);
+	public void saveAlarmCfgData(List<AlarmCfgData> listmodel);
 
 	/**
 	 * 根据filter取列表报警数据
@@ -35,7 +29,7 @@ public interface AlarmCfgDataApi {
 	 * @param filter
 	 * @return
 	 */
-	public List<AlarmCfgData> getAlarmCfgData(AlarmCfgDataFilter filter);
+	public List<AlarmCfgDataAlarmCfg> getAlarmCfgData(AlarmCfgDataFilter filter);
 
 	/**
 	 * 根据alarm_cfg_id,monitor_time取某个报警数据配置
@@ -61,5 +55,5 @@ public interface AlarmCfgDataApi {
 	 * @param pageSize
 	 * @return
 	 */
-	Page<AlarmCfgData> getRealHisCfgDataList(AlarmCfgDataFilter filter, int pageIndex, int pageSize);
+	Page<AlarmCfgDataAlarmCfg> getRealHisCfgDataList(AlarmCfgDataFilter filter, int pageIndex, int pageSize);
 }

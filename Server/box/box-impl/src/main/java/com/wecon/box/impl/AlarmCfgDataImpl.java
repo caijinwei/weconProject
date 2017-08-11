@@ -1,23 +1,19 @@
 package com.wecon.box.impl;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import com.wecon.box.api.AlarmCfgDataApi;
 import com.wecon.box.entity.AlarmCfgData;
+import com.wecon.box.entity.AlarmCfgDataAlarmCfg;
 import com.wecon.box.entity.Page;
 import com.wecon.box.filter.AlarmCfgDataFilter;
 import com.wecon.common.util.CommonUtils;
@@ -29,30 +25,11 @@ import com.wecon.common.util.CommonUtils;
 public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	private final String SEL_COL = "alarm_cfg_id,monitor_time,`value`,create_date,state";
+	private final String SEL_COL = "acd.alarm_cfg_id,acd.monitor_time,acd.value,acd.create_date,acd.state";
+
 
 	@Override
-	public long saveAlarmCfgData(final AlarmCfgData model) {
-		KeyHolder key = new GeneratedKeyHolder();
-		jdbcTemplate.update(new PreparedStatementCreator() {
-			@Override
-			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-				PreparedStatement preState = con.prepareStatement(
-						"insert into alarm_cfg_data (alarm_cfg_id,monitor_time,`value`,create_date,state)values(?,?,?,current_timestamp(),?);",
-						Statement.RETURN_GENERATED_KEYS);
-				preState.setLong(1, model.alarm_cfg_id);
-				preState.setTimestamp(2, model.monitor_time);
-				preState.setString(3, model.value);
-				preState.setInt(4, model.state);
-				return preState;
-			}
-		}, key);
-		// 从主键持有者中获得主键值
-		return key.getKey().longValue();
-	}
-
-	@Override
-	public void SaveAlarmCfgData(final List<AlarmCfgData> listmodel) {
+	public void saveAlarmCfgData(final List<AlarmCfgData> listmodel) {
 		String sql = "insert into alarm_cfg_data (alarm_cfg_id,monitor_time,`value`,create_date,state)values(?,?,?,current_timestamp(),?);";
 		jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
 
@@ -73,45 +50,31 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 	}
 
 	@Override
-	public List<AlarmCfgData> getAlarmCfgData(AlarmCfgDataFilter filter) {
+	public List<AlarmCfgDataAlarmCfg> getAlarmCfgData(AlarmCfgDataFilter filter) {
 
-		String sql = "select " + SEL_COL + " from alarm_cfg_data where 1=1";
-		String alarmcfgsql="select name from ";
+		String sql =" select "+SEL_COL+"from alarm_cfg ac ,alarm_cfg_data acd,alarm_trigger atr where 1=1 and  ac.alarmcfg_id=atr.alarmcfg_id AND  ac.alarmcfg_id=acd.alarm_cfg_id ";
+	
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
-		if (filter.alarm_cfg_id > 0) {
-			condition.append(" and alarm_cfg_id = ? ");
-			params.add(filter.alarm_cfg_id);
+		if (filter.account_id > 0) {
+			condition.append(" and ac.account_id = ? ");
+			params.add(filter.account_id);
 		}
 		if (!CommonUtils.isNullOrEmpty(filter.value)) {
-			condition.append(" and value like ? ");
+			condition.append(" and acd.value like ? ");
 			params.add("%" + filter.value + "%");
 		}
 		if (filter.state > -1) {
-			condition.append(" and state = ? ");
+			condition.append(" and acd.state = ? ");
 			params.add(filter.state);
 		}
-//		if(CommonUtils.isNullOrEmpty(filter.name)){
-////			condition.append(" and name like ? ");
-////			params.add("%" + filter.name + "%");
-//			
-//		}
-		// 操作时间起
-		if (!CommonUtils.isNullOrEmpty(filter.start_date)) {
-			condition.append(" and date_format(alarm_cfg_data.monitor_time,'%Y-%m-%d %H:%i') >= ");
-			condition.append(" date_format(str_to_date(?,'%Y-%m-%d %H:%i'),'%Y-%m-%d %H:%i') ");
-			params.add(CommonUtils.trim(filter.start_date));
-
-		}
-		// 操作时间止
-		if (!CommonUtils.isNullOrEmpty(filter.end_date)) {
-			condition.append(" and date_format(alarm_cfg_data.monitor_time,'%Y-%m-%d %H:%i') <= ");
-			condition.append(" date_format(str_to_date(?,'%Y-%m-%d %H:%i'),'%Y-%m-%d %H:%i') ");
-			params.add(CommonUtils.trim(filter.end_date));
-
+		if(CommonUtils.isNullOrEmpty(filter.name)){
+			condition.append(" and ac.name like ? ");
+			params.add("%" + filter.name + "%");
+			
 		}
 		sql += condition;
-		List<AlarmCfgData> list = jdbcTemplate.query(sql, params.toArray(), new DefaultAlarmCfgDataRowMapper());
+		List<AlarmCfgDataAlarmCfg> list = jdbcTemplate.query(sql, params.toArray(), new DefaultAlarmCfgDataAlarmCfgRowMapper());
 
 		return list;
 
@@ -136,7 +99,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 	}
 
 	@Override
-	public Page<AlarmCfgData> getRealHisCfgDataList(AlarmCfgDataFilter filter, int pageIndex, int pageSize) {
+	public Page<AlarmCfgDataAlarmCfg> getRealHisCfgDataList(AlarmCfgDataFilter filter, int pageIndex, int pageSize) {
 		String sqlCount = "select count(0) from alarm_cfg_data where 1=1";
 		String sql = "select " + SEL_COL + " from alarm_cfg_data where 1=1";
 		StringBuffer condition = new StringBuffer("");
@@ -169,10 +132,10 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 		}
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
-		Page<AlarmCfgData> page = new Page<AlarmCfgData>(pageIndex, pageSize, totalRecord);
+		Page<AlarmCfgDataAlarmCfg> page = new Page<AlarmCfgDataAlarmCfg>(pageIndex, pageSize, totalRecord);
 		String sort = " order by alarm_cfg_id desc";
 		sql += condition + sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
-		List<AlarmCfgData> list = jdbcTemplate.query(sql, params.toArray(), new DefaultAlarmCfgDataRowMapper());
+		List<AlarmCfgDataAlarmCfg> list = jdbcTemplate.query(sql, params.toArray(), new DefaultAlarmCfgDataAlarmCfgRowMapper());
 		page.setList(list);
 		return page;
 
@@ -189,6 +152,20 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 			model.create_date = rs.getTimestamp("create_date");
 			model.state = rs.getInt("state");
 
+			return model;
+		}
+	}
+	public static final class DefaultAlarmCfgDataAlarmCfgRowMapper implements RowMapper<AlarmCfgDataAlarmCfg> {
+		
+		@Override
+		public AlarmCfgDataAlarmCfg mapRow(ResultSet rs, int i) throws SQLException {
+			AlarmCfgDataAlarmCfg model = new AlarmCfgDataAlarmCfg();
+			model.alarm_cfg_id = rs.getLong("alarm_cfg_id");
+			model.monitor_time = rs.getTimestamp("monitor_time");
+			model.value = rs.getString("value");
+			model.create_date = rs.getTimestamp("create_date");
+			model.state = rs.getInt("state");
+			
 			return model;
 		}
 	}

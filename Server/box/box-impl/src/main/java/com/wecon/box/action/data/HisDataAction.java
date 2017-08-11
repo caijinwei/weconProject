@@ -43,19 +43,19 @@ public class HisDataAction {
 		JSONObject json = new JSONObject();
 		JSONArray arr = new JSONArray();
 		JSONObject data = null;
+		// 获取实时数据配置信息
+		RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
 		List<RealHisCfgDevice> realHisCfgDeviceList = null;
 		/** 超级管理 **/
 		if (client.userInfo.getUserType() == 0) {
-			// 获取实时数据配置信息
-			RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
+		
 			realHisCfgFilter.addr_type = -1;
 			realHisCfgFilter.data_type = 1;
 			realHisCfgFilter.his_cycle = -1;
 			realHisCfgFilter.state = 1;
+			realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(realHisCfgFilter);
 		} else if (client.userInfo.getUserType() == 1) {
 			/** 管理 **/
-			// 获取实时数据配置信息
-			RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
 			realHisCfgFilter.addr_type = -1;
 			realHisCfgFilter.data_type = 1;
 			realHisCfgFilter.his_cycle = -1;
@@ -103,17 +103,22 @@ public class HisDataAction {
 			@RequestParam("start_date") String start_date, @RequestParam("end_date") String end_date,
 			@RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
 
+		JSONObject data = new JSONObject();
+
 		RealHisCfgDataFilter realHisCfgDataFilter = new RealHisCfgDataFilter();
-		if (!CommonUtils.isNullOrEmpty(real_his_cfg_id)) {
-			realHisCfgDataFilter.real_his_cfg_id = Long.parseLong(real_his_cfg_id);
+		if (CommonUtils.isNullOrEmpty(real_his_cfg_id)) {
+			data.put("realHisCfgDataList", "");
+			return new Output(data);
+
 		}
+		realHisCfgDataFilter.real_his_cfg_id = Long.parseLong(real_his_cfg_id);
 		realHisCfgDataFilter.start_date = start_date;
 		realHisCfgDataFilter.end_date = end_date;
 		realHisCfgDataFilter.state = 1;
-		
 
-		Page<RealHisCfgData> realHisCfgDataList = realHisCfgDataApi.getRealHisCfgDataList(realHisCfgDataFilter,pageIndex,pageSize);
-		JSONObject data = new JSONObject();
+		Page<RealHisCfgData> realHisCfgDataList = realHisCfgDataApi.getRealHisCfgDataList(realHisCfgDataFilter,
+				pageIndex, pageSize);
+
 		data.put("realHisCfgDataList", realHisCfgDataList);
 		return new Output(data);
 
