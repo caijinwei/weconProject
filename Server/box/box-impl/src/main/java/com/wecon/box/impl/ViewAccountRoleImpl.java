@@ -53,22 +53,12 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
     * */
     @Override
     public Page<RealHisCfg> getViewRealHisCfgByViewAndAccId(long view_id, long account_id, Integer type, Integer pageIndex, Integer pageSize) {
-        /*
-		* 默认pageIndex为1
-		* 默认pageSize为5
-		*
-		* */
-        if (pageIndex == null) {
-            pageIndex = 1;
-        } else if (pageSize == null) {
-            pageSize = 5;
-        }
         Object[] args0 = new Object[]{account_id, type, view_id};
         String sqlCount = "select count(*) from real_his_cfg a WHERE account_id=? AND a.data_type=? AND id NOT IN(SELECT cfg_id FROM view_account_role where view_id=?);";
         int totalRecord = jdbcTemplate.queryForObject(sqlCount, args0, Integer.class);
         Page<RealHisCfg> page = new Page<RealHisCfg>(pageIndex, pageSize, totalRecord);
 
-        Object[] args = new Object[]{account_id, type, view_id, pageIndex, pageSize};
+        Object[] args = new Object[]{account_id, type, view_id, page.getStartIndex(), page.getPageSize()};
         String sql = "select a.id, a.state,a.name , a.digit_count,a.addr , a.addr_type,a.describe from real_his_cfg a WHERE account_id=?  AND a.data_type=? AND id NOT IN(SELECT cfg_id FROM view_account_role where view_id=?)LIMIT ?,?";
         List<RealHisCfg> list = jdbcTemplate.query(sql, args, new RowMapper() {
             @Override
