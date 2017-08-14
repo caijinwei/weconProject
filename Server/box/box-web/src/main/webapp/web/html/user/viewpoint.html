@@ -27,7 +27,7 @@
         <table class="table table-bordered">
             <caption>
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#showRestOpint"
-                        ng-click="showRestPoint()">
+                        ng-click="showRestList()">
                     <span class="glyphicon glyphicon-plus"></span> 分配监控点
                 </button>
             </caption>
@@ -46,7 +46,7 @@
                 <td>{{x.id}}</td>
                 <td>{{x.name}}</td>
                 <td>{{x.addr}}</td>
-                <td>{{x.state==1?'启动':'未启动'}}</td>
+                <td>{{x.state==1?'启用':'未启用'}}</td>
                 <td>
                     {{x.role_type==0?'无权限':(x.role_type==1?'只读':(x.role_type==2?'只写':'读写'))}}
                 </td>
@@ -80,13 +80,7 @@
                     <table class="table table-bordered">
                         <tr>
                             <td>监控点状态:</td>
-                            <td><label class="radio-inline">
-                                <input type="radio" name="optionsRadiosinline" value="option1" checked> 启用
-                            </label>
-                                <label class="radio-inline">
-                                    <input type="radio" name="optionsRadiosinline" value="option2"> 未启用
-                                </label>
-                            </td>
+                            <td>{{x.state==1?'启用':'未启用'}}</td>
                         </tr>
                         <tr>
                             <td>监控点权限:</td>
@@ -175,7 +169,7 @@
                                 <input name="cbid" type="checkbox" value="{{x.id}}"/>
                             </td>
                             <td><label class="radio-inline">
-                                <input type="radio" name="right_{{x.id}}"   value="1"
+                                <input type="radio" name="right_{{x.id}}"   value="1"  ng-checked="1"
                                        checked> 只读
                             </label>
                                 <label class="radio-inline">
@@ -184,12 +178,7 @@
                                 </label>
                             </td>
                             <td>{{x.id}}</td>
-                            <td>
-                                <a href="#" title="设备已变更或移除">
-                                        <span class="glyphicon glyphicon-exclamation-sign"
-                                              style="color: #ff3a28;"></span>
-                                </a>
-                            </td>
+                            <td>{{x.state==1?'启用':'未启用'}}</td>
                             <td>{{x.addr}}</td>
                             <td>{{x.name}}</td>
                             <td>{{x.describe}}</td>
