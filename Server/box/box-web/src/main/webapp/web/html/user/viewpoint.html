@@ -13,6 +13,7 @@
             vertical-align: middle !important;
         }
     </style>
+    <link rel="stylesheet" type="text/css" href="../../css/page.css"/>
 </head>
 <body ng-controller="listController" ng-init="onInit()">
 <div class="container">
@@ -26,7 +27,7 @@
         <table class="table table-bordered">
             <caption>
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#showRestOpint"
-                        ng-click="showRealHisPoint()">
+                        ng-click="showRestPoint()">
                     <span class="glyphicon glyphicon-plus"></span> 分配监控点
                 </button>
             </caption>
@@ -145,7 +146,7 @@
     <!--监控点分配模态窗口-->
     <div class="modal fade" id="showRestOpint" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
          aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog" style="width: 70%;height: 100%">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
@@ -159,16 +160,29 @@
                     <table class="table table-bordered table-hover" id="pointlist">
                         <thead>
                         <tr>
+                            <th class="col-md-1"><a>全选</a></th>
+                            <th class="col-md-2">权限</th>
                             <th class="col-md-1">编号</th>
                             <th class="col-md-1">状态</th>
                             <th class="col-md-2">地址</th>
                             <th class="col-md-2">名称</th>
-                            <th class="col-md-2">数值</th>
-                            <th class="col-md-4">描述</th>
+                            <th class="col-md-3">描述</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr ng-repeat="x in resrPointDatas">
+                            <td>
+                                <input name="cbid" type="checkbox" value="{{x.id}}"/>
+                            </td>
+                            <td><label class="radio-inline">
+                                <input type="radio" name="right_{{x.id}}"   value="1"
+                                       checked> 只读
+                            </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="right_{{x.id}}"   value="3">
+                                    读写
+                                </label>
+                            </td>
                             <td>{{x.id}}</td>
                             <td>
                                 <a href="#" title="设备已变更或移除">
@@ -178,18 +192,20 @@
                             </td>
                             <td>{{x.addr}}</td>
                             <td>{{x.name}}</td>
-                            <td>{{x.digit_count}}</td>
                             <td>{{x.describe}}</td>
                         </tr>
                         </tbody>
                     </table>
-                    <tm-pagination conf="paginationConf"></tm-pagination>
+
+                    <div style="margin-bottom: 40px">
+                        <tm-pagination conf="paginationConf"></tm-pagination>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭
                     </button>
-                    <button type="button" class="btn btn-primary">
-                        提交更改
+                    <button type="button" class="btn btn-primary" ng-click="setViewOpint()">
+                        确定
                     </button>
                 </div>
             </div><!-- /.modal-content -->
