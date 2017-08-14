@@ -76,4 +76,18 @@ public interface ViewAccountRoleApi {
       * */
     public void setViewPoint(Integer viewId, String[] ids ,String[] rights);
 
+    /*
+    * 视图用户监控点解绑
+    * @param    viewId ，   roleType      pointId
+    *         视图账号ID   监控点类型    监控点ID
+    * */
+    public void deletePoint(Integer viewId,Integer roleType,Integer pointId);
+    /*
+   * 视图账户监控点权限设置
+   * @param viewId       pointId      roleType
+   *       视图账户ID  监控点ID      权限：0无权限  1只读  3读写
+   * UPDATE view_account_role SET role_type="1" WHERE view_id=111 AND cfg_id=12 ;
+   * */
+    public void updateViewPointRoleType( Integer viewId,Integer pointId, Integer roleType);
+
 }

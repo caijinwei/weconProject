@@ -112,8 +112,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
         });
         var ids = chk_value.join(",");
         var rights = rightOption.join(",");
-        if(chk_value.length==0)
-        {
+        if (chk_value.length == 0) {
             alert("没有添加任何监控点");
             $("#showRestOpint").modal("hide");
             return;
@@ -133,5 +132,68 @@ appModule.controller("listController", function ($scope, $http, $compile) {
         }, function () {
             alert("ajax error");
         });
+    };
+
+    /*
+     * 操作视图账号实时历史监控点解除绑定
+     * */
+
+    $scope.deleteOpintParam = function (pointId, roleType) {
+        $scope.pointIdParam = pointId;
+        $scope.roleTypeParam = roleType;
     }
+    $scope.deleteOption = function () {
+        var viewid = T.common.util.getParameter("viewid");
+        var params =
+        {
+            roleType: $scope.roleTypeParam,
+            pointId: $scope.pointIdParam,
+            viewId: viewid
+        }
+        T.common.ajax.request("WeconBox", "Viewpoint/deletePoint", params, function (data, code, msg) {
+            if (code == 200) {
+                var type = T.common.util.getParameter("type");
+                $("#delectOpint").modal("hide");
+                alert("解除关联操作成功！");
+                $scope.showRealPoint(type, viewid);
+            }
+            else {
+                alert(code + "-" + msg);
+            }
+        }, function () {
+            alert("ajax error");
+        });
+    }
+    /*
+     * 修改视图账号监控点权限类型
+     * */
+
+    $scope.updateViewPointRoleTypeParam=function(viewpointIdParam)
+    {
+        $scope.viewPointRoleTypeParam = viewpointIdParam;
+    }
+    $scope.updateViewPointRoleType = function () {
+        var roleType = $('input[name="roleType"]:checked').val();
+        var viewId=T.common.util.getParameter("viewid");
+        var type = T.common.util.getParameter("type");
+        if(viewId==null)
+        {
+            alert("登录失效，请从新登录");
+        }
+        var params =
+        {
+            viewId:viewId,
+            pointId: $scope.viewPointRoleTypeParam,
+            roleType: roleType
+        }
+        T.common.ajax.request("WeconBox", "Viewpoint/updateViewPointRoleType", params, function (data, code, msg) {
+            if (code == 200) {
+                alert("修改监控点权限成功！");
+                $("#updateRoleSyle").modal("hide");
+                $scope.showRealPoint(type, viewId);
+            }
+        });
+    }
+
+
 });
