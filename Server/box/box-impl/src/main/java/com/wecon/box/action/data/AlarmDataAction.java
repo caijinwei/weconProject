@@ -1,6 +1,5 @@
 package com.wecon.box.action.data;
 
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
@@ -13,7 +12,6 @@ import com.wecon.box.entity.AlarmCfgDataAlarmCfg;
 import com.wecon.box.entity.Page;
 import com.wecon.box.filter.AlarmCfgDataFilter;
 import com.wecon.common.util.CommonUtils;
-import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.Client;
 import com.wecon.restful.core.Output;
