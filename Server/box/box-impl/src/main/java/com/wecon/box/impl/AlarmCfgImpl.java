@@ -2,6 +2,7 @@ package com.wecon.box.impl;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,30 +12,35 @@ import org.springframework.stereotype.Component;
 
 import com.wecon.box.api.AlarmCfgApi;
 import com.wecon.box.entity.AlarmCfg;
+import com.wecon.box.entity.AlarmCfgData;
+import com.wecon.box.entity.Page;
+import com.wecon.box.entity.RealHisCfgDevice;
+import com.wecon.box.impl.RealHisCfgImpl.DefaultRealHisCfgDeviceRowMapper;
+import com.wecon.common.util.CommonUtils;
 
 /**
- * @author lanpenghui
- * 2017年8月9日下午2:20:05
+ * @author lanpenghui 2017年8月9日下午2:20:05
  */
 @Component
 public class AlarmCfgImpl implements AlarmCfgApi {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	private final String SEL_COL ="alarmcfg_id,data_id,account_id,name,addr,addr_type,text,condition_type,state,create_date,update_date";
+	private final String SEL_COL = "alarmcfg_id,data_id,account_id,name,addr,addr_type,text,condition_type,state,create_date,update_date";
 
 	@Override
 	public List<AlarmCfg> getAlarmCfg(long account_id) {
 		String sql = "select " + SEL_COL + " from alarm_cfg where account_id=?";
-		List<AlarmCfg> list = jdbcTemplate.query(sql, new Object[] {account_id },
-				new DefaultAlarmCfgRowMapper());
+		List<AlarmCfg> list = jdbcTemplate.query(sql, new Object[] { account_id }, new DefaultAlarmCfgRowMapper());
 		if (!list.isEmpty()) {
 			return list;
 		}
 
 		return null;
-		
-	
+
 	}
+
+
+
 	public static final class DefaultAlarmCfgRowMapper implements RowMapper<AlarmCfg> {
 
 		@Override
@@ -46,7 +52,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			model.name = rs.getString("name");
 			model.addr = rs.getString("addr");
 			model.addr_type = rs.getInt("addr_type");
-			model.text=rs.getString("text");
+			model.text = rs.getString("text");
 			model.state = rs.getInt("state");
 			model.condition_type = rs.getInt("condition_type");
 			model.create_date = rs.getTimestamp("create_date");
@@ -55,6 +61,5 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			return model;
 		}
 	}
-
 
 }

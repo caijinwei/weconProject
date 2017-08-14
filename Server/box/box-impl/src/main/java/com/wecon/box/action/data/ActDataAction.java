@@ -51,26 +51,26 @@ public class ActDataAction {
 		JSONObject json = new JSONObject();
 		JSONArray arr = new JSONArray();
 		JSONObject data = null;
+		// 获取实时数据配置信息
+		RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
 
 		List<RealHisCfgDevice> realHisCfgDeviceList = null;
-		/** 超级管理**/
+		/** 超级管理 **/
 		if (client.userInfo.getUserType() == 0) {
-			// 获取实时数据配置信息
-			RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
+
 			realHisCfgFilter.addr_type = -1;
 			realHisCfgFilter.data_type = 0;
 			realHisCfgFilter.his_cycle = -1;
+			realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(realHisCfgFilter);
 		} else if (client.userInfo.getUserType() == 1) {
-			/** 管理**/
-			// 获取实时数据配置信息
-			RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
+			/** 管理 **/
 			realHisCfgFilter.addr_type = -1;
 			realHisCfgFilter.data_type = 0;
 			realHisCfgFilter.his_cycle = -1;
 			realHisCfgFilter.account_id = client.userId;
 			realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(realHisCfgFilter);
 		} else if (client.userInfo.getUserType() == 2) {
-			/** 视图	**/
+			/** 视图 **/
 			// 通过视图获取配置信息
 			ViewAccountRoleFilter viewAccountRoleFilter = new ViewAccountRoleFilter();
 			viewAccountRoleFilter.view_id = client.userId;
