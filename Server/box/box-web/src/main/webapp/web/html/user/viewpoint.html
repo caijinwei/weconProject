@@ -51,10 +51,11 @@
                     {{x.role_type==0?'无权限':(x.role_type==1?'只读':(x.role_type==2?'只写':'读写'))}}
                 </td>
                 <td>
-                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#updateRoleSyle">修改状态
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#updateRoleSyle" ng-click="updateViewPointRoleTypeParam(x.id)">修改权限
                     </button>
                     <a href="#" data-toggle="modal" data-target="#realunbind">
-                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delectOpint">
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delectOpint"
+                                ng-click="deleteOpintParam(x.id,x.role_type)">
                             解除关联
                         </button>
                     </a>
@@ -79,23 +80,13 @@
                 <div class="modal-body">
                     <table class="table table-bordered">
                         <tr>
-                            <td>监控点状态:</td>
-                            <td>{{x.state==1?'启用':'未启用'}}</td>
-                        </tr>
-                        <tr>
                             <td>监控点权限:</td>
                             <td>
                                 <label class="radio-inline">
-                                    <input type="radio" name="optionsRadiosinline" value="option1" checked>无权限
+                                    <input type="radio" name="roleType" value="1"> 只读
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" name="optionsRadiosinline" value="option2"> 只读
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" name="optionsRadiosinline" value="option2"> 只写
-                                </label>
-                                <label class="radio-inline">
-                                    <input type="radio" name="optionsRadiosinline" value="option2"> 读写
+                                    <input type="radio" name="roleType" value="3"> 读写
                                 </label>
                             </td>
                         </tr>
@@ -104,7 +95,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭
                     </button>
-                    <button type="button" class="btn btn-primary">
+                    <button type="button" class="btn btn-primary" ng-click="updateViewPointRoleType()">
                         提交更改
                     </button>
                 </div>
@@ -130,7 +121,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭
                     </button>
-                    <button type="button" class="btn btn-primary">
+                    <button type="button" class="btn btn-primary" ng-click="deleteOption()">
                         提交更改
                     </button>
                 </div>
@@ -169,11 +160,11 @@
                                 <input name="cbid" type="checkbox" value="{{x.id}}"/>
                             </td>
                             <td><label class="radio-inline">
-                                <input type="radio" name="right_{{x.id}}"   value="1"  ng-checked="1"
+                                <input type="radio" name="right_{{x.id}}" value="1" ng-checked="1"
                                        checked> 只读
                             </label>
                                 <label class="radio-inline">
-                                    <input type="radio" name="right_{{x.id}}"   value="3">
+                                    <input type="radio" name="right_{{x.id}}" value="3">
                                     读写
                                 </label>
                             </td>
