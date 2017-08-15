@@ -66,11 +66,11 @@ public class UserActionTest extends TestBase {
         JSONObject jsonObject = JSON.parseObject(ret);
         Assert.assertEquals(jsonObject.get("code").toString(), "11009");
 
-        request = MockMvcRequestBuilders.post("/user/chgemail");
+        /*request = MockMvcRequestBuilders.post("/user/chgemail");
         request.param("email", "86779961@qq.com");
         ret = test(request, true);
         jsonObject = JSON.parseObject(ret);
-        Assert.assertEquals(jsonObject.get("code").toString(), "200");
+        Assert.assertEquals(jsonObject.get("code").toString(), "200");*/
     }
 
     /**
@@ -123,6 +123,118 @@ public class UserActionTest extends TestBase {
         Assert.assertEquals(jsonObject.get("code").toString(), "11002");
     }
 
+    /**
+     * 登出
+     */
+    @Test
+    public void signout() {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/user/signout");
+        String ret = test(request, true);
+        JSONObject jsonObject = JSON.parseObject(ret);
+        Assert.assertEquals(jsonObject.get("code").toString(), "200");
+    }
+
+    /**
+     * 邮箱地址注册
+     * 1.邮箱格式有误
+     * 2.用户已存在
+     * 3.新增帐号--不测
+     */
+    @Test
+    public void signupByEmail() {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/user/signupemail");
+        request.param("username", "zzp");
+        request.param("password", DigestUtils.md5Hex("1"));
+        request.param("email", "123@123");
+        String ret = test(request, true);
+        JSONObject jsonObject = JSON.parseObject(ret);
+        Assert.assertEquals(jsonObject.get("code").toString(), "11001");
+
+        request = MockMvcRequestBuilders.post("/user/signupemail");
+        request.param("username", "zzp");
+        request.param("password", DigestUtils.md5Hex("1"));
+        request.param("email", "123@qq.com");
+        ret = test(request, true);
+        jsonObject = JSON.parseObject(ret);
+        Assert.assertEquals(jsonObject.get("code").toString(), "11000");
+    }
+
+    /**
+     * 激活邮件
+     * 需要redis数据支持，不测
+     */
+    @Test
+    public void emailActive() {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/user/signupemailactive");
+        request.param("type", "3");
+        request.param("uid", "1000007");
+        request.param("token", "123123");
+        System.out.println(test(request, true));
+    }
+
+    /**
+     * 获取登录用户基本信息--从session中取信息
+     * 需要redis数据支持，不测
+     */
+    @Test
+    public void getUserInfo() {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/user/userinfo");
+        System.out.println(test(request, true));
+    }
+
+    /**
+     * 获取登录用户信息--从db中取信息
+     */
+    @Test
+    public void getUserInfoDetail() {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/user/userinfod");
+        String ret = test(request, true);
+        JSONObject jsonObject = JSON.parseObject(ret);
+        Assert.assertEquals(jsonObject.get("code").toString(), "200");
+        System.out.println(test(request, true));
+    }
+
+    /**
+     * 获取视图帐号分页列表
+     */
+    @Test
+    public void getViewUserList() {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/user/getviewusers");
+        request.param("pageIndex", "1");
+        request.param("pageSize", "20");
+        String ret = test(request, true);
+        JSONObject jsonObject = JSON.parseObject(ret);
+        Assert.assertEquals(jsonObject.get("code").toString(), "200");
+        System.out.println(test(request, true));
+    }
+
+    /**
+     * 新增视图帐号
+     * 1.用户存在
+     */
+    @Test
+    public void addViewUser() {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/user/addviewuser");
+        request.param("username", "dd");
+        request.param("password", DigestUtils.md5Hex("1"));
+        request.param("state", "1");
+        String ret = test(request, true);
+        JSONObject jsonObject = JSON.parseObject(ret);
+        Assert.assertEquals(jsonObject.get("code").toString(), "11000");
+    }
+
+    /**
+     * 修改视图用户状态
+     */
+    @Test
+    public void chgViewUserState() {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/user/chgviewuserstate");
+        request.param("user_id", "1000010");
+        request.param("state", "1");
+        String ret = test(request, true);
+        JSONObject jsonObject = JSON.parseObject(ret);
+        Assert.assertEquals(jsonObject.get("code").toString(), "200");
+    }
 
     @Before
     public void init() {

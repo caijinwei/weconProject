@@ -15,6 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Label("查询账号信息")
 @RestController
 public class UserInfoAction extends UserBaseAction {
+    /**
+     * 从session中取信息
+     *
+     * @return
+     */
     @RequestMapping("user/userinfo")
     @WebApi(forceAuth = true, master = true)
     public Output getUserInfo() {
@@ -24,10 +29,15 @@ public class UserInfoAction extends UserBaseAction {
         return new Output(data);
     }
 
+    /**
+     * 从db中取信息
+     *
+     * @return
+     */
     @RequestMapping("user/userinfod")
     @WebApi(forceAuth = true, master = true)
     public Output getUserInfoDetail() {
-        Account userInfo=accountApi.getAccount( AppContext.getSession().client.userId);
+        Account userInfo = accountApi.getAccount(AppContext.getSession().client.userId);
         JSONObject data = new JSONObject();
         data.put("userInfo", userInfo);
         return new Output(data);
