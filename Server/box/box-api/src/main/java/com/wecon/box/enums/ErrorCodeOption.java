@@ -8,7 +8,7 @@ public enum ErrorCodeOption {
     Unknown("未知错误", 10000),
     //用户操作相关
     AccountExisted("用户已经存在,不能注册", 11000),
-    EmailErorr("邮箱格式有错", 11001),
+    EmailError("邮箱格式有错", 11001),
     Login_NotAccount("登录帐号不存在", 11002),
     Login_PwdError("密码错误", 11003),
     Login_NotAllow("禁止登录", 11004),
@@ -20,6 +20,10 @@ public enum ErrorCodeOption {
     CanAddTheSameGroup("分组命名不能重复", 11010),
     UserGroupTypeIsUndefined("分组类型未定义", 11011),
     OnlyOperateOneselfGroup("只能操作自己创建的分组", 11012),
+    PhonenumError("手机号码格式有错", 11013),
+    SmsVercodeError("手机验证码有错", 11014),
+    AccountEmailExisted("邮箱已经被使用", 11015),
+    AccountPhoneExisted("邮箱已经被使用", 11016),
 
     Account_Permissions_No("账户权限不足，无法新增盒子", 30001),
     Device_NotFound("该设备不存在",30002),
