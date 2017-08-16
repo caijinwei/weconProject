@@ -7,8 +7,6 @@ import com.wecon.box.entity.ViewAccountRoleView;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 /**
  * @author lanpenghui
  *         2017年8月1日
@@ -70,7 +68,7 @@ public interface ViewAccountRoleApi {
     *           0：实时监控点
     *           1：历史监控点
     **/
-    public List<ViewAccountRoleView> getViewAccountRoleViewByViewID(Integer data_type, long view_id);
+    public Page<ViewAccountRoleView> getViewAccountRoleViewByViewID(Integer data_type, long view_id,Integer pageIndex,Integer pageSize);
     /*
       * 为视图账号分配监控监控点
       * */

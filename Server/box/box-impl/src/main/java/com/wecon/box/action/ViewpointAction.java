@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 /**
  * Created by caijinw on 2017/8/10.
  */
@@ -31,14 +29,15 @@ public class ViewpointAction {
     @Label("实时历史监控点")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping("showReal")
-    public Output showRealpoint(@RequestParam("view_id") Integer viewId, @RequestParam("type") Integer type) {
+    public Output showRealpoint(@RequestParam("view_id") Integer viewId, @RequestParam("type") Integer type,@RequestParam("pageIndex")Integer pageIndex,@RequestParam("pageSize") Integer pageSize)
+    {
+        System.out.println("pageIndex的值是"+pageIndex);
         if (viewId == null || type == null) {
             return new Output();
         }
-        List<ViewAccountRoleView> list = viewAccountRoleApi.getViewAccountRoleViewByViewID(type, viewId);
+        Page<ViewAccountRoleView> page = viewAccountRoleApi.getViewAccountRoleViewByViewID(type, viewId,pageIndex,pageSize);
         JSONObject data = new JSONObject();
-        data.put("list", list);
-        System.out.println(data);
+        data.put("page", page);
         return new Output(data);
     }
     /*

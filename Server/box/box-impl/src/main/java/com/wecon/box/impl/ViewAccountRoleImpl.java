@@ -99,14 +99,18 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
         *           1：历史监控点
         * */
     @Override
-    public List<ViewAccountRoleView> getViewAccountRoleViewByViewID(Integer data_type, long view_id) {
+    public Page<ViewAccountRoleView> getViewAccountRoleViewByViewID(Integer data_type, long view_id,Integer pageIndex,Integer pageSize) {
         if (data_type == null || data_type < 0 || data_type > 1) {
             return null;
         }
-        String sql = "SELECT a.cfg_id,a.role_type,b.name,b.addr,b.state FROM view_account_role a INNER JOIN real_his_cfg b ON a.cfg_id = b.id WHERE a.cfg_type = '1' AND b.data_type = ? AND a.view_id =?";
         Object[] args = new Object[]{data_type, view_id};
+        String sqlCount="SELECT COUNT(*) FROM view_account_role a INNER JOIN real_his_cfg b ON a.cfg_id = b.id WHERE a.cfg_type = '1' AND b.data_type = ? AND a.view_id =?";
+        int totalCount=jdbcTemplate.queryForObject(sqlCount,args,Integer.class);
+        Page<ViewAccountRoleView> page =new Page<ViewAccountRoleView>(pageIndex,pageSize,totalCount);
+        Object[] args1=new Object[]{data_type,view_id,page.getStartIndex(),page.getPageSize()};
+        String sql = "SELECT a.cfg_id,a.role_type,b.name,b.addr,b.state FROM view_account_role a INNER JOIN real_his_cfg b ON a.cfg_id = b.id WHERE a.cfg_type = '1' AND b.data_type = ? AND a.view_id =? LIMIT ?,?";
         List<ViewAccountRoleView> list = new ArrayList<ViewAccountRoleView>();
-        return jdbcTemplate.query(sql, args, new RowMapper() {
+        list=jdbcTemplate.query(sql, args1, new RowMapper() {
             @Override
             public Object mapRow(ResultSet resultSet, int i) throws SQLException {
                 ViewAccountRoleView model = new ViewAccountRoleView();
@@ -118,6 +122,9 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
                 return model;
             }
         });
+        page.setList(list);
+        System.out.println("这边显示"+list);
+        return page;
     }
 
     /*

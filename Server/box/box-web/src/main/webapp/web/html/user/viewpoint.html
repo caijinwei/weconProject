@@ -14,6 +14,8 @@
         }
     </style>
     <link rel="stylesheet" type="text/css" href="../../css/page.css"/>
+
+
 </head>
 <body ng-controller="listController" ng-init="onInit()">
 <div class="container">
@@ -51,7 +53,8 @@
                     {{x.role_type==0?'无权限':(x.role_type==1?'只读':(x.role_type==2?'只写':'读写'))}}
                 </td>
                 <td>
-                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#updateRoleSyle" ng-click="updateViewPointRoleTypeParam(x.id)">修改权限
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#updateRoleSyle"
+                            ng-click="updateViewPointRoleTypeParam(x.id)">修改权限
                     </button>
                     <a href="#" data-toggle="modal" data-target="#realunbind">
                         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delectOpint"
@@ -63,6 +66,12 @@
             </tr>
             </tbody>
         </table>
+        <p>
+
+        <div style="margin-bottom: 40px">
+            <tm-pagination conf="paginationConf"></tm-pagination>
+        </div>
+        </p>
     </div>
     <!-- 修改权限模态框（Modal） -->
     <div class="modal fade" id="updateRoleSyle" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
@@ -128,6 +137,7 @@
             </div><!-- /.modal-content -->
         </div>
     </div><!-- /.modal -->
+
     <!--监控点分配模态窗口-->
     <div class="modal fade" id="showRestOpint" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
          aria-hidden="true">
@@ -141,45 +151,12 @@
                         分配余下监控点
                     </h4>
                 </div>
-                <div class="modal-body">
-                    <table class="table table-bordered table-hover" id="pointlist">
-                        <thead>
-                        <tr>
-                            <th class="col-md-1"><a>全选</a></th>
-                            <th class="col-md-2">权限</th>
-                            <th class="col-md-1">编号</th>
-                            <th class="col-md-1">状态</th>
-                            <th class="col-md-2">地址</th>
-                            <th class="col-md-2">名称</th>
-                            <th class="col-md-3">描述</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="x in resrPointDatas">
-                            <td>
-                                <input name="cbid" type="checkbox" value="{{x.id}}"/>
-                            </td>
-                            <td><label class="radio-inline">
-                                <input type="radio" name="right_{{x.id}}" value="1" ng-checked="1"
-                                       checked> 只读
-                            </label>
-                                <label class="radio-inline">
-                                    <input type="radio" name="right_{{x.id}}" value="3">
-                                    读写
-                                </label>
-                            </td>
-                            <td>{{x.id}}</td>
-                            <td>{{x.state==1?'启用':'未启用'}}</td>
-                            <td>{{x.addr}}</td>
-                            <td>{{x.name}}</td>
-                            <td>{{x.describe}}</td>
-                        </tr>
-                        </tbody>
-                    </table>
+                <div class="modal-body" id="model-body-id">
 
-                    <div style="margin-bottom: 40px">
-                        <tm-pagination conf="paginationConf"></tm-pagination>
-                    </div>
+                    <iframe id="myiframe"
+                            frameborder="0" scrolling="no" marginheight="0"
+                            marginwidth="0" width="100%" height="100%"></iframe>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭
@@ -189,8 +166,9 @@
                     </button>
                 </div>
             </div><!-- /.modal-content -->
-        </div><!-- /.modal -->
-    </div>
+        </div>
+    </div><!-- /.modal -->
+</div>
 </div>
 
 <script src="../../lib/jquery/jquery-3.2.1.min.js"></script>
