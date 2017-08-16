@@ -66,4 +66,78 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             }
         });
     }
+
+    var countdown = 60;
+
+    function settime(obj) {
+        if (countdown == 0) {
+            obj.removeAttribute("disabled");
+            obj.innerHTML = "获取验证码";
+            countdown = 60;
+            return;
+        } else {
+            obj.setAttribute("disabled", true);
+            obj.innerHTML = "" + countdown + "秒后再获取";
+            countdown--;
+        }
+        setTimeout(function () {
+            settime(obj)
+        }, 1000)
+    }
+
+    /**
+     * 发送验证码
+     */
+    $scope.sendsms = function () {
+        var oldphone = $scope.userInfo.phonenum;
+        var newphone = $("#newphone").val().trim();
+        if (newphone == "") {
+            alert("请填写手机号码");
+            return;
+        }
+        if (oldphone != "" && oldphone == newphone) {
+            alert("手机号码与旧号码一样,请填写新号码");
+            return;
+        }
+        var params =
+        {
+            phonenum: newphone
+        };
+        $btn = document.getElementById("sendsms");
+        $btn.setAttribute("disabled", true);
+        T.common.ajax.request("WeconBox", "user/sendvercode", params, function (data, code, msg) {
+            if (code == 200) {
+                settime($btn);
+            }
+            else {
+                alert(msg);
+                $btn.removeAttribute("disabled");
+            }
+        }, function () {
+            alert("ajax error");
+            $btn.removeAttribute("disabled");
+        });
+    }
+
+    $scope.chgphone = function () {
+        var params =
+        {
+            phonenum: $("#newphone").val().trim(),
+            vercode: $("#vercode").val().trim()
+        };
+        T.common.ajax.request("WeconBox", "user/chgphonenum", params, function (data, code, msg) {
+            if (code == 200) {
+                alert("修改成功");
+                $("#updatePhoneNum").hide();
+                $scope.userInfo.phonenum = data.phonenum;
+                $scope.$apply();
+            }
+            else {
+                alert(msg);
+            }
+        }, function () {
+            alert("ajax error");
+        });
+    }
+
 })

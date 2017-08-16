@@ -50,7 +50,7 @@ public class ViewUserAction extends UserBaseAction {
     public Output chgViewUserState(@Valid ViewUserChgStateParam param) {
         Account viewUserInfo = accountApi.getAccount(param.user_id);
         viewUserInfo.state = param.state;
-        accountApi.updateAccount(viewUserInfo);
+        accountApi.updateAccountState(viewUserInfo);
         return new Output();
     }
 }

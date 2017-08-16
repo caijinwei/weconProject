@@ -23,6 +23,16 @@ public interface AccountApi {
     Account signupByEmail(String username, String email, String password);
 
     /**
+     * 手机号注册
+     *
+     * @param username
+     * @param phonenum
+     * @param password
+     * @return
+     */
+    Account signupByPhone(String username, String phonenum, String password);
+
+    /**
      * 退出登录
      *
      * @param sid
@@ -43,12 +53,28 @@ public interface AccountApi {
     String createSession(Account user, int productId, String fuid, long loginIp, long loginTime, int seconds);
 
     /**
-     * 更新用户信息
+     * 更新邮箱
      *
      * @param model
      * @return
      */
-    boolean updateAccount(Account model);
+    boolean updateAccountEmail(Account model);
+
+    /**
+     * 更新手机号
+     *
+     * @param model
+     * @return
+     */
+    boolean updateAccountPhone(Account model);
+
+    /**
+     * 更新帐户状态
+     *
+     * @param model
+     * @return
+     */
+    boolean updateAccountState(Account model);
 
     /**
      * 更新密码

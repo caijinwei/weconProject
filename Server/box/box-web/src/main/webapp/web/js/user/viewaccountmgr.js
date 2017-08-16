@@ -76,14 +76,12 @@ appModule.controller("listController", function ($scope, $http, $compile) {
         T.common.ajax.request("WeconBox", "user/addviewuser", params, function (data, code, msg) {
             if (code == 200) {
                 $scope.getList($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
-                $("#loadingModal").modal("hide");
-                $("#addViewAccount").modal("hide");
             }
             else {
                 alert(msg);
-                $("#loadingModal").modal("hide");
-                $("#addViewAccount").hide();
             }
+            $("#loadingModal").modal("hide");
+            $("#addViewAccount").modal("hide");
         }, function () {
             alert("ajax error");
         });

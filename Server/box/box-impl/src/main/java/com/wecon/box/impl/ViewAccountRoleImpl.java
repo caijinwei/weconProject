@@ -5,16 +5,24 @@ import com.wecon.box.entity.Page;
 import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.entity.ViewAccountRole;
 import com.wecon.box.entity.ViewAccountRoleView;
+import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.filter.ViewAccountRoleFilter;
+import com.wecon.restful.core.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by caijinw on 2017/8/10.
@@ -23,6 +31,8 @@ import java.util.List;
 public class ViewAccountRoleImpl implements ViewAccountRoleApi {
     @Autowired
     JdbcTemplate jdbcTemplate;
+    @Autowired
+    public PlatformTransactionManager transactionManager;
 
     @Override
     public long saveViewAccountRole(ViewAccountRole model) {
@@ -53,22 +63,12 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
     * */
     @Override
     public Page<RealHisCfg> getViewRealHisCfgByViewAndAccId(long view_id, long account_id, Integer type, Integer pageIndex, Integer pageSize) {
-        /*
-		* 默认pageIndex为1
-		* 默认pageSize为5
-		*
-		* */
-        if (pageIndex == null) {
-            pageIndex = 1;
-        } else if (pageSize == null) {
-            pageSize = 5;
-        }
         Object[] args0 = new Object[]{account_id, type, view_id};
         String sqlCount = "select count(*) from real_his_cfg a WHERE account_id=? AND a.data_type=? AND id NOT IN(SELECT cfg_id FROM view_account_role where view_id=?);";
         int totalRecord = jdbcTemplate.queryForObject(sqlCount, args0, Integer.class);
         Page<RealHisCfg> page = new Page<RealHisCfg>(pageIndex, pageSize, totalRecord);
 
-        Object[] args = new Object[]{account_id, type, view_id, pageIndex, pageSize};
+        Object[] args = new Object[]{account_id, type, view_id, page.getStartIndex(),page.getPageSize()};
         String sql = "select a.id, a.state,a.name , a.digit_count,a.addr , a.addr_type,a.describe from real_his_cfg a WHERE account_id=?  AND a.data_type=? AND id NOT IN(SELECT cfg_id FROM view_account_role where view_id=?)LIMIT ?,?";
         List<RealHisCfg> list = jdbcTemplate.query(sql, args, new RowMapper() {
             @Override
@@ -85,6 +85,7 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
             }
         });
         page.setList(list);
+        System.out.println(list);
         return page;
     }
 
@@ -118,20 +119,58 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
             }
         });
     }
+
     /*
     * 为视图账号分配监控监控点
     * */
-    public void setViewPoint(Integer viewId,String[] ids ,String[] rights)
-    {
-        if(ids.length<=0||viewId==null||rights.length==0)
-        {
+    public void setViewPoint(Integer viewId, String[] ids, String[] rights) {
+        if (ids.length <= 0 || viewId == null || rights.length == 0) {
             return;
         }
-        String[] sqls=new String[ids.length];
-        for(int i=0;i<ids.length;i++)
-        {
-            sqls[i]="INSERT into view_account_role  (view_id,cfg_type,cfg_id,role_type,create_date,update_date) VALUES("+viewId+",1,"+ids[i]+","+rights[i]+",NOW(),NOW());";
+        String[] sqls = new String[ids.length];
+        for (int i = 0; i < ids.length; i++) {
+            sqls[i] = "INSERT into view_account_role  (view_id,cfg_type,cfg_id,role_type,create_date,update_date) VALUES(" + viewId + ",1," + ids[i] + "," + rights[i] + ",NOW(),NOW());";
             jdbcTemplate.update(sqls[i]);
         }
+    }
+
+    /*
+    * 视图用户监控点解绑
+    * @param    viewId ，   roleType      pointId
+    *         视图账号ID   监控点类型    监控点ID
+    *
+    *  sql:DELETE FROM account_dir_rel  WHERE  ref_id=10 AND acc_dir_id IN (SELECT id FROM account_dir WHERE account_id=123 AND type=1);
+    * */
+    public void deletePoint(final Integer viewId, final Integer roleType, final Integer pointId) {
+        TransactionTemplate tt = new TransactionTemplate(transactionManager);
+        try {
+            tt.execute(new TransactionCallback() {
+                @Override
+                public Object doInTransaction(TransactionStatus ts) {
+                    String sql_deleteSqlView_Account_role = "DELETE FROM view_account_role WHERE view_id=? AND cfg_id=?";
+                    String sql_delect_ref = "DELETE FROM account_dir_rel  WHERE  ref_id=? AND acc_dir_id IN (SELECT id FROM account_dir WHERE account_id=? AND type=?)";
+                    Object[] args0 = new Object[]{viewId, pointId};
+                    jdbcTemplate.update(sql_deleteSqlView_Account_role, args0);
+                    Object[] args1 = new Object[]{pointId, viewId, roleType};
+                    jdbcTemplate.update(sql_delect_ref, args1);
+                    return true;
+                }
+            });
+        } catch (Exception e) {
+            Logger.getLogger(AccountImpl.class.getName()).log(Level.SEVERE, null, e);
+            throw new BusinessException(ErrorCodeOption.Viewpoint_Dlete_False.key, ErrorCodeOption.Viewpoint_Dlete_False.value);
+        }
+    }
+    /*
+    * 视图账户监控点权限设置
+    * @param viewId       pointId      roleType
+    *       视图账户ID  监控点ID      权限：0无权限  1只读  3读写
+    * UPDATE view_account_role SET role_type="1" WHERE view_id=111 AND cfg_id=12 ;
+    * */
+    public void updateViewPointRoleType( Integer viewId,Integer pointId, Integer roleType)
+    {
+        String sql="UPDATE view_account_role SET role_type=? WHERE view_id=? AND cfg_id=?";
+        Object[] args=new Object[]{roleType,viewId,pointId};
+        jdbcTemplate.update(sql,args);
     }
 }
