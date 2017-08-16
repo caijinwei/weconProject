@@ -34,6 +34,8 @@ public class HisDataAction {
 	@Autowired
 	private RealHisCfgDataApi realHisCfgDataApi;
 
+	
+	
 	@WebApi(forceAuth = true, master = true)
 	@Description("获取改账户下的plc和对应的监控点")
 	@RequestMapping(value = "/getComMonitor")

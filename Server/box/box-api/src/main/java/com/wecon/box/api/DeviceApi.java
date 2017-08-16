@@ -1,5 +1,7 @@
 package com.wecon.box.api;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 import com.wecon.box.entity.Device;
 import com.wecon.box.entity.Page;
@@ -41,6 +43,13 @@ public interface DeviceApi {
 	 * @return
 	 */
 	public Device getDevice(String machine_code);
+	/**
+	 * 通过用户获取绑定的机器
+	 * @param account_id
+	 * @return
+	 */
+	
+	public List<Device> getDeviceList(long account_id,long account_dir_id);
 
 	/**
 	 * 根据device_id删除设备信息

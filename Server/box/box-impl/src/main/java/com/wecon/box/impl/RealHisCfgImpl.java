@@ -100,12 +100,20 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	@Override
 	public List<RealHisCfgDevice> getRealHisCfg(RealHisCfgFilter filter) {
 		String sql = "select " + SEL_COL + ",d.machine_code"
-				+ " from real_his_cfg r ,device d,plc_info p where 1=1 and p.`plc_id`=r.plc_id and p.`device_id`=d.device_id";
+				+ " from account_dir ad,account_dir_rel adr ,real_his_cfg  r,plc_info pli,device d where 1=1 and  ad.`id`=adr.`acc_dir_id` and pli.`plc_id`=r.`plc_id` and pli.`device_id`=d.`device_id` and r.`id`=adr.`ref_id` and ad.`account_id`=r.`account_id`";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
 		if (filter.id > 0) {
 			condition.append(" and r.id = ? ");
 			params.add(filter.id);
+		}
+		if (filter.device_id > 0) {
+			condition.append(" and d.device_id = ? ");
+			params.add(filter.device_id);
+		}
+		if(filter.dirId > 0){
+			condition.append(" and ad.id = ? ");
+			params.add(filter.dirId);
 		}
 		if (filter.data_id > 0) {
 			condition.append(" and r.data_id = ? ");
@@ -166,13 +174,17 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	@Override
 	public List<RealHisCfgDevice> getRealHisCfg(ViewAccountRoleFilter filter) {
 		String sql = "select " + SEL_COL + ",d.machine_code"
-				+ " from   real_his_cfg r , device d,plc_info p, view_account_role v where 1=1 and  p.plc_id=r.plc_id and p.device_id=d.device_id and v.cfg_id=r.id and v.cfg_type=1";
+				+ " from   real_his_cfg r , device d,plc_info p, view_account_role v,account_dir ad,account_dir_rel adr where 1=1 and  p.plc_id=r.plc_id and r.id=adr.`ref_id` and p.device_id=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and ad.`id`=adr.`acc_dir_id` and ad.`account_id`=v.view_id";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
 
 		if (filter.view_id > 0) {
 			condition.append(" and v.view_id = ? ");
 			params.add(filter.view_id);
+		}
+		if (filter.dirId > 0) {
+			condition.append(" and ad.`id` = ? ");
+			params.add(filter.dirId);
 		}
 		if (filter.role_type > -1) {
 			condition.append(" and v.role_type = ? ");

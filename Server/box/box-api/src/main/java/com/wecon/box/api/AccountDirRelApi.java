@@ -1,5 +1,7 @@
 package com.wecon.box.api;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 /**
  * @author lanpenghui

@@ -83,6 +83,30 @@ public class DeviceImpl implements DeviceApi {
 	}
 
 	@Override
+	public List<Device> getDeviceList(long account_id, long account_dir_id) {
+		String sql = "select d.device_id,d.machine_code,d.`password`,d.dev_model,d.name,d.remark,d.map,d.state,d.dir_id,d.create_date,d.update_date from  account_dir ad,account_dir_rel adr,device d ,dev_bind_user dbu WHERE 1=1 and ad.`id`=adr.`acc_dir_id`AND ad.`type`=0 AND adr.`ref_id`=d.device_id AND dbu.account_id=ad.`account_id`AND dbu.device_id=d.device_id";
+		StringBuffer condition = new StringBuffer("");
+		List<Object> params = new ArrayList<Object>();
+		if (account_id > 0) {
+			condition.append(" and ad.account_id = ? ");
+			params.add(account_id);
+
+		}
+		if (account_dir_id > 0) {
+			condition.append(" and ad.id = ? ");
+			params.add(account_dir_id);
+
+		}
+		sql += condition;
+		List<Device> list = jdbcTemplate.query(sql, params.toArray(), new DefaultDeviceRowMapper());
+		if (!list.isEmpty()) {
+			return list;
+		}
+		return null;
+
+	}
+
+	@Override
 	public void delDevice(long device_id) {
 		String sql = "delete from  device  where device_id=?";
 		jdbcTemplate.update(sql, new Object[] { device_id });
@@ -94,7 +118,7 @@ public class DeviceImpl implements DeviceApi {
 		String sql = "select " + SEL_COL + " from device where 1=1";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
-		if (filter.device_id>0) {
+		if (filter.device_id > 0) {
 			condition.append(" and device_id = ? ");
 			params.add(filter.device_id);
 		}
@@ -118,11 +142,11 @@ public class DeviceImpl implements DeviceApi {
 			condition.append(" and map like ? ");
 			params.add("%" + filter.map + "%");
 		}
-		if (filter.state>-1) {
+		if (filter.state > -1) {
 			condition.append(" and state = ? ");
 			params.add(filter.state);
 		}
-		if (filter.dir_id>0) {
+		if (filter.dir_id > 0) {
 			condition.append(" and dir_id = ? ");
 			params.add(filter.dir_id);
 		}
