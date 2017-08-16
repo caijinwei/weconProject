@@ -47,6 +47,12 @@ public class SignupEmailAction extends UserBaseAction {
         return new Output();
     }
 
+    /**
+     * 激活邮件接口
+     *
+     * @param param
+     * @return
+     */
     @RequestMapping("user/signupemailactive")
     @WebApi(forceAuth = false, master = true)
     public Output emailActive(@Valid EmailActiveParam param) {
@@ -67,6 +73,7 @@ public class SignupEmailAction extends UserBaseAction {
                 return new Output(data);
             }
         } else if (param.type == 2) {
+            //修改邮箱验证
             String redisKey = String.format(ConstKey.REDIS_EMAIL_CHANGE_TOKEN, param.uid);
             Map<String, String> map = RedisManager.hgetAll(ConstKey.REDIS_GROUP_NAME, redisKey);
             Account user = accountApi.getAccount(param.uid);
