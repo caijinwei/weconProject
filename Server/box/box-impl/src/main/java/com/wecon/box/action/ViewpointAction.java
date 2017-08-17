@@ -3,10 +3,7 @@ package com.wecon.box.action;
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.DeviceApi;
 import com.wecon.box.api.ViewAccountRoleApi;
-import com.wecon.box.entity.Device;
-import com.wecon.box.entity.Page;
-import com.wecon.box.entity.RealHisCfg;
-import com.wecon.box.entity.ViewAccountRoleView;
+import com.wecon.box.entity.*;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
@@ -36,7 +33,6 @@ public class ViewpointAction {
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping("showReal")
     public Output showRealpoint(@RequestParam("view_id") Integer viewId, @RequestParam("type") Integer type, @RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
-        System.out.println("pageIndex的值是" + pageIndex);
         if (viewId == null || type == null) {
             return new Output();
         }
@@ -45,7 +41,20 @@ public class ViewpointAction {
         data.put("page", page);
         return new Output(data);
     }
-    /*
+
+    @Label("视图账户报警监控点")
+    @WebApi(forceAuth = true, master = true, authority = {"1"})
+    @RequestMapping("showAlarm")
+    public Output showAlarmpoint(@RequestParam("view_id") Integer viewId, @RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
+        Page<ViewAccountRoleView> page = viewAccountRoleApi.getAlarmViewAccountRoleViewByViewID(viewId, pageIndex, pageSize);
+        if (page.getList().size() == 0) {
+            throw new BusinessException(ErrorCodeOption.AlarmViewpoint_IsNULL.key, ErrorCodeOption.AlarmViewpoint_IsNULL.value);
+        }
+        JSONObject data = new JSONObject();
+        data.put("page", page);
+        return new Output(data);
+    }
+   /*
     *管理用户分配监控点展示（未分配）
     * */
 

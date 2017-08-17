@@ -26,7 +26,7 @@ public class ViewAccountRoleActionTest extends TestBase {
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/Viewpoint/getDeviceName");
         String ret = test(request, true);
         JSONObject jsonObject = JSON.parseObject(ret);
-        Assert.assertEquals(jsonObject.get("code").toString(), "11011");
+        Assert.assertEquals(jsonObject.get("code").toString(), "30001");
 
         request = MockMvcRequestBuilders.post("/Viewpoint/getDeviceName");
         ret = test(request, true);
@@ -34,6 +34,21 @@ public class ViewAccountRoleActionTest extends TestBase {
         Assert.assertEquals(jsonObject.get("code").toString(), "200");
     }
 
+    /*
+    * 获取报警监控点监控点
+    * */
+    @Test
+    public  void getAlarmList()
+    {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/Viewpoint/showAlarm");
+        String ret = test(request, true);
+        JSONObject jsonObject = JSON.parseObject(ret);
+
+        request = MockMvcRequestBuilders.post("/Viewpoint/getDeviceName");
+        ret = test(request, true);
+        jsonObject = JSON.parseObject(ret);
+        Assert.assertEquals(jsonObject.get("code").toString(), "200");
+    }
 
     @Before
     public void init() {

@@ -27,11 +27,10 @@ appModule.controller("listController", function ($scope, $http, $compile) {
                 }
             }
         }
-
-
-        //展示主页面列表
+        /*
+        * 初始化 展示视图账户实时历史监控点
+        * */
         $scope.showAlreadPoint(type, viewid);
-
     }
     $scope.paginationConf = {
         totalItems: $scope.count
@@ -43,9 +42,9 @@ appModule.controller("listController", function ($scope, $http, $compile) {
         $scope.showPointBut(type, viewid, $scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
 
     }
-    $scope.showPointBut = function (type, view_id,pageIndex,pageSize) {
-        if(pageIndex==0){
-            pageIndex=1;
+    $scope.showPointBut = function (type, view_id, pageIndex, pageSize) {
+        if (pageIndex == 0) {
+            pageIndex = 1;
         }
 
         var params =
@@ -55,6 +54,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             pageIndex: pageIndex,
             pageSize: pageSize
         };
+
         T.common.ajax.request("WeconBox", "Viewpoint/showReal", params, function (data, code, msg) {
             if (code == 200) {
                 $scope.realpointDatas = data.page.list;
@@ -85,12 +85,11 @@ appModule.controller("listController", function ($scope, $http, $compile) {
         var rightOption = [];
         var chk_value = [];
         $("#myiframe").contents().find('input[name="cbid"]:checked').each(
-          function()
-          {
-              chk_value.push($(this).val());
-              var tem = "right_" + $(this).val();
-              rightOption.push($("#myiframe").contents().find("input[name="+tem+"]").val());
-          }
+            function () {
+                chk_value.push($(this).val());
+                var tem = "right_" + $(this).val();
+                rightOption.push($("#myiframe").contents().find("input[name=" + tem + "]").val());
+            }
         );
         //$('input[name="cbid"]:checked').each(function () {
         //    chk_value.push($(this).val());
@@ -110,8 +109,8 @@ appModule.controller("listController", function ($scope, $http, $compile) {
                 $("#showRestOpint").modal("hide");
                 alert("添加成功");
                 var type = T.common.util.getParameter("type").toString();
-                console.log("类型:",typeof type);
-                $scope.showAlreadPoint(type.toString(),viewid.toString());
+                console.log("类型:", typeof type);
+                $scope.showAlreadPoint(type.toString(), viewid.toString());
                 //$scope.getRestList( $scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
             }
             else {
@@ -181,12 +180,11 @@ appModule.controller("listController", function ($scope, $http, $compile) {
         });
     }
     /*
-    * 展示剩余监控点设置iframe的url属性
-    * */
-    $scope.showRestList =function()
-    {
-        var path="../user/viewpointTable.html?type="+$scope.type+"&viewid="+$scope.viewid;
-        $("#myiframe").attr('src',path);
+     * 展示剩余监控点设置iframe的url属性
+     * */
+    $scope.showRestList = function () {
+        var path = "../user/viewpointTable.html?type=" + $scope.type + "&viewid=" + $scope.viewid;
+        $("#myiframe").attr('src', path);
     }
 
 });

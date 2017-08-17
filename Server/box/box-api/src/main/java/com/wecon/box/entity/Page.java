@@ -149,4 +149,16 @@ public class Page<T> {
     public void setList(final List<T> list) {
         this.list = list;
     }
+
+    @Override
+    public String toString() {
+        return "Page{" +
+                "totalRecord=" + totalRecord +
+                ", pageSize=" + pageSize +
+                ", totalPage=" + totalPage +
+                ", startIndex=" + startIndex +
+                ", currentPage=" + currentPage +
+                ", list=" + list +
+                '}';
+    }
 }

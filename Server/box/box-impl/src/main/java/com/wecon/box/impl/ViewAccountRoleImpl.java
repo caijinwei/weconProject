@@ -89,7 +89,7 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
     }
 
     /*
-    *   该盒子下的余下监控点
+    *   该盒子下的余下监控点（实时历史）
     *   SELECT	a.id,	a.state,	a. NAME,	a.digit_count,	a.addr,	a.addr_type,	a.`describe` FROM	real_his_cfg a WHERE	a.data_type = 0 AND a.plc_id IN (	SELECT	plc_id FROM	plc_info	WHERE	device_id = '1')AND id NOT IN (	SELECT	cfg_id	FROM	view_account_role	WHERE		view_id = '1000021')LIMIT 1, 5;
     * */
     public Page<RealHisCfg> getViewRealHisCfgByViewAndDeivceId(long account_id, long view_id, long device_id, Integer type, Integer pageIndex, Integer pageSize) {
@@ -118,6 +118,10 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
         System.out.println(list);
         return page;
     }
+    /*
+    * 该盒子下的余下监控点（报警）
+    * */
+
 
         /*
         *视图账户实时历史监控点展示
@@ -154,10 +158,35 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
             }
         });
         page.setList(list);
-        System.out.println("这边显示" + list);
         return page;
     }
-
+      /*
+    *视图账户报警监控点展示
+    * SELECT a.cfg_id,a.role_type,b.name,b.addr,b.state FROM view_account_role a INNER JOIN alarm_cfg b ON a.cfg_id = b.alarmcfg_id WHERE a.cfg_type = '2'  AND a.view_id=1000021 LIMIT 1,5;
+    * */
+      public Page<ViewAccountRoleView> getAlarmViewAccountRoleViewByViewID(long view_id, Integer pageIndex, Integer pageSize) {
+          Object[] args = new Object[]{view_id};
+          String sqlCount = "SELECT COUNT(*) FROM view_account_role a INNER JOIN alarm_cfg b ON a.cfg_id = b.alarmcfg_id WHERE a.cfg_type = '2'  AND a.view_id=?";
+          int totalCount = jdbcTemplate.queryForObject(sqlCount, args, Integer.class);
+          Page<ViewAccountRoleView> page = new Page<ViewAccountRoleView>(pageIndex, pageSize, totalCount);
+          Object[] args1 = new Object[]{ view_id, page.getStartIndex(), page.getPageSize()};
+          String sql = "SELECT a.cfg_id,a.role_type,b.name,b.addr,b.state FROM view_account_role a INNER JOIN alarm_cfg b ON a.cfg_id = b.alarmcfg_id WHERE a.cfg_type = '2'  AND a.view_id=? LIMIT ?,?";
+          List<ViewAccountRoleView> list = new ArrayList<ViewAccountRoleView>();
+          list = jdbcTemplate.query(sql, args1, new RowMapper() {
+              @Override
+              public Object mapRow(ResultSet resultSet, int i) throws SQLException {
+                  ViewAccountRoleView model = new ViewAccountRoleView();
+                  model.id = resultSet.getInt("cfg_id");
+                  model.role_type = resultSet.getInt("role_type");
+                  model.name = resultSet.getString("name");
+                  model.addr = resultSet.getString("addr");
+                  model.state = resultSet.getInt("state");
+                  return model;
+              }
+          });
+          page.setList(list);
+          return page;
+      }
     /*
     * 为视图账号分配监控监控点
     * */
@@ -199,7 +228,6 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
             throw new BusinessException(ErrorCodeOption.Viewpoint_Dlete_False.key, ErrorCodeOption.Viewpoint_Dlete_False.value);
         }
     }
-
     /*
     * 视图账户监控点权限设置
     * @param viewId       pointId      roleType
@@ -211,9 +239,4 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
         Object[] args = new Object[]{roleType, viewId, pointId};
         jdbcTemplate.update(sql, args);
     }
-
-    /*
-    * 视图账户报警数据展示
-    * SELECT a.cfg_id,a.role_type,b.name,b.addr,b.state FROM view_account_role a INNER JOIN alarm_cfg b ON a.cfg_id = b.alarmcfg_id WHERE a.cfg_type = '2'  AND a.view_id=1000021 LIMIT 1,5;
-    * */
 }

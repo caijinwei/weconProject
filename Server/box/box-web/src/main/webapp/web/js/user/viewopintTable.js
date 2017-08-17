@@ -31,7 +31,6 @@ appModule.controller("listController", function ($scope, $http, $compile) {
         if (pageIndex == 0)
             pageIndex = 1;
         var device_id = $("#check_device_id").val();
-        console.log("获取的device——device_id:", device_id);
         var params =
         {
             view_id: view_id,
@@ -87,6 +86,4 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             $scope.allCheck = 0;
         }
     };
-
-
 });

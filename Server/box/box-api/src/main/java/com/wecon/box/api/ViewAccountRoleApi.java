@@ -96,4 +96,9 @@ public interface ViewAccountRoleApi {
    * */
     public void updateViewPointRoleType(Integer viewId, Integer pointId, Integer roleType);
 
+   /* 户报警监控点展示
+    * SELECT a.cfg_id,a.role_type,b.name,b.addr,b.state FROM view_account_role a INNER JOIN alarm_cfg b ON a.cfg_id = b.alarmcfg_id WHERE a.cfg_type = '2'  AND a.view_id=1000021 LIMIT 1,5;
+    * */
+    public Page<ViewAccountRoleView> getAlarmViewAccountRoleViewByViewID( long view_id, Integer pageIndex, Integer pageSize);
+
 }
