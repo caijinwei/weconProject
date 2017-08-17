@@ -19,7 +19,7 @@
 			<div>
 				<span class="col-md-1" style="height: 30px; line-height: 30px;">监控点</span>
 				<select id="monitorid" class="col-md-3" style="height: 35px;">
-					<option ng-repeat="x in commonitors" value={{x.monitorid}}>{{x.monitordata}}</option>
+					<option ng-repeat="x in commonitors" value={{x.id}}>{{x.name}}</option>
 				</select>
 			</div>
 			<div class="btn-group" style="margin-left: 20px;">
@@ -54,7 +54,7 @@
 						class="glyphicon glyphicon-th"></span></span>
 				</div>
 			</div>
-			<button type="button" class="btn btn-primary"
+			<button type="button" class="btn btn-primary" id="searchid"
 				style="margin-left: 30px;" ng-click="searchHisData(paginationConf.currentPage,paginationConf.itemsPerPage)">
 				<span class="glyphicon glyphicon-search"></span>
 			</button>

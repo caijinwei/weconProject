@@ -79,6 +79,7 @@ public interface RealHisCfgApi {
 	 * @param pageSize
 	 * @return
 	 */
-	Page<RealHisCfg> getRealHisCfgList(RealHisCfgFilter filter, int pageIndex, int pageSize);
+	Page<RealHisCfgDevice> getRealHisCfgList(RealHisCfgFilter filter, int pageIndex, int pageSize);
+	Page<RealHisCfgDevice> getRealHisCfgList(ViewAccountRoleFilter filter, int pageIndex, int pageSize);
 
 }

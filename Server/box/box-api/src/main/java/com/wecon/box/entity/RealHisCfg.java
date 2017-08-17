@@ -22,6 +22,7 @@ public class RealHisCfg {
 	 * `STATE` int(11) DEFAULT NULL COMMENT '状态:1-启用; 0-未启用', 
 	 * `CREATE_DATE`datetime DEFAULT NULL,
      * `UPDATE_DATE` datetime DEFAULT NULL, 
+     * `bind_state` int(11) DEFAULT '1' COMMENT '1.绑定状态 0.解绑状态',
 	 */
 	public long id;
 	public long data_id;
@@ -36,6 +37,7 @@ public class RealHisCfg {
 	public int his_cycle;//历史数据采集周期
 	public int data_type;//0：实时数据 1：历史数据
 	public int state;//状态:1-启用; 0-未启用
+	public int bind_state;//1.绑定状态 0.解绑状态
 	public Timestamp create_date;
 	public Timestamp update_date;
 	

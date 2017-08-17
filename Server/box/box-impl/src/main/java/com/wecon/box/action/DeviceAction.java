@@ -144,7 +144,7 @@ public class DeviceAction {
 		for (int i = 0; i < accountDirList.size(); i++) {
 			AccountDir accountDir = accountDirList.get(i);
 			data = new JSONObject();
-
+			devicearr = new JSONArray();
 			data.put("accountdirId", accountDir.id);
 			data.put("accountdirName", accountDir.name);
 
@@ -153,7 +153,7 @@ public class DeviceAction {
 				for (int j = 0; j < deviceList.size(); j++) {
 
 					devicedata = new JSONObject();
-					devicearr = new JSONArray();
+				
 					Device device = deviceList.get(j);
 					devicedata.put("deviceId", device.device_id);
 					devicedata.put("deviceName", device.name);

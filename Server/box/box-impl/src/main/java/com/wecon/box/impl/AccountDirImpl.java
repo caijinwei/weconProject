@@ -132,25 +132,30 @@ public class AccountDirImpl implements AccountDirApi {
 		return list;
 	}
 
-//	@Override
-//	public List<AccountDir> getAccountDirList(long account_id,long device_id) {
-//		String sql = " select ad.id,ad.account_id,ad.name,ad.type,ad.create_date,ad.update_date from account_dir ad,account_dir_rel adr ,real_his_cfg  rhc,plc_info pli where 1=1 and ad.`id`=adr.`acc_dir_id` and pli.`plc_id`=rhc.`plc_id`and rhc.`id`=adr.`ref_id` and ad.`TYPE` =1";
-//		StringBuffer condition = new StringBuffer("");
-//		List<Object> params = new ArrayList<Object>();
-//		if (account_id > 0) {
-//			condition.append(" and ad.account_id = ? ");
-//			params.add(account_id);
-//
-//		}
-//		if (device_id > 0) {
-//			condition.append(" and pli.device_id = ? ");
-//			params.add(device_id);
-//
-//		}
-//		sql += condition;
-//		List<AccountDir> list = jdbcTemplate.query(sql, params.toArray(), new DefaultAccountDirRowMapper());
-//		return list;
-//	}
+	@Override
+	public List<AccountDir> getAccountDirList(long account_id,int type,long device_id) {
+		String sql = " select distinct  ad.id,ad.account_id,ad.name,ad.type,ad.create_date,ad.update_date from account_dir ad,account_dir_rel adr ,real_his_cfg  rhc,plc_info pli where 1=1 and ad.`id`=adr.`acc_dir_id` and pli.`plc_id`=rhc.`plc_id`and rhc.`id`=adr.`ref_id` and ad.`account_id`=rhc.`account_id`";
+		StringBuffer condition = new StringBuffer("");
+		List<Object> params = new ArrayList<Object>();
+		if (account_id > 0) {
+			condition.append(" and ad.account_id = ? ");
+			params.add(account_id);
+
+		}
+		if (device_id > 0) {
+			condition.append(" and pli.device_id = ? ");
+			params.add(device_id);
+
+		}
+		if (type > -1) {
+			condition.append(" and ad.type = ? ");
+			params.add(type);
+			
+		}
+		sql += condition;
+		List<AccountDir> list = jdbcTemplate.query(sql, params.toArray(), new DefaultAccountDirRowMapper());
+		return list;
+	}
 
 	public static final class DefaultAccountDirRowMapper implements RowMapper<AccountDir> {
 
@@ -167,5 +172,7 @@ public class AccountDirImpl implements AccountDirApi {
 			return model;
 		}
 	}
+
+
 
 }

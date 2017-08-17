@@ -18,6 +18,7 @@ public class AlarmCfg {
   `STATE` int(11) DEFAULT NULL COMMENT '状态:1-启用; 0-未启用',
   `CREATE_DATE` datetime DEFAULT NULL,
   `UPDATE_DATE` datetime DEFAULT NULL,
+  `bind_state` int(11) DEFAULT '1' COMMENT '1.绑定状态 0.解绑状态',
  */
 	public long alarmcfg_id;
 	public long data_id;
@@ -28,6 +29,7 @@ public class AlarmCfg {
 	public String text;
 	public int condition_type;
 	public int state;
+	public int bind_state;//1.绑定状态 0.解绑状态
 	public Timestamp create_date;
 	public Timestamp update_date;
 	
