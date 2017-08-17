@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en"  ng-app="weconweb">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--<script src="http://apps.bdimg.com/libs/jquery/2.0.0/jquery.min.js"></script>-->
+    <link rel="stylesheet" type="text/css" href="../css/style.css"/>
+    <link rel="stylesheet" href="../lib/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../lib/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="../lib/jquery/jquery-3.2.1.min.js"></script>
+    <script src="../lib/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="../lib/angular/angular.js"></script>
+</head>
+<body  ng-controller="infoController" ng-init="onInit()" >
+<div class="container-fluid">
+    <div class="row" style="margin-top: 40px;">
+        <table class="table table-bordered">
+            <caption>
+                <a href="#" data-toggle="modal" data-target="#addConfig" style="text-decoration: none">
+                    <span class="glyphicon glyphicon-plus"></span> 添加
+                </a>
+            </caption>
+            <thead>
+            <tr>
+                <th>编号</th>
+                <th>通讯接口</th>
+                <th>串口协议</th>
+                <th>驱动名称</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+
+
+            <tr ng-repeat="x in infoDatas">
+                <td>{{x.plcId}}</td>
+                <td>{{x.port}}</td>
+                <td>{{x.comtype}}</td>
+                <td>{{x.type}}</td>
+                <td>
+                    <a href="#" data-toggle="modal" data-target="#addConfig" ng-click="setplc_id()"><span class="glyphicon glyphicon-edit" title="编辑"
+                                      style="color:#2889d0;margin:10px;"></span></a>
+                    <a href="#"><span class="glyphicon glyphicon-trash" title="删除此配置"
+                                      style="color:#2889d0;margin:10px;"></span></a>
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<!--添加通信口配置-->
+<div class="modal" id="addConfig" tabindex="-1" data-backdrop="false">
+    <div class="modal-dialog " >
+
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                <h4 class="modal-title">添加通信口配置</h4>
+            </div>
+            <div class="modal-body" style="padding-right: 45px">
+                <div class="container-fluid">
+
+                    <!--
+                     隐藏plc_id
+                    当plc_id为默认值0时候  就是新增用户
+                    当plc_id为非0数值时候  就是修改改plc_id的内容
+
+                     -->
+                    <input type="hidden"  id="plc_id" value="0"/>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5">设备ID</span>
+                                <input class="col-md-7" name="device_id" id="device_id" style="height: 30px; cursor: not-allowed;" disabled  />
+                            </div>
+                            <div class=" col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5"><span style="color: red">*</span>驱动名称</span>
+                                <select class="col-md-7" style="height: 30px;" id="type" name="type">
+                                    <option>SIMUTOCOL LX1S</option>
+                                    <option>SIMUTOCOL LX2N</option>
+                                    <option>SIMUTOCOL LX3V</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 " style="margin: 10px 0;">
+
+                                <span class="col-md-5"><span style="color: red">*</span>通讯协议</span>
+                                <select class="col-md-7" name="port" style="height: 30px;" id="port">
+                                    <option>COM1</option>
+                                    <option>COM2</option>
+                                    <option>Ethernet</option>
+                                    <option>USB</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 " style="margin: 10px 0;" >
+                                <span class="col-md-5"><span style="color: red">*</span>串口协议</span>
+                                <select class="col-md-7" style="height: 30px;" name="comtype" id="comtype"
+                                        onchange="show_sub(this.options[this.options.selectedIndex].value)">
+                                    <option value="1">RS232</option>
+                                    <option value="2">RS422</option>
+                                    <option value="3">RS485</option>
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5" ><span style="color: red">*</span>盒子站号</span>
+                                <input class="col-md-7" style="height: 30px;" type="number" name="box_stat_no" id="box_stat_no"/>
+                            </div>
+                            <div class="col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5" ><span style="color: red">*</span>PLC站号</span>
+                                <input class="col-md-7" style="height: 30px;" name="plc_stat_no" type="number" id="plc_stat_no"/>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5"><span style="color: red">*</span>波特率</span>
+                                <input class="col-md-7"  style="height: 30px;" type="number"  name="baudrate" id="baudrate"/>
+                            </div>
+                            <div class="col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5"><span style="color: red">*</span>停止位</span>
+                                <input class="col-md-7" style="height: 30px;" type="number"  name="stop_bit" id="stop_bit"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5"><span style="color: red">*</span>数据位</span>
+                                <input class="col-md-7"  style="height: 30px;" type="number" name="data_length" id="data_length"/>
+                            </div>
+                            <div class="col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5"><span style="color: red">*</span>校验位</span>
+                                <input class="col-md-7" style="height: 30px;" type="number" name="check_bit" id="check_bit"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5"><span style="color: red">*</span>重试次数</span>
+                                <input class="col-md-7"  style="height: 30px;" type="number" name="retry_times" id="retry_times"/>
+                            </div>
+                            <div class="col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5"><span style="color: red">*</span>等待超时 ms</span>
+                                <input class="col-md-7" style="height: 30px;" type="number" name="wait_timeout" id="wait_timeout"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5"><span style="color: red">*</span>接收超时 ms</span>
+                                <input class="col-md-7"  style="height: 30px;" type="number" name="rev_timeout" id="rev_timeout"/>
+                            </div>
+                            <div class="col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5"><span style="color: red">*</span>连续长度</span>
+                                <input class="col-md-7" style="height: 30px;" type="number"  name="com_stepinterval" id="com_stepinterval"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5"><span style="color: red">*</span>通讯延迟时间 ms</span>
+                                <input class="col-md-7"  style="height: 30px;" type="number"  name="com_iodelaytime" id="com_iodelaytime"/>
+                            </div>
+                            <div class="col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5"><span style="color: red">*</span>重试超时 s</span>
+                                <input class="col-md-7" style="height: 30px;" type="number"  name="retry_timeout" id="retry_timeout"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5"><span style="color: red">*</span>端口</span>
+                                <input class="col-md-7"  style="height: 30px;"type="number"   name="net_port" id="net_port"/>
+                            </div>
+                            <div class="col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5"><span style="color: red">*</span>网络类型</span>
+                                <select class="col-md-7" style="height: 30px;" name="net_type" id="net_type">
+                                    <option value="0">tcp_client</option>
+                                    <option value="1">udp_client</option>
+                                    <option value="2">tcp_client_2n</option>
+                                    <option value="3">udp_client_2n</option>
+                                    <option value="4">tcp_server</option>
+                                    <option value="5">udp_server</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5"><span style="color: red">*</span>使用广播地址</span>
+                                <input class="col-md-7"  style="height: 30px;" type="number"  name="net_isbroadcast" id="net_isbroadcast"/>
+                            </div>
+                            <div class="col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5"><span style="color: red">*</span>广播地址站号</span>
+                                <input class="col-md-7" style="height: 30px;" type="number"  name="net_broadcastaddr" id="net_broadcastaddr"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5"><span style="color: red">*</span>IP地址</span>
+                                <input class="col-md-7"  style="height: 30px;" name="net_ipaddr" id="net_ipaddr"/>
+                            </div>
+                            <div class="col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5"><span style="color: red">*</span>state</span>
+                                <input class="col-md-7" style="height: 30px;" type="number"  name="state" id="state"/>
+                            </div>
+                        </div>
+
+                </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" ng-click="addPlcInfosetting_submit()">确定</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+</div>
+</body>
+
+<script src="../lib/wecon-common.js"></script>
+<script src="../js/plc-info-setting.js"></script>
+</html>
