@@ -1,55 +1,53 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="weconweb">
 <head>
-<meta charset="UTF-8">
-<title>Title</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" type="text/css" href="../css/style.css" />
-<link rel="stylesheet"
-	href="../lib/bootstrap/3.3.7/css/bootstrap.min.css">
-<link rel="stylesheet"
-	href="../lib/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta charset="UTF-8">
+    <title>pibox</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../css/style.css"/>
+    <link rel="stylesheet" href="../lib/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../lib/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body ng-controller="infoController" ng-init="onInit()">
-	<div class="container-fluid">
-		<ol class="breadcrumb" style="margin-top: 20px;">
-			<li><a href="overview.html">主页</a></li>
-			<li class="active">{{devicename}}</li>
-		</ol>
-		<ul class="nav nav-pills nav-justified" role="tablist"
-			id="overviewtab" style="margin-top: 20px;">
-			<li class="active"><a href="#data-monitor"
-				onclick="showPage('alarm-log','dataitem.html?device_id={{deviceid}}')">数据监控</a></li>
-			<li><a href="#alarm-log"
-				onclick="showPage('alarm-log','alarmlog.html')">报警记录</a></li>
-			<li><a href="#history-data"
-				onclick="showPage('history-data','historydata.html')">历史数据</a></li>
-			<li><a href="#remote-download"
-				onclick="showPage('remote-download','remotedownload.html')">远程下载</a></li>
-			<li><a href="#base-config"
-				onclick="showPage('base-config','baseconfig.html')">基本配置</a></li>
-		</ul>
-		<hr>
-		<div class="tab-content">
-			<!--<iframe src="dataitem.html" name="content_frame" frameborder="0"></iframe>-->
-			<div class="tab-pane active" id="data-monitor"></div>
-			<div class="tab-pane" id="alarm-log"></div>
-			<div class="tab-pane" id="history-data"></div>
-			<div class="tab-pane" id="remote-download"></div>
-			<div class="tab-pane" id="base-config"></div>
-		</div>
-	</div>
+<div class="container-fluid">
+    <ol class="breadcrumb" style="margin-top: 20px;">
+        <li><a href="overview.html">主页</a></li>
+        <li class="active">{{devicename}}</li>
+    </ol>
+    <ul class="nav nav-pills nav-justified" role="tablist"
+        id="overviewtab" style="margin-top: 20px;">
+        <li class="active"><a href="#data-monitor"
+                              onclick="showPage('data-monitor','dataitem.html?device_id={{deviceid}}')">数据监控</a></li>
+        <li><a href="#alarm-log"
+               onclick="showPage('alarm-log','alarmlog.html')">报警记录</a></li>
+        <li><a href="#history-data"
+               onclick="showPage('history-data','historydata.html')">历史数据</a></li>
+        <li><a href="#remote-download"
+               onclick="showPage('remote-download','remotedownload.html')">远程下载</a></li>
+        <li><a href="#base-config"
+               onclick="showPage('base-config','baseconfig.html')">基本配置</a></li>
+    </ul>
+    <hr>
+    <div class="tab-content">
+        <!--<iframe src="dataitem.html" name="content_frame" frameborder="0"></iframe>-->
+        <div class="tab-pane active" id="data-monitor"></div>
+        <div class="tab-pane" id="alarm-log"></div>
+        <div class="tab-pane" id="history-data"></div>
+        <div class="tab-pane" id="remote-download"></div>
+        <div class="tab-pane" id="base-config"></div>
+    </div>
+</div>
 
 
-	<script language="JavaScript">
-		$(function() {
-			$('#data-monitor').load('dataitem.html');
-		})
-		function showPage(tabId, url) {
-			$('#overviewtab a[href="#' + tabId + '"]').tab("show");//显示点击的页面
-			$('#' + tabId).load(url);
-		}
-	</script>
+<script language="JavaScript">
+    $(function () {
+        $('#data-monitor').load('dataitem.html');
+    })
+    function showPage(tabId, url) {
+        $('#overviewtab a[href="#' + tabId + '"]').tab("show");//显示点击的页面
+        $('#' + tabId).load(url);
+    }
+</script>
 </body>
 <script src="../lib/jquery/jquery-3.2.1.min.js"></script>
 <script src="../lib/bootstrap/3.3.7/js/bootstrap.min.js"></script>

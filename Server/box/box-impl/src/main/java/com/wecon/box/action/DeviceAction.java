@@ -110,7 +110,7 @@ public class DeviceAction {
 		return new Output();
 	}
 
-	@WebApi(forceAuth = true, master = true)
+	@WebApi(forceAuth = true, master = true, authority = { "1" })
 	@Description("根据用户获取分组下的盒子")
 	@RequestMapping(value = "/getBoxGroup")
 	public Output getBoxGroup() {
