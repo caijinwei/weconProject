@@ -59,7 +59,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
                     else {
                         alert(msg);
                         $("#loadingModal").modal("hide");
-                        $("#addGroup").hide();
+                        $("#addGroup").modal("hide");
                     }
                 }, function () {
                     alert("ajax error");
@@ -93,7 +93,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             else {
                 alert(msg);
                 $("#loadingModal").modal("hide");
-                $("#addGroup").hide();
+                $("#addGroup").modal("hide");
             }
         }, function () {
             alert("ajax error");

@@ -22,10 +22,15 @@ public class ConstKey {
     /**
      * 保存激活邮件的token的key,由帐号Id组成，值为随机生成的token,有设置过期时间
      */
-    public final static String REDIS_EMAIL_SIGNIN_TOKEN = "pibox:emailsignintoken:%s";
+    public final static String REDIS_EMAIL_SIGNUP_TOKEN = "pibox:emailsignuptoken:%s";
 
     /**
      * 更新邮件需要的token的key,由帐号Id组成, 保存值为map,由token和新邮箱组成
      */
     public final static String REDIS_EMAIL_CHANGE_TOKEN = "pibox:emailchgtoken:%s";
+
+    /**
+     * 保存手机验证码的key,由手机号组成，值为随机生成的六位数,有设置过期时间
+     */
+    public final static String REDIS_PHONE_SIGNIN_VERCODE = "pibox:phonesignupvercode:%s";
 }

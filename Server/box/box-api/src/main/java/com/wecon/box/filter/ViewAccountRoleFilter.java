@@ -8,6 +8,7 @@ public class ViewAccountRoleFilter {
 	public int data_type;//0：实时数据  1：历史数据
 	public long cfg_id;
 	public long role_type;
+	public long dirId;//分组id
 	public Timestamp create_date;
 	public Timestamp update_date;
 }

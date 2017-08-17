@@ -83,6 +83,11 @@ public class DeviceImpl implements DeviceApi {
     }
 
     @Override
+    public List<Device> getDeviceList(long account_id, long account_dir_id) {
+        return null;
+    }
+
+    @Override
     public void delDevice(long device_id) {
         String sql = "delete from  device  where device_id=?";
         jdbcTemplate.update(sql, new Object[]{device_id});

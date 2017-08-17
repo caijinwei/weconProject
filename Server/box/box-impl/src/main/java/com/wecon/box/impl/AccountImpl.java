@@ -74,6 +74,37 @@ public class AccountImpl implements AccountApi {
     }
 
     @Override
+    public Account signupByPhone(final String username, final String phonenum, final String password) {
+        String sql = "select count(1) from account where username = ? or username = ? or phonenum = ?  or phonenum = ?  ";
+
+        int ret = jdbcTemplate.queryForObject(sql,
+                new Object[]{username, phonenum, username, phonenum},
+                Integer.class);
+        if (ret > 0) {
+            throw new BusinessException(ErrorCodeOption.AccountExisted.key, ErrorCodeOption.AccountExisted.value);
+        }
+        KeyHolder key = new GeneratedKeyHolder();
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement preState = con.prepareStatement("insert into account(username,`password`,phonenum,secret_key,create_date,`type`,state,update_date) values (?,?,?,?,current_timestamp(),?,?,current_timestamp() );", Statement.RETURN_GENERATED_KEYS);
+                String secret_key = DigestUtils.md5Hex(UUID.randomUUID().toString());
+                preState.setString(1, username);
+                preState.setString(2, DigestUtils.md5Hex(password + secret_key));
+                preState.setString(3, phonenum);
+                preState.setString(4, secret_key);
+                preState.setInt(5, 1);//注册帐号为管理帐号
+                preState.setInt(6, 1);//注册成功为启用
+
+                return preState;
+            }
+        }, key);
+        //从主键持有者中获得主键值
+        long account_id = key.getKey().longValue();
+        return getAccount(account_id);
+    }
+
+    @Override
     public void signout(String sid) {
         SessionManager.deleteSession(sid);
     }
@@ -97,9 +128,42 @@ public class AccountImpl implements AccountApi {
     }
 
     @Override
-    public boolean updateAccount(Account model) {
-        String sql = "update account set phonenum=?,email=?,state=?,update_date=current_timestamp()  where account_id=?";
-        jdbcTemplate.update(sql, new Object[]{model.phonenum, model.email, model.state, model.account_id});
+    public boolean updateAccountEmail(Account model) {
+        //判断新邮箱不能被使用
+        String sql = "select count(1) from account where account_id<>? and (username = ? or email = ? or phonenum = ? ) ";
+
+        int ret = jdbcTemplate.queryForObject(sql,
+                new Object[]{model.account_id, model.email, model.email, model.email},
+                Integer.class);
+        if (ret > 0) {
+            throw new BusinessException(ErrorCodeOption.AccountEmailExisted.key, ErrorCodeOption.AccountEmailExisted.value);
+        }
+
+        sql = "update account set email=?,state=?,update_date=current_timestamp()  where account_id=?";
+        jdbcTemplate.update(sql, new Object[]{model.email, model.state, model.account_id});
+        return true;
+    }
+
+    @Override
+    public boolean updateAccountPhone(Account model) {
+        String sql = "select count(1) from account where account_id<>? and (username = ? or email = ? or phonenum = ? ) ";
+
+        int ret = jdbcTemplate.queryForObject(sql,
+                new Object[]{model.account_id, model.phonenum, model.phonenum, model.phonenum},
+                Integer.class);
+        if (ret > 0) {
+            throw new BusinessException(ErrorCodeOption.AccountPhoneExisted.key, ErrorCodeOption.AccountPhoneExisted.value);
+        }
+
+        sql = "update account set phonenum=?,state=?,update_date=current_timestamp()  where account_id=?";
+        jdbcTemplate.update(sql, new Object[]{model.phonenum, model.state, model.account_id});
+        return true;
+    }
+
+    @Override
+    public boolean updateAccountState(Account model) {
+        String sql = "update account set state=?,update_date=current_timestamp()  where account_id=?";
+        jdbcTemplate.update(sql, new Object[]{ model.state, model.account_id});
         return true;
     }
 

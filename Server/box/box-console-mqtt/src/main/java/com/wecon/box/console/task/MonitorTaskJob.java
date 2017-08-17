@@ -165,7 +165,7 @@ public class MonitorTaskJob implements Job {
 						System.out.println("device add success");
 					}
 				}
-				// 估计版本信息
+				// 固件版本信息
 				if (!CommonUtils.isNullOrEmpty(jsonBase.getString("dev_firm"))) {
 					if (olddevice != null) {
 						DevFirm newdevFirm = JSON.parseObject(jsonBase.getString("dev_firm"),

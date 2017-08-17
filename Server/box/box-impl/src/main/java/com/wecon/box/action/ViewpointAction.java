@@ -116,9 +116,7 @@ public class ViewpointAction {
     public Output getDevicesName() {
         long acc_id = AppContext.getSession().client.userId;
         List<Device> list = deviceApi.getDeviceNameByAccId(acc_id);
-        if (list.size() == 0) {
-            throw new BusinessException(ErrorCodeOption.Account_Not_Device.key, ErrorCodeOption.Account_Not_Device.value);
-        }
+
         JSONObject data = new JSONObject();
         data.put("list", list);
         return new Output(data);

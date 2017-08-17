@@ -236,6 +236,48 @@ public class UserActionTest extends TestBase {
         Assert.assertEquals(jsonObject.get("code").toString(), "200");
     }
 
+    /**
+     * 发送验证码
+     * 1.手机号码验证
+     * 2.发送验证码-暂不测
+     */
+    @Test
+    public void sendVercode() {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/user/sendvercode");
+        request.param("phonenum", "123456789101");
+        String ret = test(request, true);
+        JSONObject jsonObject = JSON.parseObject(ret);
+        Assert.assertEquals(jsonObject.get("code").toString(), "11013");
+
+        /*request.param("phonenum", "13655099598");
+        ret = test(request, true);
+        jsonObject = JSON.parseObject(ret);
+        Assert.assertEquals(jsonObject.get("code").toString(), "200");*/
+    }
+
+    /**
+     * 手机注册帐号
+     * 1.新增帐号-不测
+     */
+    @Test
+    public void signupPhone() {
+        /*MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/user/signupphone");
+        request.param("username", "13655099598");
+        request.param("phonenum", "13655099598");
+        request.param("password", DigestUtils.md5Hex("1"));
+        request.param("vercode","123456");*/
+    }
+
+    /**
+     * 更新手机号，需要发短信，不测
+     */
+    @Test
+    public void changePhonenum() {
+        /*MockHttpServletRequestBuilder request = MockMvcRequestBuilders.post("/user/chgphonenum");
+        request.param("phonenum", "13655099598");
+        request.param("vercode","123456");*/
+    }
+
     @Before
     public void init() {
         // 设置客户端

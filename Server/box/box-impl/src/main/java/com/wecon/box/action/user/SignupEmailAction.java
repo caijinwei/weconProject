@@ -33,12 +33,12 @@ public class SignupEmailAction extends UserBaseAction {
     @WebApi(forceAuth = false, master = true)
     public Output signupByEmail(@Valid SignupEmailParam param) {
         if (!VerifyUtil.isValidEmail(param.email)) {
-            throw new BusinessException(ErrorCodeOption.EmailErorr.key, ErrorCodeOption.EmailErorr.value);
+            throw new BusinessException(ErrorCodeOption.EmailError.key, ErrorCodeOption.EmailError.value);
         }
         Account user = accountApi.signupByEmail(param.username, param.email, param.password);
         //db状态为未激活
         String token = UUID.randomUUID().toString().replace("-", "");
-        String redisKey = String.format(ConstKey.REDIS_EMAIL_SIGNIN_TOKEN, user.account_id);
+        String redisKey = String.format(ConstKey.REDIS_EMAIL_SIGNUP_TOKEN, user.account_id);
         RedisManager.set(ConstKey.REDIS_GROUP_NAME, redisKey, token, 3600);
         String url = BoxWebConfigContext.boxWebConfig.getEmailActiveUrl() + "?t=1&u=" + user.account_id + "&token=" + token;
         String content = "<h1>请点击下面链接完成激活操作！</h1><h3><a href='" + url + "'>" + url + "</a></h3>";
@@ -58,14 +58,14 @@ public class SignupEmailAction extends UserBaseAction {
     public Output emailActive(@Valid EmailActiveParam param) {
         if (param.type == 1) {
             //验证token是否有效
-            String redisKey = String.format(ConstKey.REDIS_EMAIL_SIGNIN_TOKEN, param.uid);
+            String redisKey = String.format(ConstKey.REDIS_EMAIL_SIGNUP_TOKEN, param.uid);
             String token = RedisManager.get(ConstKey.REDIS_GROUP_NAME, redisKey);
             if (token != null && token.equals(param.token)) {
                 //验证成功，修改db状态，直接登录
                 Client client = AppContext.getSession().client;
                 Account user = accountApi.getAccount(param.uid);
                 user.state = 1;
-                accountApi.updateAccount(user);
+                accountApi.updateAccountEmail(user);
 
                 String sid = accountApi.createSession(user, client.appid, client.fuid, client.ip, client.timestamp, ConstKey.SESSION_EXPIRE_TIME);
                 JSONObject data = new JSONObject();
@@ -78,7 +78,7 @@ public class SignupEmailAction extends UserBaseAction {
             Map<String, String> map = RedisManager.hgetAll(ConstKey.REDIS_GROUP_NAME, redisKey);
             Account user = accountApi.getAccount(param.uid);
             user.email = map.get(param.token);
-            accountApi.updateAccount(user);
+            accountApi.updateAccountEmail(user);
             return new Output();
         }
         throw new BusinessException(ErrorCodeOption.EmailActiveError.key, ErrorCodeOption.EmailActiveError.value);

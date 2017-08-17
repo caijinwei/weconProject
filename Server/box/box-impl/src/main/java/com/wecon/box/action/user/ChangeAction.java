@@ -1,5 +1,6 @@
 package com.wecon.box.action.user;
 
+import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.constant.ConstKey;
 import com.wecon.box.entity.Account;
 import com.wecon.box.enums.ErrorCodeOption;
@@ -42,7 +43,7 @@ public class ChangeAction extends UserBaseAction {
     @WebApi(forceAuth = true, master = true)
     public Output changeEmail(@Valid ChgEmailParam param) {
         if (!VerifyUtil.isValidEmail(param.email)) {
-            throw new BusinessException(ErrorCodeOption.EmailErorr.key, ErrorCodeOption.EmailErorr.value);
+            throw new BusinessException(ErrorCodeOption.EmailError.key, ErrorCodeOption.EmailError.value);
         }
         Client client = AppContext.getSession().client;
         Account user = accountApi.getAccount(client.userId);
@@ -60,6 +61,28 @@ public class ChangeAction extends UserBaseAction {
         EmailUtil.send(param.email, "邮箱更改激活邮件", content);
 
         return new Output();
+    }
+
+    @Label("更换手机号码")
+    @RequestMapping("user/chgphonenum")
+    @WebApi(forceAuth = true, master = true)
+    public Output changePhonenum(@Valid ChgPhoneParam param) {
+        if (!VerifyUtil.isChinaPhone(param.phonenum)) {
+            throw new BusinessException(ErrorCodeOption.PhonenumError.key, ErrorCodeOption.PhonenumError.value);
+        }
+        //验证码是否有效
+        String redisKey = String.format(ConstKey.REDIS_PHONE_SIGNIN_VERCODE, param.phonenum);
+        String vercode = RedisManager.get(ConstKey.REDIS_GROUP_NAME, redisKey);
+        if (vercode == null || !vercode.equals(param.vercode)) {
+            throw new BusinessException(ErrorCodeOption.SmsVercodeError.key, ErrorCodeOption.SmsVercodeError.value);
+        }
+        Client client = AppContext.getSession().client;
+        Account user = accountApi.getAccount(client.userId);
+        user.phonenum = param.phonenum;
+        accountApi.updateAccountPhone(user);
+        JSONObject data = new JSONObject();
+        data.put("phonenum", user.phonenum);
+        return new Output(data);
     }
 }
 
@@ -91,6 +114,25 @@ class ChgEmailParam {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+}
+
+class ChgPhoneParam {
+    @Label("手机号码")
+    @NotNull
+    @Length(max = 16, min = 1)
+    public String phonenum;
+
+    @Label("短信验证码")
+    @NotNull
+    public String vercode;
+
+    public void setVercode(String vercode) {
+        this.vercode = vercode;
+    }
+
+    public void setPhonenum(String phonenum) {
+        this.phonenum = phonenum;
     }
 }
 

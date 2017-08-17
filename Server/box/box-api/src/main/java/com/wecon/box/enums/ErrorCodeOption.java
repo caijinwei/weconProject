@@ -8,7 +8,7 @@ public enum ErrorCodeOption {
     Unknown("未知错误", 10000),
     //用户操作相关
     AccountExisted("用户已经存在,不能注册", 11000),
-    EmailErorr("邮箱格式有错", 11001),
+    EmailError("邮箱格式有错", 11001),
     Login_NotAccount("登录帐号不存在", 11002),
     Login_PwdError("密码错误", 11003),
     Login_NotAllow("禁止登录", 11004),
@@ -20,14 +20,19 @@ public enum ErrorCodeOption {
     CanAddTheSameGroup("分组命名不能重复", 11010),
     UserGroupTypeIsUndefined("分组类型未定义", 11011),
     OnlyOperateOneselfGroup("只能操作自己创建的分组", 11012),
+    PhonenumError("手机号码格式有错", 11013),
+    SmsVercodeError("手机验证码有错", 11014),
+    AccountEmailExisted("邮箱已经被使用", 11015),
+    AccountPhoneExisted("邮箱已经被使用", 11016),
 
     Account_Permissions_No("账户权限不足，无法新增盒子", 30001),
     Device_NotFound("该设备不存在",30002),
-    Device_AlreadyBind("该设备已经被别的用户绑定",300023),
-    Viewpoint_Dlete_False("视图账户监控点解绑失败",300003),
-    AlarmViewpoint_IsNULL("报警监控点为空",300006),
-    Account_Not_Device("该账户没有绑定盒子",300005),
-    ViewpointRoleTypePrams_Update_False("视图账号监控点权限分配失败(参数不能为空)",300004);
+    Device_AlreadyBind("该设备已经被别的用户绑定",300003),
+    Viewpoint_Dlete_False("视图账户监控点解绑失败",300004),
+    ViewpointRoleTypePrams_Update_False("视图账号监控点权限分配失败(参数不能为空)",300007),
+	Get_DeviceList_Error("获取盒子列表失败",30005),
+    Get_ActList_Error("获取实时数据配置列表失败",30006),
+    AlarmViewpoint_IsNULL("报警监控点为空",300007);
 
     public int value;
     public String key;

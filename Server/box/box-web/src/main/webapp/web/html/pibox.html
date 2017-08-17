@@ -1,26 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="weconweb">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>pibox</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="../css/style.css"/>
     <link rel="stylesheet" href="../lib/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="../lib/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
-<body>
+<body ng-controller="infoController" ng-init="onInit()">
 <div class="container-fluid">
     <ol class="breadcrumb" style="margin-top: 20px;">
         <li><a href="overview.html">主页</a></li>
-        <li class="active">盒子1-0</li>
+        <li class="active">{{devicename}}</li>
     </ol>
-    <ul class="nav nav-pills nav-justified" role="tablist" id="overviewtab" style="margin-top: 20px;">
-        <li class="active"><a href="#data-monitor" onclick="showPage('alarm-log','dataitem.html')">数据监控</a></li>
-        <li><a href="#alarm-log" onclick="showPage('alarm-log','alarmlog.html')">报警记录</a></li>
-        <li><a href="#history-data" onclick="showPage('history-data','historydata.html')">历史数据</a></li>
-        <li><a href="#remote-download" onclick="showPage('remote-download','remotedownload.html')">远程下载</a></li>
-        <li><a href="#base-config" onclick="showPage('base-config','baseconfig.html')">基本配置</a></li>
-        <li><a href="#test" onclick="showPage('test','groupmgr.html')">test</a></li>
+    <ul class="nav nav-pills nav-justified" role="tablist"
+        id="overviewtab" style="margin-top: 20px;">
+        <li class="active"><a href="#data-monitor"
+                              onclick="showPage('data-monitor','dataitem.html?device_id={{deviceid}}')">数据监控</a></li>
+        <li><a href="#alarm-log"
+               onclick="showPage('alarm-log','alarmlog.html')">报警记录</a></li>
+        <li><a href="#history-data"
+               onclick="showPage('history-data','historydata.html')">历史数据</a></li>
+        <li><a href="#remote-download"
+               onclick="showPage('remote-download','remotedownload.html')">远程下载</a></li>
+        <li><a href="#base-config"
+               onclick="showPage('base-config','baseconfig.html')">基本配置</a></li>
     </ul>
     <hr>
     <div class="tab-content">
@@ -30,13 +35,9 @@
         <div class="tab-pane" id="history-data"></div>
         <div class="tab-pane" id="remote-download"></div>
         <div class="tab-pane" id="base-config"></div>
-        <div class="tab-pane" id="test"></div>
     </div>
 </div>
-<script src="../lib/jquery/jquery-3.2.1.min.js"></script>
-<script src="../lib/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="../lib/angular/angular.min.js" type="text/javascript"></script>
-<script src="../lib/wecon-common.js" type="text/javascript"></script>
+
 
 <script language="JavaScript">
     $(function () {
@@ -44,18 +45,13 @@
     })
     function showPage(tabId, url) {
         $('#overviewtab a[href="#' + tabId + '"]').tab("show");//显示点击的页面
-//        $('#' + tabId).load(url);
-        $.ajax({
-            url: url, //这里是静态页的地址
-            type: "GET", //静态页用get方法，否则服务器会抛出405错误
-            dataType: "html",
-            async: false,
-            success: function (data) {
-//                var result = $(data).find("body");
-                $('#' + tabId).html(data);
-            }
-        });
+        $('#' + tabId).load(url);
     }
 </script>
 </body>
+<script src="../lib/jquery/jquery-3.2.1.min.js"></script>
+<script src="../lib/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="../lib/angular/angular.min.js" type="text/javascript"></script>
+<script src="../lib/wecon-common.js" type="text/javascript"></script>
+<script src="../js/pibox.js" type="text/javascript"></script>
 </html>

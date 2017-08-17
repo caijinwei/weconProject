@@ -38,6 +38,14 @@ public class AccountDirAction {
             throw new BusinessException(ErrorCodeOption.UserGroupTypeIsUndefined.key, ErrorCodeOption.UserGroupTypeIsUndefined.value);
         }
         List<AccountDir> list = accountDirApi.getAccountDirList(AppContext.getSession().client.userId, type);
+        if (list.size() == 0) {
+            AccountDir model = new AccountDir();
+            model.account_id = AppContext.getSession().client.userId;
+            model.name = "默认组";
+            model.type = type;
+            accountDirApi.addAccountDir(model);
+            list = accountDirApi.getAccountDirList(AppContext.getSession().client.userId, type);
+        }
         JSONObject data = new JSONObject();
         data.put("list", list);
         return new Output(data);
