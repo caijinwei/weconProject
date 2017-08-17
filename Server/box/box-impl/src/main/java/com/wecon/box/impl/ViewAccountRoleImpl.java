@@ -1,10 +1,7 @@
 package com.wecon.box.impl;
 
 import com.wecon.box.api.ViewAccountRoleApi;
-import com.wecon.box.entity.Page;
-import com.wecon.box.entity.RealHisCfg;
-import com.wecon.box.entity.ViewAccountRole;
-import com.wecon.box.entity.ViewAccountRoleView;
+import com.wecon.box.entity.*;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.restful.core.BusinessException;
@@ -61,6 +58,9 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
     *  	需要分页
     *  	id   state  name  digit_count addr  addr_type desceibe
     * */
+    /*
+    * 该账户全部余下监控点
+    * */
     @Override
     public Page<RealHisCfg> getViewRealHisCfgByViewAndAccId(long view_id, long account_id, Integer type, Integer pageIndex, Integer pageSize) {
         Object[] args0 = new Object[]{account_id, type, view_id};
@@ -68,8 +68,38 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
         int totalRecord = jdbcTemplate.queryForObject(sqlCount, args0, Integer.class);
         Page<RealHisCfg> page = new Page<RealHisCfg>(pageIndex, pageSize, totalRecord);
 
-        Object[] args = new Object[]{account_id, type, view_id, page.getStartIndex(),page.getPageSize()};
+        Object[] args = new Object[]{account_id, type, view_id, page.getStartIndex(), page.getPageSize()};
         String sql = "select a.id, a.state,a.name , a.digit_count,a.addr , a.addr_type,a.describe from real_his_cfg a WHERE account_id=?  AND a.data_type=? AND id NOT IN(SELECT cfg_id FROM view_account_role where view_id=?)LIMIT ?,?";
+        List<RealHisCfg> list = jdbcTemplate.query(sql, args, new RowMapper() {
+            @Override
+            public Object mapRow(ResultSet resultSet, int i) throws SQLException {
+                RealHisCfg model = new RealHisCfg();
+                model.id = resultSet.getLong("id");
+                model.state = resultSet.getInt("state");
+                model.name = resultSet.getString("name");
+                model.digit_count = resultSet.getString("digit_count");
+                model.addr = resultSet.getString("addr");
+                model.addr_type = resultSet.getInt("addr_type");
+                model.describe = resultSet.getString("describe");
+                return model;
+            }
+        });
+        page.setList(list);
+        return page;
+    }
+
+    /*
+    *   该盒子下的余下监控点
+    *   SELECT	a.id,	a.state,	a. NAME,	a.digit_count,	a.addr,	a.addr_type,	a.`describe` FROM	real_his_cfg a WHERE	a.data_type = 0 AND a.plc_id IN (	SELECT	plc_id FROM	plc_info	WHERE	device_id = '1')AND id NOT IN (	SELECT	cfg_id	FROM	view_account_role	WHERE		view_id = '1000021')LIMIT 1, 5;
+    * */
+    public Page<RealHisCfg> getViewRealHisCfgByViewAndDeivceId(long account_id, long view_id, long device_id, Integer type, Integer pageIndex, Integer pageSize) {
+        Object[] args0 = new Object[]{account_id, type, device_id, view_id};
+        String sqlCount = "SELECT COUNT(*) FROM real_his_cfg a WHERE  account_id=?  AND a.data_type = ? AND a.plc_id IN ( SELECT plc_id FROM plc_info WHERE device_id = ?)AND id NOT IN ( SELECT cfg_id FROM view_account_role WHERE view_id = ?)";
+        int totalRecord = jdbcTemplate.queryForObject(sqlCount, args0, Integer.class);
+        Page<RealHisCfg> page = new Page<RealHisCfg>(pageIndex, pageSize, totalRecord);
+
+        Object[] args = new Object[]{type, device_id, view_id, page.getStartIndex(), page.getPageSize()};
+        String sql = "SELECT  a.id, a.state,a.name ,a.digit_count,a.addr , a.addr_type,a.describe FROM real_his_cfg a WHERE a.data_type = ? AND a.plc_id IN ( SELECT plc_id FROM plc_info WHERE device_id = ?)AND id NOT IN ( SELECT cfg_id FROM view_account_role WHERE view_id = ?) LIMIT ?,?";
         List<RealHisCfg> list = jdbcTemplate.query(sql, args, new RowMapper() {
             @Override
             public Object mapRow(ResultSet resultSet, int i) throws SQLException {
@@ -89,7 +119,8 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
         return page;
     }
 
-    /*
+        /*
+        *视图账户实时历史监控点展示
         * SELECT * FROM view_account_role a,real_his_cfg b WHERE a.cfg_id=b.id AND a.view_id="1" AND a.cfg_type='1'AND b.data_type='0';
         * cgf_type ：
         *           1实时历史监控点
@@ -99,18 +130,18 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
         *           1：历史监控点
         * */
     @Override
-    public Page<ViewAccountRoleView> getViewAccountRoleViewByViewID(Integer data_type, long view_id,Integer pageIndex,Integer pageSize) {
+    public Page<ViewAccountRoleView> getViewAccountRoleViewByViewID(Integer data_type, long view_id, Integer pageIndex, Integer pageSize) {
         if (data_type == null || data_type < 0 || data_type > 1) {
             return null;
         }
         Object[] args = new Object[]{data_type, view_id};
-        String sqlCount="SELECT COUNT(*) FROM view_account_role a INNER JOIN real_his_cfg b ON a.cfg_id = b.id WHERE a.cfg_type = '1' AND b.data_type = ? AND a.view_id =?";
-        int totalCount=jdbcTemplate.queryForObject(sqlCount,args,Integer.class);
-        Page<ViewAccountRoleView> page =new Page<ViewAccountRoleView>(pageIndex,pageSize,totalCount);
-        Object[] args1=new Object[]{data_type,view_id,page.getStartIndex(),page.getPageSize()};
+        String sqlCount = "SELECT COUNT(*) FROM view_account_role a INNER JOIN real_his_cfg b ON a.cfg_id = b.id WHERE a.cfg_type = '1' AND b.data_type = ? AND a.view_id =?";
+        int totalCount = jdbcTemplate.queryForObject(sqlCount, args, Integer.class);
+        Page<ViewAccountRoleView> page = new Page<ViewAccountRoleView>(pageIndex, pageSize, totalCount);
+        Object[] args1 = new Object[]{data_type, view_id, page.getStartIndex(), page.getPageSize()};
         String sql = "SELECT a.cfg_id,a.role_type,b.name,b.addr,b.state FROM view_account_role a INNER JOIN real_his_cfg b ON a.cfg_id = b.id WHERE a.cfg_type = '1' AND b.data_type = ? AND a.view_id =? LIMIT ?,?";
         List<ViewAccountRoleView> list = new ArrayList<ViewAccountRoleView>();
-        list=jdbcTemplate.query(sql, args1, new RowMapper() {
+        list = jdbcTemplate.query(sql, args1, new RowMapper() {
             @Override
             public Object mapRow(ResultSet resultSet, int i) throws SQLException {
                 ViewAccountRoleView model = new ViewAccountRoleView();
@@ -123,7 +154,7 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
             }
         });
         page.setList(list);
-        System.out.println("这边显示"+list);
+        System.out.println("这边显示" + list);
         return page;
     }
 
@@ -168,16 +199,21 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
             throw new BusinessException(ErrorCodeOption.Viewpoint_Dlete_False.key, ErrorCodeOption.Viewpoint_Dlete_False.value);
         }
     }
+
     /*
     * 视图账户监控点权限设置
     * @param viewId       pointId      roleType
     *       视图账户ID  监控点ID      权限：0无权限  1只读  3读写
     * UPDATE view_account_role SET role_type="1" WHERE view_id=111 AND cfg_id=12 ;
     * */
-    public void updateViewPointRoleType( Integer viewId,Integer pointId, Integer roleType)
-    {
-        String sql="UPDATE view_account_role SET role_type=? WHERE view_id=? AND cfg_id=?";
-        Object[] args=new Object[]{roleType,viewId,pointId};
-        jdbcTemplate.update(sql,args);
+    public void updateViewPointRoleType(Integer viewId, Integer pointId, Integer roleType) {
+        String sql = "UPDATE view_account_role SET role_type=? WHERE view_id=? AND cfg_id=?";
+        Object[] args = new Object[]{roleType, viewId, pointId};
+        jdbcTemplate.update(sql, args);
     }
+
+    /*
+    * 视图账户报警数据展示
+    * SELECT a.cfg_id,a.role_type,b.name,b.addr,b.state FROM view_account_role a INNER JOIN alarm_cfg b ON a.cfg_id = b.alarmcfg_id WHERE a.cfg_type = '2'  AND a.view_id=1000021 LIMIT 1,5;
+    * */
 }

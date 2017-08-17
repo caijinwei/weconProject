@@ -25,6 +25,7 @@ public enum ErrorCodeOption {
     Device_NotFound("该设备不存在",30002),
     Device_AlreadyBind("该设备已经被别的用户绑定",300023),
     Viewpoint_Dlete_False("视图账户监控点解绑失败",300003),
+    Account_Not_Device("该账户没有绑定盒子",300005),
     ViewpointRoleTypePrams_Update_False("视图账号监控点权限分配失败(参数不能为空)",300004);
 
     public int value;

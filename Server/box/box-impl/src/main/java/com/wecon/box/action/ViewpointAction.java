@@ -1,7 +1,9 @@
 package com.wecon.box.action;
 
 import com.alibaba.fastjson.JSONObject;
+import com.wecon.box.api.DeviceApi;
 import com.wecon.box.api.ViewAccountRoleApi;
+import com.wecon.box.entity.Device;
 import com.wecon.box.entity.Page;
 import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.entity.ViewAccountRoleView;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * Created by caijinw on 2017/8/10.
  */
@@ -25,17 +29,18 @@ public class ViewpointAction {
 
     @Autowired
     ViewAccountRoleApi viewAccountRoleApi;
+    @Autowired
+    DeviceApi deviceApi;
 
     @Label("实时历史监控点")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping("showReal")
-    public Output showRealpoint(@RequestParam("view_id") Integer viewId, @RequestParam("type") Integer type,@RequestParam("pageIndex")Integer pageIndex,@RequestParam("pageSize") Integer pageSize)
-    {
-        System.out.println("pageIndex的值是"+pageIndex);
+    public Output showRealpoint(@RequestParam("view_id") Integer viewId, @RequestParam("type") Integer type, @RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
+        System.out.println("pageIndex的值是" + pageIndex);
         if (viewId == null || type == null) {
             return new Output();
         }
-        Page<ViewAccountRoleView> page = viewAccountRoleApi.getViewAccountRoleViewByViewID(type, viewId,pageIndex,pageSize);
+        Page<ViewAccountRoleView> page = viewAccountRoleApi.getViewAccountRoleViewByViewID(type, viewId, pageIndex, pageSize);
         JSONObject data = new JSONObject();
         data.put("page", page);
         return new Output(data);
@@ -47,9 +52,14 @@ public class ViewpointAction {
     @Label("未分配实时历史监控点展示")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping(value = "showRealHiss")
-    public Output showRealHiss(@RequestParam("view_id") Integer viewId, @RequestParam("type") Integer type, @RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
+    public Output showRealHiss(@RequestParam("view_id") Integer viewId, @RequestParam("device_id") Integer device_id, @RequestParam("type") Integer type, @RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
         long userId = AppContext.getSession().client.userId;
-        Page<RealHisCfg> page = viewAccountRoleApi.getViewRealHisCfgByViewAndAccId(viewId, userId, type, pageIndex, pageSize);
+        Page<RealHisCfg> page = null;
+        if (device_id != 0) {
+            page = viewAccountRoleApi.getViewRealHisCfgByViewAndDeivceId(userId, viewId, device_id, type, pageIndex, pageSize);
+        } else {
+            page = viewAccountRoleApi.getViewRealHisCfgByViewAndAccId(viewId, userId, type, pageIndex, pageSize);
+        }
         JSONObject data = new JSONObject();
         data.put("page", page);
         System.out.println(page.getList());
@@ -89,6 +99,20 @@ public class ViewpointAction {
         }
         viewAccountRoleApi.updateViewPointRoleType(viewId, pointId, roleType);
         return new Output();
+    }
+
+    @Label("管理员账户下盒子名称")
+    @RequestMapping(value = "getDeviceName")
+    @WebApi(forceAuth = true, master = true, authority = {"1"})
+    public Output getDevicesName() {
+        long acc_id = AppContext.getSession().client.userId;
+        List<Device> list = deviceApi.getDeviceNameByAccId(acc_id);
+        if (list.size() == 0) {
+            throw new BusinessException(ErrorCodeOption.Account_Not_Device.key, ErrorCodeOption.Account_Not_Device.value);
+        }
+        JSONObject data = new JSONObject();
+        data.put("list", list);
+        return new Output(data);
     }
 
 }

@@ -19,12 +19,32 @@
 </head>
 <body ng-controller="listController" ng-init="onInit()">
 
-<!--监控点分配模态窗口-->
 
+<!--监控点分配模态窗口-->
+<div class="container-fluid search-div">
+    <div class="row form-horizontal">
+        <div class="col-xs-4 col-sm-4 col-md-4 form-group">
+            <label class="col-sm-4 control-label">盒子1:</label>
+
+            <div class="col-sm-8">
+                <select id="check_device_id" class=" form-control form-inline" >
+                    <option value="0">全部盒子</option>
+                    <option ng-repeat="x in deviceList" value="{{x.device_id}}">{{x.name}}</option>
+                </select>
+            </div>
+        </div>
+        <button type="button" class="btn btn-primary"
+                ng-click="getRestList(1,5)">查询
+        </button>
+    </div>
+    <div>
+
+    </div>
+</div>
 <table class="table table-bordered table-hover" id="pointlist">
     <thead>
     <tr>
-        <th class="col-md-1"><a>全选</a></th>
+        <th class="col-md-1"><a ng-click="selectAll()">全选</a></th>
         <th class="col-md-2">权限</th>
         <th class="col-md-1">编号</th>
         <th class="col-md-1">状态</th>
@@ -36,7 +56,7 @@
     <tbody>
     <tr ng-repeat="x in resrPointDatas">
         <td>
-            <input name="cbid" type="checkbox" value="{{x.id}}"/>
+            <input name="cbid" type="checkbox" ng-checked="allCheck" value="{{x.id}}"/>
         </td>
         <td><label class="radio-inline">
             <input type="radio" name="right_{{x.id}}" value="1" ng-checked="1"

@@ -97,6 +97,7 @@ public class DeviceAction {
             accountDirRel.acc_dir_id = acc_dir_id;
             accountDirRelApi.saveAccountDirRel(accountDirRel);
         }
+
         return new Output();
     }
 

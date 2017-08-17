@@ -44,8 +44,10 @@ appModule.controller("listController", function ($scope, $http, $compile) {
 
     }
     $scope.showPointBut = function (type, view_id,pageIndex,pageSize) {
-        console.log("起始位置",pageIndex);
-        console.log("每页信息",pageSize);
+        if(pageIndex==0){
+            pageIndex=1;
+        }
+
         var params =
         {
             view_id: view_id,
@@ -87,9 +89,14 @@ appModule.controller("listController", function ($scope, $http, $compile) {
           {
               chk_value.push($(this).val());
               var tem = "right_" + $(this).val();
-              rightOption.push($("#myiframe").contents().find("input[name="+tem+"]:checked").val());
+              rightOption.push($("#myiframe").contents().find("input[name="+tem+"]").val());
           }
         );
+        //$('input[name="cbid"]:checked').each(function () {
+        //    chk_value.push($(this).val());
+        //    var tem = "right_" + $(this).val();
+        //    rightOption.push($("input[name=" + tem + "]:checked").val());
+        //});
         var ids = chk_value.join(",");
         var rights = rightOption.join(",");
         if (chk_value.length == 0) {
@@ -97,13 +104,14 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             $("#showRestOpint").modal("hide");
             return;
         }
-        var params = {viewId: viewid, selectedId: ids, rights: rights};
+        var params = {viewId: viewid.toString(), selectedId: ids, rights: rights};
         T.common.ajax.request("WeconBox", "Viewpoint/setViewPoint", params, function (data, code, msg) {
             if (code == 200) {
                 $("#showRestOpint").modal("hide");
                 alert("添加成功");
-                var type = T.common.util.getParameter("type");
-                $scope.showAlreadPoint(type, viewid);
+                var type = T.common.util.getParameter("type").toString();
+                console.log("类型:",typeof type);
+                $scope.showAlreadPoint(type.toString(),viewid.toString());
                 //$scope.getRestList( $scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
             }
             else {

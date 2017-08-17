@@ -19,9 +19,8 @@ appModule.controller("listController", function ($scope, $http, $compile) {
                 }
             }
         }
-
-
         $scope.getRestList($scope.conf.currentPage, $scope.conf.itemsPerPage);
+        $scope.showDeviceList();
     }
     $scope.conf = {
         totalItems: $scope.count
@@ -31,11 +30,12 @@ appModule.controller("listController", function ($scope, $http, $compile) {
         var type = T.common.util.getParameter("type");
         if (pageIndex == 0)
             pageIndex = 1;
-        console.log("pageIndex：", pageIndex);
-        console.log("pageSize:", pageSize);
+        var device_id = $("#check_device_id").val();
+        console.log("获取的device——device_id:", device_id);
         var params =
         {
             view_id: view_id,
+            device_id: device_id,
             type: type,
             pageIndex: pageIndex,
             pageSize: pageSize
@@ -53,5 +53,40 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             alert("ajax error");
         });
     }
+    /*
+     * 展示管理账户的盒子
+     * */
+    $scope.showDeviceList = function () {
+        var params = {};
+        T.common.ajax.request("WeconBox", "Viewpoint/getDeviceName", params, function (data, code, msg) {
+            if (code == 200) {
+                $scope.deviceList = data.list;
+                $scope.$apply();
+            }
+            else {
+                alert(code + "-" + msg);
+            }
+        }, function () {
+            alert("ajax error");
+        });
+    }
+    /*
+     * 全选功能实现
+     * */
+    //默认没有选中全选
+    $scope.isChecked = 0;
+    $scope.selectAll = function () {
+        if ($scope.isChecked == 0) {
+            $scope.isChecked = 1;
+        } else {
+            $scope.isChecked = 0;
+        }
+        if ($scope.isChecked == 1) {
+            $scope.allCheck = 1;
+        } else {
+            $scope.allCheck = 0;
+        }
+    };
+
 
 });
