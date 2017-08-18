@@ -2,7 +2,11 @@ package com.wecon.box.api;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
+import com.wecon.box.entity.RealHisCfgDevice;
+import com.wecon.box.filter.RealHisCfgFilter;
+import com.wecon.box.filter.ViewAccountRoleFilter;
 import org.springframework.stereotype.Component;
 import com.wecon.box.entity.Page;
 import com.wecon.box.entity.RealHisCfgData;
@@ -52,4 +56,20 @@ public interface RealHisCfgDataApi {
 	 * @return
 	 */
 	Page<RealHisCfgData> getRealHisCfgDataList(RealHisCfgDataFilter filter, int pageIndex, int pageSize);
+
+	/**
+	 * 通过filter及外部参数分页获取历史数据列表
+	 *
+	 * @param filter
+	 * @return
+	 */
+	public Page<Map<String, Object>> getRealHisCfgDataPage(RealHisCfgFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize);
+
+	/**
+	 * 通过filter及外部参数分页获取历史数据列表
+	 *
+	 * @param filter
+	 * @return
+	 */
+	public Page<Map<String, Object>> getRealHisCfgDataPage(ViewAccountRoleFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize);
 }
