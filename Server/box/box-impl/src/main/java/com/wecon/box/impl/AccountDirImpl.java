@@ -38,9 +38,9 @@ public class AccountDirImpl implements AccountDirApi {
 	@Override
 	public long addAccountDir(final AccountDir model) {
 		// 相同用户，相同类型，不允许重名
-		String sql = "select count(1) from account_dir where account_id = ? and `name` = ? and `type` = ?  ";
+		String sql = "select count(1) from account_dir where account_id = ? and `name` = ? and `type` = ? and `device_id` = ?  ";
 
-		int ret = jdbcTemplate.queryForObject(sql, new Object[] { model.account_id, model.name, model.type },
+		int ret = jdbcTemplate.queryForObject(sql, new Object[] { model.account_id, model.name, model.type,model.device_id },
 				Integer.class);
 		if (ret > 0) {
 			throw new BusinessException(ErrorCodeOption.CanAddTheSameGroup.key,
@@ -52,12 +52,13 @@ public class AccountDirImpl implements AccountDirApi {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
 				PreparedStatement preState = con.prepareStatement(
-						"insert into account_dir(account_id,`name`,`type`,create_date,update_date) values (?,?,?,current_timestamp(),current_timestamp());",
+						"insert into account_dir(account_id,`name`,`type`,create_date,update_date,device_id) values (?,?,?,current_timestamp(),current_timestamp(),?);",
 						Statement.RETURN_GENERATED_KEYS);
 				String secret_key = DigestUtils.md5Hex(UUID.randomUUID().toString());
 				preState.setLong(1, model.account_id);
 				preState.setString(2, model.name);
 				preState.setInt(3, model.type);
+				preState.setLong(4, model.device_id);
 
 				return preState;
 			}
@@ -70,8 +71,8 @@ public class AccountDirImpl implements AccountDirApi {
 	@Override
 	public boolean updateAccountDir(AccountDir model) {
 		// 只能更新分组名
-		String sql = "select count(1) from account_dir where account_id = ? and `name` = ? and `type` = ? and id <> ? ";
-		int ret = jdbcTemplate.queryForObject(sql, new Object[] { model.account_id, model.name, model.type, model.id },
+		String sql = "select count(1) from account_dir where account_id = ? and `name` = ? and `type` = ? and `device_id` = ? and id <> ? ";
+		int ret = jdbcTemplate.queryForObject(sql, new Object[] { model.account_id, model.name, model.type, model.device_id, model.id },
 				Integer.class);
 		if (ret > 0) {
 			throw new BusinessException(ErrorCodeOption.CanAddTheSameGroup.key,
@@ -134,21 +135,21 @@ public class AccountDirImpl implements AccountDirApi {
 
 	@Override
 	public List<AccountDir> getAccountDirList(long account_id,int type,long device_id) {
-		String sql = " select distinct  ad.id,ad.account_id,ad.name,ad.type,ad.create_date,ad.update_date from account_dir ad,account_dir_rel adr ,real_his_cfg  rhc,plc_info pli where 1=1 and ad.`id`=adr.`acc_dir_id` and pli.`plc_id`=rhc.`plc_id`and rhc.`id`=adr.`ref_id` and ad.`account_id`=rhc.`account_id`";
+		String sql = " select  *from account_dir where 1=1 ";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
 		if (account_id > 0) {
-			condition.append(" and ad.account_id = ? ");
+			condition.append(" and account_id = ? ");
 			params.add(account_id);
 
 		}
 		if (device_id > 0) {
-			condition.append(" and pli.device_id = ? ");
+			condition.append(" and device_id = ? ");
 			params.add(device_id);
 
 		}
 		if (type > -1) {
-			condition.append(" and ad.type = ? ");
+			condition.append(" and type = ? ");
 			params.add(type);
 			
 		}
@@ -168,6 +169,7 @@ public class AccountDirImpl implements AccountDirApi {
 			model.type = rs.getInt("type");
 			model.create_date = rs.getTimestamp("create_date");
 			model.update_date = rs.getTimestamp("update_date");
+			model.device_id = rs.getLong("device_id");
 
 			return model;
 		}

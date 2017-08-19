@@ -304,6 +304,11 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			condition.append(" and r.data_type = ? ");
 			params.add(filter.data_type);
 		}
+		if (filter.state > -1) {
+			condition.append(" and r.state = ? ");
+			params.add(filter.state);
+
+		}
 
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);

@@ -64,6 +64,7 @@ public class ActDataAction {
 			model.account_id = client.userId;
 			model.name = "默认组";
 			model.type = 1;
+			model.device_id=deviceid;
 			long id = accountDirApi.addAccountDir(model);
 			if (id > 0) {
 				accountDirList = accountDirApi.getAccountDirList(client.userId, 1, deviceid);
@@ -107,6 +108,8 @@ public class ActDataAction {
 			realHisCfgFilter.addr_type = -1;
 			realHisCfgFilter.data_type = 0;
 			realHisCfgFilter.his_cycle = -1;
+			realHisCfgFilter.state = 1;
+			
 			realHisCfgFilter.account_id = client.userId;
 
 			if (!CommonUtils.isNullOrEmpty(acc_dir_id)) {
@@ -115,7 +118,7 @@ public class ActDataAction {
 			if (!CommonUtils.isNullOrEmpty(device_id)) {
 				realHisCfgFilter.device_id = Long.parseLong(device_id);
 			}
-			realHisCfgDeviceList = realHisCfgApi.getRealHisCfgList(realHisCfgFilter, 1, 5);
+			realHisCfgDeviceList = realHisCfgApi.getRealHisCfgList(realHisCfgFilter, pageIndex, pageSize);
 
 		} else if (client.userInfo.getUserType() == 2) {
 			/** 视图 **/
@@ -124,10 +127,11 @@ public class ActDataAction {
 			viewAccountRoleFilter.cfg_type = 1;
 			viewAccountRoleFilter.data_type = 0;
 			viewAccountRoleFilter.role_type = -1;
+			viewAccountRoleFilter.state = 1;
 			if (!CommonUtils.isNullOrEmpty(acc_dir_id)) {
 				viewAccountRoleFilter.dirId = Long.parseLong(acc_dir_id);
 			}
-			realHisCfgDeviceList = realHisCfgApi.getRealHisCfgList(viewAccountRoleFilter, 1, 5);
+			realHisCfgDeviceList = realHisCfgApi.getRealHisCfgList(viewAccountRoleFilter, pageIndex, pageSize);
 		}
 
 		// 如果该账号下无实时数据配置文件直接返回空

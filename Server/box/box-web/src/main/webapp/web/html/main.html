@@ -9,6 +9,12 @@
 	href="../lib/bootstrap/3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet"
 	href="../lib/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak,
+	.x-ng-cloak {
+	display: none !important;
+}
+</style>
 </head>
 <body ng-controller="infoController" ng-init="onInit()"
 	class="main-body">
@@ -24,9 +30,9 @@
 						</a>
 					</div>
 					<div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
-						<a href="user/info.html" target="content_frame" class="userinfo"><span
-							style="font-size: 18px;">{{username}}</span></a> <br /> <a href="#"
-							ng-click="logout()"> <span
+						<a href="user/info.html" target="content_frame" class="userinfo">
+							<span style="font-size: 18px;">{{username}}</span>
+						</a> <br /> <a href="#" ng-click="logout()"> <span
 							class="glyphicon glyphicon-log-out"></span> 注销
 						</a> <br /> <br />
 					</div>
@@ -82,7 +88,6 @@
 						</button>
 					</a>
 				</div>
-
 			</div>
 			<!--添加盒子对话框-->
 			<div class="modal" id="addPIBox" tabindex="-1" data-backdrop="false">
@@ -116,7 +121,6 @@
 								</div>
 								<div class="row" style="margin-top: 20px; margin-bottom: 20px;">
 									<select id="acc_dir_id" class=" form-control form-inline">
-										<option value="0">默认分组</option>
 										<option ng-repeat="x in refList" value="{{x.id}}">{{x.name}}</option>
 									</select>
 								</div>
@@ -131,8 +135,8 @@
 				</div>
 			</div>
 
-			<ul id="side_nav">
-				<li><a href="pibox.html"> <span
+			<ul id="side_nav" ng-cloak ng-if="type==1">
+				<li><a href="datamonitor.html" target="content_frame"> <span
 						class="glyphicon glyphicon-eye-open "> 所有监控点</span>
 				</a></li>
 				<li ng-repeat="x in allDatas"><a href="#"
@@ -142,12 +146,29 @@
 				</a>
 					<ul id="dir_ul_{{x.accountdirId}}">
 						<a
-							href="pibox.html?device_id={{y.deviceId}}&device_name={{y.deviceName}}"
+							href="datamonitor.html?device_id={{y.deviceId}}&device_name={{y.deviceName}}"
 							class="list-group-item" target="content_frame"
 							ng-repeat="y in x.deviceList">{{y.deviceName}}</a>
-
 					</ul></li>
+			</ul>
 
+			<ul class="nav nav-pills nav-stacked" role="tablist" id="overviewtab"
+				style="margin-top: 40px;" ng-cloak ng-if="type==2">
+				<li><a href="datamonitor.html" target="content_frame"> <span
+						class="glyphicon glyphicon-eye-open"> 数据监控</span>
+				</a></li>
+				<li><a href="alarmlog.html" target="content_frame"> <span
+						class="glyphicon glyphicon-exclamation-sign"> 报警记录</span>
+				</a></li>
+				<li><a href="historydata.html" target="content_frame"> <span
+						class="glyphicon glyphicon-signal"> 历史数据</span>
+				</a></li>
+				<li><a href="remotedownload.html" target="content_frame"> <span
+						class="glyphicon glyphicon-save"> 远程下载</span>
+				</a></li>
+				<li><a href="baseconfig.html" target="content_frame"> <span
+						class="glyphicon glyphicon-cog"> 基本配置</span>
+				</a></li>
 			</ul>
 		</div>
 		<div id="right" class="col-xs-9 col-sm-9 col-md-10 col-lg-10">

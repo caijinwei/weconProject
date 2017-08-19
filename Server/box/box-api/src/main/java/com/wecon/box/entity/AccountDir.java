@@ -20,4 +20,5 @@ public class AccountDir {
 	public int type;
 	public Timestamp create_date;
 	public Timestamp update_date;
+	public long device_id;
 }

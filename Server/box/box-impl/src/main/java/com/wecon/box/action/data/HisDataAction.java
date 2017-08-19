@@ -57,6 +57,7 @@ public class HisDataAction {
 			model.account_id = client.userId;
 			model.name = "默认组";
 			model.type = 2;
+			model.device_id=deviceid;
 			long id = accountDirApi.addAccountDir(model);
 			if (id > 0) {
 				accountDirList = accountDirApi.getAccountDirList(client.userId, 2, deviceid);

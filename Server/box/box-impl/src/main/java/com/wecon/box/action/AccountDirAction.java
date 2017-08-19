@@ -38,6 +38,14 @@ public class AccountDirAction {
             throw new BusinessException(ErrorCodeOption.UserGroupTypeIsUndefined.key, ErrorCodeOption.UserGroupTypeIsUndefined.value);
         }
         List<AccountDir> list = accountDirApi.getAccountDirList(AppContext.getSession().client.userId, type);
+        if (list.size() == 0) {
+            AccountDir model = new AccountDir();
+            model.account_id = AppContext.getSession().client.userId;
+            model.name = "默认组";
+            model.type = type;
+            accountDirApi.addAccountDir(model);
+            list = accountDirApi.getAccountDirList(AppContext.getSession().client.userId, type);
+        }
         JSONObject data = new JSONObject();
         data.put("list", list);
         return new Output(data);
@@ -52,6 +60,7 @@ public class AccountDirAction {
         model.id = param.id;
         model.name = param.name;
         model.type = param.type;
+        model.device_id=param.device_id;
         if (model.id > 0) {
             accountDirApi.updateAccountDir(model);
         } else {
@@ -105,6 +114,10 @@ class UserDirParam {
     @NotNull
     @Range(min = 0, max = 3)
     public Integer type;
+    @Label("设备ID")
+    @NotNull
+    public Long device_id;
+    
 
     public void setId(Long id) {
         this.id = id;
@@ -117,4 +130,9 @@ class UserDirParam {
     public void setType(Integer type) {
         this.type = type;
     }
+
+	public void setDevice_id(Long device_id) {
+		this.device_id = device_id;
+	}
+    
 }
