@@ -46,7 +46,8 @@ appModule.controller("listController", function ($scope, $http, $compile) {
         if (pageIndex == 0) {
             pageIndex = 1;
         }
-
+        console.log("  $scope.type",$scope.type);
+        //disabled
         var params =
         {
             view_id: view_id,
@@ -59,6 +60,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             if (code == 200) {
                 $scope.realpointDatas = data.page.list;
                 $scope.conf.totalItems = data.page.totalRecord;
+
                 $scope.$apply();
             }
             else {
@@ -183,6 +185,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
      * 展示剩余监控点设置iframe的url属性
      * */
     $scope.showRestList = function () {
+        console.log();
         var path = "../user/viewpointTable.html?type=" + $scope.type + "&viewid=" + $scope.viewid;
         $("#myiframe").attr('src', path);
     }

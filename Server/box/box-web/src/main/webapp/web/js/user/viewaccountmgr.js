@@ -125,7 +125,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             location = "viewpoint.html?type=1&viewid=" + model.account_id + "&name=" + model.username;
         },
         viewpointalarm:function (model) {
-            location = "viewpointalarm.html?viewid=" + model.account_id + "&name=" + model.username;
+            location = "viewpointalarm.html?type=2&viewid=" + model.account_id + "&name=" + model.username;
         }
     }
 })

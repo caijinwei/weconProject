@@ -1,9 +1,6 @@
 package com.wecon.box.api;
 
-import com.wecon.box.entity.Page;
-import com.wecon.box.entity.RealHisCfg;
-import com.wecon.box.entity.ViewAccountRole;
-import com.wecon.box.entity.ViewAccountRoleView;
+import com.wecon.box.entity.*;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import org.springframework.stereotype.Component;
 
@@ -39,9 +36,19 @@ public interface ViewAccountRoleApi {
     public Page<RealHisCfg> getViewRealHisCfgByViewAndAccId(long view_id, long account_id, Integer type, Integer pageIndex, Integer pageSize);
 
     /*
-* 盒子下的余下监控点
-* */
-    public Page<RealHisCfg> getViewRealHisCfgByViewAndDeivceId(long account_id,long view_id, long device_id, Integer type, Integer pageIndex, Integer pageSize);
+    * 盒子下的报警监控点
+    * */
+    public Page<AlarmCfg> getViewAlarmCfgByViewAndDeivceId(long account_id, long view_id, Integer device_id, Integer pageIndex, Integer pageSize);
+
+    /*
+    * 账户下的报警监控点
+    * */
+    public Page<AlarmCfg> getViewAlarmCfgByView(long account_id, long view_id,  Integer pageIndex, Integer pageSize);
+    /*
+    * 盒子下的余下监控点
+    **/
+    public Page<RealHisCfg> getViewRealHisCfgByViewAndDeivceId(long account_id, long view_id, long device_id, Integer type, Integer pageIndex, Integer pageSize);
+
     /**
      * 根据view_id删除某个视图账号
      *
@@ -79,7 +86,7 @@ public interface ViewAccountRoleApi {
     /*
       * 为视图账号分配监控监控点
       * */
-    public void setViewPoint(Integer viewId, String[] ids, String[] rights);
+    public void setViewPoint(Integer viewId, String[] ids, String[] rights ,Integer cgf_type);
 
     /*
     * 视图用户监控点解绑
@@ -96,9 +103,9 @@ public interface ViewAccountRoleApi {
    * */
     public void updateViewPointRoleType(Integer viewId, Integer pointId, Integer roleType);
 
-   /* 户报警监控点展示
-    * SELECT a.cfg_id,a.role_type,b.name,b.addr,b.state FROM view_account_role a INNER JOIN alarm_cfg b ON a.cfg_id = b.alarmcfg_id WHERE a.cfg_type = '2'  AND a.view_id=1000021 LIMIT 1,5;
-    * */
-    public Page<ViewAccountRoleView> getAlarmViewAccountRoleViewByViewID( long view_id, Integer pageIndex, Integer pageSize);
+    /* 户报警监控点展示
+     * SELECT a.cfg_id,a.role_type,b.name,b.addr,b.state FROM view_account_role a INNER JOIN alarm_cfg b ON a.cfg_id = b.alarmcfg_id WHERE a.cfg_type = '2'  AND a.view_id=1000021 LIMIT 1,5;
+     * */
+    public Page<ViewAccountRoleView> getAlarmViewAccountRoleViewByViewID(long view_id, Integer pageIndex, Integer pageSize);
 
 }

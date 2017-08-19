@@ -1,9 +1,6 @@
 /**
  * Created by caijinw on 2017/8/17.
  */
-/**
- * Created by zengzhipeng on 2017/8/9.
- */
 var appModule = angular.module('weconweb', []);
 appModule.controller("listController", function ($scope, $http, $compile) {
     $scope.onInit = function () {
@@ -43,24 +40,21 @@ appModule.controller("listController", function ($scope, $http, $compile) {
      * */
     $scope.setViewOpint = function () {
         var viewid = T.common.util.getParameter("viewid");
-        var rightOption = [];
         var chk_value = [];
         $("#myiframe").contents().find('input[name="cbid"]:checked').each(
             function () {
                 chk_value.push($(this).val());
-                var tem = "right_" + $(this).val();
-                rightOption.push($("#myiframe").contents().find("input[name=" + tem + "]").val());
             }
         );
         var ids = chk_value.join(",");
-        var rights = rightOption.join(",");
         if (chk_value.length == 0) {
             alert("没有添加任何监控点");
             $("#showRestOpint").modal("hide");
             return;
         }
-        var params = {viewId: viewid,selectedId: ids, rights: rights};
-        T.common.ajax.request("WeconBox", "Viewpoint/setViewPoint", params, function (data, code, msg) {
+        var params = {viewId: viewid,selectedId: ids,cfg_type:"2"};
+        console.log("ids:",params.selectedId);
+        T.common.ajax.request("WeconBox", "Viewpoint/setViewHisAlarmPoint", params, function (data, code, msg) {
             if (code == 200) {
                 $("#showRestOpint").modal("hide");
                 alert("添加成功");
@@ -76,6 +70,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
 
     /*
      * 操作视图账号实时历史监控点解除绑定
+     * role_type  报警数据3
      * */
 
     $scope.deleteOpintParam = function (pointId, roleType) {
@@ -86,7 +81,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
         var viewid = T.common.util.getParameter("viewid");
         var params =
         {
-            roleType: $scope.roleTypeParam,
+            roleType: 3,
             pointId: $scope.pointIdParam,
             viewId: viewid
         }
@@ -108,10 +103,10 @@ appModule.controller("listController", function ($scope, $http, $compile) {
      * 展示剩余监控点设置iframe的url属性
      * */
     $scope.showRestList = function () {
-        var path = "../user/viewpointTable.html?type=" + $scope.type + "&viewid=" + $scope.viewid;
+        console.log("这边的type:",$scope.type);
+        var path = "../user/viewpointalarmTable.html?type=" + $scope.type + "&viewid=" + $scope.viewid;
         $("#myiframe").attr('src', path);
     }
-
     /*
      * 视图账户报警监控点展示
      * @RequestParam("view_id") Integer viewId ,@RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize)

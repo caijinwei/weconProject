@@ -87,7 +87,7 @@ th {
 /*数据列表相关样式 end*/
 
 .search-div{
-    background-color: #eee;
+    /*background-color: #eee;*/
     margin:10px 10px 20px 10px;
     padding: 10px 10px 10px 10px;
 }

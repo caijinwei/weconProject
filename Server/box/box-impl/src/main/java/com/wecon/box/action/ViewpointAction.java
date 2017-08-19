@@ -47,9 +47,6 @@ public class ViewpointAction {
     @RequestMapping("showAlarm")
     public Output showAlarmpoint(@RequestParam("view_id") Integer viewId, @RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
         Page<ViewAccountRoleView> page = viewAccountRoleApi.getAlarmViewAccountRoleViewByViewID(viewId, pageIndex, pageSize);
-        if (page.getList().size() == 0) {
-            throw new BusinessException(ErrorCodeOption.AlarmViewpoint_IsNULL.key, ErrorCodeOption.AlarmViewpoint_IsNULL.value);
-        }
         JSONObject data = new JSONObject();
         data.put("page", page);
         return new Output(data);
@@ -76,15 +73,53 @@ public class ViewpointAction {
     }
 
     /*
-    * 这边没做  验证
+    * device_id=0 表示全部盒子的监控点
     * */
-    @Label("为视图账号配置监控点")
+    @Label("未分配报警监控点展示")
+    @WebApi(forceAuth = true, master = true, authority = {"1"})
+    @RequestMapping(value = "showAlarmrestpoint")
+    public Output showAlarmrestpoint( @RequestParam("view_id") Integer viewId, @RequestParam("device_id") Integer device_id, @RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
+       long account_id=AppContext.getSession().client.userId;
+        Page<AlarmCfg> page=null;
+        if(device_id==0)
+        {
+            page=viewAccountRoleApi.getViewAlarmCfgByView(account_id, viewId, pageIndex, pageSize);
+        }else
+        {
+            page=viewAccountRoleApi.getViewAlarmCfgByViewAndDeivceId(account_id, viewId, device_id ,pageIndex, pageSize);
+        }
+
+        JSONObject data=new JSONObject();
+        data.put("page",page);
+        return new Output(data);
+    }
+
+    /*
+    *   有赋值权限
+    *   public void setViewPoint(Integer viewId, String[] ids, String[] rights ,Integer cgf_type)
+    * */
+    @Label("为视图账号配置（实时）监控点")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping(value = "setViewPoint")
     public Output setViewPoint(@RequestParam("rights") String rights, @RequestParam("selectedId") String selectedId, @RequestParam("viewId") Integer viewId) {
         String[] ids = selectedId.split(",");
         String[] rightParams = rights.split(",");
-        viewAccountRoleApi.setViewPoint(viewId, ids, rightParams);
+        viewAccountRoleApi.setViewPoint(viewId, ids, rightParams,1);
+        return new Output();
+    }
+    /*
+    *  没有权限
+    *          设rights=null
+    *  cgf_type
+    *           1) 1 历史
+    *           2）2 报警
+    * */
+    @Label("为视图账户配置（报警历史）监控点")
+    @WebApi(forceAuth =true,master = true,authority = {"1"})
+    @RequestMapping(value="setViewHisAlarmPoint")
+    public Output setViewHisAlarmPoint( @RequestParam("selectedId") String selectedId, @RequestParam("viewId") Integer viewId,@RequestParam("cfg_type") Integer cgf_type) {
+        String[] ids = selectedId.split(",");
+        viewAccountRoleApi.setViewPoint(viewId,ids,null,cgf_type);
         return new Output();
     }
 
