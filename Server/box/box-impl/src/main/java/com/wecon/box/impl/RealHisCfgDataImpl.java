@@ -3,7 +3,10 @@ package com.wecon.box.impl;
 import com.wecon.box.api.RealHisCfgDataApi;
 import com.wecon.box.entity.Page;
 import com.wecon.box.entity.RealHisCfgData;
+import com.wecon.box.entity.RealHisCfgDevice;
 import com.wecon.box.filter.RealHisCfgDataFilter;
+import com.wecon.box.filter.RealHisCfgFilter;
+import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.common.util.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -16,7 +19,9 @@ import org.springframework.stereotype.Component;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lanpenghui 2017年8月2日
@@ -130,6 +135,131 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 
 	}
 
+	@Override
+	public Page<Map<String, Object>> getRealHisCfgDataPage(RealHisCfgFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize) {
+		String fromStr = "from real_his_cfg_data rd, real_his_cfg r, device d, plc_info p";
+		StringBuffer condition = new StringBuffer();
+		List<Object> params = new ArrayList<Object>();
+
+		if (filter.account_id > 0) {
+			condition.append(" and r.account_id = ? ");
+			params.add(filter.account_id);
+		}
+		if (filter.addr_type > -1) {
+			condition.append(" and r.addr_type = ? ");
+			params.add(filter.addr_type);
+		}
+		if (filter.data_type > -1) {
+			condition.append(" and r.data_type = ? ");
+			params.add(filter.data_type);
+		}
+		if (filter.his_cycle > -1) {
+			condition.append(" and r.his_cycle = ? ");
+			params.add(filter.his_cycle);
+		}
+		// 操作时间起
+		if (!CommonUtils.isNullOrEmpty(bParams.get("monitorBeginTime"))) {
+			condition.append(" and date_format(real_his_cfg_data.monitor_time,'%Y-%m-%d %H:%i') >= ");
+			condition.append(" date_format(str_to_date(?,'%Y-%m-%d %H:%i'),'%Y-%m-%d %H:%i') ");
+			params.add(CommonUtils.trim(bParams.get("monitorBeginTime").toString()));
+
+		}
+		// 操作时间止
+		if (!CommonUtils.isNullOrEmpty(bParams.get("monitorEndTime"))) {
+			condition.append(" and date_format(real_his_cfg_data.monitor_time,'%Y-%m-%d %H:%i') <=  ");
+			condition.append(" date_format(str_to_date(?,'%Y-%m-%d %H:%i'),'%Y-%m-%d %H:%i') ");
+			params.add(CommonUtils.trim(bParams.get("monitorEndTime").toString()));
+		}
+
+		Object boxId = bParams.get("boxId");
+		Object groupId = bParams.get("groupId");
+		Object monitorId = bParams.get("monitorId");
+		if(null != boxId){
+			condition.append(" and d.device_id = ? ");
+			params.add(boxId);
+		}
+		if(null != groupId){
+			fromStr += ", account_dir_ref f";
+			condition.append(" and r.id=f.ref_id and f.acc_dir_id = ?");
+			params.add(groupId);
+		}
+		if(null != monitorId){
+			condition.append(" and r.plc_id = ?");
+			params.add(monitorId);
+		}
+		String sqlCount = "select count(0) "+fromStr+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and rd.real_his_cfg_id=r.id";
+		String sql = "select r.name, rd.value, rd.monitor_time"
+				+ "  "+fromStr+ "  where 1=1 adn  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and rd.real_his_cfg_id=r.id";
+		sqlCount += condition;
+		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
+		Page<Map<String, Object>> page = new Page<Map<String, Object>>(pageIndex, pageSize, totalRecord);
+		String sort = " order by rd.id desc";
+		sql += condition + sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
+		List<Map<String, Object>> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgMapRowMapper());
+		page.setList(list);
+		return page;
+
+	}
+
+	@Override
+	public Page<Map<String, Object>> getRealHisCfgDataPage(ViewAccountRoleFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize) {
+		String fromStr = "from real_his_cfg_data rd, real_his_cfg r ,device d, plc_info p, view_account_role v";
+		StringBuffer condition = new StringBuffer();
+		List<Object> params = new ArrayList<Object>();
+
+		if (filter.view_id > 0) {
+			condition.append(" and v.view_id = ? ");
+			params.add(filter.view_id);
+		}
+		if (filter.role_type > -1) {
+			condition.append(" and v.role_type = ? ");
+			params.add(filter.role_type);
+		}
+		if (filter.data_type > -1) {
+			condition.append(" and r.data_type = ? ");
+			params.add(filter.data_type);
+		}
+
+		// 操作时间起
+		if (!CommonUtils.isNullOrEmpty(bParams.get("monitorBeginTime"))) {
+			condition.append(" and date_format(rd.monitor_time,'%Y-%m-%d %H:%i') >= ");
+			condition.append(" date_format(str_to_date(?,'%Y-%m-%d %H:%i'),'%Y-%m-%d %H:%i') ");
+			params.add(CommonUtils.trim(bParams.get("monitorBeginTime").toString()));
+
+		}
+		// 操作时间止
+		if (!CommonUtils.isNullOrEmpty(bParams.get("monitorEndTime"))) {
+			condition.append(" and date_format(rd.monitor_time,'%Y-%m-%d %H:%i') <=  ");
+			condition.append(" date_format(str_to_date(?,'%Y-%m-%d %H:%i'),'%Y-%m-%d %H:%i') ");
+			params.add(CommonUtils.trim(bParams.get("monitorEndTime").toString()));
+
+		}
+
+		Object groupId = bParams.get("groupId");
+		Object monitorId = bParams.get("monitorId");
+		if(null != groupId){
+			fromStr += ", account_dir_ref f";
+			condition.append(" and r.id=f.ref_id and f.acc_dir_id = ?");
+			params.add(groupId);
+		}
+		if(null != monitorId){
+			condition.append(" and r.plc_id = ?");
+			params.add(monitorId);
+		}
+		String sqlCount = "select count(0) "+fromStr+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and rd.real_his_cfg_id=r.id";
+		String sql = "select r.name, rd.value, rd.monitor_time"
+				+ "  "+fromStr+ "  where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and rd.real_his_cfg_id=r.id";
+		sqlCount += condition;
+		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
+		Page<Map<String, Object>> page = new Page<Map<String, Object>>(pageIndex, pageSize, totalRecord);
+		String sort = " order by rd.id desc";
+		sql += condition + sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
+		List<Map<String, Object>> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgMapRowMapper());
+		page.setList(list);
+		return page;
+
+	}
+
 	public static final class DefaultRealHisCfgDataRowMapper implements RowMapper<RealHisCfgData> {
 
 		@Override
@@ -137,11 +267,22 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 			RealHisCfgData model = new RealHisCfgData();
 			model.real_his_cfg_id = rs.getLong("real_his_cfg_id");
 			model.monitor_time = rs.getTimestamp("monitor_time");
-			model.value = rs.getString("value");
+			model.value = rs.getString("value"); 
 			model.create_date = rs.getTimestamp("create_date");
 			model.state = rs.getInt("state");
 
 			return model;
+		}
+	}
+
+	public static final class DefaultRealHisCfgMapRowMapper implements RowMapper<Map<String, Object>> {
+		@Override
+		public Map<String, Object> mapRow(ResultSet rs, int i) throws SQLException {
+			Map<String, Object> row = new HashMap<String, Object>();
+			row.put("monitorName", rs.getString("name"));
+			row.put("number", rs.getString("value"));
+			row.put("monitorTime", rs.getTimestamp("monitor_time"));
+			return row;
 		}
 	}
 

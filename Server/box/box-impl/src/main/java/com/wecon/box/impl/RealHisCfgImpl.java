@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lanpenghui 2017年8月2日
@@ -281,8 +282,92 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 	}
 
+@Override
+	public Page<RealHisCfgDevice> getRealHisCfgDevicePage(RealHisCfgFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize) {
+		String fromStr = "from real_his_cfg r ,device d, plc_info p";
+		StringBuffer condition = new StringBuffer();
+		List<Object> params = new ArrayList<Object>();
+
+		if (filter.account_id > 0) {
+			condition.append(" and r.account_id = ? ");
+			params.add(filter.account_id);
+		}
+		if (filter.addr_type > -1) {
+			condition.append(" and r.addr_type = ? ");
+			params.add(filter.addr_type);
+		}
+		if (filter.data_type > -1) {
+			condition.append(" and r.data_type = ? ");
+			params.add(filter.data_type);
+		}
+		if (filter.his_cycle > -1) {
+			condition.append(" and r.his_cycle = ? ");
+			params.add(filter.his_cycle);
+		}
+
+		Object boxId = bParams.get("boxId");
+		Object groupId = bParams.get("groupId");
+		if(null != boxId){
+			condition.append(" and d.device_id = ? ");
+			params.add(boxId);
+		}
+		if(null != groupId){
+			fromStr += ", account_dir_ref f";
+			condition.append(" and r.id=f.ref_id and f.acc_dir_id = ?");
+			params.add(groupId);
+		}
+		String sqlCount = "select count(0) "+fromStr+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id";
+		String sql = "select " + SEL_COL + ",d.machine_code"
+				+ "  "+fromStr+ "  where 1=1 adn  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id";
+		sqlCount += condition;
+		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
+		Page<RealHisCfgDevice> page = new Page<RealHisCfgDevice>(pageIndex, pageSize, totalRecord);
+		String sort = " order by id desc";
+		sql += condition + sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
+		List<RealHisCfgDevice> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgDeviceRowMapper());
+		page.setList(list);
+		return page;
+
+	}
+
 	@Override
-	public Page<RealHisCfgDevice> getRealHisCfgList(ViewAccountRoleFilter filter, int pageIndex, int pageSize) {
+	public Page<RealHisCfgDevice> getRealHisCfgDevicePage(ViewAccountRoleFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize) {
+		String fromStr = "from real_his_cfg r ,device d, plc_info p, view_account_role v";
+		StringBuffer condition = new StringBuffer();
+		List<Object> params = new ArrayList<Object>();
+
+		if (filter.view_id > 0) {
+			condition.append(" and v.view_id = ? ");
+			params.add(filter.view_id);
+		}
+		if (filter.role_type > -1) {
+			condition.append(" and v.role_type = ? ");
+			params.add(filter.role_type);
+		}
+		if (filter.data_type > -1) {
+			condition.append(" and r.data_type = ? ");
+			params.add(filter.data_type);
+		}
+
+		Object groupId = bParams.get("groupId");
+		if(null != groupId){
+			fromStr += ", account_dir_ref f";
+			condition.append(" and r.id=f.ref_id and f.acc_dir_id = ?");
+			params.add(groupId);
+		}
+		String sqlCount = "select count(0) "+fromStr+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1";
+		String sql = "select " + SEL_COL + ",d.machine_code"
+				+ "  "+fromStr+ "  where 1=1 adn  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1";
+		sqlCount += condition;
+		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
+		Page<RealHisCfgDevice> page = new Page<RealHisCfgDevice>(pageIndex, pageSize, totalRecord);
+		String sort = " order by id desc";
+		sql += condition + sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
+		List<RealHisCfgDevice> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgDeviceRowMapper());
+		page.setList(list);
+		return page;
+
+	}public Page<RealHisCfgDevice> getRealHisCfgList(ViewAccountRoleFilter filter, int pageIndex, int pageSize) {
 		String sqlCount = "select count(0) from  real_his_cfg r , device d,plc_info p, view_account_role v,account_dir ad,account_dir_rel adr where 1=1 and  p.plc_id=r.plc_id and r.id=adr.`ref_id` and p.device_id=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and ad.`id`=adr.`acc_dir_id` and ad.`account_id`=v.view_id and r.bind_state=1";
 		String sql = "select " + SEL_COL + ",d.machine_code"
 				+ " from real_his_cfg r , device d,plc_info p, view_account_role v,account_dir ad,account_dir_rel adr where 1=1 and  p.plc_id=r.plc_id and r.id=adr.`ref_id` and p.device_id=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and ad.`id`=adr.`acc_dir_id` and ad.`account_id`=v.view_id and r.bind_state=1";
@@ -318,9 +403,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		List<RealHisCfgDevice> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgDeviceRowMapper());
 		page.setList(list);
 		return page;
-	}
-
-	public static final class DefaultRealHisCfgRowMapper implements RowMapper<RealHisCfg> {
+	}	public static final class DefaultRealHisCfgRowMapper implements RowMapper<RealHisCfg> {
 
 		@Override
 		public RealHisCfg mapRow(ResultSet rs, int i) throws SQLException {

@@ -1,6 +1,7 @@
 package com.wecon.box.api;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
@@ -81,5 +82,21 @@ public interface RealHisCfgApi {
 	 */
 	Page<RealHisCfgDevice> getRealHisCfgList(RealHisCfgFilter filter, int pageIndex, int pageSize);
 	Page<RealHisCfgDevice> getRealHisCfgList(ViewAccountRoleFilter filter, int pageIndex, int pageSize);
+
+	/**
+	 * 通过filter及外部参数分页获取历史（实时）数据配置信息列表
+	 *
+	 * @param filter
+	 * @return
+	 */
+	public Page<RealHisCfgDevice> getRealHisCfgDevicePage(RealHisCfgFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize);
+
+	/**
+	 * 通过filter及外部参数分页获取历史（实时）数据配置信息列表
+	 *
+	 * @param filter
+	 * @return
+	 */
+	public Page<RealHisCfgDevice> getRealHisCfgDevicePage(ViewAccountRoleFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize);
 
 }

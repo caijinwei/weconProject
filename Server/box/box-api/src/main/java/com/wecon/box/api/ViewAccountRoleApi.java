@@ -1,13 +1,8 @@
 package com.wecon.box.api;
 
-import com.wecon.box.entity.Page;
-import com.wecon.box.entity.RealHisCfg;
-import com.wecon.box.entity.ViewAccountRole;
-import com.wecon.box.entity.ViewAccountRoleView;
+import com.wecon.box.entity.*;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * @author lanpenghui
@@ -40,6 +35,20 @@ public interface ViewAccountRoleApi {
 * */
     public Page<RealHisCfg> getViewRealHisCfgByViewAndAccId(long view_id, long account_id, Integer type, Integer pageIndex, Integer pageSize);
 
+    /*
+    * 盒子下的报警监控点
+    * */
+    public Page<AlarmCfg> getViewAlarmCfgByViewAndDeivceId(long account_id, long view_id, Integer device_id, Integer pageIndex, Integer pageSize);
+
+    /*
+    * 账户下的报警监控点
+    * */
+    public Page<AlarmCfg> getViewAlarmCfgByView(long account_id, long view_id,  Integer pageIndex, Integer pageSize);
+    /*
+    * 盒子下的余下监控点
+    **/
+    public Page<RealHisCfg> getViewRealHisCfgByViewAndDeivceId(long account_id, long view_id, long device_id, Integer type, Integer pageIndex, Integer pageSize);
+
     /**
      * 根据view_id删除某个视图账号
      *
@@ -70,24 +79,33 @@ public interface ViewAccountRoleApi {
     *           0：实时监控点
     *           1：历史监控点
     **/
-    public List<ViewAccountRoleView> getViewAccountRoleViewByViewID(Integer data_type, long view_id);
+
+    public Page<ViewAccountRoleView> getViewAccountRoleViewByViewID(Integer data_type, long view_id, Integer pageIndex, Integer pageSize);
+
+
     /*
       * 为视图账号分配监控监控点
       * */
-    public void setViewPoint(Integer viewId, String[] ids ,String[] rights);
+    public void setViewPoint(Integer viewId, String[] ids, String[] rights ,Integer cgf_type);
 
     /*
     * 视图用户监控点解绑
     * @param    viewId ，   roleType      pointId
     *         视图账号ID   监控点类型    监控点ID
     * */
-    public void deletePoint(Integer viewId,Integer roleType,Integer pointId);
+    public void deletePoint(Integer viewId, Integer roleType, Integer pointId);
+
     /*
    * 视图账户监控点权限设置
    * @param viewId       pointId      roleType
    *       视图账户ID  监控点ID      权限：0无权限  1只读  3读写
    * UPDATE view_account_role SET role_type="1" WHERE view_id=111 AND cfg_id=12 ;
    * */
-    public void updateViewPointRoleType( Integer viewId,Integer pointId, Integer roleType);
+    public void updateViewPointRoleType(Integer viewId, Integer pointId, Integer roleType);
+
+    /* 户报警监控点展示
+     * SELECT a.cfg_id,a.role_type,b.name,b.addr,b.state FROM view_account_role a INNER JOIN alarm_cfg b ON a.cfg_id = b.alarmcfg_id WHERE a.cfg_type = '2'  AND a.view_id=1000021 LIMIT 1,5;
+     * */
+    public Page<ViewAccountRoleView> getAlarmViewAccountRoleViewByViewID(long view_id, Integer pageIndex, Integer pageSize);
 
 }

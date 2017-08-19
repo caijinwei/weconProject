@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="weconweb">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--<script src="http://apps.bdimg.com/libs/jquery/2.0.0/jquery.min.js"></script>-->
+    <link rel="stylesheet" type="text/css" href="../css/style.css" />
+    <link rel="stylesheet" href="../lib/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="../lib/jquery/jquery-3.2.1.min.js"></script>
+    <script src="../lib/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="../lib/angular/angular.js"></script>
+    <link rel="stylesheet" href="../lib/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body ng-controller="infoController" ng-init="onInit()" >
+    <div class="container-fluid" style="margin-top: 10px;font-size: 15px;">
+        <div class="row" style="margin-top: 20px;">
+            <span class="col-md-1">PIBox名称</span>
+            <span style="font-weight: bold;margin-left: 20px;">{{infoData.name}}</span>
+        </div>
+
+        <div class="row" style="margin-top: 20px;">
+            <span class="col-md-1">设备ID</span>
+            <span style="font-weight: bold;margin-left: 20px;">{{infoData.device_id}}</span>
+        </div>
+        <div class="row" style="margin-top: 20px;">
+            <span class="col-md-1">在线状态</span>
+            <span style="font-weight: bold;margin-left: 20px;">{{infoData.state}}</span>
+        </div>
+        <div class="row" style="margin-top: 20px;">
+            <span class="col-md-1">机器码</span>
+            <span style="font-weight: bold;margin-left: 20px;">{{infoData.machine_code}}</span>
+        </div>
+        <div class="row" style="margin-top: 20px;">
+            <span class="col-md-1">设备型号</span>
+            <span style="font-weight: bold;margin-left: 20px;">{{infoData.dev_model}}</span>
+        </div>
+
+        <div class="row" style="margin-top: 20px;">
+            <span class="col-md-1">地图信息</span>
+            <span style="font-weight: bold;margin-left: 20px;">（{{infoData.map}}）</span>
+        </div>
+
+        <div class="row" style="margin-top: 20px;">
+            <span class="col-md-1">更新时间</span>
+            <span style="font-weight: bold;margin-left: 20px;">{{infoData.update_date|date:'yyyy-MM-dd HH:mm:ss'}}</span>
+        </div>
+        <div class="row" style="margin-top: 20px;">
+            <span class="col-md-1">创建时间</span>
+            <span style="font-weight: bold;margin-left: 20px;">{{infoData.create_date|date:'yyyy-MM-dd HH:mm:ss'}}</span>
+        </div>
+
+
+
+        <div class="row" style="margin-top:20px;">
+            <span class="col-md-1">备注信息</span>
+            <div class="form-group col-md-5" style="display: inline-block;">
+                <textarea class="form-control" rows="4">{{infoData.remark}}</textarea>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 20px;">
+            <span class="col-md-1">高级功能</span>
+            <div class="btn-group" style="margin-left: 10px;">
+                <button type="button" class="btn btn-danger">删除PIBox</button>
+                <button type="button" class="btn btn-danger">重启PIBox</button>
+                <button type="button" class="btn btn-danger">清除PIBox数据</button>
+                <button type="button" class="btn btn-warning">强制同步</button>
+                <button type="button" class="btn btn-info">更多</button>
+                <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                    <span class="caret"></span>
+                    <span class="sr-only">切换下拉菜单</span>
+                </button>
+                <ul class="dropdown-menu pull-right" role="menu">
+                    <li><a href="#">分享PIBox</a></li>
+                    <li><a href="#">复制PIBox</a></li>
+                    <li><a href="#">移交PIBox</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">切换域名</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script src="../lib/wecon-common.js"></script>
+<script src="../js/baseinfo.js"></script>
+</html>

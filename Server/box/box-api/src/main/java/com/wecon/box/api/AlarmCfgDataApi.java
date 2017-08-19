@@ -2,6 +2,7 @@ package com.wecon.box.api;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 import com.wecon.box.entity.AlarmCfgData;
@@ -58,4 +59,8 @@ public interface AlarmCfgDataApi {
 	Page<AlarmCfgDataAlarmCfg> getRealHisCfgDataList(AlarmCfgDataFilter filter, int pageIndex, int pageSize);
 	
 	Page<AlarmCfgDataAlarmCfg> getViewRealHisCfgDataList(AlarmCfgDataFilter filter, int pageIndex, int pageSize);
+
+	Page<AlarmCfgDataAlarmCfg> getAdminAlarmCfgDataPage(AlarmCfgDataFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize);
+
+	Page<AlarmCfgDataAlarmCfg> getViewAlarmCfgDataPage(AlarmCfgDataFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize);
 }
