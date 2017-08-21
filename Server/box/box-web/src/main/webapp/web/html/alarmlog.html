@@ -30,9 +30,9 @@
 			href="alarmlog.html?device_id={{deviceid}}&device_name={{devicename}}">报警记录</a></li>
 		<li><a
 			href="historydata.html?device_id={{deviceid}}&device_name={{devicename}}">历史数据</a></li>
-		<li ng-cloak ng-if="accounttype==1 & deviceid>0"><a
+		<li ng-if="accounttype==1 && deviceid>0"><a
 			href="remotedownload.html?device_id={{deviceid}}&device_name={{devicename}}">远程下载</a></li>
-		<li ng-cloak ng-if="accounttype==1 & deviceid>0"><a
+		<li ng-if="accounttype==1 && deviceid>0"><a
 			href="baseconfig.html?device_id={{deviceid}}&device_name={{devicename}}">基本配置</a></li>
 	</ul>
 	<div class="container-fluid">
