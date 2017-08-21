@@ -164,7 +164,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 		}
 		sql += condition;
-		List<RealHisCfgDevice> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgDeviceRowMapper());
+		List<RealHisCfgDevice> list = jdbcTemplate.query(sql, params.toArray(), new DefaultHisCfgDeviceRowMapper());
 		return list;
 	}
 
@@ -184,7 +184,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			params.add(filter.role_type);
 		}
 		sql += condition;
-		List<RealHisCfgDevice> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgDeviceRowMapper());
+		List<RealHisCfgDevice> list = jdbcTemplate.query(sql, params.toArray(), new DefaultHisCfgDeviceRowMapper());
 		return list;
 	}
 
@@ -446,6 +446,30 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.update_date = rs.getTimestamp("update_date");
 			model.machine_code = rs.getString("machine_code");
 			model.ref_alais = rs.getString("ref_alais");
+			return model;
+		}
+	}
+	public static final class DefaultHisCfgDeviceRowMapper implements RowMapper<RealHisCfgDevice> {
+		
+		@Override
+		public RealHisCfgDevice mapRow(ResultSet rs, int i) throws SQLException {
+			RealHisCfgDevice model = new RealHisCfgDevice();
+			model.id = rs.getLong("id");
+			model.data_id = rs.getLong("data_id");
+			model.account_id = rs.getLong("account_id");
+			model.plc_id = rs.getLong("plc_id");
+			model.name = rs.getString("name");
+			model.addr = rs.getString("addr");
+			model.addr_type = rs.getInt("addr_type");
+			model.describe = rs.getString("describe");
+			model.digit_count = rs.getString("digit_count");
+			model.data_limit = rs.getString("data_limit");
+			model.his_cycle = rs.getInt("his_cycle");
+			model.data_type = rs.getInt("data_type");
+			model.state = rs.getInt("state");
+			model.create_date = rs.getTimestamp("create_date");
+			model.update_date = rs.getTimestamp("update_date");
+			model.machine_code = rs.getString("machine_code");
 			return model;
 		}
 	}
