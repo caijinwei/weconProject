@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="weconweb">
+<head>
+<meta charset="UTF-8">
+<title>Title</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<link rel="stylesheet"
+	href="../lib/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="../lib/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<link href="../css/page.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet"
+	href="../lib/bootstrap/datetimepicker/css/bootstrap-datetimepicker.min.css">
+
+
+</head>
+<body ng-controller="infoController" ng-init="onInit()"
+	style="margin-top: 20px;">
+	<ol class="breadcrumb">
+		<li><a href="overview.html">主页</a></li>
+		<li class="active">{{devicename}}</li>
+	</ol>
+	<ul class="nav nav-pills nav-justified" role="tablist"
+		style="margin-top: 20px;">
+		<li><a
+			href="datamonitor.html?device_id={{deviceid}}&&device_name={{devicename}}">数据监控</a></li>
+		<li class="active"><a
+			href="alarmlog.html?device_id={{deviceid}}&&device_name={{devicename}}">报警记录</a></li>
+		<li><a
+			href="historydata.html?device_id={{deviceid}}&&device_name={{devicename}}">历史数据</a></li>
+		<li ng-cloak ng-if="accounttype==1 && deviceid>0"><a
+			href="remotedownload.html?device_id={{deviceid}}&&device_name={{devicename}}">远程下载</a></li>
+		<li ng-cloak ng-if="accounttype==1 && deviceid>0"><a
+			href="baseconfig.html?device_id={{deviceid}}&&device_name={{devicename}}">基本配置</a></li>
+	</ul>
+	<div class="container-fluid">
+		<ul class="nav nav-tabs" role="tablist" id="alarmtab"
+			style="margin-top: 40px;">
+			<li class="active"><a href="#current-alarm" data-toggle="tab"
+				ng-click="alarm_submit(paginationConf_current.currentPage,paginationConf_current.itemsPerPage)">当前报警</a></li>
+			<li><a href="#history-alarm" data-toggle="tab"
+				ng-click="hisalarm_submit(paginationConf_history.currentPage,paginationConf_history.itemsPerPage)">历史报警</a></li>
+			<li><a href="#alarm-record" data-toggle="tab">报警登记</a></li>
+			<li><a href="#alarm-global-setting" data-toggle="tab">全局设置</a></li>
+		</ul>
+		<div class="tab-content">
+			<div class="tab-pane active" id="current-alarm">
+				<div class="container-fluid">
+					<table class="table table-bordered" style="margin-top: 20px;">
+						<thead>
+							<tr>
+								<th class="col-md-1">编码</th>
+								<th class="col-md-1">名称</th>
+								<th class="col-md-3">信息</th>
+								<th class="col-md-1">状态</th>
+								<th class="col-md-2">值</th>
+								<th class="col-md-3">时间</th>
+								<th class="col-md-2">操作</th>
+
+							</tr>
+						</thead>
+						<tbody>
+							<tr style="color: red" ng-repeat="x in alarmDatas">
+								<td>{{x.alarm_cfg_id}}</td>
+								<td>{{x.name}}</td>
+								<td>{{x.text}}</td>
+								<td>{{x.state==0?"确认":"未确认"}}</td>
+								<td>{{x.value}}</td>
+								<td>{{x.monitor_time|date:'yyyy-MM-dd HH:mm:ss'}}</td>
+								<td><a href="#" title="详情"><span
+										class="glyphicon glyphicon-info-sign"></span></a> <a href="#"
+									title="确认"><span class="glyphicon glyphicon-ok"
+										style="margin-left: 5px;"></span></a></td>
+							</tr>
+						</tbody>
+					</table>
+					<tm-pagination conf="paginationConf_current"></tm-pagination>
+				</div>
+			</div>
+			<div class="modal fade" id="loadingModal" tabindex="-1" role="dialog"
+				aria-labelledby="mySmallModalLabel">
+				<div class="modal-dialog modal-sm" role="document"
+					style="margin-top: 350px; text-align: center">
+					<img src="../image/loading.jpg" />
+				</div>
+			</div>
+			<div class="tab-pane" id="history-alarm">
+				<div class="container-fluid" style="margin-top: 20px;">
+					<div class="row">
+						<span class="col-md-1" style="height: 30px; line-height: 30px;">编码</span>
+						<input id="alarmcfgid" class="col-md-3" type="text"
+							style="padding-left: 5px; height: 35px;" /> <span
+							class="col-md-1"
+							style="height: 30px; line-height: 30px; margin-left: 30px">名称</span>
+						<input id="alarmcfgname" class="col-md-3" type="text"
+							style="padding-left: 5px; height: 35px;" />
+					</div>
+					<div class="row" style="margin-top: 20px;">
+						<div style="display: inline-block; margin-left: -15px;"
+							class="col-md-4">
+							<span class="col-md-3" style="height: 30px; line-height: 30px;">起始日期</span>
+							<div class="input-group date form_datetime col-md-9"
+								data-date="1979-09-16T05:25:07Z"
+								data-date-format="yyyy-mm-dd hh:ii">
+								<input id="startdateid" class="form-control" size="16"
+									type="text" value="" readonly> <span
+									class="input-group-addon"><span
+									class="glyphicon glyphicon-remove"></span></span> <span
+									class="input-group-addon"><span
+									class="glyphicon glyphicon-calendar"></span></span>
+							</div>
+						</div>
+						<div
+							style="float: left; display: inline-block; margin-left: 35px;"
+							class="col-md-4">
+							<span class="col-md-3" style="height: 30px; line-height: 30px;">结束日期</span>
+							<div class="input-group date form_datetime col-md-9"
+								data-date="1979-09-16T05:25:07Z"
+								data-date-format="yyyy-mm-dd hh:ii">
+								<input id="enddateid" class="form-control" size="16" type="text"
+									value="" readonly> <span class="input-group-addon"><span
+									class="glyphicon glyphicon-remove"></span></span> <span
+									class="input-group-addon"><span
+									class="glyphicon glyphicon-calendar"></span></span>
+							</div>
+						</div>
+						<button type="button" class="btn btn-primary"
+							style="margin-left: 20px;"
+							ng-click="hisalarm_submit(paginationConf_history.currentPage,paginationConf_history.itemsPerPage)">
+							<span class="glyphicon glyphicon-search"></span>
+						</button>
+						<button type="button" class="btn btn-primary">
+							<span class="glyphicon glyphicon-share"></span>
+						</button>
+					</div>
+					<table class="table table-bordered" style="margin-top: 20px;">
+						<thead>
+							<tr>
+								<th class="col-md-1">编码</th>
+								<th class="col-md-1">名称</th>
+								<th class="col-md-3">信息</th>
+								<th class="col-md-2">状态</th>
+								<th class="col-md-2">值</th>
+								<th class="col-md-3">时间</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr style="color: green" ng-repeat="x in alarmHisDatas">
+								<td>{{x.alarm_cfg_id}}</td>
+								<td>{{x.name}}</td>
+								<td>{{x.text}}</td>
+								<td>{{x.state==0?"确认":"未确认"}}</td>
+								<td>{{x.value}}</td>
+								<td>{{x.monitor_time|date:'yyyy-MM-dd HH:mm:ss'}}</td>
+								<!-- <td><a href="#" title="详情"><span
+							class="glyphicon glyphicon-info-sign"></span></a> <a href="#"
+						title="确认"><span class="glyphicon glyphicon-ok"
+							style="margin-left: 5px;"></span></a></td> -->
+							</tr>
+						</tbody>
+					</table>
+					<tm-pagination conf="paginationConf_history"></tm-pagination>
+				</div>
+			</div>
+
+
+			<div class="tab-pane" id="alarm-record">
+				<div class="container-fluid">
+					<table class="table table-bordered table-striped"
+						style="margin-top: 20px;">
+						<caption>
+							<div class="row" style="margin: 10px 0;">
+								<div class="col-md-2">
+									<select id="dataGroupSelect" id="groupSelect"
+										class=" form-control form-inline">
+										<option>分组1</option>
+										<option>分组2</option>
+										<option>分组3</option>
+									</select>
+								</div>
+								<button type="button" class="btn btn-primary"
+									style="margin: 0 10px;">
+									<span class="glyphicon glyphicon-cog"></span> 分组设置
+								</button>
+								<button type="button" class="btn btn-primary"
+									style="margin: 0 10px;">
+									<span class="glyphicon glyphicon-pencil"></span> 报警登记
+								</button>
+							</div>
+						</caption>
+						<thead>
+							<tr>
+								<th class="col-md-1">编码</th>
+								<th class="col-md-1">名称</th>
+								<th class="col-md-3">触发条件</th>
+								<th class="col-md-3">报警内容</th>
+								<th class="col-md-2">分组</th>
+								<th class="col-md-2">操作</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>1 <a href="#" title="设备已变更或移除"><span
+										class="glyphicon glyphicon-exclamation-sign"
+										style="float: right; color: #ff3a28;"></span></a>
+								</td>
+								<td>1</td>
+								<td>ON</td>
+								<td>数据记录开始</td>
+								<td>默认组</td>
+								<td><a href="#" style="text-decoration: none"> <span
+										class="glyphicon glyphicon-edit" data-toggle="modal"
+										data-target="#editGroupName"
+										style="color: #2889d0; margin: 10px;"></span>
+								</a> <a href="#" style="text-decoration: none"> <span
+										class="glyphicon glyphicon-file" data-toggle="modal"
+										data-target="" style="color: #2889d0; margin: 10px;"></span>
+								</a> <a href="#" style="text-decoration: none"> <span
+										class="glyphicon glyphicon-trash" data-toggle="modal"
+										data-target="#deleteGroup"
+										style="color: #2889d0; margin: 10px;"></span>
+								</a></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="tab-pane" id="alarm-global-setting">
+				<div class="container-fluid" style="margin-top: 20px;">
+					<div class="checkbox">
+						<label> <input type="checkbox" value="" />暂停报警数据推送
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<script src="../lib/jquery/jquery-3.2.1.min.js" type="text/javascript"></script>
+	<script src="../lib/bootstrap/3.3.7/js/bootstrap.min.js"
+		type="text/javascript"></script>
+	<script src="../lib/angular/angular.min.js" type="text/javascript"></script>
+	<script src="../lib/bootstrap/select/js/bootstrap-select.js"></script>
+	<script src="../lib/wecon-common.js" type="text/javascript"></script>
+	<script src="../js/alarmlog.js" type="text/javascript"></script>
+	<script
+		src="../lib/bootstrap/datetimepicker/js/bootstrap-datetimepicker.js"></script>
+
+	<script src="../lib/pagination.js" type="text/javascript"></script>
+</body>
+</html>

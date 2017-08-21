@@ -64,7 +64,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		jdbcTemplate.update(sql,
 				new Object[] { model.data_id, model.account_id, model.plc_id, model.name, model.addr, model.addr_type,
 						model.describe, model.digit_count, model.data_limit, model.his_cycle, model.data_type,
-						model.state,model.bind_state });
+						model.state, model.bind_state,model.id });
 
 		return true;
 	}
@@ -101,7 +101,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	@Override
 	public List<RealHisCfgDevice> getRealHisCfg(RealHisCfgFilter filter) {
 		String sql = "select " + SEL_COL + ",d.machine_code"
-				+ " from account_dir ad,account_dir_rel adr ,real_his_cfg  r,plc_info pli,device d where 1=1 and  ad.`id`=adr.`acc_dir_id` and pli.`plc_id`=r.`plc_id` and pli.`device_id`=d.`device_id` and r.`id`=adr.`ref_id` and ad.`account_id`=r.`account_id` and r.bind_state=1";
+				+ " from  device d,real_his_cfg r where 1=1 and d.`device_id`=r.device_id and r.bind_state=1 ";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
 		if (filter.id > 0) {
@@ -109,12 +109,8 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			params.add(filter.id);
 		}
 		if (filter.device_id > 0) {
-			condition.append(" and d.device_id = ? ");
+			condition.append(" and r.device_id = ? ");
 			params.add(filter.device_id);
-		}
-		if (filter.dirId > 0) {
-			condition.append(" and ad.id = ? ");
-			params.add(filter.dirId);
 		}
 		if (filter.data_id > 0) {
 			condition.append(" and r.data_id = ? ");
@@ -175,7 +171,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	@Override
 	public List<RealHisCfgDevice> getRealHisCfg(ViewAccountRoleFilter filter) {
 		String sql = "select " + SEL_COL + ",d.machine_code"
-				+ " from   real_his_cfg r , device d,plc_info p, view_account_role v,account_dir ad,account_dir_rel adr where 1=1 and  p.plc_id=r.plc_id and r.id=adr.`ref_id` and p.device_id=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and ad.`id`=adr.`acc_dir_id` and ad.`account_id`=v.view_id and r.bind_state=1";
+				+ " from   device d,real_his_cfg r ,view_account_role v ,account_relation ar where 1=1 and  d.`device_id`=r.device_id and  v.view_id=ar.view_id and ar.manager_id=r.`account_id` and  r.bind_state=1 and r.data_type=1 and  r.`id`=v.cfg_id";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
 
@@ -183,19 +179,10 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			condition.append(" and v.view_id = ? ");
 			params.add(filter.view_id);
 		}
-		if (filter.dirId > 0) {
-			condition.append(" and ad.`id` = ? ");
-			params.add(filter.dirId);
-		}
 		if (filter.role_type > -1) {
 			condition.append(" and v.role_type = ? ");
 			params.add(filter.role_type);
 		}
-		if (filter.data_type > -1) {
-			condition.append(" and r.data_type = ? ");
-			params.add(filter.data_type);
-		}
-
 		sql += condition;
 		List<RealHisCfgDevice> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgDeviceRowMapper());
 		return list;
@@ -282,8 +269,9 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 	}
 
-@Override
-	public Page<RealHisCfgDevice> getRealHisCfgDevicePage(RealHisCfgFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize) {
+	@Override
+	public Page<RealHisCfgDevice> getRealHisCfgDevicePage(RealHisCfgFilter filter, Map<String, Object> bParams,
+			int pageIndex, int pageSize) {
 		String fromStr = "from real_his_cfg r ,device d, plc_info p";
 		StringBuffer condition = new StringBuffer();
 		List<Object> params = new ArrayList<Object>();
@@ -307,18 +295,19 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 		Object boxId = bParams.get("boxId");
 		Object groupId = bParams.get("groupId");
-		if(null != boxId){
+		if (null != boxId) {
 			condition.append(" and d.device_id = ? ");
 			params.add(boxId);
 		}
-		if(null != groupId){
+		if (null != groupId) {
 			fromStr += ", account_dir_ref f";
 			condition.append(" and r.id=f.ref_id and f.acc_dir_id = ?");
 			params.add(groupId);
 		}
-		String sqlCount = "select count(0) "+fromStr+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id";
-		String sql = "select " + SEL_COL + ",d.machine_code"
-				+ "  "+fromStr+ "  where 1=1 adn  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id";
+		String sqlCount = "select count(0) " + fromStr
+				+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id";
+		String sql = "select " + SEL_COL + ",d.machine_code" + "  " + fromStr
+				+ "  where 1=1 adn  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id";
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<RealHisCfgDevice> page = new Page<RealHisCfgDevice>(pageIndex, pageSize, totalRecord);
@@ -331,7 +320,8 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	}
 
 	@Override
-	public Page<RealHisCfgDevice> getRealHisCfgDevicePage(ViewAccountRoleFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize) {
+	public Page<RealHisCfgDevice> getRealHisCfgDevicePage(ViewAccountRoleFilter filter, Map<String, Object> bParams,
+			int pageIndex, int pageSize) {
 		String fromStr = "from real_his_cfg r ,device d, plc_info p, view_account_role v";
 		StringBuffer condition = new StringBuffer();
 		List<Object> params = new ArrayList<Object>();
@@ -350,14 +340,15 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		}
 
 		Object groupId = bParams.get("groupId");
-		if(null != groupId){
+		if (null != groupId) {
 			fromStr += ", account_dir_ref f";
 			condition.append(" and r.id=f.ref_id and f.acc_dir_id = ?");
 			params.add(groupId);
 		}
-		String sqlCount = "select count(0) "+fromStr+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1";
-		String sql = "select " + SEL_COL + ",d.machine_code"
-				+ "  "+fromStr+ "  where 1=1 adn  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1";
+		String sqlCount = "select count(0) " + fromStr
+				+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1";
+		String sql = "select " + SEL_COL + ",d.machine_code" + "  " + fromStr
+				+ "  where 1=1 adn  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1";
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<RealHisCfgDevice> page = new Page<RealHisCfgDevice>(pageIndex, pageSize, totalRecord);
@@ -367,7 +358,9 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		page.setList(list);
 		return page;
 
-	}public Page<RealHisCfgDevice> getRealHisCfgList(ViewAccountRoleFilter filter, int pageIndex, int pageSize) {
+	}
+
+	public Page<RealHisCfgDevice> getRealHisCfgList(ViewAccountRoleFilter filter, int pageIndex, int pageSize) {
 		String sqlCount = "select count(0) from  real_his_cfg r , device d,plc_info p, view_account_role v,account_dir ad,account_dir_rel adr where 1=1 and  p.plc_id=r.plc_id and r.id=adr.`ref_id` and p.device_id=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and ad.`id`=adr.`acc_dir_id` and ad.`account_id`=v.view_id and r.bind_state=1";
 		String sql = "select " + SEL_COL + ",d.machine_code"
 				+ " from real_his_cfg r , device d,plc_info p, view_account_role v,account_dir ad,account_dir_rel adr where 1=1 and  p.plc_id=r.plc_id and r.id=adr.`ref_id` and p.device_id=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and ad.`id`=adr.`acc_dir_id` and ad.`account_id`=v.view_id and r.bind_state=1";
@@ -403,7 +396,9 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		List<RealHisCfgDevice> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgDeviceRowMapper());
 		page.setList(list);
 		return page;
-	}	public static final class DefaultRealHisCfgRowMapper implements RowMapper<RealHisCfg> {
+	}
+
+	public static final class DefaultRealHisCfgRowMapper implements RowMapper<RealHisCfg> {
 
 		@Override
 		public RealHisCfg mapRow(ResultSet rs, int i) throws SQLException {
@@ -420,6 +415,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.data_limit = rs.getString("data_limit");
 			model.his_cycle = rs.getInt("his_cycle");
 			model.data_type = rs.getInt("data_type");
+			model.bind_state = rs.getInt("bind_state");
 			model.state = rs.getInt("state");
 			model.create_date = rs.getTimestamp("create_date");
 			model.update_date = rs.getTimestamp("update_date");

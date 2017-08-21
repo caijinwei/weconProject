@@ -136,8 +136,8 @@
 			</div>
 
 			<ul id="side_nav" ng-cloak ng-if="type==1">
-				<li><a href="datamonitor.html" target="content_frame"> <span
-						class="glyphicon glyphicon-eye-open "> 所有监控点</span>
+				<li><a href="datamonitor.html?device_id=-100&&device_name=自定义监控点" target="content_frame"> <span
+						class="glyphicon glyphicon-eye-open "> 自定义监控点</span>
 				</a></li>
 				<li ng-repeat="x in allDatas"><a href="#"
 					ng-click="sideclick(x);"> <span
@@ -146,7 +146,7 @@
 				</a>
 					<ul id="dir_ul_{{x.accountdirId}}">
 						<a
-							href="datamonitor.html?device_id={{y.deviceId}}&device_name={{y.deviceName}}"
+							href="datamonitor.html?device_id={{y.deviceId}}&&device_name={{y.deviceName}}}"
 							class="list-group-item" target="content_frame"
 							ng-repeat="y in x.deviceList">{{y.deviceName}}</a>
 					</ul></li>
