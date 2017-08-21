@@ -31,9 +31,11 @@ public enum ErrorCodeOption {
     Device_AlreadyBind("该设备已经被别的用户绑定",300023),
     Viewpoint_Dlete_False("视图账户监控点解绑失败",300003),
     ViewpointRoleTypePrams_Update_False("视图账号监控点权限分配失败(参数不能为空)",300004),
-	Get_DeviceList_Error("获取盒子列表失败",30005),
-    Get_ActList_Error("获取实时数据配置列表失败",30006),
-    AlarmViewpoint_IsNULL("报警监控点为空",300008);
+    Get_DeviceList_Error("获取盒子列表失败",30005),
+    AlarmViewpoint_IsNULL("报警监控点为空",300008),
+    Get_HisList_Error("获取历史数据配置列表失败",30006),
+    Get_AlarmList_Error("获取报警数据配置列表失败",30007),
+    Get_ActList_Error("获取实时数据配置列表失败",30008);
 
     public int value;
     public String key;
