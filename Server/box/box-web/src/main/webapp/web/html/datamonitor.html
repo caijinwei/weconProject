@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="weconweb">
+<head>
+<meta charset="UTF-8">
+<title>Title</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" type="text/css" href="../css/style.css" />
+<link rel="stylesheet"
+	href="../lib/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="../lib/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="../css/page.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet"
+	href="../lib/x-editable-1.5.1/css/bootstrap-editable.css">
+</head>
+<body ng-controller="infoController" ng-init="onInit()"
+	style="margin-top: 20px;">
+	<ol class="breadcrumb">
+		<li><a href="overview.html">主页</a></li>
+		<li class="active">{{devicename}}</li>
+	</ol>
+	<ul class="nav nav-pills nav-justified" role="tablist">
+		<li class="active"><a
+			href="datamonitor.html?device_id={{deviceid}}&&device_name={{devicename}}">数据监控</a></li>
+		<li><a
+			href="alarmlog.html?device_id={{deviceid}}&&device_name={{devicename}}">报警记录</a></li>
+		<li><a
+			href="historydata.html?device_id={{deviceid}}&&device_name={{devicename}}">历史数据</a></li>
+		<li ng-cloak ng-if="accounttype==1 && deviceid>0"><a
+			href="remotedownload.html?device_id={{deviceid}}&&device_name={{devicename}}">远程下载</a></li>
+		<li ng-cloak ng-if="accounttype==1 && deviceid>0"><a
+			href="baseinfo.html?device_id={{deviceid}}&&device_name={{devicename}}">基本配置</a></li>
+	</ul>
+	<div class="container-fluid" style="margin-top: 40px;">
+		<ul class="nav nav-tabs" role="tablist" id="monitorTab"
+			style="margin-top: 20px;">
+
+			<li ng-repeat="x in dir_list"
+				ng-class="{active:x.id==dir_list[0].id && type==0 }"><a
+				href="#data-item-1" data-toggle="tab" id="actgroupId"
+				ng-click="mc_change();act_submit(paginationConf.currentPage,paginationConf.itemsPerPage,x.id);">{{x.name}}</a>
+			</li>
+
+
+			<li><a href="#group-setting" data-toggle="tab"
+				ng-click="mc_change();"> <span class="glyphicon glyphicon-cog"></span>
+					分组设置
+			</a></li>
+			<li><a href="#global-setting" data-toggle="tab"
+				ng-click="mc_change();"> <span class="glyphicon glyphicon-globe"></span>
+					全局设置
+			</a></li>
+		</ul>
+		<div id="monitorContent" class="tab-content">
+			<!--数据分组-->
+			<div class="tab-pane active" id="data-item-1">
+				<!--search data id:{{search_id}}-->
+				<div class="conatiner-fluid" style="margin: 20px 20px;">
+					<table class="table table-bordered">
+						<caption>
+							<button type="button" class="btn btn-primary" data-toggle="modal"
+								ng-cloak ng-if="accounttype==1 && deviceid>0"
+								data-target="#addpoint">
+								<span class="glyphicon glyphicon-plus"></span> 添加监控点
+							</button>
+							<button type="button" class="btn btn-primary" data-toggle="modal"
+								ng-cloak ng-if="accounttype==1 && deviceid==-100"
+								data-target="#dispatchpoint">
+								<span class="fa fa-indent"></span> 分配监控点
+							</button>
+							<button type="button" class="btn btn-primary" data-toggle="modal"
+								ng-cloak ng-if="accounttype==1 && deviceid>0"
+								data-target="#addpoint">
+								<span class="glyphicon glyphicon-list"
+									style="margin-left: 15px;"></span> 批量添加
+							</button>
+						</caption>
+						<thead>
+							<tr>
+								<th class="col-md-1">ID</th>
+								<th class="col-md-1">状态</th>
+								<th class="col-md-1">名称</th>
+								<th class="col-md-1">数值</th>
+								<th class="col-md-1">地址</th>
+								<th class="col-md-1">地址类型</th>
+								<th class="col-md-2">描述</th>
+								<th class="col-md-3">操作</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="x in actDatas">
+								<td>{{x.id}}</td>
+								<td>{{x.re_state==0?"超时":"在线"}}</td>
+								<td><a href="#" id="act_name_{{x.id}}"
+									ng-click="editable_name(x);mc_change();">{{x.name}}</a></td>
+								<td><a href="#" id="act_value_{{x.id}}"
+									ng-click="editable_value(x);mc_change();">{{x.re_value}}</a></td>
+								<td>{{x.addr}}</td>
+								<td>{{x.addr_type==0?"位地址":x.addr_type==1?"字地址":"双字"}}</td>
+								<td>{{x.describe}}</td>
+								<td><a href="#" title="编辑" class="col-md-3"
+									data-toggle="modal" data-target="#editpoint"> <span
+										class="glyphicon glyphicon-edit"></span> 编辑
+								</a> <a href="#" title="复制" class="col-md-3" data-toggle="modal"
+									data-target="#copyDataGroup"> <span
+										class="glyphicon glyphicon-file"></span> 复制
+								</a> <a href="#" title="移动分组" class="col-md-3" data-toggle="modal"
+									data-target="#moveDataGroup"> <span
+										class="glyphicon glyphicon-resize-horizontal"></span> 移动
+								</a> <a href="#" title="移除" class="col-md-3" data-toggle="modal"
+									data-target="#deletePoint"> <span
+										class="glyphicon glyphicon-trash"></span> 移除
+								</a></td>
+							</tr>
+						</tbody>
+					</table>
+					<tm-pagination conf="paginationConf"></tm-pagination>
+					<!--添加监控点-->
+					<div class="modal" id="addpoint" tabindex="-1"
+						data-backdrop="false">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">
+										<span>&times;</span>
+									</button>
+									<h4 class="modal-title">添加监控数据</h4>
+								</div>
+								<div class="modal-body">
+									<div class="container-fluid">
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;">
+											<span class="col-md-3">名称</span><input type="text"
+												class="col-md-9" style="height: 30px; padding-left: 5px;" />
+										</div>
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;">
+											<span class="col-md-3">连接设备</span> <select class="col-md-9"
+												style="height: 30px;">
+												<option>SIMUTOCOL LX1S</option>
+												<option>SIMUTOCOL LX2N</option>
+												<option>SIMUTOCOL LX3V</option>
+											</select>
+										</div>
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;">
+											<span class="col-md-3">数据格式</span> <select id="datatype"
+												class="col-md-9" style="height: 30px;"
+												onchange="show_sub(this.options[this.options.selectedIndex].value)">
+												<option value="0">0：位地址</option>
+												<option value="162">16位二进制</option>
+												<option value="168">16位八进制</option>
+												<option value="1616">16位十六进制</option>
+												<option value="16bcd">16位BCD码</option>
+												<option value="16110">16位有符号十进制数</option>
+												<option value="16010">16位无符号十进制数</option>
+												<option value="322">32位二进制</option>
+												<option value="328">32位八进制</option>
+												<option value="3216">32位十六进制</option>
+												<option value="32bcd">32位BCD码</option>
+												<option value="32110">32位有符号十进制数</option>
+												<option value="32010">32位无符号十进制数</option>
+												<option value="32f">32位（单精度）浮点数</option>
+												<option value="64d">64位（双精度）浮点数</option>
+											</select>
+										</div>
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;">
+											<span class="col-md-3">地址</span><input type="text"
+												class="col-md-6" style="height: 30px; padding-left: 5px;" />
+											<button type="button"
+												class="btn btn-info col-md-2 col-md-offset-1"
+												data-toggle="modal" data-target="#addrsetting">设置</button>
+										</div>
+
+										<div id="datadigits" class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0; display: none;">
+											<div id="div-integer">
+												<span class="col-md-3">整数位数</span> <select
+													id="integerdigits" class="col-md-3" style="height: 30px;"
+													onchange="getData()">
+
+												</select>
+											</div>
+											<div id="div-decimal">
+												<span class="col-md-3">小数位数</span> <select
+													id="decimaldigits" class="col-md-3" style="height: 30px;"
+													onchange="calcuSystem()">
+
+												</select>
+											</div>
+										</div>
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;">
+											<div id="value-min">
+												<span class="col-md-3">最小值</span> <input id="dataMin"
+													type="number" class="col-md-3"
+													style="height: 30px; padding-left: 5px;" value="0" min="" />
+											</div>
+											<div id="value-max">
+												<span class="col-md-3">最大值</span> <input id="dataMax"
+													type="number" class="col-md-3"
+													style="height: 30px; padding-left: 5px;" value="1" />
+											</div>
+										</div>
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;">
+											<span class="col-md-3">描述</span> <input type="text"
+												class="col-md-9" style="height: 30px; padding-left: 5px;"
+												placeholder="0X 1" />
+										</div>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-info">确定</button>
+									<button type="button" class="btn btn-default"
+										data-dismiss="modal">取消</button>
+								</div>
+							</div>
+
+						</div>
+					</div>
+					<!--设置地址-->
+					<div class="modal" id="addrsetting" tabindex="1"
+						data-backdrop="false">
+						<div class="modal-dialog modal-sm">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">
+										<span>&times;</span>
+									</button>
+									<h4 class="modal-title">设置地址</h4>
+								</div>
+								<div class="modal-body">
+									<div class="container-fluid">
+										<div style="margin: 10px 0;">
+											<div class="row">
+												<span class="col-md-5">寄存器类型</span> <select class="col-md-7"
+													style="height: 30px;">
+													<option value="x">X</option>
+													<option value="y">Y</option>
+													<option value="m">M</option>
+													<option value="t">T</option>
+													<option value="c">C</option>
+													<option value="d">D</option>
+													<option value="s">S</option>
+													<option value="sd">SD</option>
+													<option value="ch">CH</option>
+												</select>
+											</div>
+											<div class="row" style="margin-top: 20px;">
+												<span class="col-md-5">寄存器地址</span> <input type="text"
+													class="col-md-7" style="height: 30px; padding-left: 5px;"
+													placeholder="十进制数或十六进制数" />
+											</div>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-info">确定</button>
+										<button type="button" class="btn btn-default"
+											data-dismiss="modal">取消</button>
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+					<!--编辑监控点-->
+					<div class="modal" id="editpoint" tabindex="-1"
+						data-backdrop="false">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">
+										<span>&times;</span>
+									</button>
+									<h4 class="modal-title">添加监控数据</h4>
+								</div>
+								<div class="modal-body">
+									<div class="container-fluid">
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;">
+											<span class="col-md-3">名称</span><input type="text"
+												class="col-md-9" style="height: 30px; padding-left: 5px;" />
+										</div>
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;">
+											<span class="col-md-3">连接设备</span> <select class="col-md-9"
+												style="height: 30px;">
+												<option>SIMUTOCOL LX1S</option>
+												<option>SIMUTOCOL LX2N</option>
+												<option>SIMUTOCOL LX3V</option>
+											</select>
+										</div>
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;">
+											<span class="col-md-3">数据格式</span> <select class="col-md-9"
+												style="height: 30px;"
+												onchange="show_sub(this.options[this.options.selectedIndex].value)">
+												<option value="0">0：位地址</option>
+												<option value="162">16位二进制</option>
+												<option value="168">16位八进制</option>
+												<option value="1616">16位十六进制</option>
+												<option value="16bcd">16位BCD码</option>
+												<option value="16110">16位有符号十进制数</option>
+												<option value="16010">16位无符号十进制数</option>
+												<option value="322">32位二进制</option>
+												<option value="328">32位八进制</option>
+												<option value="3216">32位十六进制</option>
+												<option value="32bcd">32位BCD码</option>
+												<option value="32110">32位有符号十进制数</option>
+												<option value="32010">32位无符号十进制数</option>
+												<option value="32f">32位（单精度）浮点数</option>
+												<option value="64d">64位（双精度）浮点数</option>
+											</select>
+										</div>
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;">
+											<span class="col-md-3">地址</span><input type="text"
+												class="col-md-6" style="height: 30px; padding-left: 5px;" />
+											<button type="button"
+												class="btn btn-info col-md-2 col-md-offset-1"
+												data-toggle="modal" data-target="#addrsetting">设置</button>
+										</div>
+
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0; display: none;">
+											<div>
+												<span class="col-md-3">整数位数</span> <select class="col-md-3"
+													style="height: 30px;" onchange="getData()">
+
+												</select>
+											</div>
+											<div>
+												<span class="col-md-3">小数位数</span> <select class="col-md-3"
+													style="height: 30px;" onchange="calcuSystem()">
+
+												</select>
+											</div>
+										</div>
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;">
+											<div>
+												<span class="col-md-3">最小值</span> <input type="number"
+													class="col-md-3" style="height: 30px; padding-left: 5px;"
+													value="0" min="" />
+											</div>
+											<div>
+												<span class="col-md-3">最大值</span> <input type="number"
+													class="col-md-3" style="height: 30px; padding-left: 5px;"
+													value="1" />
+											</div>
+										</div>
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;">
+											<span class="col-md-3">描述</span> <input type="text"
+												class="col-md-9" style="height: 30px; padding-left: 5px;"
+												placeholder="0X 1" />
+										</div>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-info">确定</button>
+									<button type="button" class="btn btn-default"
+										data-dismiss="modal">取消</button>
+								</div>
+							</div>
+
+						</div>
+					</div>
+					<!--复制监控点-->
+					<div class="modal" id="copyDataGroup" tabindex="-1"
+						data-backdrop="false">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">
+										<span>&times;</span>
+									</button>
+									<h4 class="modal-title">监控点移动</h4>
+								</div>
+								<div class="modal-body">
+									<div class="container-fluid">
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;">
+											<span class="col-md-3">当前分组</span> <span class="col-md-9">数据分组1</span>
+										</div>
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;">
+											<span class="col-md-3">复制到</span> <select class="col-md-9"
+												style="height: 30px;"
+												onchange="show_sub(this.options[this.options.selectedIndex].value)">
+												<option>数据分组1</option>
+												<option>数据分组2</option>
+												<option>数据分组3</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-info">确定</button>
+									<button type="button" class="btn btn-default"
+										data-dismiss="modal">取消</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!--删除监控点-->
+					<div class="modal" tabindex="-1" id="deletePoint"
+						data-backdrop="false">
+						<div class="modal-dialog modal-sm">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">
+										<span>&times;</span>
+									</button>
+									<h4 class="modal-title">删除监控点</h4>
+								</div>
+								<div class="modal-body">
+									<span>确定要删除该监控点吗？</span>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-info">确定</button>
+									<button type="button" class="btn btn-default"
+										data-dismiss="modal">取消</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!--移动监控点-->
+					<div class="modal" id="moveDataGroup" tabindex="-1"
+						data-backdrop="false">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">
+										<span>&times;</span>
+									</button>
+									<h4 class="modal-title">监控点移动</h4>
+								</div>
+								<div class="modal-body">
+									<div class="container-fluid">
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;">
+											<span class="col-md-3">当前分组</span> <span class="col-md-9">数据分组1</span>
+										</div>
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;">
+											<span class="col-md-3">移动到</span> <select id="groupselect"
+												class="col-md-9" style="height: 30px;"
+												onchange="show_sub(this.options[this.options.selectedIndex].value)">
+												<option>数据分组1</option>
+												<option>数据分组2</option>
+												<option>数据分组3</option>
+											</select>
+										</div>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-info">确定</button>
+									<button type="button" class="btn btn-default"
+										data-dismiss="modal">取消</button>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!--分配监控点-->
+					<div class="modal" id="dispatchpoint" tabindex="-1"
+						data-backdrop="false">
+						<div class="modal-dialog modal-lg">
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">
+										<span>&times;</span>
+									</button>
+									<h4 class="modal-title">分配监控点</h4>
+								</div>
+								<div class="modal-body">
+									<div class="container-fluid">
+										<div class="row">
+											<table class="table table-bordered table-hover"
+												id="allpointlist">
+												<thead>
+													<tr>
+														<th class="col-md-1">编号</th>
+														<th class="col-md-2">状态</th>
+														<th class="col-md-3">名称</th>
+														<th class="col-md-3">数值</th>
+														<th class="col-md-3">描述</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>1</td>
+														<td><a href="#" title="设备已变更或移除"> <span
+																class="glyphicon glyphicon-exclamation-sign"
+																style="color: #ff3a28;"></span>
+														</a></td>
+														<td>aa0</td>
+														<td></td>
+														<td>0X1</td>
+													</tr>
+													<tr>
+														<td>2</td>
+														<td><a href="#" title="超时"> <span
+																class="glyphicon glyphicon-exclamation-sign"
+																style="color: #ff3a28;"></span>
+														</a></td>
+														<td>PLC1</td>
+														<td></td>
+														<td>D0</td>
+													</tr>
+													<tr>
+														<td>3</td>
+														<td><a href="#" title="设备已变更或移除"> <span
+																class="glyphicon glyphicon-exclamation-sign"
+																style="color: #ff3a28;"></span>
+														</a></td>
+														<td>PLC2</td>
+														<td></td>
+														<td>0X1</td>
+													</tr>
+													<tr>
+														<td>4</td>
+														<td><a href="#" title="超时"> <span
+																class="glyphicon glyphicon-exclamation-sign"
+																style="color: #ff3a28;"></span>
+														</a></td>
+														<td>aa0</td>
+														<td></td>
+														<td>0X1</td>
+													</tr>
+													<tr>
+														<td>5</td>
+														<td><a href="#" title="设备已变更或移除"> <span
+																class="glyphicon glyphicon-exclamation-sign"
+																style="color: #ff3a28;"></span>
+														</a></td>
+														<td>PLC1</td>
+														<td></td>
+														<td>D0</td>
+													</tr>
+													<tr>
+														<td>6</td>
+														<td><a href="#" title="设备已变更或移除"> <span
+																class="glyphicon glyphicon-exclamation-sign"
+																style="color: #ff3a28;"></span>
+														</a></td>
+														<td>PLC2</td>
+														<td></td>
+														<td>0X1</td>
+													</tr>
+													<tr>
+														<td>7</td>
+														<td><a href="#" title="设备已变更或移除"> <span
+																class="glyphicon glyphicon-exclamation-sign"
+																style="color: #ff3a28;"></span>
+														</a></td>
+														<td>aa0</td>
+														<td></td>
+														<td>0X1</td>
+													</tr>
+													<tr>
+														<td>8</td>
+														<td><a href="#" title="超时"> <span
+																class="glyphicon glyphicon-exclamation-sign"
+																style="color: #ff3a28;"></span>
+														</a></td>
+														<td>PLC1</td>
+														<td></td>
+														<td>D0</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+										<div style="margin: 0 auto; text-align: center;">
+											<nav>
+												<ul class="pagination pagination-lg">
+													<li class="disabled"><a href="#" aria-label="Previous">
+															<span aria-hidden="true">«</span>
+													</a></li>
+													<li class="active"><a href="#">1</a></li>
+													<li><a href="#">2</a></li>
+													<li><a href="#">3</a></li>
+													<li><a href="#">4</a></li>
+													<li><a href="#">5</a></li>
+													<li><a href="#" aria-label="Next"> <span
+															aria-hidden="true">»</span>
+													</a></li>
+												</ul>
+											</nav>
+										</div>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-info">确定</button>
+									<button type="button" class="btn btn-default"
+										data-dismiss="modal">取消</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--分组设置-->
+			<div class="tab-pane" id="group-setting">
+				<div class="container-fluid" style="margin: 20px 20px;">
+					<table class="table table-bordered table-striped">
+						<caption>
+							<button type="button" class="btn btn-primary" data-toggle="modal"
+								data-target="#addDataGroup">
+								<span class="glyphicon glyphicon-plus"></span> 创建分组
+							</button>
+						</caption>
+						<thead>
+							<tr>
+								<th>分组名称</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="x in dir_list">
+								<td>{{x.name}}</td>
+								<td><a href="#"> <span class="glyphicon glyphicon-edit"
+										data-toggle="modal" data-target="#editGroupName"
+										style="color: #2889d0; margin: 10px;"></span>
+								</a> <a href="#"> <span class="glyphicon glyphicon-trash"
+										data-toggle="modal" data-target="#deleteGroup"
+										style="color: #2889d0; margin: 10px;"></span>
+								</a></td>
+							</tr>
+
+						</tbody>
+					</table>
+				</div>
+				<!--创建分组-->
+				<div class="modal" tabindex="-1" id="addDataGroup"
+					data-backdrop="false">
+					<div class="modal-dialog modal-sm">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal"
+									ng-click="showAddGroup()">
+									<span>&times;</span>
+								</button>
+								<h4 class="modal-title">创建分组</h4>
+							</div>
+							<div class="modal-body">
+								<div class="container-fluid">
+									<div class="form-group">
+										<input id="newGroupName" type="text" class="form-control"
+											placeholder="请输入分组名称" style="padding-left: 5px;"
+											maxlength="10">
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-info" data-dismiss="modal"
+									ng-click="add_group()">确定</button>
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">取消</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--删除分组-->
+				<div class="modal" tabindex="-1" id="deleteGroup"
+					data-backdrop="false">
+					<div class="modal-dialog modal-sm">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">
+									<span>&times;</span>
+								</button>
+								<h4 class="modal-title">删除分组</h4>
+							</div>
+							<div class="modal-body">
+								<span>确定要删除该分组吗？</span>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-info">确定</button>
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">取消</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--编辑分组-->
+				<div class="modal" tabindex="-1" id="editGroupName"
+					data-backdrop="false">
+					<div class="modal-dialog modal-sm">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">
+									<span>&times;</span>
+								</button>
+								<h4 class="modal-title">编辑分组</h4>
+							</div>
+							<div class="modal-body">
+								<div class="container-fluid">
+									<div class="form-group">
+										<input type="text" class="form-control"
+											style="padding-left: 5px;" value="数据分组1"
+											onfocus="this.select()" autofocus="autofocus">
+									</div>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-info">确定</button>
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">取消</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--全局设置-->
+			<div class="tab-pane" id="global-setting">
+				<div class="container-fluid"
+					style="margin: 20px 20px; font-size: 16px;">
+					<div class="row">
+						刷新间隔： <span><strong>1000秒</strong></span>
+						<button class="btn btn-primary" style="margin-left: 20px;">
+							<span class="glyphicon glyphicon-cog"></span> 设置
+						</button>
+					</div>
+					<div class="row" style="margin-top: 20px;">
+						当监控数据勾选“省流量模式”时，按此时间间隔定期检查数据变化和发送以节省流量。<br /> <br />
+					</div>
+					<div class="row">
+						<div class="checkbox" style="color: #ff3a28;">
+							<label><input type="checkbox" value="">新建条目时，默认勾选“省流量模式”。</label>
+						</div>
+					</div>
+					<div class="row">
+						<div class="checkbox" x>
+							<label><input type="checkbox" value="">暂停监控数据发送</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="../lib/jquery/jquery-3.2.1.min.js" type="text/javascript"></script>
+	<script src="../lib/bootstrap/3.3.7/js/bootstrap.min.js"
+		type="text/javascript"></script>
+	<script src="../lib/angular/angular.min.js" type="text/javascript"></script>
+	<script src="../lib/x-editable-1.5.1/js/bootstrap-editable.min.js"></script>
+	<script src="../lib/wecon-common.js" type="text/javascript"></script>
+	<script src="../js/datamonitor.js" type="text/javascript"></script>
+	<script src="../lib/pagination.js" type="text/javascript"></script>
+	<script language="JavaScript">
+		$(function() {
+			function initTableCheckbox() {
+				var $thr = $('#allpointlist thead tr');
+				var $checkAllTh = $('<th><input type="checkbox" id="checkAll" name="checkAll" style="width: 18px;height: 18px;" /></th>');
+				/*将全选/反选复选框添加到表头最前，即增加一列*/
+				$thr.prepend($checkAllTh);
+				/*“全选/反选”复选框*/
+				var $checkAll = $thr.find('input');
+				$checkAll
+						.click(function(event) {
+							/*将所有行的选中状态设成全选框的选中状态*/
+							$tbr.find('input').prop('checked',
+									$(this).prop('checked'));
+							/*并调整所有选中行的CSS样式*/
+							if ($(this).prop('checked')) {
+								$tbr.find('input').parent().parent().addClass(
+										'info');
+							} else {
+								$tbr.find('input').parent().parent()
+										.removeClass('info');
+							}
+							/*阻止向上冒泡，以防再次触发点击操作*/
+							event.stopPropagation();
+						});
+				/*点击全选框所在单元格时也触发全选框的点击操作*/
+				$checkAllTh.click(function() {
+					$(this).find('input').click();
+				});
+				var $tbr = $('#allpointlist tbody tr');
+				var $checkItemTd = $('<td><input type="checkbox" name="checkItem"  style="width: 16px;height: 16px;"/></td>');
+				/*每一行都在最前面插入一个选中复选框的单元格*/
+				$tbr.prepend($checkItemTd);
+				/*点击每一行的选中复选框时*/
+				$tbr
+						.find('input')
+						.click(
+								function(event) {
+									/*调整选中行的CSS样式*/
+									$(this).parent().parent().toggleClass(
+											'info');
+									/*如果已经被选中行的行数等于表格的数据行数，将全选框设为选中状态，否则设为未选中状态*/
+									$checkAll
+											.prop(
+													'checked',
+													$tbr.find('input:checked').length == $tbr.length ? true
+															: false);
+									/*阻止向上冒泡，以防再次触发点击操作*/
+									event.stopPropagation();
+								});
+				/*点击每一行时也触发该行的选中操作*/
+				$tbr.click(function() {
+					$(this).find('input').click();
+				});
+			}
+			initTableCheckbox();
+		});
+	</script>
+</body>
+</html>
