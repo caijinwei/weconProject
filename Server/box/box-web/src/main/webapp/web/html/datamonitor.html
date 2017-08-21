@@ -21,22 +21,22 @@
 	</ol>
 	<ul class="nav nav-pills nav-justified" role="tablist">
 		<li class="active"><a
-			href="datamonitor.html?device_id={{deviceid}}&&device_name={{devicename}}">数据监控</a></li>
+			href="datamonitor.html?device_id={{deviceid}}&device_name={{devicename}}">数据监控</a></li>
 		<li><a
-			href="alarmlog.html?device_id={{deviceid}}&&device_name={{devicename}}">报警记录</a></li>
+			href="alarmlog.html?device_id={{deviceid}}&device_name={{devicename}}">报警记录</a></li>
 		<li><a
-			href="historydata.html?device_id={{deviceid}}&&device_name={{devicename}}">历史数据</a></li>
-		<li ng-cloak ng-if="accounttype==1 && deviceid>0"><a
-			href="remotedownload.html?device_id={{deviceid}}&&device_name={{devicename}}">远程下载</a></li>
-		<li ng-cloak ng-if="accounttype==1 && deviceid>0"><a
-			href="baseinfo.html?device_id={{deviceid}}&&device_name={{devicename}}">基本配置</a></li>
+			href="historydata.html?device_id={{deviceid}}&device_name={{devicename}}">历史数据</a></li>
+		<li ng-cloak ng-if="accounttype==1 & deviceid>0"><a
+			href="remotedownload.html?device_id={{deviceid}}&device_name={{devicename}}">远程下载</a></li>
+		<li ng-cloak ng-if="accounttype==1 & deviceid>0"><a
+			href="baseinfo.html?device_id={{deviceid}}&device_name={{devicename}}">基本配置</a></li>
 	</ul>
 	<div class="container-fluid" style="margin-top: 40px;">
 		<ul class="nav nav-tabs" role="tablist" id="monitorTab"
 			style="margin-top: 20px;">
 
 			<li ng-repeat="x in dir_list"
-				ng-class="{active:x.id==dir_list[0].id && type==0 }"><a
+				ng-class="{active:x.id==dir_list[0].id & type==0 }"><a
 				href="#data-item-1" data-toggle="tab" id="actgroupId"
 				ng-click="mc_change();act_submit(paginationConf.currentPage,paginationConf.itemsPerPage,x.id);">{{x.name}}</a>
 			</li>
@@ -59,17 +59,17 @@
 					<table class="table table-bordered">
 						<caption>
 							<button type="button" class="btn btn-primary" data-toggle="modal"
-								ng-cloak ng-if="accounttype==1 && deviceid>0"
+								ng-cloak ng-if="accounttype==1 & deviceid>0"
 								data-target="#addpoint">
 								<span class="glyphicon glyphicon-plus"></span> 添加监控点
 							</button>
 							<button type="button" class="btn btn-primary" data-toggle="modal"
-								ng-cloak ng-if="accounttype==1 && deviceid==-100"
+								ng-cloak ng-if="accounttype==1 & deviceid==-100"
 								data-target="#dispatchpoint">
 								<span class="fa fa-indent"></span> 分配监控点
 							</button>
 							<button type="button" class="btn btn-primary" data-toggle="modal"
-								ng-cloak ng-if="accounttype==1 && deviceid>0"
+								ng-cloak ng-if="accounttype==1 & deviceid>0"
 								data-target="#addpoint">
 								<span class="glyphicon glyphicon-list"
 									style="margin-left: 15px;"></span> 批量添加
