@@ -5,8 +5,6 @@ import com.wecon.box.entity.plcdom.Plc;
 import com.wecon.box.entity.plcdom.Res;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,14 +13,14 @@ import java.util.List;
  * Created by win7 on 2017/8/19.
  */
 public class PlcTypeParser {
-    private static Logger logger = LoggerFactory.getLogger(PlcTypeParser.class);
+    //private static Logger logger = LoggerFactory.getLogger(PlcTypeParser.class);
     /**
      * 解析plcType文件中的数据填充到po
      */
     public static void doParse() {
         try {
-            logger.debug("parse begin");
-            Document doc = DOMUtil.getXMLByFilePath("e:/PLCType.plc");
+            //logger.debug("parse begin");
+            Document doc = DOMUtil.getXMLByFilePath("/PLCType.plc");
             Element root = doc.getRootElement();
             /** 解析plc节点*/
             List<Element> plcElementList = root.elements("plc");
@@ -41,7 +39,7 @@ public class PlcTypeParser {
                 }
                 for(Element addrElement : addrElementList){
                     AddrDom addrDom = new AddrDom();
-                    //设置Wordaddr标签属性
+                    //设置addr标签属性
                     addrDom.setAttributes(addrElement.attributes());
                     /** 解析res节点*/
                     List<Element> resElementList = addrElement.elements("res");
@@ -57,10 +55,10 @@ public class PlcTypeParser {
                 }
                 plcList.add(plc);
             }
-            logger.debug("parse finish", "total："+plcList.size());
+            //logger.debug("parse finish", "total："+plcList.size());
             PlcTypeCache.localPlcTypeData = plcList;
         } catch (Exception e) {
-            logger.error("parse fail", e.getMessage());
+            //logger.error("parse fail", e.getMessage());
             e.printStackTrace();
         }
     }

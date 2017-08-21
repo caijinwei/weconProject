@@ -1,14 +1,11 @@
 package com.wecon.box.util;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.wecon.common.util.XmlUtil;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -33,8 +30,9 @@ public class DOMUtil {
         }
         Document document = null;
         try {
+            InputStream inputStream = XmlUtil.class.getResourceAsStream(path);
             SAXReader reader = new SAXReader();
-            document = reader.read(new File(path));
+            document = reader.read(inputStream);
         } catch (Exception e) {
             e.printStackTrace();
         }
