@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by win7 on 2017/8/19.
+ * Created by whp on 2017/8/19.
  */
 public class PlcTypeParser {
     //private static Logger logger = LoggerFactory.getLogger(PlcTypeParser.class);
@@ -65,7 +65,7 @@ public class PlcTypeParser {
 
     public static void main(String[] arg){
         doParse();
-        List<Plc> result = PlcTypeQuerier.getInstance().query("plctype", "Siemens S7-200 CPU22x/Smart PPI");
+        List<String> result = PlcTypeQuerier.getInstance().queryValuesByKey("Type");
         System.out.print(result);
     }
 }

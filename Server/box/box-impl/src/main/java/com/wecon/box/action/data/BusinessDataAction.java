@@ -47,7 +47,7 @@ public class BusinessDataAction {
      * @return
      */
     @RequestMapping("data/real")
-    @WebApi(forceAuth = false, master = true)
+    @WebApi(forceAuth = true, master = true)
     public Output getRealData(@Valid BusinessDataParam param) {
         Client client = AppContext.getSession().client;
         RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
@@ -118,7 +118,7 @@ public class BusinessDataAction {
      * @return
      */
     @RequestMapping("data/history")
-    @WebApi(forceAuth = false, master = true)
+    @WebApi(forceAuth = true, master = true)
     public Output getHistoryData(@Valid BusinessDataParam param) {
         Client client = AppContext.getSession().client;
         RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
@@ -171,7 +171,7 @@ public class BusinessDataAction {
      * @return
      */
     @RequestMapping("data/alarm")
-    @WebApi(forceAuth = false, master = true)
+    @WebApi(forceAuth = true, master = true)
     public Output getAlarmData(@Valid BusinessDataParam param) {
         Client client = AppContext.getSession().client;
         Page<AlarmCfgDataAlarmCfg> alarmCfgDataPage = null;
@@ -219,7 +219,7 @@ public class BusinessDataAction {
      * @return
      */
     @RequestMapping("data/boxs")
-    @WebApi(forceAuth = false, master = true)
+    @WebApi(forceAuth = true, master = true)
     public Output getBoxData(@Valid BusinessDataParam param) {
         return new Output(null);
     }
