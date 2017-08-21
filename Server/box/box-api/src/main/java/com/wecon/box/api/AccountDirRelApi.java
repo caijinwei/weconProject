@@ -25,6 +25,13 @@ public interface AccountDirRelApi {
 	 * @return
 	 */
 	public AccountDirRel getAccountDirRel(long acc_dir_id,long ref_id);
+	/**
+	 * 更新别名
+	 * @param acc_dir_id
+	 * @param ref_id
+	 * @return
+	 */
+	public boolean upAccountDirRel(AccountDirRel model);
 
 	/**
 	 * 根据acc_dir_id，ref_id删除某个分组所关联的监控点

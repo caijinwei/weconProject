@@ -233,7 +233,8 @@ appModule
 						var params = {
 
 							name : name,
-							id : model.id
+							id : model.id,
+							actgroupId : actgroupId
 
 						};
 						T.common.ajax

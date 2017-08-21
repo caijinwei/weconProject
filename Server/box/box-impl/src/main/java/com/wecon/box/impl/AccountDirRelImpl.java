@@ -24,33 +24,40 @@ public class AccountDirRelImpl implements AccountDirRelApi {
 	@Override
 	public void saveAccountDirRel(final AccountDirRel model) {
 
-		String sql="insert into account_dir_rel(acc_dir_id,ref_id,ref_alais,create_date) values (?,?,?,current_timestamp())";
-		Object[] args=new Object[]{model.acc_dir_id,model.ref_id,model.ref_alais};
-		jdbcTemplate.update(sql,args);
+		String sql = "insert into account_dir_rel(acc_dir_id,ref_id,ref_alais,create_date) values (?,?,?,current_timestamp())";
+		Object[] args = new Object[] { model.acc_dir_id, model.ref_id, model.ref_alais };
+		jdbcTemplate.update(sql, args);
 	}
 
 	@Override
 	public AccountDirRel getAccountDirRel(long acc_dir_id, long ref_id) {
-		
-		String sql = "select " + SEL_COL + " from account_dir where id=?";
-		List<AccountDirRel> list = jdbcTemplate.query(sql, new Object[] { acc_dir_id,ref_id }, new DefaultAccountDirRelRowMapper());
+
+		String sql = "select " + SEL_COL + " from account_dir_rel where acc_dir_id=? and ref_id=?";
+		List<AccountDirRel> list = jdbcTemplate.query(sql, new Object[] { acc_dir_id, ref_id },
+				new DefaultAccountDirRelRowMapper());
 		if (!list.isEmpty()) {
 			return list.get(0);
 		}
 		return null;
-		
-		
+
+	}
+
+	@Override
+	public boolean upAccountDirRel(AccountDirRel model) {
+		String sql = "update account_dir_rel SET ref_alais=?,create_date=?  where acc_dir_id=? and ref_id=?";
+		jdbcTemplate.update(sql, new Object[] { model.ref_alais, model.create_date, model.acc_dir_id, model.ref_id });
+
+		return true;
 	}
 
 	@Override
 	public void delAccountDir(long acc_dir_id, long ref_id) {
-		
-			String sql = "delete from  account_dir  where acc_dir_id=? and ref_id=?";
-			jdbcTemplate.update(sql, new Object[] { acc_dir_id,ref_id });
 
-		
+		String sql = "delete from  account_dir_rel  where acc_dir_id=? and ref_id=?";
+		jdbcTemplate.update(sql, new Object[] { acc_dir_id, ref_id });
 
 	}
+
 	public static final class DefaultAccountDirRelRowMapper implements RowMapper<AccountDirRel> {
 
 		@Override
@@ -63,15 +70,15 @@ public class AccountDirRelImpl implements AccountDirRelApi {
 			return model;
 		}
 	}
+
 	/*
-	* 删除用户绑定下的全部盒子
-	* delete FROM account_dir_rel where ref_id=1 AND acc_dir_id IN (SELECT id FROM account_dir WHERE account_id=1)
-	* */
-	public void deleteDeviceRel(Integer device_id,long account_id)
-	{
-		Object[] args=new Object[]{device_id,account_id};
-		String sql="delete FROM account_dir_rel where ref_id=? AND acc_dir_id IN (SELECT id FROM account_dir WHERE account_id=?)";
-		jdbcTemplate.update(sql,args);
+	 * 删除用户绑定下的全部盒子 delete FROM account_dir_rel where ref_id=1 AND acc_dir_id IN
+	 * (SELECT id FROM account_dir WHERE account_id=1)
+	 */
+	public void deleteDeviceRel(Integer device_id, long account_id) {
+		Object[] args = new Object[] { device_id, account_id };
+		String sql = "delete FROM account_dir_rel where ref_id=? AND acc_dir_id IN (SELECT id FROM account_dir WHERE account_id=?)";
+		jdbcTemplate.update(sql, args);
 	}
 
 }

@@ -92,7 +92,7 @@
 								<td>{{x.id}}</td>
 								<td>{{x.re_state==0?"超时":"在线"}}</td>
 								<td><a href="#" id="act_name_{{x.id}}"
-									ng-click="editable_name(x);mc_change();">{{x.name}}</a></td>
+									ng-click="editable_name(x);mc_change();">{{x.ref_alais==''?x.name:x.ref_alais}}</a></td>
 								<td><a href="#" id="act_value_{{x.id}}"
 									ng-click="editable_value(x);mc_change();">{{x.re_value}}</a></td>
 								<td>{{x.addr}}</td>

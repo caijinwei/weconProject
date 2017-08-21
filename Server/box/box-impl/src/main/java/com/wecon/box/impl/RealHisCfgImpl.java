@@ -191,7 +191,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	@Override
 	public Page<RealHisCfgDevice> getRealHisCfgList(RealHisCfgFilter filter, int pageIndex, int pageSize) {
 		String sqlCount = "select count(0) from account_dir ad,account_dir_rel adr ,real_his_cfg  r,plc_info pli,device d where 1=1 and  ad.`id`=adr.`acc_dir_id` and pli.`plc_id`=r.`plc_id` and pli.`device_id`=d.`device_id` and r.`id`=adr.`ref_id` and ad.`account_id`=r.`account_id`and r.bind_state=1";
-		String sql = "select " + SEL_COL + ",d.machine_code"
+		String sql = "select " + SEL_COL + ",d.machine_code,adr.ref_alais"
 				+ " from account_dir ad,account_dir_rel adr ,real_his_cfg  r,plc_info pli,device d where 1=1 and  ad.`id`=adr.`acc_dir_id` and pli.`plc_id`=r.`plc_id` and pli.`device_id`=d.`device_id` and r.`id`=adr.`ref_id` and ad.`account_id`=r.`account_id`and r.bind_state=1";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
@@ -362,7 +362,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 	public Page<RealHisCfgDevice> getRealHisCfgList(ViewAccountRoleFilter filter, int pageIndex, int pageSize) {
 		String sqlCount = "select count(0) from  real_his_cfg r , device d,plc_info p, view_account_role v,account_dir ad,account_dir_rel adr where 1=1 and  p.plc_id=r.plc_id and r.id=adr.`ref_id` and p.device_id=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and ad.`id`=adr.`acc_dir_id` and ad.`account_id`=v.view_id and r.bind_state=1";
-		String sql = "select " + SEL_COL + ",d.machine_code"
+		String sql = "select " + SEL_COL + ",d.machine_code,adr.ref_alais"
 				+ " from real_his_cfg r , device d,plc_info p, view_account_role v,account_dir ad,account_dir_rel adr where 1=1 and  p.plc_id=r.plc_id and r.id=adr.`ref_id` and p.device_id=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and ad.`id`=adr.`acc_dir_id` and ad.`account_id`=v.view_id and r.bind_state=1";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
@@ -445,6 +445,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.create_date = rs.getTimestamp("create_date");
 			model.update_date = rs.getTimestamp("update_date");
 			model.machine_code = rs.getString("machine_code");
+			model.ref_alais = rs.getString("ref_alais");
 			return model;
 		}
 	}

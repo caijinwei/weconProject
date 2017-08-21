@@ -12,13 +12,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.AccountDirApi;
+import com.wecon.box.api.AccountDirRelApi;
 import com.wecon.box.api.RealHisCfgApi;
 import com.wecon.box.api.RedisPiBoxApi;
 import com.wecon.box.entity.AccountDir;
+import com.wecon.box.entity.AccountDirRel;
 import com.wecon.box.entity.Page;
 import com.wecon.box.entity.PiBoxCom;
 import com.wecon.box.entity.PiBoxComAddr;
-import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.entity.RealHisCfgDevice;
 import com.wecon.box.entity.RedisPiBoxActData;
 import com.wecon.box.enums.ErrorCodeOption;
@@ -45,6 +46,8 @@ public class ActDataAction {
 	private RealHisCfgApi realHisCfgApi;
 	@Autowired
 	private AccountDirApi accountDirApi;
+	@Autowired
+	private AccountDirRelApi accountDirRelApi;
 
 	/**
 	 * 通过机器码获取对应的实时数据组
@@ -188,15 +191,17 @@ public class ActDataAction {
 	 */
 	@Description("更新实时监控点名称")
 	@RequestMapping(value = "/upActcfgName")
-	public Output upActcfgName(@RequestParam("id") String id, @RequestParam("name") String name) {
+	public Output upActcfgName(@RequestParam("id") String id, @RequestParam("name") String name,
+			@RequestParam("actgroupId") String actgroupId) {
 
-		if (!CommonUtils.isNullOrEmpty(id)) {
-			RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(id));
+		if (!CommonUtils.isNullOrEmpty(id) && !CommonUtils.isNullOrEmpty(actgroupId)) {
+			AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(Long.parseLong(actgroupId),
+					Long.parseLong(id));
 
-			if (realHisCfg != null) {
-				realHisCfg.name = name;
+			if (accountDirRel != null) {
+				accountDirRel.ref_alais = name;
 
-				realHisCfgApi.updateRealHisCfg(realHisCfg);
+				accountDirRelApi.upAccountDirRel(accountDirRel);
 			}
 
 		}
