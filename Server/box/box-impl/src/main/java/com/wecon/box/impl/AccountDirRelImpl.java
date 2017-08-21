@@ -63,5 +63,15 @@ public class AccountDirRelImpl implements AccountDirRelApi {
 			return model;
 		}
 	}
+	/*
+	* 删除用户绑定下的全部盒子
+	* delete FROM account_dir_rel where ref_id=1 AND acc_dir_id IN (SELECT id FROM account_dir WHERE account_id=1)
+	* */
+	public void deleteDeviceRel(Integer device_id,long account_id)
+	{
+		Object[] args=new Object[]{device_id,account_id};
+		String sql="delete FROM account_dir_rel where ref_id=? AND acc_dir_id IN (SELECT id FROM account_dir WHERE account_id=?)";
+		jdbcTemplate.update(sql,args);
+	}
 
 }

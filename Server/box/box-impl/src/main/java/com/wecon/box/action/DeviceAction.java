@@ -2,11 +2,7 @@ package com.wecon.box.action;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.wecon.box.api.AccountApi;
-import com.wecon.box.api.AccountDirApi;
-import com.wecon.box.api.AccountDirRelApi;
-import com.wecon.box.api.DevBindUserApi;
-import com.wecon.box.api.DeviceApi;
+import com.wecon.box.api.*;
 import com.wecon.box.entity.AccountDir;
 import com.wecon.box.entity.AccountDirRel;
 import com.wecon.box.entity.DevBindUser;
@@ -17,14 +13,14 @@ import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.BusinessException;
 import com.wecon.restful.core.Client;
 import com.wecon.restful.core.Output;
-
-import java.util.List;
-
+import com.wecon.restful.doc.Label;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * Created by caijinw on 2017/8/8.
@@ -52,19 +48,43 @@ public class DeviceAction {
 	 * @param device_id
 	 * @return
 	 */
+	@Label("盒子基本信息展示")
 	@RequestMapping(value = "showBaseInfo")
-	@WebApi(forceAuth = true, master = true)
+	@WebApi(forceAuth = true, master = true ,authority = {"1"})
 	public Output showBaseInfo(@RequestParam("device_id") Integer device_id) {
-		/*
-		 * 验证信息(不知道怎么写)
-		 */
+		long account_id=AppContext.getSession().client.userId;
+		if(devBindUserApi.isRecord(device_id,account_id)==false)
+		{
+			throw new BusinessException(ErrorCodeOption.PiBoxDevice_IsNot_Found.key,ErrorCodeOption.PiBoxDevice_IsNot_Found.value);
+		}
 		Device device = deviceApi.getDevice(device_id);
 		JSONObject data = new JSONObject();
 		data.put("device", device);
-
+		if(device==null||data.size()==0)
+		{
+			throw new BusinessException(ErrorCodeOption.PiBoxDevice_IsNot_Found.key,ErrorCodeOption.PiBoxDevice_IsNot_Found.value);
+		}
 		return new Output(data);
 	}
 
+	@Label("删除PIBox")
+	@RequestMapping(value="deletePIBox")
+	@WebApi(forceAuth = true,master = true,authority = {"1"})
+	public Output deletePIBox(@RequestParam("device_id") Integer device_id)
+	{
+		long accountId=AppContext.getSession().client.userId;
+		/*
+		* 删除 设备用户关联表
+		* */;
+		devBindUserApi.delDevBindUser(accountId,device_id);
+
+		/*
+		* 删除所关联的分组
+		* delete FROM account_dir_rel where ref_id=1 AND acc_dir_id IN (SELECT id FROM account_dir WHERE account_id=1)
+		* */
+		accountDirRelApi.deleteDeviceRel(device_id,accountId);
+		return new Output();
+	}
 	/*
 	 * 测试 没有用户登入等验证 直接先传入user_id
 	 */
