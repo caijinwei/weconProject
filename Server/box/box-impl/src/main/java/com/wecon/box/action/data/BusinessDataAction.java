@@ -212,8 +212,18 @@ public class BusinessDataAction {
         }
         return new Output(json);
     }
-}
 
+    /**
+     * 获取盒子列表
+     * @param param
+     * @return
+     */
+    @RequestMapping("data/boxs")
+    @WebApi(forceAuth = false, master = true)
+    public Output getBoxData(@Valid BusinessDataParam param) {
+        return new Output(null);
+    }
+}
 
 class BusinessDataParam {
     @Label("盒子ID")

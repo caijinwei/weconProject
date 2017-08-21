@@ -24,8 +24,8 @@ public class DevBindUserImpl implements DevBindUserApi {
 
     @Override
     public void saveDevBindUser(final DevBindUser model) {
-        String sql="insert into dev_bind_user (account_id,device_id,create_date)values(?,?,current_timestamp())";
-        jdbcTemplate.update(sql,new Object[]{model.account_id,model.device_id});
+        String sql = "insert into dev_bind_user (account_id,device_id,create_date)values(?,?,current_timestamp())";
+        jdbcTemplate.update(sql, new Object[]{model.account_id, model.device_id});
     }
 
     @Override
@@ -55,7 +55,9 @@ public class DevBindUserImpl implements DevBindUserApi {
 
     @Override
     public void delDevBindUser(long account_id, long device_id) {
-
+        Object[] args = new Object[]{account_id, device_id};
+        String sql = "DELETE FROM dev_bind_user  WHERE  account_id=? AND device_id=?";
+        jdbcTemplate.update(sql, args);
     }
 
     @Override
@@ -75,5 +77,17 @@ public class DevBindUserImpl implements DevBindUserApi {
             model.create_date = rs.getTimestamp("create_date");
             return model;
         }
+    }
+
+    public boolean isRecord(Integer device_id,long account_id)
+    {
+        Object[] args=new Object[]{device_id,account_id};
+        String sql="SELECT COUNT(*) FROM dev_bind_user WHERE device_id=? AND account_id=?";
+        Integer count=jdbcTemplate.queryForObject(sql,args,Integer.class);
+        if(count==1)
+        {
+            return true;
+        }
+        return false;
     }
 }

@@ -39,4 +39,11 @@ public interface DevBindUserApi {
 	* 根据设备号查询记录
 	* */
 	public int findByDevId(long device_id);
+
+	/*
+	* 查看是否绑定（表中是否有记录）
+	* @param    device_id     account_id
+	* 		    设备号id	用户账户id
+	* */
+	public boolean isRecord(Integer device_id,long account_id);
 }

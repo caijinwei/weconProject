@@ -1,14 +1,12 @@
 package com.wecon.box.api;
 
-import java.util.List;
-
+import com.wecon.box.entity.AccountDirRel;
 import org.springframework.stereotype.Component;
+
 /**
  * @author lanpenghui
  * 2017年8月1日
  */
-
-import com.wecon.box.entity.AccountDirRel;
 @Component
 public interface AccountDirRelApi {
 	/**
@@ -35,5 +33,11 @@ public interface AccountDirRelApi {
 	 */
 	public void delAccountDir(long acc_dir_id,long ref_id);
 
-
+	/*
+	* 删除用户绑定下的全部盒子
+	* @param device_id       account_id
+	* 		盒子id			用户id
+	* delete FROM account_dir_rel where ref_id=1 AND acc_dir_id IN (SELECT id FROM account_dir WHERE account_id=1)
+	* */
+	public void deleteDeviceRel(Integer device_id,long account_id);
 }
