@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by win7 on 2017/8/19.
+ * Created by whp on 2017/8/19.
  */
 public class BaseDom {
     private Map<String, String> attributes;
