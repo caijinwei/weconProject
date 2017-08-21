@@ -218,7 +218,7 @@ public class BusinessDataAction {
      * @param param
      * @return
      */
-    @RequestMapping("data/alarm")
+    @RequestMapping("data/boxs")
     @WebApi(forceAuth = false, master = true)
     public Output getBoxData(@Valid BusinessDataParam param) {
         return new Output(null);

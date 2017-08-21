@@ -33,10 +33,13 @@ public class PlcTypeQuerier {
      * @return
      */
     public List<Plc> query(String key, String value){
-        if(CommonUtils.isNullOrEmpty(key) || CommonUtils.isNullOrEmpty(value)){
+        List<Plc> localPlcTypeData = PlcTypeCache.localPlcTypeData;
+        if(CommonUtils.isNullOrEmpty(key)){
             return null;
         }
-        List<Plc> localPlcTypeData = PlcTypeCache.localPlcTypeData;
+        if(CommonUtils.isNullOrEmpty(value)){
+            return localPlcTypeData;
+        }
         List<Plc> result = null;
         if(null != localPlcTypeData){
             result = new ArrayList<Plc>();
