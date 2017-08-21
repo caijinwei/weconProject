@@ -52,5 +52,6 @@ public interface AccountDirApi {
      * @return
      */
     List<AccountDir> getAccountDirList(long account_id, int type);
+    List<AccountDir> getAccountDirList(long account_id, int type,long device_id);
 
 }

@@ -80,7 +80,8 @@ public interface RealHisCfgApi {
 	 * @param pageSize
 	 * @return
 	 */
-	Page<RealHisCfg> getRealHisCfgList(RealHisCfgFilter filter, int pageIndex, int pageSize);
+	Page<RealHisCfgDevice> getRealHisCfgList(RealHisCfgFilter filter, int pageIndex, int pageSize);
+	Page<RealHisCfgDevice> getRealHisCfgList(ViewAccountRoleFilter filter, int pageIndex, int pageSize);
 
 	/**
 	 * 通过filter及外部参数分页获取历史（实时）数据配置信息列表

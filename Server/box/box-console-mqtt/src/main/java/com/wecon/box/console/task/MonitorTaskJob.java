@@ -162,6 +162,7 @@ public class MonitorTaskJob implements Job {
 					} else {
 						// 保存device
 						deviceApi.saveDevice(newdevice);
+						olddevice = deviceApi.getDevice(machineCode);
 						System.out.println("device add success");
 					}
 				}
