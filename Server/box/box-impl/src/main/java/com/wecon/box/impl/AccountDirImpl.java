@@ -135,7 +135,7 @@ public class AccountDirImpl implements AccountDirApi {
 
 	@Override
 	public List<AccountDir> getAccountDirList(long account_id,int type,long device_id) {
-		String sql = " select  * from account_dir where 1=1 ";
+		String sql = " select  *from account_dir where 1=1 ";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
 		if (account_id > 0) {
@@ -143,7 +143,7 @@ public class AccountDirImpl implements AccountDirApi {
 			params.add(account_id);
 
 		}
-		if (device_id > 0||device_id==-100) {//管理账户默认device_id=-100
+		if (device_id > 0) {
 			condition.append(" and device_id = ? ");
 			params.add(device_id);
 
