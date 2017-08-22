@@ -1,6 +1,10 @@
 package com.wecon.box.action.data;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,9 +12,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.AccountDirApi;
+import com.wecon.box.api.AccountDirRelApi;
 import com.wecon.box.api.RealHisCfgApi;
 import com.wecon.box.api.RedisPiBoxApi;
 import com.wecon.box.entity.AccountDir;
+import com.wecon.box.entity.AccountDirRel;
 import com.wecon.box.entity.Page;
 import com.wecon.box.entity.PiBoxCom;
 import com.wecon.box.entity.PiBoxComAddr;
@@ -19,6 +25,7 @@ import com.wecon.box.entity.RedisPiBoxActData;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
+import com.wecon.box.util.ServerMqtt;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
@@ -39,9 +46,12 @@ public class ActDataAction {
 	private RealHisCfgApi realHisCfgApi;
 	@Autowired
 	private AccountDirApi accountDirApi;
+	@Autowired
+	private AccountDirRelApi accountDirRelApi;
 
 	/**
 	 * 通过机器码获取对应的实时数据组
+	 * 
 	 * @param device_id
 	 * @return
 	 */
@@ -64,7 +74,7 @@ public class ActDataAction {
 			model.account_id = client.userId;
 			model.name = "默认组";
 			model.type = 1;
-			model.device_id=deviceid;
+			model.device_id = deviceid;
 			long id = accountDirApi.addAccountDir(model);
 			if (id > 0) {
 				accountDirList = accountDirApi.getAccountDirList(client.userId, 1, deviceid);
@@ -77,6 +87,7 @@ public class ActDataAction {
 		}
 
 		json.put("ActGroup", accountDirList);
+		json.put("type", client.userInfo.getUserType());
 		return new Output(json);
 
 	}
@@ -97,9 +108,9 @@ public class ActDataAction {
 			@RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
 		Client client = AppContext.getSession().client;
 		JSONObject json = new JSONObject();
-		/**获取实时数据配置信息**/
+		/** 获取实时数据配置信息 **/
 		RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
-		/** 通过视图获取配置信息**/
+		/** 通过视图获取配置信息 **/
 		ViewAccountRoleFilter viewAccountRoleFilter = new ViewAccountRoleFilter();
 
 		Page<RealHisCfgDevice> realHisCfgDeviceList = null;
@@ -109,7 +120,7 @@ public class ActDataAction {
 			realHisCfgFilter.data_type = 0;
 			realHisCfgFilter.his_cycle = -1;
 			realHisCfgFilter.state = 1;
-			
+
 			realHisCfgFilter.account_id = client.userId;
 
 			if (!CommonUtils.isNullOrEmpty(acc_dir_id)) {
@@ -171,6 +182,70 @@ public class ActDataAction {
 		json.put("piBoxActDateMode", realHisCfgDeviceList);
 		return new Output(json);
 
+	}
+
+	/**
+	 * 更新实时监控点名称
+	 * 
+	 * @return
+	 */
+	@Description("更新实时监控点名称")
+	@RequestMapping(value = "/upActcfgName")
+	public Output upActcfgName(@RequestParam("id") String id, @RequestParam("name") String name,
+			@RequestParam("actgroupId") String actgroupId) {
+
+		if (!CommonUtils.isNullOrEmpty(id) && !CommonUtils.isNullOrEmpty(actgroupId)) {
+			AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(Long.parseLong(actgroupId),
+					Long.parseLong(id));
+
+			if (accountDirRel != null) {
+				accountDirRel.ref_alais = name;
+
+				accountDirRelApi.upAccountDirRel(accountDirRel);
+			}
+
+		}
+
+		return new Output();
+
+	}
+
+	@Description("mosquito消息的推送测试")
+	@RequestMapping(value = "/putMess")
+	public Output putMQTTMess(@RequestParam("machine_code") String machine_code, @RequestParam("com") String com,
+			@RequestParam("value") String value, @RequestParam("addr_id") String addr_id) throws MqttException {
+		ServerMqtt server = new ServerMqtt();
+		server.message = new MqttMessage();
+		server.message.setQos(1);
+		server.message.setRetained(true);
+
+		PiBoxComAddr addr1 = new PiBoxComAddr();
+		addr1.addr_id = addr_id;
+		addr1.value = value;
+		List<PiBoxCom> operate_data_list = new ArrayList<PiBoxCom>();
+		PiBoxCom piBoxCom = new PiBoxCom();
+		List<PiBoxComAddr> piBoxComAddrs = new ArrayList<PiBoxComAddr>();
+		piBoxCom.com = com;
+		piBoxComAddrs.add(addr1);
+		piBoxCom.addr_list = piBoxComAddrs;
+		operate_data_list.add(piBoxCom);
+
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("act", 2000);
+		jsonObject.put("machine_code", machine_code);
+		JSONObject oplistObject = new JSONObject();
+		oplistObject.put("operate_data_list", operate_data_list);
+		jsonObject.put("data", oplistObject);
+		jsonObject.put("feedback", 0);
+		String message = jsonObject.toJSONString();
+		System.out.println(message);
+		server.message.setPayload((message).getBytes());
+		server.topic11 = server.client.getTopic("pibox/stc/" + machine_code);
+
+		server.publish(server.topic11, server.message);
+		System.out.println(server.message.isRetained() + "------ratained状态");
+		server.client.disconnect();
+		return new Output();
 	}
 
 }

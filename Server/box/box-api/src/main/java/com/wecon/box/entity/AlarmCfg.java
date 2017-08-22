@@ -23,6 +23,7 @@ public class AlarmCfg {
 	public long alarmcfg_id;
 	public long data_id;
 	public long  account_id;
+	public long plc_id;
 	public String name;
 	public String addr;
 	public int addr_type;

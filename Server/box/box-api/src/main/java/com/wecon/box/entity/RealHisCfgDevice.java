@@ -8,6 +8,7 @@ package com.wecon.box.entity;
 public class RealHisCfgDevice extends RealHisCfg{
 	
 	public String machine_code;
+	public String ref_alais;
 	public String re_state;
 	public String re_value;
 	

@@ -103,9 +103,9 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 
 	@Override
 	public Page<AlarmCfgDataAlarmCfg> getRealHisCfgDataList(AlarmCfgDataFilter filter, int pageIndex, int pageSize) {
-		String sqlCount = "select count(0) from alarm_cfg ac ,alarm_cfg_data acd,alarm_trigger atr where 1=1 and  ac.alarmcfg_id=atr.alarmcfg_id and  ac.alarmcfg_id=acd.alarm_cfg_id and ac.bind_state=1";
+		String sqlCount = "select count(0) from alarm_cfg ac ,alarm_cfg_data acd,alarm_trigger atr,plc_info pli where 1=1 and  ac.alarmcfg_id=atr.alarmcfg_id and  ac.alarmcfg_id=acd.alarm_cfg_id and ac.bind_state=1 and pli.`plc_id`=ac.plc_id";
 		String sql = " select " + SEL_COL + ",ac.name,ac.text "
-				+ " from alarm_cfg ac ,alarm_cfg_data acd,alarm_trigger atr where 1=1 and  ac.alarmcfg_id=atr.alarmcfg_id and  ac.alarmcfg_id=acd.alarm_cfg_id and ac.bind_state=1";
+				+ " from alarm_cfg ac ,alarm_cfg_data acd,alarm_trigger atr,plc_info pli where 1=1 and  ac.alarmcfg_id=atr.alarmcfg_id and  ac.alarmcfg_id=acd.alarm_cfg_id and ac.bind_state=1 and pli.`plc_id`=ac.plc_id";
 
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
@@ -116,6 +116,10 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 		if (filter.alarm_cfg_id > 0) {
 			condition.append(" and acd.alarm_cfg_id = ? ");
 			params.add(filter.alarm_cfg_id);
+		}
+		if (filter.device_id > 0) {
+			condition.append(" and pli.device_id = ? ");
+			params.add(filter.device_id);
 		}
 		if (!CommonUtils.isNullOrEmpty(filter.value)) {
 			condition.append(" and acd.value like ? ");
@@ -159,9 +163,9 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 	@Override
 	public Page<AlarmCfgDataAlarmCfg> getViewRealHisCfgDataList(AlarmCfgDataFilter filter, int pageIndex,
 			int pageSize) {
-		String sqlCount = "select count(0) from view_account_role var,alarm_cfg ac,alarm_trigger atr ,alarm_cfg_data  acd where 1=1 and ac.alarmcfg_id=var.cfg_id and ac.alarmcfg_id=atr.alarmcfg_id and ac.alarmcfg_id=acd.alarm_cfg_id and var.cfg_type=2 and ac.bind_state=1 ";
+		String sqlCount = "select count(0) from view_account_role var,alarm_cfg ac,alarm_trigger atr ,alarm_cfg_data  acd,plc_info pli where 1=1 and ac.alarmcfg_id=var.cfg_id and ac.alarmcfg_id=atr.alarmcfg_id and ac.alarmcfg_id=acd.alarm_cfg_id and var.cfg_type=2 and ac.bind_state=1 and pli.`plc_id`=ac.plc_id";
 		String sql = " select " + SEL_COL + ",ac.name,ac.text "
-				+ " from view_account_role var,alarm_cfg ac,alarm_trigger atr ,alarm_cfg_data  acd where 1=1 and ac.alarmcfg_id=var.cfg_id and ac.alarmcfg_id=atr.alarmcfg_id and ac.alarmcfg_id=acd.alarm_cfg_id and var.cfg_type=2 and ac.bind_state=1 ";
+				+ " from view_account_role var,alarm_cfg ac,alarm_trigger atr ,alarm_cfg_data  acd,plc_info pli where 1=1 and ac.alarmcfg_id=var.cfg_id and ac.alarmcfg_id=atr.alarmcfg_id and ac.alarmcfg_id=acd.alarm_cfg_id and var.cfg_type=2 and ac.bind_state=1 and pli.`plc_id`=ac.plc_id";
 
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
@@ -172,6 +176,10 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 		if (filter.alarm_cfg_id > 0) {
 			condition.append(" and acd.alarm_cfg_id = ? ");
 			params.add(filter.alarm_cfg_id);
+		}
+		if (filter.device_id > 0) {
+			condition.append(" and pli.device_id = ? ");
+			params.add(filter.device_id);
 		}
 		if (!CommonUtils.isNullOrEmpty(filter.value)) {
 			condition.append(" and acd.value like ? ");
@@ -211,10 +219,9 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 		return page;
 	}
 
-
-
 	@Override
-	public Page<AlarmCfgDataAlarmCfg> getViewAlarmCfgDataPage(AlarmCfgDataFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize) {
+	public Page<AlarmCfgDataAlarmCfg> getViewAlarmCfgDataPage(AlarmCfgDataFilter filter, Map<String, Object> bParams,
+			int pageIndex, int pageSize) {
 		String fromStr = "from view_account_role var,alarm_cfg ac,alarm_trigger atr ,alarm_cfg_data  acd";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
@@ -243,15 +250,15 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 
 		}
 		Object groupId = bParams.get("groupId");
-		if(null != groupId){
+		if (null != groupId) {
 			fromStr += ", account_dir_ref f";
 			condition.append(" and ac.alarmcfg_id=f.ref_id and f.acc_dir_id = ?");
 			params.add(groupId);
 		}
-		String sqlCount = "select count(0) "+fromStr+
-				" where 1=1 and ac.alarmcfg_id=var.cfg_id and ac.alarmcfg_id=atr.alarmcfg_id and ac.alarmcfg_id=acd.alarm_cfg_id and var.cfg_type=2 ";
-		String sql = " select " + SEL_COL + ",ac.name,ac.text " +fromStr+
-				" where 1=1 and ac.alarmcfg_id=var.cfg_id and ac.alarmcfg_id=atr.alarmcfg_id and ac.alarmcfg_id=acd.alarm_cfg_id and var.cfg_type=2 ";
+		String sqlCount = "select count(0) " + fromStr
+				+ " where 1=1 and ac.alarmcfg_id=var.cfg_id and ac.alarmcfg_id=atr.alarmcfg_id and ac.alarmcfg_id=acd.alarm_cfg_id and var.cfg_type=2 ";
+		String sql = " select " + SEL_COL + ",ac.name,ac.text " + fromStr
+				+ " where 1=1 and ac.alarmcfg_id=var.cfg_id and ac.alarmcfg_id=atr.alarmcfg_id and ac.alarmcfg_id=acd.alarm_cfg_id and var.cfg_type=2 ";
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<AlarmCfgDataAlarmCfg> page = new Page<AlarmCfgDataAlarmCfg>(pageIndex, pageSize, totalRecord);
@@ -264,7 +271,8 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 	}
 
 	@Override
-	public Page<AlarmCfgDataAlarmCfg> getAdminAlarmCfgDataPage(AlarmCfgDataFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize) {
+	public Page<AlarmCfgDataAlarmCfg> getAdminAlarmCfgDataPage(AlarmCfgDataFilter filter, Map<String, Object> bParams,
+			int pageIndex, int pageSize) {
 		String fromStr = "from alarm_cfg ac ,alarm_cfg_data acd,alarm_trigger atr";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
@@ -293,18 +301,20 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 		}
 		Object boxId = bParams.get("boxId");
 		Object groupId = bParams.get("groupId");
-		if(null != boxId){
+		if (null != boxId) {
 			fromStr += ",device d, plc_info p";
 			condition.append(" and d.device_id=p.device_id and p.plc_id=ac.plc_id and d.device_id = ? ");
 			params.add(boxId);
 		}
-		if(null != groupId){
+		if (null != groupId) {
 			fromStr += ", account_dir_ref f";
 			condition.append(" and ac.alarmcfg_id=f.ref_id and f.acc_dir_id = ?");
 			params.add(groupId);
 		}
-		String sqlCount = "select count(0) "+fromStr+" where 1=1 and  ac.alarmcfg_id=atr.alarmcfg_id and  ac.alarmcfg_id=acd.alarm_cfg_id";
-		String sql = " select " + SEL_COL + ",ac.name,ac.text " + fromStr + " where 1=1 and  ac.alarmcfg_id=atr.alarmcfg_id and  ac.alarmcfg_id=acd.alarm_cfg_id ";
+		String sqlCount = "select count(0) " + fromStr
+				+ " where 1=1 and  ac.alarmcfg_id=atr.alarmcfg_id and  ac.alarmcfg_id=acd.alarm_cfg_id";
+		String sql = " select " + SEL_COL + ",ac.name,ac.text " + fromStr
+				+ " where 1=1 and  ac.alarmcfg_id=atr.alarmcfg_id and  ac.alarmcfg_id=acd.alarm_cfg_id ";
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<AlarmCfgDataAlarmCfg> page = new Page<AlarmCfgDataAlarmCfg>(pageIndex, pageSize, totalRecord);

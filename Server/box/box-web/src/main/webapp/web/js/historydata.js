@@ -4,6 +4,10 @@ appModule
 				"infoController",
 				function($scope, $http, $compile) {
 					$scope.onInit = function() {
+						$scope.deviceid = T.common.util
+								.getParameter("device_id");
+						$scope.devicename = T.common.util
+								.getParameter("device_name");
 						$scope.commointor_submit();
 
 						$('.form_datetime').datetimepicker({
@@ -25,8 +29,7 @@ appModule
 					$scope.commointor_submit = function() {
 						$("#loadingModal").modal("show");
 						var params = {
-							device_id : 1,
-							acc_dir_id : 21
+							device_id : $scope.deviceid
 
 						};
 						T.common.ajax.request("WeconBox",
@@ -34,6 +37,7 @@ appModule
 								function(data, code, msg) {
 									if (code == 200) {
 										$scope.commonitors = data.monitors;
+										$scope.accounttype = data.type;
 										if ($scope.commonitors == "") {
 											$("#searchid").attr("disabled",
 													true);
