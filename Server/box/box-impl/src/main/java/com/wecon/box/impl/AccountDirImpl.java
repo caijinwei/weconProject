@@ -83,6 +83,7 @@ public class AccountDirImpl implements AccountDirApi {
 		return true;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public boolean delAccountDir(final long id) {
 		TransactionTemplate tt = new TransactionTemplate(transactionManager);

@@ -248,4 +248,93 @@ public class ActDataAction {
 		return new Output();
 	}
 
+	/**
+	 * 复制监控点到其他组
+	 * 
+	 * @return
+	 */
+	@Description("复制监控点到其他组")
+	@RequestMapping(value = "/copyMonitor")
+	public Output copyMonitor(@RequestParam("monitorid") String monitorid,
+			@RequestParam("acc_dir_id") String acc_dir_id, @RequestParam("alais") String alais) {
+
+		if (CommonUtils.isNullOrEmpty(monitorid) || CommonUtils.isNullOrEmpty(acc_dir_id)
+				|| CommonUtils.isNullOrEmpty(alais)) {
+			throw new BusinessException(ErrorCodeOption.Get_Data_Error.key, ErrorCodeOption.Get_Data_Error.value);
+		}
+		AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(Long.parseLong(acc_dir_id),
+				Long.parseLong(monitorid));
+
+		if (accountDirRel != null) {
+			throw new BusinessException(ErrorCodeOption.Monitor_Existed.key, ErrorCodeOption.Monitor_Existed.value);
+		} else {
+
+			accountDirRel = new AccountDirRel();
+			accountDirRel.acc_dir_id = Long.parseLong(acc_dir_id);
+			accountDirRel.ref_id = Long.parseLong(monitorid);
+			accountDirRel.ref_alais = alais;
+			accountDirRelApi.saveAccountDirRel(accountDirRel);
+
+		}
+
+		return new Output();
+
+	}
+
+	/**
+	 * 移动监控点到其他组
+	 * 
+	 * @return
+	 */
+	@Description("复制监控点到其他组")
+	@RequestMapping(value = "/moveMonitor")
+	public Output moveMonitor(@RequestParam("monitorid") String monitorid,
+			@RequestParam("to_acc_dir_id") String to_acc_dir_id,
+			@RequestParam("from_acc_dir_id") String from_acc_dir_id, @RequestParam("alais") String alais) {
+
+		if (CommonUtils.isNullOrEmpty(monitorid) || CommonUtils.isNullOrEmpty(to_acc_dir_id)
+				|| CommonUtils.isNullOrEmpty(from_acc_dir_id) || CommonUtils.isNullOrEmpty(alais)) {
+			throw new BusinessException(ErrorCodeOption.Get_Data_Error.key, ErrorCodeOption.Get_Data_Error.value);
+		}
+		AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(Long.parseLong(to_acc_dir_id),
+				Long.parseLong(monitorid));
+
+		if (accountDirRel != null) {
+			throw new BusinessException(ErrorCodeOption.Monitor_Existed.key, ErrorCodeOption.Monitor_Existed.value);
+		} else {
+
+			accountDirRel = new AccountDirRel();
+			accountDirRel.acc_dir_id = Long.parseLong(to_acc_dir_id);
+			accountDirRel.ref_id = Long.parseLong(monitorid);
+			accountDirRel.ref_alais = alais;
+			accountDirRelApi.saveAccountDirRel(accountDirRel);
+			// 删除该分组下的监控点
+			accountDirRelApi.delAccountDir(Long.parseLong(from_acc_dir_id), Long.parseLong(monitorid));
+
+		}
+
+		return new Output();
+
+	}
+
+	/**
+	 * 复制监控点到其他组
+	 * 
+	 * @return
+	 */
+	@Description("移除监控点")
+	@RequestMapping(value = "/delMonitor")
+	public Output delMonitor(@RequestParam("monitorid") String monitorid,
+			@RequestParam("acc_dir_id") String acc_dir_id) {
+
+		if (CommonUtils.isNullOrEmpty(monitorid) || CommonUtils.isNullOrEmpty(acc_dir_id)) {
+			throw new BusinessException(ErrorCodeOption.Get_Data_Error.key, ErrorCodeOption.Get_Data_Error.value);
+		}
+		// 删除该分组下的监控点
+		accountDirRelApi.delAccountDir(Long.parseLong(acc_dir_id), Long.parseLong(monitorid));
+
+		return new Output();
+
+	}
+
 }
