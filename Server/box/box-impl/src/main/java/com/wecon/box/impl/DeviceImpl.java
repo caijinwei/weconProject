@@ -1,10 +1,12 @@
 package com.wecon.box.impl;
 
-import com.wecon.box.api.DeviceApi;
+import com.wecon.box.api.*;
 import com.wecon.box.entity.Device;
 import com.wecon.box.entity.Page;
+import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.filter.DeviceFilter;
 import com.wecon.common.util.CommonUtils;
+import com.wecon.restful.core.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -12,16 +14,33 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author lanpenghui 2017年8月4日上午10:01:01
  */
 @Component
 public class DeviceImpl implements DeviceApi {
+
+    @Autowired
+    AlarmCfgApi alarmCfgApi;
+    @Autowired
+    RealHisCfgApi realHisCfgApi;
+    @Autowired
+    DevBindUserApi devBindUserApi;
+    @Autowired
+    AccountDirRelApi accountDirRelApi;
+    @Autowired
+    public PlatformTransactionManager transactionManager;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -201,4 +220,47 @@ public class DeviceImpl implements DeviceApi {
         return list;
     }
 
+    /*
+    * PIBox解除绑定
+    * */
+    public boolean unbindDevice(final Integer accountId, final Integer deviceId) {
+        TransactionTemplate tt = new TransactionTemplate(transactionManager);
+        try {
+            tt.execute(new TransactionCallback() {
+                @Override
+                public Object doInTransaction(TransactionStatus ts) {
+
+	            /*
+                * 删除 设备用户关联表
+		        * */
+                    devBindUserApi.delDevBindUser(accountId, deviceId);
+                    /*
+		            * 删除所关联的分组
+		            * delete FROM account_dir_rel where ref_id=1 AND acc_dir_id IN (SELECT id FROM account_dir WHERE account_id=1)
+		            * */
+                    accountDirRelApi.deleteDeviceRel(deviceId, accountId);
+
+                    /*
+                    *查询盒子下的监控点
+                    * */
+                    ArrayList<Integer>realHisCfgIds=realHisCfgApi.findRealHisCfgIdSBydevice_id(deviceId);
+                    realHisCfgApi.setBind_state(toIntArray(realHisCfgIds),0);
+                    ArrayList<Integer>alarmCfgIds=alarmCfgApi.findAlarmCfgIdSBydevice_id(deviceId);
+                    alarmCfgApi.setBind_state(toIntArray(alarmCfgIds),0);
+                    return true;
+                }
+            });
+        } catch (Exception e) {
+            Logger.getLogger(AccountImpl.class.getName()).log(Level.SEVERE, null, e);
+            throw new BusinessException(ErrorCodeOption.AccountExisted.key, ErrorCodeOption.AccountExisted.value);
+//            throw new RuntimeException(e);
+        }
+        return true;
+    }
+    int[] toIntArray(List<Integer> list){
+        int[] ret = new int[list.size()];
+        for(int i = 0;i <ret.length;i++)
+            ret[i] = list.get(i);
+        return ret;
+    }
 }

@@ -1,11 +1,9 @@
 package com.wecon.box.api;
 
-import java.util.List;
-
-import org.springframework.stereotype.Component;
 import com.wecon.box.entity.Device;
 import com.wecon.box.entity.Page;
 import com.wecon.box.filter.DeviceFilter;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -77,4 +75,9 @@ public interface DeviceApi {
 * sql:SELECT a.device_id, b.`name` FROM dev_bind_user a INNER JOIN device b ON a.device_id=b.device_id WHERE a.account_id='1000017';
 * */
     public List<Device> getDeviceNameByAccId(long acc_id);
+
+    /*
+    * 根据device_id解除盒子的绑定（分组，监控点）
+    * */
+    public boolean unbindDevice(final Integer accountId, final Integer deviceId);
 }

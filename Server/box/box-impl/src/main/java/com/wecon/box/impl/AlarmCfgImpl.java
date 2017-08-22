@@ -1,22 +1,18 @@
 package com.wecon.box.impl;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.wecon.box.api.AlarmCfgApi;
+import com.wecon.box.entity.AlarmCfg;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
-import com.wecon.box.api.AlarmCfgApi;
-import com.wecon.box.entity.AlarmCfg;
-import com.wecon.box.entity.AlarmCfgData;
-import com.wecon.box.entity.Page;
-import com.wecon.box.entity.RealHisCfgDevice;
-import com.wecon.box.impl.RealHisCfgImpl.DefaultRealHisCfgDeviceRowMapper;
-import com.wecon.common.util.CommonUtils;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author lanpenghui 2017年8月9日下午2:20:05
@@ -59,6 +55,45 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			model.update_date = rs.getTimestamp("update_date");
 
 			return model;
+		}
+	}
+	/*
+ * 查询盒子下的监控点
+ * */
+	public ArrayList<Integer> findAlarmCfgIdSBydevice_id(Integer device_id)
+	{
+		Object[] args=new Object[]{device_id};
+		String sql="SELECT alarmcfg_id FROM alarm_cfg WHERE device_id=?";
+		ArrayList<Integer> list=null;
+		list= (ArrayList<Integer>) jdbcTemplate.query(sql, args, new RowMapper<Integer>() {
+			public Integer mapRow(ResultSet resultSet, int i) throws SQLException {
+				Integer model=resultSet.getInt("id");
+				return model;
+			}
+		});
+		return list;
+
+	}
+	/*
+  * 设置bind_state=0
+  * 解绑
+  * */
+	public void setBind_state(final int[] alaramCfgId, final Integer state) {
+		String sql = "UPDATE alarm_cfg SET alarmcfg_id=? where bind_state=?";
+		Object[] args = new Object[]{alaramCfgId, state};
+		if (alaramCfgId.length != 0) {
+			jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+				@Override
+				public void setValues(PreparedStatement ps, int i) throws SQLException {
+					ps.setInt(1, alaramCfgId[i]);
+					ps.setInt(2, state);
+				}
+
+				@Override
+				public int getBatchSize() {
+					return 0;
+				}
+			});
 		}
 	}
 

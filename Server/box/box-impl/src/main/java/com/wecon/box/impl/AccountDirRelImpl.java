@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,62 +17,89 @@ import java.util.List;
  */
 @Component
 public class AccountDirRelImpl implements AccountDirRelApi {
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-	private final String SEL_COL = "acc_dir_id,ref_id,ref_alais,create_date";
+    @Autowired
+    public PlatformTransactionManager transactionManager;
 
-	@Override
-	public void saveAccountDirRel(final AccountDirRel model) {
 
-		String sql="insert into account_dir_rel(acc_dir_id,ref_id,ref_alais,create_date) values (?,?,?,current_timestamp())";
-		Object[] args=new Object[]{model.acc_dir_id,model.ref_id,model.ref_alais};
-		jdbcTemplate.update(sql,args);
-	}
+    private final String SEL_COL = "acc_dir_id,ref_id,ref_alais,create_date";
 
-	@Override
-	public AccountDirRel getAccountDirRel(long acc_dir_id, long ref_id) {
-		
-		String sql = "select " + SEL_COL + " from account_dir where id=?";
-		List<AccountDirRel> list = jdbcTemplate.query(sql, new Object[] { acc_dir_id,ref_id }, new DefaultAccountDirRelRowMapper());
-		if (!list.isEmpty()) {
-			return list.get(0);
-		}
-		return null;
-		
-		
-	}
+    @Override
+    public void saveAccountDirRel(final AccountDirRel model) {
 
-	@Override
-	public void delAccountDir(long acc_dir_id, long ref_id) {
-		
-			String sql = "delete from  account_dir  where acc_dir_id=? and ref_id=?";
-			jdbcTemplate.update(sql, new Object[] { acc_dir_id,ref_id });
+        String sql = "insert into account_dir_rel(acc_dir_id,ref_id,ref_alais,create_date) values (?,?,?,current_timestamp())";
+        Object[] args = new Object[]{model.acc_dir_id, model.ref_id, model.ref_alais};
+        jdbcTemplate.update(sql, args);
+    }
 
-		
+    @Override
+    public AccountDirRel getAccountDirRel(long acc_dir_id, long ref_id) {
 
-	}
-	public static final class DefaultAccountDirRelRowMapper implements RowMapper<AccountDirRel> {
+        String sql = "select " + SEL_COL + " from account_dir where id=?";
+        List<AccountDirRel> list = jdbcTemplate.query(sql, new Object[]{acc_dir_id, ref_id}, new DefaultAccountDirRelRowMapper());
+        if (!list.isEmpty()) {
+            return list.get(0);
+        }
+        return null;
 
-		@Override
-		public AccountDirRel mapRow(ResultSet rs, int i) throws SQLException {
-			AccountDirRel model = new AccountDirRel();
-			model.acc_dir_id = rs.getLong("acc_dir_id");
-			model.ref_id = rs.getLong("ref_id");
-			model.ref_alais = rs.getString("ref_alais");
-			model.create_date = rs.getTimestamp("create_date");
-			return model;
-		}
-	}
-	/*
-	* 删除用户绑定下的全部盒子
-	* delete FROM account_dir_rel where ref_id=1 AND acc_dir_id IN (SELECT id FROM account_dir WHERE account_id=1)
-	* */
-	public void deleteDeviceRel(Integer device_id,long account_id)
-	{
-		Object[] args=new Object[]{device_id,account_id};
-		String sql="delete FROM account_dir_rel where ref_id=? AND acc_dir_id IN (SELECT id FROM account_dir WHERE account_id=?)";
-		jdbcTemplate.update(sql,args);
-	}
+
+    }
+
+    @Override
+    public void delAccountDir(long acc_dir_id, long ref_id) {
+
+        String sql = "delete from  account_dir  where acc_dir_id=? and ref_id=?";
+        jdbcTemplate.update(sql, new Object[]{acc_dir_id, ref_id});
+
+
+    }
+
+    public static final class DefaultAccountDirRelRowMapper implements RowMapper<AccountDirRel> {
+
+        @Override
+        public AccountDirRel mapRow(ResultSet rs, int i) throws SQLException {
+            AccountDirRel model = new AccountDirRel();
+            model.acc_dir_id = rs.getLong("acc_dir_id");
+            model.ref_id = rs.getLong("ref_id");
+            model.ref_alais = rs.getString("ref_alais");
+            model.create_date = rs.getTimestamp("create_date");
+            return model;
+        }
+    }
+
+    /*
+    * 删除用户绑定下的全部盒子
+    * delete FROM account_dir_rel where ref_id=1 AND acc_dir_id IN (SELECT id FROM account_dir WHERE account_id=1)
+    * */
+    public void deleteDeviceRel(Integer device_id, long account_id) {
+        Object[] args = new Object[]{device_id, account_id};
+        String sql = "delete FROM account_dir_rel where ref_id=? AND acc_dir_id IN (SELECT id FROM account_dir WHERE account_id=?)";
+        jdbcTemplate.update(sql, args);
+    }
+
+    /*
+    * 删除AccountDirRel记录
+    * */
+    public int deleteAccountDirRel(AccountDirRel accountDirRel) {
+        String sql = "DELETE FROM account_dir_rel WHERE acc_dir_id=? AND ref_id=?";
+        Object[] args = new Object[]{accountDirRel.acc_dir_id, accountDirRel.ref_id};
+        return jdbcTemplate.update(sql, args);
+    }
+
+    /*
+    * 更新分组信息
+    * */
+    public int updateAccountDirRel(AccountDirRel newAccDirRel, AccountDirRel oldAccDirRel) {
+        String sql = "UPDATE account_dir_rel SET acc_dir_id=?, ref_id=? WHERE acc_dir_id=? AND  ref_id=?";
+        Object[] args = new Object[]{newAccDirRel.acc_dir_id, newAccDirRel.ref_id, oldAccDirRel.acc_dir_id, newAccDirRel.ref_id};
+        return jdbcTemplate.update(sql, args);
+    }
+
+
 
 }
+
+
+

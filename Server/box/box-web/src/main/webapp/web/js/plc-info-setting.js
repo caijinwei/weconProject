@@ -1,17 +1,13 @@
 var appModule = angular.module('weconweb', []);
-
-
-
-appModule.controller("infoController", function ($scope,$window,$http,$location,$compile) {
+appModule.controller("infoController", function ($scope, $window, $http, $location, $compile) {
     $scope.onInit = function () {
         /*
          * plc配置展示
          * */
-
-        $scope.device_id=T.common.util.getParameter("device_id");
+        $scope.device_id = T.common.util.getParameter("device_id");
         $("#device_id").val($scope.device_id);
-        var params={device_id:$("#device_id").val()};
-        T.common.ajax.request("WeconBox", "plcInfoAction/showAllPlcConf", params,function (data, code, msg) {
+        var params = {device_id: $("#device_id").val()};
+        T.common.ajax.request("WeconBox", "plcInfoAction/showAllPlcConf", params, function (data, code, msg) {
             var test = 1;
             if (code == 200) {
                 $scope.infoDatas = data.infoDatas;
@@ -23,6 +19,28 @@ appModule.controller("infoController", function ($scope,$window,$http,$location,
         }, function () {
             alert("ajax error");
         });
+    }
+
+    /*
+    * 盒子下plc配置展示
+    * */
+    $scope.showAllPlcConf=function ()
+    {
+            $scope.device_id = T.common.util.getParameter("device_id");
+            $("#device_id").val($scope.device_id);
+            var params = {device_id: $("#device_id").val()};
+            T.common.ajax.request("WeconBox", "plcInfoAction/showAllPlcConf", params, function (data, code, msg) {
+                var test = 1;
+                if (code == 200) {
+                    $scope.infoDatas = data.infoDatas;
+                    $scope.$apply();
+                }
+                else {
+                    alert(code + "-" + msg);
+                }
+            }, function () {
+                alert("ajax error");
+            });
     }
 
     /**
@@ -63,19 +81,17 @@ appModule.controller("infoController", function ($scope,$window,$http,$location,
             alert("配置参数填未填写");
             return;
 
-            if(isValidIP(params.net_ipaddr)!=true)
-            {
+            if (isValidIP(params.net_ipaddr) != true) {
                 alert("情输入正确的IP地址");
             }
             return;
         }
 
         /*
-        * 当plc_id 不等于0
-        * 对plc_id的通讯口就行修改编辑
-        * */
-        if($("#plc_id").val()!=0)
-        {
+         * 当plc_id 不等于0
+         * 对plc_id的通讯口就行修改编辑
+         * */
+        if ($("#plc_id").val() != 0) {
             T.common.ajax.request("WeconBox", "plcInfoAction/updataPlcInfo", params, function (data, code, msg) {
                 if (code == 200) {
 //                    console.log(data);
@@ -88,37 +104,35 @@ appModule.controller("infoController", function ($scope,$window,$http,$location,
             }, function () {
                 alert("ajax error");
             });
-
-        }
-
-        T.common.ajax.request("WeconBox", "plcInfoAction/addPlcInfo", params, function (data, code, msg) {
-            if (code == 200) {
+        } else {
+            T.common.ajax.request("WeconBox", "plcInfoAction/addPlcInfo", params, function (data, code, msg) {
+                if (code == 200) {
 //                    console.log(data);
-                alert("添加配置成功");
+                    alert("添加配置成功");
 
-                $("#addConfig").modal("hide");
-            }
-            else {
-                alert(code + "-" + msg);
-            }
-        }, function () {
-            alert("ajax error");
-        });
-    };
-
+                    $("#addConfig").modal("hide");
+                }
+                else {
+                    alert(code + "-" + msg);
+                }
+            }, function () {
+                alert("ajax error");
+            });
+        }
+        ;
+    }
     /*
-    * 设置 点击的plc_id
-    * 用于区别是添加通讯口配置还是修改通讯口配置
-    * */
-    $scope.setplc_id=function(plc_id)
-    {
-        $("#plc_id").value=plc_id;
+     * 设置 点击的plc_id
+     * 用于区别是添加通讯口配置还是修改通讯口配置
+     * */
+    $scope.setplc_id = function (plc_id) {
+        $("#plc_id").value = plc_id;
         alert("plc_id设置成功");
     }
 
     /*
-    * 进行输入框IP地址验证
-    * */
+     * 进行输入框IP地址验证
+     * */
 
 
     function isValidIP(ip) {
