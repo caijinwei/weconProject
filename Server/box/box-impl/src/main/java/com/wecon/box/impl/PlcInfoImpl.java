@@ -67,7 +67,6 @@ private final String SEL_COL = "plc_id,device_id,type,driver,box_stat_no,plc_sta
         });
 
     }
-
     @Override
     public boolean updatePlcInfo(PlcInfo model) {
 

@@ -8,6 +8,7 @@ import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.common.util.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -271,7 +272,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 	@Override
 	public Page<RealHisCfgDevice> getRealHisCfgDevicePage(RealHisCfgFilter filter, Map<String, Object> bParams,
-			int pageIndex, int pageSize) {
+														  int pageIndex, int pageSize) {
 		String fromStr = "from real_his_cfg r ,device d, plc_info p";
 		StringBuffer condition = new StringBuffer();
 		List<Object> params = new ArrayList<Object>();
@@ -321,7 +322,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 	@Override
 	public Page<RealHisCfgDevice> getRealHisCfgDevicePage(ViewAccountRoleFilter filter, Map<String, Object> bParams,
-			int pageIndex, int pageSize) {
+														  int pageIndex, int pageSize) {
 		String fromStr = "from real_his_cfg r ,device d, plc_info p, view_account_role v";
 		StringBuffer condition = new StringBuffer();
 		List<Object> params = new ArrayList<Object>();
@@ -450,7 +451,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		}
 	}
 	public static final class DefaultHisCfgDeviceRowMapper implements RowMapper<RealHisCfgDevice> {
-		
+
 		@Override
 		public RealHisCfgDevice mapRow(ResultSet rs, int i) throws SQLException {
 			RealHisCfgDevice model = new RealHisCfgDevice();
@@ -473,5 +474,46 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			return model;
 		}
 	}
+	/*
+       * 查询盒子下的监控点
+       * */
+	public ArrayList<Integer> findRealHisCfgIdSBydevice_id(Integer device_id)
+	{
+		Object[] args=new Object[]{device_id};
+		String sql="SELECT id FROM real_his_cfg WHERE device_id=?";
+		ArrayList<Integer> list=null;
+		list= (ArrayList<Integer>) jdbcTemplate.query(sql, args, new RowMapper<Integer>() {
+			public Integer mapRow(ResultSet resultSet, int i) throws SQLException {
+				Integer model=resultSet.getInt("id");
+				return model;
+			}
+		});
+		return list;
+
+	}
+
+	/*
+    * 设置bind_state=0
+    * 解绑
+    * */
+	public void setBind_state(final int[] realHisCfg, final Integer state) {
+		String sql = "UPDATE real_his_cfg SET id=? where bind_state=?";
+		Object[] args = new Object[]{realHisCfg, state};
+		if (realHisCfg.length != 0) {
+			jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+				@Override
+				public void setValues(PreparedStatement ps, int i) throws SQLException {
+					ps.setInt(1, realHisCfg[i]);
+					ps.setInt(2, state);
+				}
+
+				@Override
+				public int getBatchSize() {
+					return 0;
+				}
+			});
+		}
+	}
+
 
 }

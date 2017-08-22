@@ -15,4 +15,5 @@ public class AccountDirRel {
 	public long ref_id;// 1.实时数据、历史数据id 2.报警数据id 3.机器id
 	public String ref_alais;
 	public Timestamp create_date;
+
 }

@@ -1,15 +1,15 @@
 package com.wecon.box.api;
 
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.stereotype.Component;
-
 import com.wecon.box.entity.Page;
 import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.entity.RealHisCfgDevice;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author lanpenghui 2017年8月1日
@@ -44,7 +44,7 @@ public interface RealHisCfgApi {
 	/**
 	 * 通过filter获取历史（实时）数据配置信息列表
 	 * 
-	 * @param account
+	 * @param
 	 * @return
 	 */
 	public List<RealHisCfgDevice> getRealHisCfg(RealHisCfgFilter filter);
@@ -99,4 +99,14 @@ public interface RealHisCfgApi {
 	 */
 	public Page<RealHisCfgDevice> getRealHisCfgDevicePage(ViewAccountRoleFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize);
 
-}
+	/*
+	* 查找id根据device_id
+	* */
+	public ArrayList<Integer> findRealHisCfgIdSBydevice_id(Integer device_id);
+
+	/*
+	* 解绑device
+	* */
+	public void setBind_state(final int[] realHisCfg, final Integer state);
+
+	}
