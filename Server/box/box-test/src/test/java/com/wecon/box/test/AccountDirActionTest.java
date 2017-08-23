@@ -46,6 +46,7 @@ public class AccountDirActionTest extends TestBase {
         request.param("id", "0");
         request.param("name", "盒子分组3");
         request.param("type", "0");
+        request.param("device_id", "0");
         String ret = test(request, true);
         JSONObject jsonObject = JSON.parseObject(ret);
         Assert.assertEquals(jsonObject.get("code").toString(), "11010");

@@ -32,7 +32,7 @@ public class LogAccountImpl implements LogAccountApi {
 
     @Override
     public long addLog(final LogAccount log) {
-        final String sql = "insert into log_account(`account_id`, `client_platform`, `client_ip`, `op_type`, `op_date`, `op_time`, `message`, `url`) values(?,?,?,?,?,CURRENT_TIMESTAMP(),?,?)";
+        final String sql = "insert into log_account(`account_id`, `client_platform`, `client_ip`, `op_type`, `op_date`, `op_time`, `message`, `url`, `res_id`, `res_type`) values(?,?,?,?,?,CURRENT_TIMESTAMP(),?,?,?,?)";
         //创建一个主键持有者
         KeyHolder key = new GeneratedKeyHolder();
 
@@ -47,6 +47,8 @@ public class LogAccountImpl implements LogAccountApi {
                 preState.setLong(5, log.op_date);
                 preState.setString(6, log.message);
                 preState.setString(7, log.url);
+                preState.setLong(8, log.res_id);
+                preState.setInt(9, log.res_type);
                 return preState;
             }
         }, key);
