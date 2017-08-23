@@ -35,7 +35,11 @@ public enum ErrorCodeOption {
     AlarmViewpoint_IsNULL("报警监控点为空",300008),
     Get_HisList_Error("获取历史数据配置列表失败",30006),
     Get_AlarmList_Error("获取报警数据配置列表失败",30007),
-    Get_ActList_Error("获取实时数据配置列表失败",30008);
+    Get_ActList_Error("获取实时数据配置列表失败",30008),
+	
+	
+    Monitor_Existed("该分组下已经存在该监控点",60001),
+	Get_Data_Error("获取参数异常",60002);
 
     public int value;
     public String key;

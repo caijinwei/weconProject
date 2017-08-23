@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"  ng-app="weconweb">
+<html lang="en" ng-app="weconweb">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -12,7 +12,7 @@
     <script src="../lib/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="../lib/angular/angular.js"></script>
 </head>
-<body  ng-controller="infoController" ng-init="onInit()" >
+<body ng-controller="infoController" ng-init="onInit()">
 <div class="container-fluid">
     <div class="row" style="margin-top: 40px;">
         <table class="table table-bordered">
@@ -39,8 +39,9 @@
                 <td>{{x.comtype}}</td>
                 <td>{{x.type}}</td>
                 <td>
-                    <a href="#" data-toggle="modal" data-target="#addConfig" ng-click="setplc_id()"><span class="glyphicon glyphicon-edit" title="编辑"
-                                      style="color:#2889d0;margin:10px;"></span></a>
+                    <a href="#" data-toggle="modal" data-target="#addConfig" ng-click="setplc_id()"><span
+                            class="glyphicon glyphicon-edit" title="编辑"
+                            style="color:#2889d0;margin:10px;"></span></a>
                     <a href="#"><span class="glyphicon glyphicon-trash" title="删除此配置"
                                       style="color:#2889d0;margin:10px;"></span></a>
                 </td>
@@ -54,7 +55,7 @@
 
 <!--添加通信口配置-->
 <div class="modal" id="addConfig" tabindex="-1" data-backdrop="false">
-    <div class="modal-dialog " >
+    <div class="modal-dialog ">
 
         <div class="modal-content">
             <div class="modal-header">
@@ -70,12 +71,14 @@
                     当plc_id为非0数值时候  就是修改改plc_id的内容
 
                      -->
-                    <input type="hidden"  id="plc_id" value="0"/>
+                    <input type="hidden" id="plc_id" value="0"/>
+
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col-md-6 " style="margin: 10px 0;">
                                 <span class="col-md-5">设备ID</span>
-                                <input class="col-md-7" name="device_id" id="device_id" style="height: 30px; cursor: not-allowed;" disabled  />
+                                <input class="col-md-7" name="device_id" id="device_id"
+                                       style="height: 30px; cursor: not-allowed;" disabled/>
                             </div>
                             <div class=" col-md-6 " style="margin: 10px 0;">
                                 <span class="col-md-5"><span style="color: red">*</span>驱动名称</span>
@@ -98,7 +101,7 @@
                                     <option>USB</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 " style="margin: 10px 0;" >
+                            <div class="col-md-6 " style="margin: 10px 0;">
                                 <span class="col-md-5"><span style="color: red">*</span>串口协议</span>
                                 <select class="col-md-7" style="height: 30px;" name="comtype" id="comtype"
                                         onchange="show_sub(this.options[this.options.selectedIndex].value)">
@@ -112,69 +115,82 @@
 
                         <div class="row">
                             <div class="col-md-6 " style="margin: 10px 0;">
-                                <span class="col-md-5" ><span style="color: red">*</span>盒子站号</span>
-                                <input class="col-md-7" style="height: 30px;" type="number" name="box_stat_no" id="box_stat_no"/>
+                                <span class="col-md-5"><span style="color: red">*</span>盒子站号</span>
+                                <input class="col-md-7" style="height: 30px;" type="number" name="box_stat_no"
+                                       id="box_stat_no"/>
                             </div>
                             <div class="col-md-6 " style="margin: 10px 0;">
-                                <span class="col-md-5" ><span style="color: red">*</span>PLC站号</span>
-                                <input class="col-md-7" style="height: 30px;" name="plc_stat_no" type="number" id="plc_stat_no"/>
+                                <span class="col-md-5"><span style="color: red">*</span>PLC站号</span>
+                                <input class="col-md-7" style="height: 30px;" name="plc_stat_no" type="number"
+                                       id="plc_stat_no"/>
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 " style="margin: 10px 0;">
                                 <span class="col-md-5"><span style="color: red">*</span>波特率</span>
-                                <input class="col-md-7"  style="height: 30px;" type="number"  name="baudrate" id="baudrate"/>
+                                <input class="col-md-7" style="height: 30px;" type="number" name="baudrate"
+                                       id="baudrate"/>
                             </div>
                             <div class="col-md-6 " style="margin: 10px 0;">
                                 <span class="col-md-5"><span style="color: red">*</span>停止位</span>
-                                <input class="col-md-7" style="height: 30px;" type="number"  name="stop_bit" id="stop_bit"/>
+                                <input class="col-md-7" style="height: 30px;" type="number" name="stop_bit"
+                                       id="stop_bit"/>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 " style="margin: 10px 0;">
                                 <span class="col-md-5"><span style="color: red">*</span>数据位</span>
-                                <input class="col-md-7"  style="height: 30px;" type="number" name="data_length" id="data_length"/>
+                                <input class="col-md-7" style="height: 30px;" type="number" name="data_length"
+                                       id="data_length"/>
                             </div>
                             <div class="col-md-6 " style="margin: 10px 0;">
                                 <span class="col-md-5"><span style="color: red">*</span>校验位</span>
-                                <input class="col-md-7" style="height: 30px;" type="number" name="check_bit" id="check_bit"/>
+                                <input class="col-md-7" style="height: 30px;" type="number" name="check_bit"
+                                       id="check_bit"/>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 " style="margin: 10px 0;">
                                 <span class="col-md-5"><span style="color: red">*</span>重试次数</span>
-                                <input class="col-md-7"  style="height: 30px;" type="number" name="retry_times" id="retry_times"/>
+                                <input class="col-md-7" style="height: 30px;" type="number" name="retry_times"
+                                       id="retry_times"/>
                             </div>
                             <div class="col-md-6 " style="margin: 10px 0;">
                                 <span class="col-md-5"><span style="color: red">*</span>等待超时 ms</span>
-                                <input class="col-md-7" style="height: 30px;" type="number" name="wait_timeout" id="wait_timeout"/>
+                                <input class="col-md-7" style="height: 30px;" type="number" name="wait_timeout"
+                                       id="wait_timeout"/>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 " style="margin: 10px 0;">
                                 <span class="col-md-5"><span style="color: red">*</span>接收超时 ms</span>
-                                <input class="col-md-7"  style="height: 30px;" type="number" name="rev_timeout" id="rev_timeout"/>
+                                <input class="col-md-7" style="height: 30px;" type="number" name="rev_timeout"
+                                       id="rev_timeout"/>
                             </div>
                             <div class="col-md-6 " style="margin: 10px 0;">
                                 <span class="col-md-5"><span style="color: red">*</span>连续长度</span>
-                                <input class="col-md-7" style="height: 30px;" type="number"  name="com_stepinterval" id="com_stepinterval"/>
+                                <input class="col-md-7" style="height: 30px;" type="number" name="com_stepinterval"
+                                       id="com_stepinterval"/>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 " style="margin: 10px 0;">
                                 <span class="col-md-5"><span style="color: red">*</span>通讯延迟时间 ms</span>
-                                <input class="col-md-7"  style="height: 30px;" type="number"  name="com_iodelaytime" id="com_iodelaytime"/>
+                                <input class="col-md-7" style="height: 30px;" type="number" name="com_iodelaytime"
+                                       id="com_iodelaytime"/>
                             </div>
                             <div class="col-md-6 " style="margin: 10px 0;">
                                 <span class="col-md-5"><span style="color: red">*</span>重试超时 s</span>
-                                <input class="col-md-7" style="height: 30px;" type="number"  name="retry_timeout" id="retry_timeout"/>
+                                <input class="col-md-7" style="height: 30px;" type="number" name="retry_timeout"
+                                       id="retry_timeout"/>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 " style="margin: 10px 0;">
                                 <span class="col-md-5"><span style="color: red">*</span>端口</span>
-                                <input class="col-md-7"  style="height: 30px;"type="number"   name="net_port" id="net_port"/>
+                                <input class="col-md-7" style="height: 30px;" type="number" name="net_port"
+                                       id="net_port"/>
                             </div>
                             <div class="col-md-6 " style="margin: 10px 0;">
                                 <span class="col-md-5"><span style="color: red">*</span>网络类型</span>
@@ -191,25 +207,27 @@
                         <div class="row">
                             <div class="col-md-6 " style="margin: 10px 0;">
                                 <span class="col-md-5"><span style="color: red">*</span>使用广播地址</span>
-                                <input class="col-md-7"  style="height: 30px;" type="number"  name="net_isbroadcast" id="net_isbroadcast"/>
+                                <input class="col-md-7" style="height: 30px;" type="number" name="net_isbroadcast"
+                                       id="net_isbroadcast"/>
                             </div>
                             <div class="col-md-6 " style="margin: 10px 0;">
                                 <span class="col-md-5"><span style="color: red">*</span>广播地址站号</span>
-                                <input class="col-md-7" style="height: 30px;" type="number"  name="net_broadcastaddr" id="net_broadcastaddr"/>
+                                <input class="col-md-7" style="height: 30px;" type="number" name="net_broadcastaddr"
+                                       id="net_broadcastaddr"/>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 " style="margin: 10px 0;">
                                 <span class="col-md-5"><span style="color: red">*</span>IP地址</span>
-                                <input class="col-md-7"  style="height: 30px;" name="net_ipaddr" id="net_ipaddr"/>
+                                <input class="col-md-7" style="height: 30px;" name="net_ipaddr" id="net_ipaddr"/>
                             </div>
                             <div class="col-md-6 " style="margin: 10px 0;">
                                 <span class="col-md-5"><span style="color: red">*</span>state</span>
-                                <input class="col-md-7" style="height: 30px;" type="number"  name="state" id="state"/>
+                                <input class="col-md-7" style="height: 30px;" type="number" name="state" id="state"/>
                             </div>
                         </div>
 
-                </div>
+                    </div>
                 </div>
 
             </div>

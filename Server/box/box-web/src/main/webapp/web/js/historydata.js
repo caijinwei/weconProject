@@ -2,7 +2,7 @@ var appModule = angular.module('weconweb', []);
 appModule
 		.controller(
 				"infoController",
-				function($scope, $http, $compile) {
+				function($scope, $http, $compile, $filter) {
 					$scope.onInit = function() {
 						$scope.deviceid = T.common.util
 								.getParameter("device_id");
@@ -38,6 +38,7 @@ appModule
 									if (code == 200) {
 										$scope.commonitors = data.monitors;
 										$scope.accounttype = data.type;
+
 										if ($scope.commonitors == "") {
 											$("#searchid").attr("disabled",
 													true);
@@ -98,6 +99,80 @@ appModule
 											if (code == 200) {
 												$scope.paginationConf.totalItems = data.realHisCfgDataList.totalRecord;
 												$scope.Hisdatas = data.realHisCfgDataList.list;
+												var xval = new Array();
+												var yval = new Array();
+												angular
+														.forEach(
+																data.realHisCfgDataList.list,
+																function(data,
+																		index,
+																		array) {
+
+																	xval
+																			.push($filter(
+																					'date')
+																					(
+																							data.monitor_time,
+																							"yyyy-MM-dd HH:mm:ss"));
+
+																	yval
+																			.push(parseFloat(data.value));
+
+																});
+												angular
+														.forEach(
+																$scope.commonitors,
+																function(data,
+																		index,
+																		array) {
+																	if ($(
+																			"#monitorid")
+																			.val() == data.id) {
+																		$scope.monitorName = data.name;
+																	}
+
+																});
+
+												var chart = new Highcharts.Chart(
+														'original-graph-container',
+														{
+															title : {
+																text : '平均数值',
+																x : -20
+															},
+															subtitle : {
+																text : '数据来源: we-con.com.cn',
+																x : -20
+															},
+															xAxis : {
+																categories : xval
+															},
+															yAxis : {
+																title : {
+																	text : '值'
+																},
+																plotLines : [ {
+																	value : 0,
+																	width : 1,
+																	color : '#808080'
+																} ]
+															},
+															tooltip : {
+																valueSuffix : ''
+															},
+															legend : {
+																layout : 'vertical',
+																align : 'right',
+																verticalAlign : 'middle',
+																borderWidth : 0
+															},
+															series : [ {
+																name : $scope.monitorName,
+																data : yval
+
+															} ]
+														});
+
 												$scope.$apply();
 												$("#loadingModal")
 														.modal("hide");
@@ -110,6 +185,27 @@ appModule
 										}, function() {
 											alert("ajax error");
 										});
+					}
+					// 原始数据界面，列表视图、曲线视图
+					$scope.showListOrCurves = function(btnId) {
+						var checkType = btnId; // 查看类型
+						$('#btn-list,#btn-curves').attr('class',
+								'btn btn-default');
+						$('#list-view,#curves-view').css('display', 'none');
+						switch (btnId) {
+						case 'btn-list':
+							$('#btn-list').attr('class', 'btn btn-primary');
+							$('#list-view').css('display', 'block');
+							break;
+						case 'btn-curves':
+							$('#btn-curves').attr('class', 'btn btn-primary');
+							$('#curves-view').css('display', 'block');
+
+							break;
+						default:
+							alert("视图切换异常！");
+							break;
+						}
 					}
 
 				})

@@ -65,7 +65,7 @@
 							</button>
 							<button type="button" class="btn btn-primary" data-toggle="modal"
 								ng-cloak ng-if="accounttype==1 && deviceid==-100"
-								data-target="#dispatchpoint">
+								data-target="#dispatchpoint" >
 								<span class="fa fa-indent"></span> 分配监控点
 							</button>
 							<button type="button" class="btn btn-primary" data-toggle="modal"
@@ -102,13 +102,16 @@
 									data-toggle="modal" data-target="#editpoint"> <span
 										class="glyphicon glyphicon-edit"></span> 编辑
 								</a> <a href="#" title="复制" class="col-md-3" data-toggle="modal"
-									data-target="#copyDataGroup"> <span
+									data-target="#copyDataGroup"
+									ng-click="mc_change();copymonitor(x);"> <span
 										class="glyphicon glyphicon-file"></span> 复制
 								</a> <a href="#" title="移动分组" class="col-md-3" data-toggle="modal"
-									data-target="#moveDataGroup"> <span
+									data-target="#moveDataGroup"
+									ng-click="mc_change();movemonitor(x);"> <span
 										class="glyphicon glyphicon-resize-horizontal"></span> 移动
 								</a> <a href="#" title="移除" class="col-md-3" data-toggle="modal"
-									data-target="#deletePoint"> <span
+									data-target="#deletePoint"
+									ng-click="mc_change();delmonitor(x);"> <span
 										class="glyphicon glyphicon-trash"></span> 移除
 								</a></td>
 							</tr>
@@ -383,22 +386,21 @@
 									<div class="container-fluid">
 										<div class="row col-md-11 col-md-offset-1"
 											style="margin: 10px 0;">
-											<span class="col-md-3">当前分组</span> <span class="col-md-9">数据分组1</span>
+											<span class="col-md-3">当前分组</span> <span class="col-md-9"
+												id="nowgroupid"></span>
 										</div>
 										<div class="row col-md-11 col-md-offset-1"
 											style="margin: 10px 0;">
 											<span class="col-md-3">复制到</span> <select class="col-md-9"
-												style="height: 30px;"
-												onchange="show_sub(this.options[this.options.selectedIndex].value)">
-												<option>数据分组1</option>
-												<option>数据分组2</option>
-												<option>数据分组3</option>
+												style="height: 30px;" id="copymonitorid">
+												<option ng-repeat="x in dir_list" value={{x.id}}>{{x.name}}</option>
 											</select>
 										</div>
 									</div>
 								</div>
 								<div class="modal-footer">
-									<button type="button" class="btn btn-info">确定</button>
+									<button type="button" class="btn btn-info"
+										ng-click="copy_monitor_group()">确定</button>
 									<button type="button" class="btn btn-default"
 										data-dismiss="modal">取消</button>
 								</div>
@@ -417,10 +419,11 @@
 									<h4 class="modal-title">删除监控点</h4>
 								</div>
 								<div class="modal-body">
-									<span>确定要删除该监控点吗？</span>
+									<span id="delgroupid"></span>
 								</div>
 								<div class="modal-footer">
-									<button type="button" class="btn btn-info">确定</button>
+									<button type="button" class="btn btn-info"
+										ng-click="del_monitor_group()">确定</button>
 									<button type="button" class="btn btn-default"
 										data-dismiss="modal">取消</button>
 								</div>
@@ -442,22 +445,21 @@
 									<div class="container-fluid">
 										<div class="row col-md-11 col-md-offset-1"
 											style="margin: 10px 0;">
-											<span class="col-md-3">当前分组</span> <span class="col-md-9">数据分组1</span>
+											<span class="col-md-3">当前分组</span> <span class="col-md-9"
+												id="movenowgroupid">></span>
 										</div>
 										<div class="row col-md-11 col-md-offset-1"
 											style="margin: 10px 0;">
-											<span class="col-md-3">移动到</span> <select id="groupselect"
-												class="col-md-9" style="height: 30px;"
-												onchange="show_sub(this.options[this.options.selectedIndex].value)">
-												<option>数据分组1</option>
-												<option>数据分组2</option>
-												<option>数据分组3</option>
+											<span class="col-md-3">移动到</span> <select id="movemonitorid"
+												class="col-md-9" style="height: 30px;" id="movemonitorid">
+												<option ng-repeat="x in dir_list" value={{x.id}}>{{x.name}}</option>
 											</select>
 										</div>
 									</div>
 								</div>
 								<div class="modal-footer">
-									<button type="button" class="btn btn-info">确定</button>
+									<button type="button" class="btn btn-info"
+										ng-click="move_monitor_group()">确定</button>
 									<button type="button" class="btn btn-default"
 										data-dismiss="modal">取消</button>
 								</div>
@@ -622,10 +624,10 @@
 							<tr ng-repeat="x in dir_list">
 								<td>{{x.name}}</td>
 								<td><a href="#"> <span class="glyphicon glyphicon-edit"
-										data-toggle="modal" data-target="#editGroupName"
+										data-toggle="modal" ng-click="editGroup(x)"
 										style="color: #2889d0; margin: 10px;"></span>
 								</a> <a href="#"> <span class="glyphicon glyphicon-trash"
-										data-toggle="modal" data-target="#deleteGroup"
+										data-toggle="modal" ng-click="delGroup(x)"
 										style="color: #2889d0; margin: 10px;"></span>
 								</a></td>
 							</tr>
@@ -656,7 +658,7 @@
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-info" data-dismiss="modal"
-									ng-click="add_group()">确定</button>
+									ng-click="add_group();">确定</button>
 								<button type="button" class="btn btn-default"
 									data-dismiss="modal">取消</button>
 							</div>
@@ -675,10 +677,11 @@
 								<h4 class="modal-title">删除分组</h4>
 							</div>
 							<div class="modal-body">
-								<span>确定要删除该分组吗？</span>
+								<span id="delid"></span>
 							</div>
 							<div class="modal-footer">
-								<button type="button" class="btn btn-info">确定</button>
+								<button type="button" class="btn btn-info"
+									ng-click="del_group();">确定</button>
 								<button type="button" class="btn btn-default"
 									data-dismiss="modal">取消</button>
 							</div>
@@ -699,14 +702,15 @@
 							<div class="modal-body">
 								<div class="container-fluid">
 									<div class="form-group">
-										<input type="text" class="form-control"
+										<input type="text" class="form-control" id="editid"
 											style="padding-left: 5px;" value="数据分组1"
 											onfocus="this.select()" autofocus="autofocus">
 									</div>
 								</div>
 							</div>
 							<div class="modal-footer">
-								<button type="button" class="btn btn-info">确定</button>
+								<button type="button" class="btn btn-info"
+									ng-click="edit_group();">确定</button>
 								<button type="button" class="btn btn-default"
 									data-dismiss="modal">取消</button>
 							</div>

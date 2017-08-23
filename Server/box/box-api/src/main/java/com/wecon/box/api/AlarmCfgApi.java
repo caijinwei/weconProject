@@ -1,14 +1,15 @@
 package com.wecon.box.api;
 
+import com.wecon.box.entity.AlarmCfg;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.stereotype.Component;
 /**
  * @author lanpenghui
  * 2017年8月1日
  */
-
-import com.wecon.box.entity.AlarmCfg;
 
 @Component
 public interface AlarmCfgApi {
@@ -16,11 +17,17 @@ public interface AlarmCfgApi {
 	/**
 	 * 根据account_id取报警数据配置
 	 *
-	 * @param alarmcfg_id
 	 * @return
 	 */
 	public List<AlarmCfg> getAlarmCfg(long account_id);
 
-	
+	/*
+	* 根据device_id 设备号ID查询alarmCfgId
+	* */
+	public ArrayList<Integer> findAlarmCfgIdSBydevice_id(Integer device_id);
 
+	/*
+	* 根据alramsCfgId 批量设置bind_state
+	* */
+	public void setBind_state(final int[] alaramCfgId, final Integer state);
 }

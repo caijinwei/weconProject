@@ -14,12 +14,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                     $scope.$apply();
                     if (data.type == 1) {
                         $scope.searchbox();
-                    }else{
+                    } else {
                         $('#overviewtab li').click(function () {
                             $('#overviewtab li').removeClass('active');
                             $('#overviewtab li span').removeAttr('style');
                             $(this).addClass('active');
-                            $(this).find('span').css('color','white');
+                            $(this).find('span').css('color', 'white');
                         })
                     }
                 } else {
@@ -128,5 +128,59 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         $("#dev_password").val("");
         $("#dev_name").val("");
     }
+    /*
+     * 拖拽用户分组（用户分组的修改）
+     * @RequestParam("target_acc_dir_id") Integer targetAccDirId, @RequestParam("target_ref_id") Integer targetRefId, @RequestParam("from_acc_dir_id") Integer fromAccDirId, @RequestParam("from_ref_id") Integer fromRefId)
+     * */
+    $scope.dragToUpdateDir = function (target_acc_dir_id, target_ref_id, from_acc_dir_id, from_ref_id) {
 
-})
+        var params =
+        {
+            target_acc_dir_id: target_acc_dir_id,
+            target_ref_id: target_ref_id,
+            from_acc_dir_id: from_acc_dir_id,
+            from_ref_id: from_ref_id
+
+        }
+        console.log(params);
+        T.common.ajax.request("WeconBox", "baseInfoAction/dragToUpdateDir", params,
+            function (data, code, msg) {
+                if (code == 200) {
+                } else {
+                    alert(code + " " + msg);
+                }
+            }, function () {
+                alert("ajax error");
+            });
+
+    }
+});
+var fromDirId;
+//允许拖拽
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+function drag(ev) {
+    ev.dataTransfer.setData("Text", ev.target.id);
+    fromDirId = $(ev.target).parent().attr("sid");
+}
+function drop(ev) {
+
+    ev.preventDefault();
+    var data = ev.dataTransfer.getData("Text");
+//      先获取到ev.target的父节点，即分组a
+    var parent = $(ev.target).parent();
+//        再获取到父节点的兄弟节点，即子分组ul
+    var next = $(parent).next();
+//        再往子分组ul中追加拖放的元素
+    next.append($(document.getElementById(data)));
+
+
+//   调用后台方法
+    var appElement = document.querySelector('[ng-controller=infoController]');
+    var $scope = angular.element(appElement).scope();
+    $scope.dragToUpdateDir($('#' + data).parent().attr("sid"), $('#' + data).attr("id"), fromDirId,$('#' + data).attr("id"));
+}
+
+
