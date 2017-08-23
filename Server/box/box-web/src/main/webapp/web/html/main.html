@@ -141,17 +141,21 @@
 					target="content_frame"> <span
 						class="glyphicon glyphicon-eye-open "> 自定义监控点</span>
 				</a></li>
+
 				<li ng-repeat="x in allDatas"><a href="#"
-					ng-click="sideclick(x);"> <span
+					ng-click="sideclick(x);" ondrop="drop(event)"
+					ondragover="allowDrop(event)"> <span
 						class="glyphicon glyphicon-folder-close "
-						id="spanid_{{x.accountdirId}}"> {{x.accountdirName}}</span>
+						id="spanid_{{x.accountdirId}}"> {{x.accountdirName}} </span>
 				</a>
-					<ul id="dir_ul_{{x.accountdirId}}">
+					<ul id="dir_ul_{{x.accountdirId}}" sid="{{x.accountdirId}}">
 						<a
 							href="datamonitor.html?device_id={{y.deviceId}}&device_name={{y.deviceName}}"
+							id="{{y.deviceId}}" draggable="true" ondragstart="drag(event)"
 							class="list-group-item" target="content_frame"
 							ng-repeat="y in x.deviceList">{{y.deviceName}}</a>
 					</ul></li>
+
 			</ul>
 
 			<ul class="nav nav-pills nav-stacked" role="tablist" id="overviewtab"
