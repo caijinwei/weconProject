@@ -23,7 +23,7 @@ public enum ErrorCodeOption {
     PhonenumError("手机号码格式有错", 11013),
     SmsVercodeError("手机验证码有错", 11014),
     AccountEmailExisted("邮箱已经被使用", 11015),
-    AccountPhoneExisted("邮箱已经被使用", 11016),
+    AccountPhoneExisted("手机号码已经被使用", 11016),
 
     PiBoxDevice_IsNot_Found("盒子不存在",300009),
     Account_Permissions_No("账户权限不足，无法新增盒子", 30001),

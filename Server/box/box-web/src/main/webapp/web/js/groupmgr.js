@@ -76,7 +76,8 @@ appModule.controller("listController", function ($scope, $http, $compile) {
         var params = {
             name: $("#groupname").val().trim(),
             id: $("#id").val(),
-            type: "0"
+            type: "0",
+            device_id: "0"
         };
         if (params.name == "") {
             alert("分组名称不能为空");

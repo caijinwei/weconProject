@@ -20,13 +20,13 @@
         </div>
     </div>
     <ul class="nav nav-tabs" id="myTab">
-        <li class="active"><a href="#baseinfo" data-toggle="tab" id="tabedit">接口测试</a></li>
+        <li><a href="#baseinfo" data-toggle="tab" id="tabedit">接口测试</a></li>
         <li><a href="#baseinfo2" data-toggle="tab" id="tabedit2">Mqtt测试</a></li>
-        <li><a href="#baseinfo3" data-toggle="tab" id="tabedit3" style="display:none;">Mqtt-mosquitto测试</a></li>
-        <li><a href="#baseinfo4" data-toggle="tab" id="tabedit4">其他</a></li>
+        <li><a href="#baseinfo3" data-toggle="tab" id="tabedit3">多分页测试</a></li>
+        <li class="active"><a href="#baseinfo4" data-toggle="tab" id="tabedit4">websocket</a></li>
     </ul>
     <div id="infotab" class="tab-content form-horizontal" style="margin-top: 10px;">
-        <div class="tab-pane active" id="baseinfo">
+        <div class="tab-pane" id="baseinfo">
             <div class="row form-group">
                 <label class="col-sm-2 col-md-2 col-xs-2 control-label" for="act_url">接口url</label>
 
@@ -48,7 +48,7 @@
                 <label class="col-xs-2 col-sm-2 col-md-2 control-label"></label>
 
                 <div class="col-xs-9 col-sm-9 col-md-9">
-                    <button type="button" class="btn btn-primary" ng-click="act_submit()"> 提 交 </button>
+                    <button type="button" class="btn btn-primary" ng-click="act_submit()"> 提 交</button>
                 </div>
             </div>
             <div class="row form-group">
@@ -112,15 +112,73 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane" id="baseinfo3"  style="display:none;">
+        <div class="tab-pane" id="baseinfo3">
+            <div class="row form-group">
+                <table class="table table-bordered table-striped" style="margin-top: 20px;">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>NAME</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="x in pushlist">
+                        <td>{{x.id}}</td>
+                        <td>{{x.name}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <tm-pagination conf="paginationConf"></tm-pagination>
+            </div>
+            <div class="row form-group">
+                <table class="table table-bordered table-striped" style="margin-top: 20px;">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>NAME</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="x in pushlist2">
+                        <td>{{x.id}}</td>
+                        <td>{{x.name}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <tm-pagination conf="paginationConf2"></tm-pagination>
+            </div>
+        </div>
+        <div class="tab-pane active" id="baseinfo4">
+            <div class="row form-group">
+                <label class="col-xs-2 col-sm-2 col-md-2 control-label">发送消息</label>
+
+                <div class="col-xs-9 col-sm-9 col-md-9">
+                    <input type="text" class="form-control" id="wsMsg" placeholder="发送消息">
+                </div>
+            </div>
             <div class="row form-group">
                 <label class="col-xs-2 col-sm-2 col-md-2 control-label"></label>
 
                 <div class="col-xs-9 col-sm-9 col-md-9">
+                    <button type="button" class="btn btn-primary" ng-click="ws_connect();">连接</button>
+                    <button type="button" class="btn btn-primary" ng-click="ws_send();">发送消息</button>
+                    <button type="button" class="btn btn-primary" ng-click="ws_close();">关闭</button>
                 </div>
             </div>
-        </div>
-        <div class="tab-pane" id="baseinfo4">
+
+            <div class="row form-group">
+                <label class="col-xs-2 col-sm-2 col-md-2 control-label"></label>
+
+                <div class="col-xs-9 col-sm-9 col-md-9">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <span class="label label-info">日志</span>
+                            <span class="label label-danger"><a id="clear" ng-click="ws_clear();">Clear</a></span>
+                        </div>
+                        <div class="panel-body" id="wsLog"></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -130,7 +188,8 @@
 <script src="../lib/jquery/jquery-3.2.1.min.js" type="text/javascript"></script>
 <script src="../lib/bootstrap/3.3.7/js/bootstrap.min.js" type="text/javascript"></script>
 <script src="../lib/angular/angular.min.js" type="text/javascript"></script>
+<script src="../lib/sockjs/sockjs.min.js" type="text/javascript"></script>
 <script src="../lib/wecon-common.js" type="text/javascript"></script>
 <script src="../js/t.js" type="text/javascript"></script>
-
+<script src="../lib/pagination.js" type="text/javascript"></script>
 </html>
