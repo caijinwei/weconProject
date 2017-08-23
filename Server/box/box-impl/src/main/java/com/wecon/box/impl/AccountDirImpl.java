@@ -144,7 +144,7 @@ public class AccountDirImpl implements AccountDirApi {
 			params.add(account_id);
 
 		}
-		if (device_id > 0||device_id==-100) {
+		if (device_id > 0||device_id==-100||device_id==-200) {//-100表示是管理者自定义监控点的设备id -200视图账号的设备id
 			condition.append(" and device_id = ? ");
 			params.add(device_id);
 

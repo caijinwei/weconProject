@@ -11,6 +11,7 @@ public class RealHisCfgDevice extends RealHisCfg{
 	public String ref_alais;
 	public String re_state;
 	public String re_value;
+	public int role_type;
 	
 
 }

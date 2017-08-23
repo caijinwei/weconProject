@@ -20,6 +20,7 @@ import com.wecon.box.entity.AccountDirRel;
 import com.wecon.box.entity.Page;
 import com.wecon.box.entity.PiBoxCom;
 import com.wecon.box.entity.PiBoxComAddr;
+import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.entity.RealHisCfgDevice;
 import com.wecon.box.entity.RedisPiBoxActData;
 import com.wecon.box.enums.ErrorCodeOption;
@@ -189,6 +190,7 @@ public class ActDataAction {
 	 * 
 	 * @return
 	 */
+	@WebApi(forceAuth = true, master = true)
 	@Description("更新实时监控点名称")
 	@RequestMapping(value = "/upActcfgName")
 	public Output upActcfgName(@RequestParam("id") String id, @RequestParam("name") String name,
@@ -210,6 +212,7 @@ public class ActDataAction {
 
 	}
 
+	@WebApi(forceAuth = true, master = true)
 	@Description("mosquito消息的推送测试")
 	@RequestMapping(value = "/putMess")
 	public Output putMQTTMess(@RequestParam("machine_code") String machine_code, @RequestParam("com") String com,
@@ -253,6 +256,7 @@ public class ActDataAction {
 	 * 
 	 * @return
 	 */
+	@WebApi(forceAuth = true, master = true)
 	@Description("复制监控点到其他组")
 	@RequestMapping(value = "/copyMonitor")
 	public Output copyMonitor(@RequestParam("monitorid") String monitorid,
@@ -286,6 +290,7 @@ public class ActDataAction {
 	 * 
 	 * @return
 	 */
+	@WebApi(forceAuth = true, master = true)
 	@Description("复制监控点到其他组")
 	@RequestMapping(value = "/moveMonitor")
 	public Output moveMonitor(@RequestParam("monitorid") String monitorid,
@@ -322,6 +327,7 @@ public class ActDataAction {
 	 * 
 	 * @return
 	 */
+	@WebApi(forceAuth = true, master = true)
 	@Description("移除监控点")
 	@RequestMapping(value = "/delMonitor")
 	public Output delMonitor(@RequestParam("monitorid") String monitorid,
@@ -335,6 +341,83 @@ public class ActDataAction {
 
 		return new Output();
 
+	}
+
+	@Description("获取分配监控点")
+	@WebApi(forceAuth = true, master = true)
+	@RequestMapping(value = "/getAllotMonitor")
+	public Output getAllotMonitor(@RequestParam("device_id") String device_id,
+			@RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
+		Client client = AppContext.getSession().client;
+		JSONObject json = new JSONObject();
+
+		/** 获取实时数据配置信息 **/
+		RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
+		/** 通过视图获取配置信息 **/
+		ViewAccountRoleFilter viewAccountRoleFilter = new ViewAccountRoleFilter();
+
+		Page<RealHisCfgDevice> realHisCfgDeviceList = null;
+		if (client.userInfo.getUserType() == 1) {
+			/** 管理 **/
+			realHisCfgFilter.addr_type = -1;
+			realHisCfgFilter.data_type = 0;
+			realHisCfgFilter.his_cycle = -1;
+			realHisCfgFilter.state = -1;
+
+			realHisCfgFilter.account_id = client.userId;
+			if (!CommonUtils.isNullOrEmpty(device_id)) {
+				realHisCfgFilter.device_id = Long.parseLong(device_id);
+			}
+
+			realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(realHisCfgFilter, pageIndex, pageSize);
+
+		} else if (client.userInfo.getUserType() == 2) {
+			/** 视图 **/
+
+			viewAccountRoleFilter.view_id = client.userId;
+			viewAccountRoleFilter.cfg_type = 1;
+			viewAccountRoleFilter.data_type = 0;
+			viewAccountRoleFilter.role_type = -1;
+			viewAccountRoleFilter.state = -1;
+			realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(viewAccountRoleFilter, pageIndex, pageSize);
+		}
+		json.put("actAllotData", realHisCfgDeviceList);
+		return new Output(json);
+	}
+
+	@Description("分配监控点")
+	@WebApi(forceAuth = true, master = true)
+	@RequestMapping(value = "/allotMonitor")
+	public Output allotMonitor(@RequestParam("acc_dir_id") String acc_dir_id,
+			@RequestParam("selectedId") String selectedId) {
+		List<AccountDirRel> listAccountDirRel = new ArrayList<AccountDirRel>();
+		AccountDirRel accountDirRel = null;
+		if (!CommonUtils.isNullOrEmpty(acc_dir_id) && !CommonUtils.isNullOrEmpty(selectedId)) {
+			String[] ids = selectedId.split(",");
+
+			for (int i = 0; i < ids.length; i++) {
+				accountDirRel = accountDirRelApi.getAccountDirRel(Long.parseLong(acc_dir_id), Long.parseLong(ids[i]));
+
+				if (accountDirRel == null) {
+					RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(ids[i]));
+					if (realHisCfg != null) {
+						accountDirRel = new AccountDirRel();
+						accountDirRel.acc_dir_id = Long.parseLong(acc_dir_id);
+						accountDirRel.ref_id = realHisCfg.id;
+						accountDirRel.ref_alais = realHisCfg.name;
+						listAccountDirRel.add(accountDirRel);
+
+					}
+
+				}
+			}
+			if (listAccountDirRel.size() > 0) {
+				accountDirRelApi.saveAccountDirRel(listAccountDirRel);
+			}
+
+		}
+
+		return new Output();
 	}
 
 }

@@ -433,7 +433,10 @@ appModule
 						});
 					}
 					$scope.editable_value = function(model) {
-
+						// 判断视图账号是否有写权限
+						if ($scope.accounttype == 2 && model.role_type != 3) {
+							return;
+						}
 						$act_value = $('#act_value_' + model.id);
 						$act_value.editable({
 							type : "text",
@@ -504,13 +507,58 @@ appModule
 									alert("ajax error");
 								});
 					}
-				/*	//分配监控点
-					$scope.allotMonitor=function(){
-						
-						
-						
-						
-						
-					}*/
+					/*
+					 * 展示所有监控点设置iframe的url属性
+					 */
+					$scope.showRestList = function() {
+						console.log();
+						var path = "viewmanagerpointTable.html?accounttype="
+								+ $scope.accounttype + "&actgroupId="
+								+ actgroupId;
+						$("#myiframe").attr('src', path);
+					}
 
+					/*
+					 * 提交选中的监控点
+					 */
+					$scope.setViewOpint = function() {
+						var rightOption = [];
+						var chk_value = [];
+						$("#myiframe").contents().find(
+								'input[name="cbid"]:checked').each(function() {
+							chk_value.push($(this).val());
+						});
+						var ids = chk_value.join(",");
+						if (chk_value.length == 0) {
+							alert("请选择至少一条监控点");
+
+							return;
+						}
+						var params = {
+							acc_dir_id : actgroupId,
+							selectedId : ids
+						};
+						T.common.ajax
+								.request(
+										"WeconBox",
+										"actDataAction/allotMonitor",
+										params,
+										function(data, code, msg) {
+											if (code == 200) {
+												$("#dispatchpoint").modal(
+														"hide");
+												$scope
+														.act_submit(
+																$scope.paginationConf.currentPage,
+																$scope.paginationConf.itemsPerPage,
+																actgroupId);
+												alert("分配监控点成功");
+
+											} else {
+												alert(code + "-" + msg);
+											}
+										}, function() {
+											alert("ajax error");
+										});
+					};
 				})

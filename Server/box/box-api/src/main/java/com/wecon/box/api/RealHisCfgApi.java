@@ -47,6 +47,7 @@ public interface RealHisCfgApi {
 	 * @param
 	 * @return
 	 */
+	Page<RealHisCfgDevice> getRealHisCfg(RealHisCfgFilter filter,int pageIndex, int pageSize);
 	public List<RealHisCfgDevice> getRealHisCfg(RealHisCfgFilter filter);
 	/**
 	 * 通过filter获取历史（实时）数据配置信息列表
@@ -54,6 +55,7 @@ public interface RealHisCfgApi {
 	 * @param filter
 	 * @return
 	 */
+	Page<RealHisCfgDevice> getRealHisCfg(ViewAccountRoleFilter filter,int pageIndex, int pageSize);
 	public List<RealHisCfgDevice> getRealHisCfg(ViewAccountRoleFilter filter);
 
 	/**
