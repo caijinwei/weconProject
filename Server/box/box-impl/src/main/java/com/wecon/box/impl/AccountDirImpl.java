@@ -83,6 +83,7 @@ public class AccountDirImpl implements AccountDirApi {
 		return true;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public boolean delAccountDir(final long id) {
 		TransactionTemplate tt = new TransactionTemplate(transactionManager);
@@ -143,7 +144,7 @@ public class AccountDirImpl implements AccountDirApi {
 			params.add(account_id);
 
 		}
-		if (device_id > 0) {
+		if (device_id > 0||device_id==-100) {
 			condition.append(" and device_id = ? ");
 			params.add(device_id);
 

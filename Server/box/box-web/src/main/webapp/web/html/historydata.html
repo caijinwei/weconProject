@@ -48,16 +48,17 @@
 					<div class="row">
 						<div>
 							<span class="col-md-1" style="height: 30px; line-height: 30px;">监控点</span>
-							<select id="monitorid" class="col-md-3" style="height: 35px;">
-								<option ng-repeat="x in commonitors" value={{x.id}}>{{x.name}}</option>
+							<select id="monitorid" class="col-md-3" style="height: 35px;" >
+								<option ng-repeat="x in commonitors" value={{x.id}} >{{x.name}}</option>
 							</select>
 						</div>
 						<div class="btn-group" style="margin-left: 20px;">
-							<button id="btn-list" type="button" class="btn btn-default"
-								onclick="showListView()">列表</button>
-							<button id="btn-curves" type="button" class="btn btn-primary"
-								onclick="showCurvesView()">曲线</button>
+							<button id="btn-list" type="button" class="btn btn-primary"
+								ng-click="showListOrCurves('btn-list')">列表</button>
+							<button id="btn-curves" type="button" class="btn btn-default"
+								ng-click="showListOrCurves('btn-curves')">曲线</button>
 						</div>
+
 					</div>
 					<div class="row" style="margin-top: 20px;">
 						<div style="display: inline-block; margin-left: -15px;"
@@ -100,7 +101,7 @@
 							<span class="glyphicon glyphicon-new-window"></span>
 						</button>
 					</div>
-					<div id="list-view" style="display: none;">
+					<div id="list-view">
 						<table class="table table-bordered" style="margin-top: 20px;">
 							<thead>
 								<tr>
@@ -123,10 +124,17 @@
 						</table>
 						<tm-pagination conf="paginationConf"></tm-pagination>
 					</div>
-					<div id="curves-view">
+					<div id="curves-view" style="display: none;">
 						<div id="original-graph-container"
 							style="min-width: 400px; height: 400px; margin-top: 40px;"></div>
 					</div>
+				</div>
+			</div>
+			<div class="modal fade" id="loadingModal" tabindex="-1" role="dialog"
+				aria-labelledby="mySmallModalLabel">
+				<div class="modal-dialog modal-sm" role="document"
+					style="margin-top: 350px; text-align: center">
+					<img src="../image/loading.jpg" />
 				</div>
 			</div>
 			<!--统计分析-->
@@ -346,50 +354,6 @@
 	<script src="../lib/hightcharts/highcharts.js"></script>
 	<script src="../lib/hightcharts/exporting.js"></script>
 	<script>
-		/**
-		 * Highcharts 在 4.2.0 开始已经不依赖 jQuery 了，直接用其构造函数既可创建图表
-		 * 地址：https://www.hcharts.cn/docs/start-download
-		 **/
-		var chart = new Highcharts.Chart('original-graph-container', {
-			title : {
-				text : '年平均数值',
-				x : -20
-			},
-			subtitle : {
-				text : '数据来源: we-con.com.cn',
-				x : -20
-			},
-			xAxis : {
-				categories : [ '一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月',
-						'九月', '十月', '十一月', '十二月' ]
-			},
-			yAxis : {
-				title : {
-					text : '值'
-				},
-				plotLines : [ {
-					value : 0,
-					width : 1,
-					color : '#808080'
-				} ]
-			},
-			tooltip : {
-				valueSuffix : ''
-			},
-			legend : {
-				layout : 'vertical',
-				align : 'right',
-				verticalAlign : 'middle',
-				borderWidth : 0
-			},
-			series : [ {
-				name : '监控点1',
-				data : [ 7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3,
-						18.3, 13.9, 9.6 ]
-			} ]
-		});
-	</script>
-	<script>
 		var chart = new Highcharts.Chart('statistic-graph-container', {
 			title : {
 				text : '年平均数值',
@@ -430,19 +394,24 @@
 		});
 	</script>
 	<script>
-		//        展示列表视图
-		function showListView() {
-			$('#btn-list').attr('class', 'btn btn-primary');
-			$('#btn-curves').attr('class', 'btn btn-default');
-			$('#list-view').css('display', 'block');
-			$('#curves-view').css('display', 'none');
-		}
-		//        展示曲线视图
-		function showCurvesView() {
-			$('#btn-list').attr('class', 'btn btn-default');
-			$('#btn-curves').attr('class', 'btn btn-primary');
-			$('#list-view').css('display', 'none');
-			$('#curves-view').css('display', 'block');
+		//    统计分析界面，分、时、天
+		function checkByTime(btnId) {
+			var checkType = btnId; //查看类型
+			$('#btn-min,#btn-hour,#btn-day').attr('class', 'btn btn-default');
+			switch (btnId) {
+			case 'btn-min':
+				$('#btn-min').attr('class', 'btn btn-primary');
+				break;
+			case 'btn-hour':
+				$('#btn-hour').attr('class', 'btn btn-primary');
+				break;
+			case 'btn-day':
+				$('#btn-day').attr('class', 'btn btn-primary');
+				break;
+			default:
+				alert("视图切换异常！");
+				break;
+			}
 		}
 	</script>
 

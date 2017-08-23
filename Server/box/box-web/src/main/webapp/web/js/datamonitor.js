@@ -60,7 +60,8 @@ appModule
 												$scope.dir_list = data.ActGroup;
 												$scope.accounttype = data.type;
 												$scope.$apply();
-												if (data.ActGroup != null) {
+												if (data.ActGroup != null
+														&& $scope.type == 0) {
 													var fristGroupId = data.ActGroup[0].id;
 													$scope
 															.act_submit(
@@ -115,9 +116,11 @@ appModule
 																function(data,
 																		index,
 																		array) {
-																	console
-																			.log("初始化=="
-																					+ data.id);
+																	/*
+																	 * console
+																	 * .log("初始化==" +
+																	 * data.id);
+																	 */
 																	$scope
 																			.editable_name(data);
 																	$scope
@@ -145,6 +148,156 @@ appModule
 						clearTimeout(t);
 					}
 
+					// 复制监控点
+					$scope.copymonitor = function(model) {
+						$scope.monitorid = model.id;// 监控点id
+						$scope.alais = model.ref_alais;// 监控点别名
+						// $scope.act_group($scope.deviceid);
+						// $scope.type = 1;
+
+						angular.forEach($scope.dir_list, function(data, index,
+								array) {
+							// console.log("data.id==" + data.id);
+							if (actgroupId == data.id) {
+								$("#nowgroupid").html(data.name);
+								$scope.groupName = data.name;
+							}
+						});
+						// $("#copyDataGroup").modal("show");
+
+					}
+					// 复制监控点到其他组
+					$scope.copy_monitor_group = function() {
+						if ($('#copymonitorid').val() == actgroupId) {
+							alert("【" + $scope.groupName + "】已经存在该监控点！");
+							return;
+
+						}
+						var params = {
+							monitorid : $scope.monitorid,
+							alais : $scope.alais,
+							acc_dir_id : $('#copymonitorid').val()
+						};
+
+						T.common.ajax
+								.request(
+										"WeconBox",
+										"actDataAction/copyMonitor",
+										params,
+										function(data, code, msg) {
+											if (code == 200) {
+												$("#copyDataGroup").modal(
+														"hide");
+												$scope
+														.act_submit(
+																$scope.paginationConf.currentPage,
+																$scope.paginationConf.itemsPerPage,
+																actgroupId);
+												alert("复制成功！");
+
+											} else {
+
+												alert(code + "-" + msg);
+											}
+										}, function() {
+											alert("ajax error");
+										});
+					}
+					// 移动监控点
+					$scope.movemonitor = function(model) {
+						$scope.moveMonitorid = model.id;// 监控点id
+						$scope.moveAlais = model.ref_alais;// 监控点别名
+						// $scope.act_group($scope.deviceid);
+						// $scope.type = 1;
+
+						angular.forEach($scope.dir_list, function(data, index,
+								array) {
+							// console.log("data.id==" + data.id);
+							if (actgroupId == data.id) {
+								$("#movenowgroupid").html(data.name);
+								$scope.movegroupName = data.name;
+							}
+						});
+						// $("#copyDataGroup").modal("show");
+
+					}
+					// 移动监控点到其他组
+					$scope.move_monitor_group = function() {
+						if ($('#movemonitorid').val() == actgroupId) {
+							alert("【" + $scope.movegroupName + "】已经存在该监控点！");
+							return;
+
+						}
+						var params = {
+							monitorid : $scope.moveMonitorid,
+							alais : $scope.moveAlais,
+							to_acc_dir_id : $('#movemonitorid').val(),
+							from_acc_dir_id : actgroupId
+						};
+
+						T.common.ajax
+								.request(
+										"WeconBox",
+										"actDataAction/moveMonitor",
+										params,
+										function(data, code, msg) {
+											if (code == 200) {
+												$("#moveDataGroup").modal(
+														"hide");
+												$scope
+														.act_submit(
+																$scope.paginationConf.currentPage,
+																$scope.paginationConf.itemsPerPage,
+																actgroupId);
+												alert("移动成功！");
+
+											} else {
+
+												alert(code + "-" + msg);
+											}
+										}, function() {
+											alert("ajax error");
+										});
+					}
+					// 删除监控点
+					$scope.delmonitor = function(model) {
+						$scope.delmonitorid = model.id;// 监控点id
+						// $scope.act_group($scope.deviceid);
+						// $scope.type = 1;
+						$("#delgroupid").html(
+								"确定要删除【" + model.ref_alais + "】监控点吗？");
+					}
+					// 移除监控点
+					$scope.del_monitor_group = function() {
+
+						var params = {
+							monitorid : $scope.delmonitorid,
+							acc_dir_id : actgroupId
+						};
+
+						T.common.ajax
+								.request(
+										"WeconBox",
+										"actDataAction/delMonitor",
+										params,
+										function(data, code, msg) {
+											if (code == 200) {
+												$("#deletePoint").modal("hide");
+												$scope
+														.act_submit(
+																$scope.paginationConf.currentPage,
+																$scope.paginationConf.itemsPerPage,
+																actgroupId);
+												alert("移除成功！");
+
+											} else {
+
+												alert(code + "-" + msg);
+											}
+										}, function() {
+											alert("ajax error");
+										});
+					}
 					// 创建分组
 					$scope.add_group = function() {
 						var params = {
@@ -191,6 +344,76 @@ appModule
 					$scope.showAddGroup = function() {
 						$('#identifier').modal('show');
 					}
+					// 获取修改分组名称
+					$scope.editGroup = function(model) {
+
+						$("#editid").val(model.name);
+						$scope.editGroupId = model.id;
+
+						$("#editGroupName").modal("show");
+
+					}
+					// 修改分组
+					$scope.edit_group = function() {
+						var params = {
+							id : $scope.editGroupId,
+							name : $('#editid').val(),
+							type : 1,
+							device_id : $scope.deviceid
+						};
+
+						T.common.ajax.request("WeconBox",
+								"userdiract/saveuserdir", params, function(
+										data, code, msg) {
+									if (code == 200) {
+
+										$("#editGroupName").modal("hide");
+										$scope.type = 1;
+
+										$scope.act_group($scope.deviceid);
+
+									} else {
+
+										alert(code + "-" + msg);
+									}
+								}, function() {
+									alert("ajax error");
+								});
+					}
+					// 获取删除分组名称
+					$scope.delGroup = function(model) {
+						var text = "确定删除【" + model.name + "】分组?"
+						$("#delid").html(text);
+						$scope.delActGroupId = model.id;
+
+						$("#deleteGroup").modal("show");
+
+					}
+					// 删除分组
+					$scope.del_group = function() {
+						var params = {
+							id : $scope.delActGroupId,
+						};
+
+						T.common.ajax.request("WeconBox",
+								"userdiract/deluserdir", params, function(data,
+										code, msg) {
+									if (code == 200) {
+
+										$("#deleteGroup").modal("hide");
+										$scope.type = 1;
+
+										$scope.act_group($scope.deviceid);
+										$scope.mc_change();
+
+									} else {
+
+										alert(code + "-" + msg);
+									}
+								}, function() {
+									alert("ajax error");
+								});
+					}
 
 					$scope.editable_name = function(model) {
 
@@ -228,6 +451,7 @@ appModule
 							}
 						});
 					}
+
 					// 修改监控点名称
 					$scope.upActcfgName = function(model, name) {
 						var params = {
@@ -280,5 +504,13 @@ appModule
 									alert("ajax error");
 								});
 					}
+				/*	//分配监控点
+					$scope.allotMonitor=function(){
+						
+						
+						
+						
+						
+					}*/
 
 				})
