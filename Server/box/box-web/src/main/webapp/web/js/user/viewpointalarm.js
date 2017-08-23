@@ -58,7 +58,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             if (code == 200) {
                 $("#showRestOpint").modal("hide");
                 alert("添加成功");
-                $scope.showViewAlarmpoint(viewid, $scope.paginationConf.currentPage, $scope.paginationConf.pagesLength);
+                $scope.showViewAlarmpoint(viewid, "1",$scope.paginationConf.pagesLength);
             }
             else {
                 alert(code + "-" + msg);
@@ -103,7 +103,6 @@ appModule.controller("listController", function ($scope, $http, $compile) {
      * 展示剩余监控点设置iframe的url属性
      * */
     $scope.showRestList = function () {
-        console.log("这边的type:",$scope.type);
         var path = "../user/viewpointalarmTable.html?type=" + $scope.type + "&viewid=" + $scope.viewid;
         $("#myiframe").attr('src', path);
     }
@@ -112,6 +111,10 @@ appModule.controller("listController", function ($scope, $http, $compile) {
      * @RequestParam("view_id") Integer viewId ,@RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize)
      * */
     $scope.showViewAlarmpoint = function (viewId, pageIndex, pageSize) {
+        if(pageIndex==0)
+        {
+            pageIndex=="1";
+        }
         var params =
         {
             view_id: viewId,

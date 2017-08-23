@@ -98,8 +98,8 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
         int totalRecord = jdbcTemplate.queryForObject(sqlCount, args0, Integer.class);
         Page<RealHisCfg> page = new Page<RealHisCfg>(pageIndex, pageSize, totalRecord);
 
-        Object[] args = new Object[]{type, device_id, view_id, page.getStartIndex(), page.getPageSize()};
-        String sql = "SELECT  a.id, a.state,a.name ,a.digit_count,a.addr , a.addr_type,a.describe FROM real_his_cfg a WHERE a.data_type = ?  AND a.bind_state=1 AND a.plc_id IN ( SELECT plc_id FROM plc_info WHERE device_id = ?)AND id NOT IN ( SELECT cfg_id FROM view_account_role WHERE view_id = ?) LIMIT ?,?";
+        Object[] args = new Object[]{account_id,type, device_id, view_id, page.getStartIndex(), page.getPageSize()};
+        String sql = "SELECT  a.id, a.state,a.name ,a.digit_count,a.addr , a.addr_type,a.describe FROM real_his_cfg a WHERE a.account_id =? AND a.data_type = ?  AND a.bind_state=1 AND a.plc_id IN ( SELECT plc_id FROM plc_info WHERE device_id = ?)AND id NOT IN ( SELECT cfg_id FROM view_account_role WHERE view_id = ?) LIMIT ?,?";
         List<RealHisCfg> list = jdbcTemplate.query(sql, args, new RowMapper() {
             @Override
             public Object mapRow(ResultSet resultSet, int i) throws SQLException {
@@ -249,28 +249,22 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
     *          2）报警监控点
     * */
     public void setViewPoint(Integer viewId, String[] ids, String[] rights ,Integer cgf_type) {
-        if (ids.length <=0) {
+        if (ids.length <= 0) {
             return;
         }
-        if (rights == null) {
+
         /*
         * 历史 报警监控点分配  （没有权限）
         * */
-            String[] sqls = new String[ids.length];
-            for (int i = 0; i < ids.length; i++) {
-                sqls[i] = "INSERT into view_account_role  (view_id,cfg_type,cfg_id,role_type,create_date,update_date) VALUES(" + viewId + ","+cgf_type+"," + ids[i] + ",0,NOW(),NOW());";
-                System.out.println("执行的sql语句是:"+sqls[i]);
-                jdbcTemplate.update(sqls[i]);
-            }
-
-        } else {
-            String[] sqls = new String[ids.length];
-            for (int i = 0; i < ids.length; i++) {
-                sqls[i] = "INSERT into view_account_role  (view_id,cfg_type,cfg_id,role_type,create_date,update_date) VALUES(" + viewId + ","+cgf_type+"," + ids[i] + "," + rights[i] + ",NOW(),NOW());";
-                jdbcTemplate.update(sqls[i]);
-            }
+        String[] sqls = new String[ids.length];
+        for (int i = 0; i < ids.length; i++) {
+            sqls[i] = "INSERT into view_account_role  (view_id,cfg_type,cfg_id,role_type,create_date,update_date) VALUES(" + viewId + "," + cgf_type + "," + ids[i] + ",0,NOW(),NOW());";
+            System.out.println("执行的sql语句是:" + sqls[i]);
+            jdbcTemplate.update(sqls[i]);
         }
+
     }
+
 
     /*
     * 视图用户监控点解绑

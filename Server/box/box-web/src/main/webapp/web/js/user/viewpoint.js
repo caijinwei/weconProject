@@ -129,7 +129,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
 
     $scope.deleteOpintParam = function (pointId, roleType) {
         $scope.pointIdParam = pointId;
-        $scope.roleTypeParam = roleType;
+        $scope.roleTypeParam = roleType.toString();
     }
     $scope.deleteOption = function () {
         var viewid = T.common.util.getParameter("viewid");
