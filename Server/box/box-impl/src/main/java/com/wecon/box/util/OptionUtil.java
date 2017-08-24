@@ -1,5 +1,7 @@
 package com.wecon.box.util;
 
+import org.springframework.stereotype.Component;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.enums.DataTypeOption;
@@ -7,6 +9,7 @@ import com.wecon.box.enums.DataTypeOption;
 /**
  * Created by zengzhipeng on 2017/8/24.
  */
+@Component
 public class OptionUtil {
 
     public JSONArray getDataTypeOptionOptions() {
@@ -18,11 +21,11 @@ public class OptionUtil {
     }
 
     /**
-     * 生成单个配置项的json object值
+     * 鐢熸垚鍗曚釜閰嶇疆椤圭殑json object鍊�
      *
-     * @param value 值
-     * @param text 值描述内容
-     * @return 返回jsonobject（含有两个数据：value，key）
+     * @param value 鍊�
+     * @param text 鍊兼弿杩板唴瀹�
+     * @return 杩斿洖jsonobject锛堝惈鏈変袱涓暟鎹細value锛宬ey锛�
      */
     private JSONObject createOption(int value, String text) {
         JSONObject option = new JSONObject();
