@@ -1,12 +1,10 @@
 package com.wecon.box.enums;
 
-import com.wecon.common.enums.EnumVal;
-
 /**
  * 数据类型枚举
  * Created by zengzhipeng on 2017/8/19.
  */
-public enum DataTypeOption  implements EnumVal {
+public enum DataTypeOption  {
     Bit_Binary_16("16位二进制", 100),
     Bit_Octal_16("16位八进制", 101),
     Bit_Hex_16("16位十六进制", 102),
@@ -41,12 +39,10 @@ public enum DataTypeOption  implements EnumVal {
         this.value = _value;
     }
 
-    @Override
     public int getValue() {
         return value;
     }
 
-    @Override
     public String getKey() {
         return key;
     }
