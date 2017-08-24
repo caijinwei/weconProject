@@ -22,25 +22,24 @@ appModule.controller("infoController", function ($scope, $window, $http, $locati
     }
 
     /*
-    * 盒子下plc配置展示
-    * */
-    $scope.showAllPlcConf=function ()
-    {
-            $scope.device_id = T.common.util.getParameter("device_id");
-            $("#device_id").val($scope.device_id);
-            var params = {device_id: $("#device_id").val()};
-            T.common.ajax.request("WeconBox", "plcInfoAction/showAllPlcConf", params, function (data, code, msg) {
-                var test = 1;
-                if (code == 200) {
-                    $scope.infoDatas = data.infoDatas;
-                    $scope.$apply();
-                }
-                else {
-                    alert(code + "-" + msg);
-                }
-            }, function () {
-                alert("ajax error");
-            });
+     * 盒子下plc配置展示
+     * */
+    $scope.showAllPlcConf = function () {
+        $scope.device_id = T.common.util.getParameter("device_id");
+        $("#device_id").val($scope.device_id);
+        var params = {device_id: $("#device_id").val()};
+        T.common.ajax.request("WeconBox", "plcInfoAction/showAllPlcConf", params, function (data, code, msg) {
+            var test = 1;
+            if (code == 200) {
+                $scope.infoDatas = data.infoDatas;
+                $scope.$apply();
+            }
+            else {
+                alert(code + "-" + msg);
+            }
+        }, function () {
+            alert("ajax error");
+        });
     }
 
     /**
@@ -130,11 +129,46 @@ appModule.controller("infoController", function ($scope, $window, $http, $locati
         alert("plc_id设置成功");
     }
 
+    $scope.showPlcSetDefault = function () {
+        var params = {};
+        T.common.ajax.request("WeconBox", "plcInfoAction/showPlcSetDefault", params, function (data, code, msg) {
+            if (code == 200) {
+                //console.log(data.usbDevice);
+                //console.log(data.ethernet);
+                $scope.usbDevices = data.usbDevice;
+                $scope.ethernet = data.ethernet;
+            }
+            else {
+                alert(code + "-" + msg);
+            }
+        }, function () {
+            alert("ajax error");
+        });
+    }
+
+    /*
+     * 修改 port通讯协议   以后改 switch
+     * */
+    $scope.chgPort = function () {
+        if ($scope.selectedPort == "USB") {
+            $scope.showDatas =  $scope.usbDevices;
+            console.log($scope.showDatas);
+        }
+    }
+    /*
+    * 修改串口协议
+    * */
+    $scope.chgPtype=function()
+    {
+        if($scope.selectedComtype=='1')
+        {
+
+        }
+    }
+
     /*
      * 进行输入框IP地址验证
      * */
-
-
     function isValidIP(ip) {
         var reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
         return reg.test(ip);

@@ -22,4 +22,10 @@ public class Plc extends BaseDom{
         this.addrs = addrs;
     }
 
+    @Override
+    public String toString() {
+        return "Plc{" +
+                "addrs=" + addrs +
+                '}';
+    }
 }

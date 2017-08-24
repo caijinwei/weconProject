@@ -7,6 +7,7 @@ import com.wecon.box.entity.PlcInfo;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.param.PlcInfoData;
 import com.wecon.box.param.PlcInfoSettingParam;
+import com.wecon.box.util.PlcListByType;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.BusinessException;
@@ -28,124 +29,130 @@ import java.util.List;
 
 @RestController
 @RequestMapping("plcInfoAction")
-public class PlcInfoSettingAction
-{
+public class PlcInfoSettingAction {
     @Autowired
     PlcInfoApi plcInfoApi;
     @Autowired
     DevBindUserApi devBindUserApi;
+    @Autowired
+    PlcListByType plcListByType;
 
     @Description("新增plc配置")
     @RequestMapping(value = "/addPlcInfo")
-    @WebApi(forceAuth =true,master=true,authority = {"1"})
-    public Output comPortSetting(@Valid PlcInfoSettingParam param)
-    {
-        long account_id=AppContext.getSession().client.userId;
-        if(devBindUserApi.isRecord((int)param.device_id,account_id)==false)
-        {
-            throw new BusinessException(ErrorCodeOption.PiBoxDevice_IsNot_Found.key,ErrorCodeOption.PiBoxDevice_IsNot_Found.value);
+    @WebApi(forceAuth = true, master = true, authority = {"1"})
+    public Output comPortSetting(@Valid PlcInfoSettingParam param) {
+        long account_id = AppContext.getSession().client.userId;
+        if (devBindUserApi.isRecord((int) param.device_id, account_id) == false) {
+            throw new BusinessException(ErrorCodeOption.PiBoxDevice_IsNot_Found.key, ErrorCodeOption.PiBoxDevice_IsNot_Found.value);
         }
-        PlcInfo plcInfo=new PlcInfo();
-        plcInfo.type=param.type;
-        plcInfo.port=param.port;
+        PlcInfo plcInfo = new PlcInfo();
+        plcInfo.type = param.type;
+        plcInfo.port = param.port;
 
-        plcInfo.baudrate=param.baudrate;
-        plcInfo.box_stat_no=param.box_stat_no;
-        plcInfo.check_bit=param.check_bit;
-        plcInfo.com_iodelaytime=param.com_iodelaytime;
-        plcInfo.com_stepinterval=param.com_stepinterval;
-        plcInfo.comtype=param.comtype;
-        plcInfo.data_length=param.data_length;
-        plcInfo.rev_timeout=param.rev_timeout;
-        plcInfo.com_stepinterval=param.com_stepinterval;
-        plcInfo.device_id=param.device_id;
-        plcInfo.net_broadcastaddr=param.net_broadcastaddr;
-        plcInfo.net_ipaddr=param.net_ipaddr;
-        plcInfo.net_isbroadcast=param.net_isbroadcast;
-        plcInfo.net_port=param.net_port;
-        plcInfo.net_type=param.net_type;
+        plcInfo.baudrate = param.baudrate;
+        plcInfo.box_stat_no = param.box_stat_no;
+        plcInfo.check_bit = param.check_bit;
+        plcInfo.com_iodelaytime = param.com_iodelaytime;
+        plcInfo.com_stepinterval = param.com_stepinterval;
+        plcInfo.comtype = param.comtype;
+        plcInfo.data_length = param.data_length;
+        plcInfo.rev_timeout = param.rev_timeout;
+        plcInfo.com_stepinterval = param.com_stepinterval;
+        plcInfo.device_id = param.device_id;
+        plcInfo.net_broadcastaddr = param.net_broadcastaddr;
+        plcInfo.net_ipaddr = param.net_ipaddr;
+        plcInfo.net_isbroadcast = param.net_isbroadcast;
+        plcInfo.net_port = param.net_port;
+        plcInfo.net_type = param.net_type;
 
 
         // 驱动文件夹 没有不能输入  这里写默认值
-        plcInfo.driver="驱动文件名（测试）Action 这边先写";
+        plcInfo.driver = "驱动文件名（测试）Action 这边先写";
         plcInfoApi.savePlcInfo(plcInfo);
         return new Output();
     }
 
 
     @Label("展示该盒子下全部通讯口")
-    @WebApi(forceAuth =true,master=true,authority = {"1"})
+    @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping("showAllPlcConf")
-    public Output showAllPlcConf(@RequestParam("device_id") Integer device_id)
-    {
+    public Output showAllPlcConf(@RequestParam("device_id") Integer device_id) {
 
-        long account_id=AppContext.getSession().client.userId;
-        if(devBindUserApi.isRecord(device_id,account_id)==false)
-        {
-            throw new BusinessException(ErrorCodeOption.PiBoxDevice_IsNot_Found.key,ErrorCodeOption.PiBoxDevice_IsNot_Found.value);
+        long account_id = AppContext.getSession().client.userId;
+        if (devBindUserApi.isRecord(device_id, account_id) == false) {
+            throw new BusinessException(ErrorCodeOption.PiBoxDevice_IsNot_Found.key, ErrorCodeOption.PiBoxDevice_IsNot_Found.value);
         }
-        JSONObject data=new JSONObject();
+        JSONObject data = new JSONObject();
 
-        List<PlcInfo> showAllPlcConf=plcInfoApi.showAllPlcInfoByDeviceId(device_id);
-        List<PlcInfoData> infoDatas=new ArrayList<PlcInfoData>();
-        for(PlcInfo info:showAllPlcConf)
-        {
-            PlcInfoData plcInfoData =new PlcInfoData();
-            if(info.comtype==1)
-            {
-                plcInfoData.comtype="RS232";
-            }else if(info.comtype==2)
-            {
-                plcInfoData.comtype="RS422";
-            }else
-            {
-                plcInfoData.comtype="RS485";
+        List<PlcInfo> showAllPlcConf = plcInfoApi.showAllPlcInfoByDeviceId(device_id);
+        List<PlcInfoData> infoDatas = new ArrayList<PlcInfoData>();
+        for (PlcInfo info : showAllPlcConf) {
+            PlcInfoData plcInfoData = new PlcInfoData();
+            if (info.comtype == 1) {
+                plcInfoData.comtype = "RS232";
+            } else if (info.comtype == 2) {
+                plcInfoData.comtype = "RS422";
+            } else {
+                plcInfoData.comtype = "RS485";
             }
-            plcInfoData.plcId=info.plc_id;
-            plcInfoData.port= info.port;
-            plcInfoData.type=info.type;
+            plcInfoData.plcId = info.plc_id;
+            plcInfoData.port = info.port;
+            plcInfoData.type = info.type;
             infoDatas.add(plcInfoData);
         }
 
-        data.put("infoDatas",infoDatas);
+        data.put("infoDatas", infoDatas);
 
         return new Output(data);
     }
 
     @Label("更新通讯口配置")
-    @WebApi(forceAuth =false,master=true)
+    @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping("updataPlcInfo")
-    public Output update(@Valid PlcInfoSettingParam param)
-    {
+    public Output update(@Valid PlcInfoSettingParam param) {
 
-        long account_id=AppContext.getSession().client.userId;
-        if(devBindUserApi.isRecord((int)param.plc_id,account_id)==false)
-        {
-            throw new BusinessException(ErrorCodeOption.PiBoxDevice_IsNot_Found.key,ErrorCodeOption.PiBoxDevice_IsNot_Found.value);
+        long account_id = AppContext.getSession().client.userId;
+        if (devBindUserApi.isRecord((int) param.plc_id, account_id) == false) {
+            throw new BusinessException(ErrorCodeOption.PiBoxDevice_IsNot_Found.key, ErrorCodeOption.PiBoxDevice_IsNot_Found.value);
         }
-        PlcInfo plcInfo=new PlcInfo();
-        plcInfo.plc_id=param.plc_id;
-        plcInfo.type=param.type;
-        plcInfo.port=param.port;
+        PlcInfo plcInfo = new PlcInfo();
+        plcInfo.plc_id = param.plc_id;
+        plcInfo.type = param.type;
+        plcInfo.port = param.port;
 
-        plcInfo.baudrate=param.baudrate;
-        plcInfo.box_stat_no=param.box_stat_no;
-        plcInfo.check_bit=param.check_bit;
-        plcInfo.com_iodelaytime=param.com_iodelaytime;
-        plcInfo.com_stepinterval=param.com_stepinterval;
-        plcInfo.comtype=param.comtype;
-        plcInfo.data_length=param.data_length;
-        plcInfo.rev_timeout=param.rev_timeout;
-        plcInfo.com_stepinterval=param.com_stepinterval;
-        plcInfo.device_id=param.device_id;
-        plcInfo.net_broadcastaddr=param.net_broadcastaddr;
-        plcInfo.net_ipaddr=param.net_ipaddr;
-        plcInfo.net_isbroadcast=param.net_isbroadcast;
-        plcInfo.net_port=param.net_port;
-        plcInfo.net_type=param.net_type;
+        plcInfo.baudrate = param.baudrate;
+        plcInfo.box_stat_no = param.box_stat_no;
+        plcInfo.check_bit = param.check_bit;
+        plcInfo.com_iodelaytime = param.com_iodelaytime;
+        plcInfo.com_stepinterval = param.com_stepinterval;
+        plcInfo.comtype = param.comtype;
+        plcInfo.data_length = param.data_length;
+        plcInfo.rev_timeout = param.rev_timeout;
+        plcInfo.com_stepinterval = param.com_stepinterval;
+        plcInfo.device_id = param.device_id;
+        plcInfo.net_broadcastaddr = param.net_broadcastaddr;
+        plcInfo.net_ipaddr = param.net_ipaddr;
+        plcInfo.net_isbroadcast = param.net_isbroadcast;
+        plcInfo.net_port = param.net_port;
+        plcInfo.net_type = param.net_type;
 
         plcInfoApi.updatePlcInfo(plcInfo);
         return new Output();
+    }
+
+    @Label("通讯口配置默认值展示")
+    @WebApi(forceAuth = true, master = true, authority = {"1"})
+    @RequestMapping("showPlcSetDefault")
+    public Output showPlcSetDefault() {
+        /*
+        * UsbDevice="1"
+        * Ethernet="1"
+        * 获取 port 通讯协议 是 USB的
+        * */
+        JSONObject data =new JSONObject();
+        data.put("usbDevice",plcListByType.getPlcListByType("UsbDevice", "1"));
+        data.put("ethernet",plcListByType.getPlcListByType("Ethernet","1"));
+        return new Output(data);
     }
 
 }

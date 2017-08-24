@@ -12,19 +12,24 @@ import java.util.List;
 /**
  * Created by whp on 2017/8/19.
  */
+
 public class PlcTypeParser {
     //private static Logger logger = LoggerFactory.getLogger(PlcTypeParser.class);
+
     /**
      * 解析plcType文件中的数据填充到po
      */
     public static void doParse() {
+        if (PlcTypeCache.localPlcTypeData != null && PlcTypeCache.localPlcTypeData.size() > 0) {
+            return;
+        }
         try {
             //logger.debug("parse begin");
             Document doc = DOMUtil.getXMLByFilePath("/PLCType.plc");
             Element root = doc.getRootElement();
             /** 解析plc节点*/
             List<Element> plcElementList = root.elements("plc");
-            if(null == plcElementList){
+            if (null == plcElementList) {
                 return;
             }
             List<Plc> plcList = new ArrayList<Plc>();
@@ -34,17 +39,17 @@ public class PlcTypeParser {
                 plc.setAttributes(plcElement.attributes());
                 /** 解析plc下一级addr节点*/
                 List<Element> addrElementList = plcElement.elements();
-                if(null == addrElementList){
+                if (null == addrElementList) {
                     continue;
                 }
-                for(Element addrElement : addrElementList){
+                for (Element addrElement : addrElementList) {
                     AddrDom addrDom = new AddrDom();
                     //设置addr标签属性
                     addrDom.setAttributes(addrElement.attributes());
                     /** 解析res节点*/
                     List<Element> resElementList = addrElement.elements("res");
-                    if(null != resElementList){
-                        for(Element resElement : resElementList){
+                    if (null != resElementList) {
+                        for (Element resElement : resElementList) {
                             Res res = new Res();
                             //设置res标签属性
                             res.setAttributes(resElement.attributes());
@@ -63,7 +68,7 @@ public class PlcTypeParser {
         }
     }
 
-    public static void main(String[] arg){
+    public static void main(String[] arg) {
         doParse();
         List<String> result = PlcTypeQuerier.getInstance().queryValuesByKey("Type");
         System.out.print(result);

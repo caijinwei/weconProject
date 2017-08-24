@@ -164,6 +164,7 @@ function allowDrop(ev) {
 function drag(ev) {
     ev.dataTransfer.setData("Text", ev.target.id);
     fromDirId = $(ev.target).parent().attr("sid");
+    ev.stopPropagation();
 }
 function drop(ev) {
 
@@ -175,7 +176,7 @@ function drop(ev) {
     var next = $(parent).next();
 //        再往子分组ul中追加拖放的元素
     next.append($(document.getElementById(data)));
-
+    ev.stopPropagation();
 
 //   调用后台方法
     var appElement = document.querySelector('[ng-controller=infoController]');
