@@ -36,6 +36,7 @@ public class PlcInfo {
  */
 	public long plc_id;
 	public long device_id;
+	public String ptype;
 	public String type;
 	public String driver;
 	public int box_stat_no;

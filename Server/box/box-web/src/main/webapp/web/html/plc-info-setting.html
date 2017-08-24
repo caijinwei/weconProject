@@ -17,7 +17,7 @@
     <div class="row" style="margin-top: 40px;">
         <table class="table table-bordered">
             <caption>
-                <a href="#" data-toggle="modal" data-target="#addConfig" style="text-decoration: none">
+                <a href="#" data-toggle="modal" data-target="#addConfig" style="text-decoration: none" ng-click="showPlcSetDefault()">
                     <span class="glyphicon glyphicon-plus"></span> 添加
                 </a>
             </caption>
@@ -59,7 +59,7 @@
 
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal"  ><span>&times;</span></button>
                 <h4 class="modal-title">添加通信口配置</h4>
             </div>
             <div class="modal-body" style="padding-right: 45px">
@@ -80,27 +80,20 @@
                                 <input class="col-md-7" name="device_id" id="device_id"
                                        style="height: 30px; cursor: not-allowed;" disabled/>
                             </div>
-                            <div class=" col-md-6 " style="margin: 10px 0;">
-                                <span class="col-md-5"><span style="color: red">*</span>驱动名称</span>
-                                <select class="col-md-7" style="height: 30px;" id="type" name="type">
-                                    <option>SIMUTOCOL LX1S</option>
-                                    <option>SIMUTOCOL LX2N</option>
-                                    <option>SIMUTOCOL LX3V</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row">
                             <div class="col-md-6 " style="margin: 10px 0;">
 
                                 <span class="col-md-5"><span style="color: red">*</span>通讯协议</span>
-                                <select class="col-md-7" name="port" style="height: 30px;" id="port">
-                                    <option>COM1</option>
+                                <select class="col-md-7" name="port" style="height: 30px;" id="port" ng-change="chgPort()" ng-model="selectedPort">
+                                    <option >COM1</option>
                                     <option>COM2</option>
                                     <option>Ethernet</option>
                                     <option>USB</option>
                                 </select>
                             </div>
+
+                        </div>
+
+                        <div class="row">
                             <div class="col-md-6 " style="margin: 10px 0;">
                                 <span class="col-md-5"><span style="color: red">*</span>串口协议</span>
                                 <select class="col-md-7" style="height: 30px;" name="comtype" id="comtype"
@@ -108,6 +101,14 @@
                                     <option value="1">RS232</option>
                                     <option value="2">RS422</option>
                                     <option value="3">RS485</option>
+                                </select>
+                            </div>
+                            <div class=" col-md-6 " style="margin: 10px 0;">
+                                <span class="col-md-5"><span style="color: red">*</span>驱动名称</span>
+                                <select class="col-md-7" style="height: 30px;" id="type" name="type">
+                                    <option>SIMUTOCOL LX1S</option>
+                                    <option>SIMUTOCOL LX2N</option>
+                                    <option>SIMUTOCOL LX3V</option>
                                 </select>
                             </div>
                         </div>
