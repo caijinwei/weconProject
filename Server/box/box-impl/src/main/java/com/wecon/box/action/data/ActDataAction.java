@@ -26,6 +26,7 @@ import com.wecon.box.entity.RedisPiBoxActData;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
+import com.wecon.box.util.OptionUtil;
 import com.wecon.box.util.ServerMqtt;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
@@ -49,6 +50,8 @@ public class ActDataAction {
 	private AccountDirApi accountDirApi;
 	@Autowired
 	private AccountDirRelApi accountDirRelApi;
+	@Autowired
+	private OptionUtil optionService;
 
 	/**
 	 * 通过机器码获取对应的实时数据组
@@ -419,6 +422,21 @@ public class ActDataAction {
 
 		return new Output();
 	}
-	
+
+	/**
+	 * 获取数据类型
+	 * 
+	 * @return
+	 */
+	@Description("获取数据类型")
+	@WebApi(forceAuth = true, master = true)
+	@RequestMapping(value = "/getDataType")
+	public Output getDataType() {
+		JSONObject json = new JSONObject();
+		json.put("DataTypeOption", optionService.getDataTypeOptionOptions());
+
+		return new Output(json);
+
+	}
 
 }

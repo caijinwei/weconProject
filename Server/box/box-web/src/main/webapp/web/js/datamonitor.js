@@ -573,5 +573,25 @@ appModule
 									alert("ajax error");
 								});
 					}
+					/**
+					 * 获取数据类型
+					 */
+					$scope.getDataType = function() {
+						
+						T.common.ajax.request("WeconBox",
+								"actDataAction/getDataType", params,
+								function(data, code, msg) {
+									var test = 1;
+									if (code == 200) {
+										$scope.dataTypes = data.DataTypeOption;
+										$scope.$apply();
+									} else {
+										alert(code + "-" + msg);
+									}
+								}, function() {
+									alert("ajax error");
+								});
+
+					}
 
 				})

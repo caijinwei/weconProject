@@ -4,7 +4,7 @@ package com.wecon.box.enums;
  * 数据类型枚举
  * Created by zengzhipeng on 2017/8/19.
  */
-public enum DataTypeOption {
+public enum DataTypeOption  {
     Bit_Binary_16("16位二进制", 100),
     Bit_Octal_16("16位八进制", 101),
     Bit_Hex_16("16位十六进制", 102),
@@ -37,5 +37,13 @@ public enum DataTypeOption {
     DataTypeOption(final String _key,final int _value) {
         this.key = _key;
         this.value = _value;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public String getKey() {
+        return key;
     }
 }

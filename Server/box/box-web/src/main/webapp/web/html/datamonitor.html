@@ -60,7 +60,8 @@
 						<caption>
 							<button type="button" class="btn btn-primary" data-toggle="modal"
 								ng-cloak ng-if="accounttype==1 && deviceid>0"
-								data-target="#addpoint" ng-click="showAllPlcConf()">
+								data-target="#addpoint"
+								ng-click="showAllPlcConf();getDataType();">
 								<span class="glyphicon glyphicon-plus"></span> 添加监控点
 							</button>
 							<button type="button" class="btn btn-primary" data-toggle="modal"
@@ -71,7 +72,8 @@
 							</button>
 							<button type="button" class="btn btn-primary" data-toggle="modal"
 								ng-cloak ng-if="accounttype==1 && deviceid>0"
-								data-target="#addpoint">
+								data-target="#addpoint"
+								ng-click="showAllPlcConf();getDataType();">
 								<span class="glyphicon glyphicon-list"
 									style="margin-left: 15px;"></span> 批量添加
 							</button>
@@ -121,110 +123,6 @@
 					</table>
 					<tm-pagination conf="paginationConf"></tm-pagination>
 					<!--添加监控点-->
-					<!-- <div class="modal" id="addpoint" tabindex="-1"
-						data-backdrop="false">
-						<div class="modal-dialog">
-							<div class="modal-content">
-								<div class="modal-header">
-									<button type="button" class="close" data-dismiss="modal" >
-										<span>&times;</span>
-									</button>
-									<h4 class="modal-title">添加监控数据</h4>
-								</div>
-								<div class="modal-body">
-									<div class="container-fluid">
-										<div class="row col-md-11 col-md-offset-1"
-											style="margin: 10px 0;">
-											<span class="col-md-3">名称</span><input type="text"
-												class="col-md-9" style="height: 30px; padding-left: 5px;" />
-										</div>
-										<div class="row col-md-11 col-md-offset-1"
-											style="margin: 10px 0;">
-											<span class="col-md-3">连接设备</span> <select class="col-md-9"
-												style="height: 30px;">
-												<option ng-repeat="x in infoDatas">{{$index+1}}-{{x.port}}</option>
-
-											</select>
-										</div>
-										<div class="row col-md-11 col-md-offset-1"
-											style="margin: 10px 0;">
-											<span class="col-md-3">数据格式</span> <select id="datatype"
-												class="col-md-9" style="height: 30px;"
-												onchange="show_sub(this.options[this.options.selectedIndex].value)">
-												<option value="0">0：位地址</option>
-												<option value="162">16位二进制</option>
-												<option value="168">16位八进制</option>
-												<option value="1616">16位十六进制</option>
-												<option value="16bcd">16位BCD码</option>
-												<option value="16110">16位有符号十进制数</option>
-												<option value="16010">16位无符号十进制数</option>
-												<option value="322">32位二进制</option>
-												<option value="328">32位八进制</option>
-												<option value="3216">32位十六进制</option>
-												<option value="32bcd">32位BCD码</option>
-												<option value="32110">32位有符号十进制数</option>
-												<option value="32010">32位无符号十进制数</option>
-												<option value="32f">32位（单精度）浮点数</option>
-												<option value="64d">64位（双精度）浮点数</option>
-											</select>
-										</div>
-										<div class="row col-md-11 col-md-offset-1"
-											style="margin: 10px 0;">
-											<span class="col-md-3">地址</span><input type="text"
-												class="col-md-6" style="height: 30px; padding-left: 5px;" />
-											<button type="button"
-												class="btn btn-info col-md-2 col-md-offset-1"
-												data-toggle="modal" data-target="#addrsetting">设置</button>
-										</div>
-
-										<div id="datadigits" class="row col-md-11 col-md-offset-1"
-											style="margin: 10px 0; display: none;">
-											<div id="div-integer">
-												<span class="col-md-3">整数位数</span> <select
-													id="integerdigits" class="col-md-3" style="height: 30px;"
-													onchange="getData()">
-
-												</select>
-											</div>
-											<div id="div-decimal">
-												<span class="col-md-3">小数位数</span> <select
-													id="decimaldigits" class="col-md-3" style="height: 30px;"
-													onchange="calcuSystem()">
-
-												</select>
-											</div>
-										</div>
-										<div class="row col-md-11 col-md-offset-1"
-											style="margin: 10px 0;">
-											<div id="value-min">
-												<span class="col-md-3">最小值</span> <input id="dataMin"
-													type="number" class="col-md-3"
-													style="height: 30px; padding-left: 5px;" value="0" min="" />
-											</div>
-											<div id="value-max">
-												<span class="col-md-3">最大值</span> <input id="dataMax"
-													type="number" class="col-md-3"
-													style="height: 30px; padding-left: 5px;" value="1" />
-											</div>
-										</div>
-										<div class="row col-md-11 col-md-offset-1"
-											style="margin: 10px 0;">
-											<span class="col-md-3">描述</span> <input type="text"
-												class="col-md-9" style="height: 30px; padding-left: 5px;"
-												placeholder="0X 1" />
-										</div>
-									</div>
-								</div>
-								<div class="modal-footer">
-									<button type="button" class="btn btn-info">确定</button>
-									<button type="button" class="btn btn-default"
-										data-dismiss="modal">取消</button>
-								</div>
-							</div>
-
-						</div>
-					</div> -->
-					<!--添加监控点-->
 					<div class="modal" id="addpoint" tabindex="-1"
 						data-backdrop="false">
 						<div class="modal-dialog">
@@ -252,10 +150,9 @@
 										<div class="row col-md-11 col-md-offset-1"
 											style="margin: 10px 0;">
 											<span class="col-md-3">数据格式</span> <select id="datatype"
-												class="col-md-3" style="height: 30px;"
-												onchange="show_sub(this.options[this.options.selectedIndex].value)">
-												<option value="0">位地址</option>
-												<option value="162">16位二进制</option>
+												class="col-md-9" style="height: 30px;">
+												<option ng-repeat="x in dataTypes" value="{{x.value}}">{{x.text}}</option>
+												<!-- <option value="162">16位二进制</option>
 												<option value="168">16位八进制</option>
 												<option value="1616">16位十六进制</option>
 												<option value="16bcd">16位BCD码</option>
@@ -268,18 +165,21 @@
 												<option value="32110">32位有符号十进制数</option>
 												<option value="32010">32位无符号十进制数</option>
 												<option value="32f">32位（单精度）浮点数</option>
-												<option value="64d">64位（双精度）浮点数</option>
+												<option value="64d">64位（双精度）浮点数</option> -->
+											</select>
+										</div>
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;">
+											<span class="col-md-3">地址类型</span> <select class="col-md-3"
+												style="height: 30px;">
+												<option>位地址</option>
+												<option>字地址</option>
 											</select> <span class="col-md-3">寄存器地址</span> <select class="col-md-3"
 												style="height: 30px;">
 												<option>BDW</option>
 												<option>BWD</option>
 												<option>BDW</option>
 											</select>
-										</div>
-										<div class="row col-md-11 col-md-offset-1"
-											style="margin: 10px 0;">
-											<span class="col-md-3">地址</span><input type="text"
-												class="col-md-9" style="height: 30px; padding-left: 5px;" />
 										</div>
 
 										<div id="datadigits" class="row col-md-11 col-md-offset-1"
@@ -302,9 +202,9 @@
 										<div class="row col-md-11 col-md-offset-1"
 											style="margin: 10px 0;">
 											<div id="data-range">
-												<span class="col-md-3">数据范围</span> <input id="dataMin"
-													type="number" class="col-md-9"
-													style="height: 30px; padding-left: 5px;" value="0" min="" />
+												<span class="col-md-3">数据范围</span> <input type="text"
+													class="col-md-9" style="height: 30px; padding-left: 5px;"
+													value="0" disabled />
 											</div>
 										</div>
 										<div class="row col-md-11 col-md-offset-1"
