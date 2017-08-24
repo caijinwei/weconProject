@@ -64,8 +64,9 @@
 								<span class="glyphicon glyphicon-plus"></span> 添加监控点
 							</button>
 							<button type="button" class="btn btn-primary" data-toggle="modal"
-								ng-cloak ng-if="accounttype==1 && deviceid==-100"
-								data-target="#dispatchpoint" >
+								ng-cloak
+								ng-if="(accounttype==1 && deviceid==-100)||(accounttype==2 && deviceid==-200)"
+								data-target="#dispatchpoint" ng-click="showRestList()">
 								<span class="fa fa-indent"></span> 分配监控点
 							</button>
 							<button type="button" class="btn btn-primary" data-toggle="modal"
@@ -99,7 +100,8 @@
 								<td>{{x.addr_type==0?"位地址":x.addr_type==1?"字地址":"双字"}}</td>
 								<td>{{x.describe}}</td>
 								<td><a href="#" title="编辑" class="col-md-3"
-									data-toggle="modal" data-target="#editpoint"> <span
+									data-toggle="modal" data-target="#editpoint" ng-cloak
+									ng-if="accounttype==1"> <span
 										class="glyphicon glyphicon-edit"></span> 编辑
 								</a> <a href="#" title="复制" class="col-md-3" data-toggle="modal"
 									data-target="#copyDataGroup"
@@ -466,6 +468,7 @@
 							</div>
 						</div>
 					</div>
+
 					<!--分配监控点-->
 					<div class="modal" id="dispatchpoint" tabindex="-1"
 						data-backdrop="false">
@@ -477,125 +480,14 @@
 									</button>
 									<h4 class="modal-title">分配监控点</h4>
 								</div>
-								<div class="modal-body">
-									<div class="container-fluid">
-										<div class="row">
-											<table class="table table-bordered table-hover"
-												id="allpointlist">
-												<thead>
-													<tr>
-														<th class="col-md-1">编号</th>
-														<th class="col-md-2">状态</th>
-														<th class="col-md-3">名称</th>
-														<th class="col-md-3">数值</th>
-														<th class="col-md-3">描述</th>
-													</tr>
-												</thead>
-												<tbody>
-													<tr>
-														<td>1</td>
-														<td><a href="#" title="设备已变更或移除"> <span
-																class="glyphicon glyphicon-exclamation-sign"
-																style="color: #ff3a28;"></span>
-														</a></td>
-														<td>aa0</td>
-														<td></td>
-														<td>0X1</td>
-													</tr>
-													<tr>
-														<td>2</td>
-														<td><a href="#" title="超时"> <span
-																class="glyphicon glyphicon-exclamation-sign"
-																style="color: #ff3a28;"></span>
-														</a></td>
-														<td>PLC1</td>
-														<td></td>
-														<td>D0</td>
-													</tr>
-													<tr>
-														<td>3</td>
-														<td><a href="#" title="设备已变更或移除"> <span
-																class="glyphicon glyphicon-exclamation-sign"
-																style="color: #ff3a28;"></span>
-														</a></td>
-														<td>PLC2</td>
-														<td></td>
-														<td>0X1</td>
-													</tr>
-													<tr>
-														<td>4</td>
-														<td><a href="#" title="超时"> <span
-																class="glyphicon glyphicon-exclamation-sign"
-																style="color: #ff3a28;"></span>
-														</a></td>
-														<td>aa0</td>
-														<td></td>
-														<td>0X1</td>
-													</tr>
-													<tr>
-														<td>5</td>
-														<td><a href="#" title="设备已变更或移除"> <span
-																class="glyphicon glyphicon-exclamation-sign"
-																style="color: #ff3a28;"></span>
-														</a></td>
-														<td>PLC1</td>
-														<td></td>
-														<td>D0</td>
-													</tr>
-													<tr>
-														<td>6</td>
-														<td><a href="#" title="设备已变更或移除"> <span
-																class="glyphicon glyphicon-exclamation-sign"
-																style="color: #ff3a28;"></span>
-														</a></td>
-														<td>PLC2</td>
-														<td></td>
-														<td>0X1</td>
-													</tr>
-													<tr>
-														<td>7</td>
-														<td><a href="#" title="设备已变更或移除"> <span
-																class="glyphicon glyphicon-exclamation-sign"
-																style="color: #ff3a28;"></span>
-														</a></td>
-														<td>aa0</td>
-														<td></td>
-														<td>0X1</td>
-													</tr>
-													<tr>
-														<td>8</td>
-														<td><a href="#" title="超时"> <span
-																class="glyphicon glyphicon-exclamation-sign"
-																style="color: #ff3a28;"></span>
-														</a></td>
-														<td>PLC1</td>
-														<td></td>
-														<td>D0</td>
-													</tr>
-												</tbody>
-											</table>
-										</div>
-										<div style="margin: 0 auto; text-align: center;">
-											<nav>
-												<ul class="pagination pagination-lg">
-													<li class="disabled"><a href="#" aria-label="Previous">
-															<span aria-hidden="true">«</span>
-													</a></li>
-													<li class="active"><a href="#">1</a></li>
-													<li><a href="#">2</a></li>
-													<li><a href="#">3</a></li>
-													<li><a href="#">4</a></li>
-													<li><a href="#">5</a></li>
-													<li><a href="#" aria-label="Next"> <span
-															aria-hidden="true">»</span>
-													</a></li>
-												</ul>
-											</nav>
-										</div>
-									</div>
+								<div class="modal-body " style="height: 450px;"
+									id="model-body-id">
+									<iframe id="myiframe" frameborder="0" marginheight="0"
+										marginwidth="0" width="100%" height="100%"></iframe>
 								</div>
 								<div class="modal-footer">
-									<button type="button" class="btn btn-info">确定</button>
+									<button type="button" class="btn btn-info"
+										ng-click="setViewOpint()">确定</button>
 									<button type="button" class="btn btn-default"
 										data-dismiss="modal">取消</button>
 								</div>

@@ -3,17 +3,19 @@ package com.wecon.restful.core;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 public class SpringMvcInterceptor implements HandlerInterceptor
 {
-	private static final Logger logger = Logger.getLogger(SpringMvcInterceptor.class);
+	private static final Logger logger = LogManager.getLogger(SpringMvcInterceptor.class);
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception
 	{
+		logger.debug("restful preHandle ...");
 		long curr = System.currentTimeMillis();
 
 		// encoding
@@ -36,6 +38,14 @@ public class SpringMvcInterceptor implements HandlerInterceptor
 			{
 				response.addHeader("Access-Control-Allow-Headers", headers);
 			}
+			return true;
+		}
+		//websocket
+		String baseUrl = request.getRequestURI();
+		int begin = baseUrl.indexOf("/api/");
+		baseUrl = baseUrl.substring(begin + 4);
+		if(baseUrl.contains("-websocket")){
+			logger.debug("websocket request");
 			return true;
 		}
 

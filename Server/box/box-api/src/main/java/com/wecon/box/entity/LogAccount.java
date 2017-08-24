@@ -15,4 +15,6 @@ public class LogAccount {
     public Timestamp op_time;
     public String message;
     public String url;
+    public long res_id;
+    public int res_type;
 }
