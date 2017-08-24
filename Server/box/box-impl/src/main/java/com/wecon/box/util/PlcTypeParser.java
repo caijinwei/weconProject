@@ -70,7 +70,7 @@ public class PlcTypeParser {
 
     public static void main(String[] arg) {
         doParse();
-        List<String> result = PlcTypeQuerier.getInstance().queryValuesByKey("Type");
+        List<String> result = PlcTypeQuerier.getInstance().queryValuesByKey("plctype");
         System.out.print(result);
     }
 }

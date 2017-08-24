@@ -211,7 +211,6 @@ appModule
 								$scope.movegroupName = data.name;
 							}
 						});
-				
 
 					}
 					// 移动监控点到其他组
@@ -552,4 +551,27 @@ appModule
 											alert("ajax error");
 										});
 					};
+					/*
+					 * 盒子下plc配置展示
+					 */
+					$scope.showAllPlcConf = function() {
+
+						var params = {
+							device_id : $scope.deviceid
+						};
+						T.common.ajax.request("WeconBox",
+								"plcInfoAction/showAllPlcConf", params,
+								function(data, code, msg) {
+									var test = 1;
+									if (code == 200) {
+										$scope.infoDatas = data.infoDatas;
+										$scope.$apply();
+									} else {
+										alert(code + "-" + msg);
+									}
+								}, function() {
+									alert("ajax error");
+								});
+					}
+
 				})
