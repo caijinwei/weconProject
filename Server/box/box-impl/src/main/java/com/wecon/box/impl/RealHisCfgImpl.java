@@ -463,7 +463,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		String sqlCount = "select count(0) " + fromStr
 				+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id";
 		String sql = "select " + SEL_COL + ",d.machine_code" + "  " + fromStr
-				+ "  where 1=1 adn  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id";
+				+ "  where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id";
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<RealHisCfgDevice> page = new Page<RealHisCfgDevice>(pageIndex, pageSize, totalRecord);
@@ -504,7 +504,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		String sqlCount = "select count(0) " + fromStr
 				+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1";
 		String sql = "select " + SEL_COL + ",d.machine_code" + "  " + fromStr
-				+ "  where 1=1 adn  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1";
+				+ "  where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1";
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<RealHisCfgDevice> page = new Page<RealHisCfgDevice>(pageIndex, pageSize, totalRecord);

@@ -2,10 +2,7 @@ package com.wecon.box.action.data;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.wecon.box.api.AlarmCfgDataApi;
-import com.wecon.box.api.RealHisCfgApi;
-import com.wecon.box.api.RealHisCfgDataApi;
-import com.wecon.box.api.RedisPiBoxApi;
+import com.wecon.box.api.*;
 import com.wecon.box.entity.*;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.filter.AlarmCfgDataFilter;
@@ -41,6 +38,8 @@ public class BusinessDataAction {
     private AlarmCfgDataApi alarmCfgDataApi;
     @Autowired
     private RealHisCfgDataApi realHisCfgDataApi;
+    @Autowired
+    private DeviceApi deviceApi;
     /**
      * 获取实时数据
      * @param param
@@ -79,7 +78,18 @@ public class BusinessDataAction {
         List<RealHisCfgDevice> realHisCfgDeviceList = realHisCfgDevicePage.getList();
         JSONObject json = new JSONObject();
         JSONArray arr = new JSONArray();
-        if (realHisCfgDeviceList == null || realHisCfgDeviceList.size() < 1) {
+
+        //假数据，后面要删除
+        for(int p=1;p<5;p++){
+            JSONObject data = new JSONObject();
+            data.put("id", p);
+            data.put("state", 1);
+            data.put("monitorName", "监控点"+p);
+            data.put("number", 60);
+            arr.add(data);
+        }
+
+        /*if (realHisCfgDeviceList == null || realHisCfgDeviceList.size() < 1) {
             return new Output(json);
         }
         for (int i = 0; i < realHisCfgDeviceList.size(); i++) {
@@ -107,7 +117,7 @@ public class BusinessDataAction {
                 }
             }
             arr.add(data);
-        }
+        }*/
         json.put("list", arr);
         return new Output(json);
     }
@@ -150,7 +160,7 @@ public class BusinessDataAction {
         List<Map<String, Object>> realHisCfgDataList = realHisCfgDataPage.getList();
         JSONObject json = new JSONObject();
         JSONArray arr = new JSONArray();
-        if (realHisCfgDataList == null || realHisCfgDataList.size() < 1) {
+        /*if (realHisCfgDataList == null || realHisCfgDataList.size() < 1) {
             return new Output(json);
         }
         for(Map<String, Object> row : realHisCfgDataList){
@@ -159,10 +169,18 @@ public class BusinessDataAction {
             data.put("number", row.get("number"));
             data.put("monitorTime", row.get("monitorTime"));
             arr.add(data);
+        }*/
+        //假数据，后面要删除
+        for(int p=1;p<5;p++){
+            JSONObject data = new JSONObject();
+            data.put("monitorName", "监控点"+p);
+            data.put("number", 56);
+            data.put("monitorTime", System.currentTimeMillis());
+            arr.add(data);
         }
-        JSONObject data = new JSONObject();
+
         json.put("list", arr);
-        return new Output(data);
+        return new Output(json);
     }
 
     /**
@@ -197,7 +215,7 @@ public class BusinessDataAction {
         }
 
         JSONObject json = new JSONObject();
-        List<AlarmCfgDataAlarmCfg> alarmCfgDataList = alarmCfgDataPage.getList();
+        /*List<AlarmCfgDataAlarmCfg> alarmCfgDataList = alarmCfgDataPage.getList();
         if(null != alarmCfgDataList){
             JSONArray arr = new JSONArray();
             for(AlarmCfgDataAlarmCfg alarmCfg : alarmCfgDataList){
@@ -209,19 +227,34 @@ public class BusinessDataAction {
                 arr.add(data);
             }
             json.put("list", arr);
+        }*/
+        //假数据，后面要删除
+        JSONArray arr = new JSONArray();
+        for(int p=1;p<5;p++){
+            JSONObject data = new JSONObject();
+            data.put("monitorName", "监控点"+p);
+            data.put("state", 1);
+            data.put("number", 48);
+            data.put("monitorTime", System.currentTimeMillis());
+            arr.add(data);
         }
+        json.put("list", arr);
+
         return new Output(json);
     }
 
     /**
      * 获取盒子列表
-     * @param param
      * @return
      */
     @RequestMapping("data/boxs")
-    @WebApi(forceAuth = true, master = true)
-    public Output getBoxData(@Valid BusinessDataParam param) {
-        return new Output(null);
+    @WebApi(forceAuth = true, master = true, authority = {"1"})
+    public Output getBoxData() {
+        Client client = AppContext.getSession().client;
+        List<Map<String, Object>> result = deviceApi.getDevicesByGroup(client.userId);
+        JSONObject json = new JSONObject();
+        json.put("list", result);
+        return new Output(json);
     }
 }
 
