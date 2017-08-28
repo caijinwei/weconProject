@@ -516,6 +516,13 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 	}
 
+	@Override
+	public List<RealHisCfgDevice> getRealHisCfgListByState(int state){
+		String sql = "select " + SEL_COL + " from real_his_cfg r ,device d, plc_info p where d.device_id=p.device_id and p.plc_id=r.plc_id and r.state = ?";
+		List<RealHisCfgDevice> list = jdbcTemplate.query(sql, new Object[]{state}, new DefaultRealCfgDeviceRowMapper());
+		return list;
+	}
+
 	public static final class DefaultRealHisCfgRowMapper implements RowMapper<RealHisCfg> {
 
 		@Override
