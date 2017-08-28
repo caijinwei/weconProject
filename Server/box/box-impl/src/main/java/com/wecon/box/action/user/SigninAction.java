@@ -51,6 +51,7 @@ public class SigninAction extends UserBaseAction {
         String sid = accountApi.createSession(user, client.appid, client.fuid, client.ip, client.timestamp, expire);
         JSONObject data = new JSONObject();
         data.put("sid", sid);
+        data.put("utype",user.type);
 //        data.put("uid", user.account_id);
         return new Output(data);
     }
