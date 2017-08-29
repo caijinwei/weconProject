@@ -7,7 +7,7 @@ appModule
 						$scope.deviceid = T.common.util
 								.getParameter("device_id");
 						$scope.devicename = T.common.util
-						.getParameter("device_name");
+								.getParameter("device_name");
 						$scope.paginationConf_current = {
 							currentPage : 1,
 							itemsPerPage : 10,
@@ -25,21 +25,21 @@ appModule
 							}
 						}
 						$scope.paginationConf_history = {
-								currentPage : 1,
-								itemsPerPage : 10,
-								totalItems : $scope.count,
-								pagesLength : 15,
-								perPageOptions : [ 5, 10, 20, 50, 100 ],
-								rememberPerPage : 'perPageItems',
-								onChange : function() {
-									if (this.currentPage != 0) {
+							currentPage : 1,
+							itemsPerPage : 10,
+							totalItems : $scope.count,
+							pagesLength : 15,
+							perPageOptions : [ 5, 10, 20, 50, 100 ],
+							rememberPerPage : 'perPageItems',
+							onChange : function() {
+								if (this.currentPage != 0) {
 
-										$scope.hisalarm_submit(this.currentPage,
-												this.itemsPerPage);
+									$scope.hisalarm_submit(this.currentPage,
+											this.itemsPerPage);
 
-									}
 								}
 							}
+						}
 						$('.form_datetime').datetimepicker({
 							weekStart : 1,
 							todayBtn : 1,
@@ -86,13 +86,7 @@ appModule
 												$scope.accounttype = data.type;
 												$scope.paginationConf_current.totalItems = data.alarmData.totalRecord;
 												$scope.$apply();
-												
-												
-												
-												
-												
-												
-												
+
 												$("#loadingModal")
 														.modal("hide");
 
@@ -145,6 +139,14 @@ appModule
 											$("#loadingModal").modal("hide");
 											alert("ajax error");
 										});
+					}
+					$scope.displaySecond = function() {
+						var value = $('#selectWith').val();
+						if (value == "none") {
+							$('#secondCondition').css('display', 'none');
+						} else {
+							$('#secondCondition').css('display', 'block');
+						}
 					}
 
 				})

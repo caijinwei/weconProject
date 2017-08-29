@@ -96,12 +96,13 @@ public class HisDataAction {
 			@RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
 
 		JSONObject data = new JSONObject();
-		Page<RealHisCfgData> realHisCfgDataList = null;
+		Page<RealHisCfgData> realHisCfgDataList = new Page<RealHisCfgData>(pageIndex,pageSize,0);
 
 		RealHisCfgDataFilter realHisCfgDataFilter = new RealHisCfgDataFilter();
 		if (CommonUtils.isNullOrEmpty(real_his_cfg_id)) {
 
-			return new Output();
+			data.put("realHisCfgDataList", realHisCfgDataList);
+			return new Output(data);
 
 		}
 		realHisCfgDataFilter.real_his_cfg_id = Long.parseLong(real_his_cfg_id);
