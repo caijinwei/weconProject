@@ -38,6 +38,19 @@ public enum DataTypeOption  {
         this.key = _key;
         this.value = _value;
     }
+    
+    public static String getDataTypeValue(long value) {
+		String key = "";
+		for (DataTypeOption it : DataTypeOption.values()) {
+			if (value == it.getValue()) {
+				key = it.getKey();
+				break;
+			}
+
+		}
+		return key;
+	}
+    
 
     public int getValue() {
         return value;

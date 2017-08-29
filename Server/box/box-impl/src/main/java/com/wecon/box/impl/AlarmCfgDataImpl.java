@@ -118,7 +118,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 			params.add(filter.alarm_cfg_id);
 		}
 		if (filter.device_id > 0) {
-			condition.append(" and pli.device_id = ? ");
+			condition.append(" and ac.device_id = ? ");
 			params.add(filter.device_id);
 		}
 		if (!CommonUtils.isNullOrEmpty(filter.value)) {
@@ -178,7 +178,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 			params.add(filter.alarm_cfg_id);
 		}
 		if (filter.device_id > 0) {
-			condition.append(" and pli.device_id = ? ");
+			condition.append(" and ac.device_id = ? ");
 			params.add(filter.device_id);
 		}
 		if (!CommonUtils.isNullOrEmpty(filter.value)) {

@@ -93,7 +93,7 @@ public class DeviceImpl implements DeviceApi {
 
     @Override
     public Device getDevice(final String machine_code) {
-        String sql = "select " + SEL_COL + " from device where machine_code=?";
+        String sql = "select " + SEL_COL + " from device where machine_code=? limit 1";
         List<Device> list = jdbcTemplate.query(sql, new Object[]{machine_code}, new DefaultDeviceRowMapper());
         if (!list.isEmpty()) {
             return list.get(0);

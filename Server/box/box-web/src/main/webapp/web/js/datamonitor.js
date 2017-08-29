@@ -10,6 +10,7 @@ appModule
 						$scope.devicename = T.common.util
 								.getParameter("device_name");
 						$scope.type = 0;
+						$scope.getDataType();
 						$scope.act_group($scope.deviceid);
 
 						$scope.paginationConf = {
@@ -133,7 +134,7 @@ appModule
 																	.act_submit(
 																			$scope.paginationConf.currentPage,
 																			$scope.paginationConf.itemsPerPage,
-																			groupId)
+																			actgroupId)
 														}, 3000);
 											} else {
 
@@ -251,18 +252,28 @@ appModule
 											alert("ajax error");
 										});
 					}
-					// 删除监控点
+
+					// 获取移除监控点信息
+					$scope.remonitor = function(model) {
+						$scope.delmonitorid = model.id;// 监控点id
+						$scope.isdelmonitor = 1; // 1.移除监控点 2.删除监控点配置
+						$("#delgroupid").html(
+								"确定要从该分组移除【" + model.ref_alais + "】监控点吗？");
+					}
+					// 获取删除监控点信息
 					$scope.delmonitor = function(model) {
 						$scope.delmonitorid = model.id;// 监控点id
+						$scope.isdelmonitor = 2; // 1.移除监控点 2.删除监控点配置
 						$("#delgroupid").html(
-								"确定要删除【" + model.ref_alais + "】监控点吗？");
+								"确定要删除【" + model.ref_alais + "】监控点配置吗？");
 					}
 					// 移除监控点
 					$scope.del_monitor_group = function() {
 
 						var params = {
 							monitorid : $scope.delmonitorid,
-							acc_dir_id : actgroupId
+							acc_dir_id : actgroupId,
+							isdel : $scope.isdelmonitor
 						};
 
 						T.common.ajax
@@ -278,7 +289,12 @@ appModule
 																$scope.paginationConf.currentPage,
 																$scope.paginationConf.itemsPerPage,
 																actgroupId);
-												alert("移除成功！");
+												if ($scope.isdelmonitor == 1) {
+													alert("移除成功！");
+
+												} else {
+													alert("删除成功！");
+												}
 
 											} else {
 
@@ -542,6 +558,7 @@ appModule
 																$scope.paginationConf.currentPage,
 																$scope.paginationConf.itemsPerPage,
 																actgroupId);
+
 												alert("分配监控点成功");
 
 											} else {
@@ -554,34 +571,71 @@ appModule
 					/*
 					 * 盒子下plc配置展示
 					 */
-					$scope.showAllPlcConf = function() {
-
+					var mtype = 0;
+					$scope.showAllPlcConf = function(dealtype) {
+						mtype = dealtype;
 						var params = {
 							device_id : $scope.deviceid
 						};
-						T.common.ajax.request("WeconBox",
-								"plcInfoAction/showAllPlcConf", params,
-								function(data, code, msg) {
-									var test = 1;
-									if (code == 200) {
-										$scope.infoDatas = data.infoDatas;
-										$scope.$apply();
-									} else {
-										alert(code + "-" + msg);
-									}
-								}, function() {
-									alert("ajax error");
-								});
+						T.common.ajax
+								.request(
+										"WeconBox",
+										"plcInfoAction/showAllPlcConf",
+										params,
+										function(data, code, msg) {
+											if (code == 200) {
+												$scope.infoDatas = data.infoDatas;
+												$scope.$apply();
+												if (dealtype == 0) {
+
+													$scope.showtype = 0;
+													$("#datatypeid")
+															.val(
+																	$scope.dataTypes[0].value);
+
+													mid = -1;
+													if (data.infoDatas != "") {
+														$scope
+																.condevice(data.infoDatas[0].plcId);
+														$("#nameid ").val("");
+														$("#addrid").val("");
+														$("#describeid")
+																.val("");
+
+													}
+												} else {
+													$scope.showtype = 1;
+													$("#nameid ").val(
+															minfo.name);
+													$("#conid ").val(
+															minfo.plc_id);
+													$scope
+															.condevice(minfo.plc_id);
+
+													$("#datatypeid").val(
+															minfo.data_id);
+													$("#addrid")
+															.val(minfo.addr);
+													$("#describeid").val(
+															minfo.describe);
+
+												}
+
+											} else {
+												alert(code + "-" + msg);
+											}
+										}, function() {
+											alert("ajax error");
+										});
 					}
 					/**
 					 * 获取数据类型
 					 */
 					$scope.getDataType = function() {
-						
+						var params = {};
 						T.common.ajax.request("WeconBox",
-								"actDataAction/getDataType", params,
-								function(data, code, msg) {
-									var test = 1;
+								"actDataAction/getDataType", params, function(
+										data, code, msg) {
 									if (code == 200) {
 										$scope.dataTypes = data.DataTypeOption;
 										$scope.$apply();
@@ -591,6 +645,178 @@ appModule
 								}, function() {
 									alert("ajax error");
 								});
+
+					}
+					/**
+					 * 连接设备点击响应
+					 */
+					var plcId;
+					$scope.condevice = function(clickplc) {
+						plcId = clickplc;
+						var params = {
+							plc_id : clickplc
+						};
+						T.common.ajax
+								.request(
+										"WeconBox",
+										"actDataAction/getAddrType",
+										params,
+										function(data, code, msg) {
+											if (code == 200) {
+												$scope.allAddrs = data.allAddr;
+
+												if (data.allAddr != "") {
+
+													$scope.addrvalues = data.allAddr[0].addrRid;
+													$("#rangid")
+															.val(
+																	data.allAddr[0].addrRid[0].range);
+													$scope.$apply();
+													if (mtype == 1) {
+
+														$("#addrtypeid")
+																.val(
+																		minfo.addr_type);
+
+														if ($("#addrtypeid")
+																.val() == null) {
+															$("#addrtypeid")
+																	.val(
+																			data.allAddr[0].addrkey);
+
+														}
+														angular
+																.forEach(
+																		$scope.allAddrs,
+																		function(
+																				data,
+																				index,
+																				array) {
+																			if ($(
+																					"#addrtypeid")
+																					.val() == data.addrkey) {
+																				$scope.addrvalues = data.addrRid;
+																				$scope
+																						.$apply();
+
+																			}
+
+																		})
+
+														$("#registerid").val(
+																minfo.rid);
+														if ($("#registerid")
+																.val() == null) {
+
+															$("#registerid")
+																	.val(
+																			$scope.addrvalues[0].addrvalue);
+
+															$("#rangid")
+																	.val(
+																			$scope.addrvalues[0].range);
+
+														} else {
+															$("#rangid")
+																	.val(
+																			minfo.data_limit);
+
+														}
+													}
+												}
+
+											} else {
+												alert(code + "-" + msg);
+											}
+										}, function() {
+											alert("ajax error");
+										});
+
+					}
+
+					// 地址类型点击
+					$scope.change = function() {
+						angular.forEach($scope.allAddrs, function(data, index,
+								array) {
+							if ($("#addrtypeid").val() == data.addrkey) {
+								$scope.addrvalues = data.addrRid;
+								$("#rangid").val(data.addrRid[0].range);
+							}
+
+						})
+
+					}
+					// 寄存器地址点击
+					$scope.changeaddr = function(event) {
+						console.log("changeaddr");
+						angular.forEach($scope.addrvalues, function(data,
+								index, array) {
+							if ($(event.target).val() == data.addrvalue) {
+								$("#rangid").val(data.range);
+
+							}
+
+						})
+
+					}
+					var mid = -1;
+					var minfo = null;
+					// 获取修改监控点的信息
+					$scope.editmonitor = function(model) {
+						minfo = model;
+						mid = model.id;
+						$scope.showAllPlcConf(1);
+
+					}
+					// 保存添加/修改监控点
+					$scope.saveupmonitor = function() {
+						if ($("#nameid").val() == ""
+								|| $("#addrid").val() == "") {
+							alert("参数为配置完整！");
+							return;
+						}
+
+						var params = {
+							id : mid,
+							plc_id : plcId,
+							device_id : $scope.deviceid,
+							name : $("#nameid").val(),
+							data_id : $("#datatypeid").val(),
+							addr_type : $("#addrtypeid").val(),
+							addr : $("#addrid").val(),
+							rid : $("#registerid").val(),
+							rang : $("#rangid").val(),
+							describe : $("#describeid").val(),
+							data_type : "0",
+							group_id : actgroupId
+
+						};
+
+						T.common.ajax
+								.request(
+										"WeconBox",
+										"actDataAction/addUpdataMonitor",
+										params,
+										function(data, code, msg) {
+											if (code == 200) {
+												$("#addpoint").modal("hide");
+												$scope
+														.act_submit(
+																$scope.paginationConf.currentPage,
+																$scope.paginationConf.itemsPerPage,
+																actgroupId);
+												if (mtype == 0) {
+													alert("添加实时监控点成功");
+												} else {
+													alert("修改实时监控点成功");
+												}
+
+											} else {
+												alert(code + "-" + msg);
+											}
+										}, function() {
+											alert("ajax error");
+										});
 
 					}
 

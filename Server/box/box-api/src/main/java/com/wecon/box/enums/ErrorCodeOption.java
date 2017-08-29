@@ -37,6 +37,7 @@ public enum ErrorCodeOption {
     Get_AlarmList_Error("获取报警数据配置列表失败",30007),
     Get_ActList_Error("获取实时数据配置列表失败",30008),
 	
+    Get_Groupid_Error("获取数组ID错误",50001),
 	
     Monitor_Existed("该分组下已经存在该监控点",60001),
 	Get_Data_Error("获取参数异常",60002);

@@ -84,7 +84,12 @@ private final String SEL_COL = "plc_id,device_id,type,driver,box_stat_no,plc_sta
 
     @Override
     public PlcInfo getPlcInfo(long plc_id) {
-        return null;
+    	String sql = "select " + SEL_COL + " from plc_info where plc_id=?";
+		List<PlcInfo> list = jdbcTemplate.query(sql, new Object[] { plc_id }, new DefaultPlcInfoRowMapper());
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+		return null;
     }
 
     @Override

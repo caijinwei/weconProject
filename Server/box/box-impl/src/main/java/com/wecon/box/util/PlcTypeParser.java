@@ -8,6 +8,7 @@ import org.dom4j.Element;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by whp on 2017/8/19.
@@ -70,7 +71,22 @@ public class PlcTypeParser {
 
     public static void main(String[] arg) {
         doParse();
-        List<String> result = PlcTypeQuerier.getInstance().queryValuesByKey("plctype");
+//        List<String> result = PlcTypeQuerier.getInstance().queryValuesByKey("plctype");
+        List<Plc> result= PlcTypeQuerier.getInstance().query("plctype", "WECON SIMUTOCOL");
+      
+        for(Plc plc:result){
+        	Map<String, AddrDom> a=plc.getAddrs();
+        	
+        	AddrDom b=a.get("bitaddr");
+        	System.out.println(b);
+        	
+//        	List<Res> sa=b.getResList();
+//        	Map<String, String> ss=sa.get(0).getAttributes();
+//        	String gg=ss.get("Rid");
+//        	System.out.println(gg);
+        
+        	
+        }
         System.out.print(result);
     }
 }

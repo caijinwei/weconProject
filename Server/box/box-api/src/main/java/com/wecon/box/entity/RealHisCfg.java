@@ -27,6 +27,7 @@ public class RealHisCfg {
 	public long id;
 	public long data_id;
 	public long account_id;
+	public long device_id;
 	public long plc_id;
 	public String name;//名称
 	public String addr;//地址
@@ -38,6 +39,7 @@ public class RealHisCfg {
 	public int data_type;//0：实时数据 1：历史数据
 	public int state;//状态:1-启用; 0-未启用
 	public int bind_state;//1.绑定状态 0.解绑状态
+	public String rid;//寄存器类型
 	public Timestamp create_date;
 	public Timestamp update_date;
 	

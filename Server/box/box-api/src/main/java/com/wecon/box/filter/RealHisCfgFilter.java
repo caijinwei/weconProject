@@ -2,7 +2,6 @@ package com.wecon.box.filter;
 
 import java.sql.Timestamp;
 
-
 public class RealHisCfgFilter {
 	public long id;
 	public long data_id;
@@ -18,7 +17,8 @@ public class RealHisCfgFilter {
 	public int data_type;// 0：实时数据 1：历史数据
 	public int state;// 状态:1-启用; 0-未启用
 	public long device_id;
-	public long dirId;//分组id
+	public String rid;// 寄存器类型
+	public long dirId;// 分组id
 	public Timestamp create_date;
 	public Timestamp update_date;
 }

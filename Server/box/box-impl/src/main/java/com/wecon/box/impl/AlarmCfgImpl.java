@@ -21,7 +21,7 @@ import java.util.List;
 public class AlarmCfgImpl implements AlarmCfgApi {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	private final String SEL_COL = "alarmcfg_id,data_id,account_id,name,addr,addr_type,text,condition_type,state,create_date,update_date";
+	private final String SEL_COL = "alarmcfg_id,data_id,account_id,name,addr,addr_type,text,condition_type,state,device_id,rid,create_date,update_date";
 
 	@Override
 	public List<AlarmCfg> getAlarmCfg(long account_id) {
@@ -34,8 +34,6 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 		return null;
 
 	}
-
-
 
 	public static final class DefaultAlarmCfgRowMapper implements RowMapper<AlarmCfg> {
 
@@ -57,30 +55,30 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			return model;
 		}
 	}
+
 	/*
- * 查询盒子下的监控点
- * */
-	public ArrayList<Integer> findAlarmCfgIdSBydevice_id(Integer device_id)
-	{
-		Object[] args=new Object[]{device_id};
-		String sql="SELECT alarmcfg_id FROM alarm_cfg WHERE device_id=?";
-		ArrayList<Integer> list=null;
-		list= (ArrayList<Integer>) jdbcTemplate.query(sql, args, new RowMapper<Integer>() {
+	 * 查询盒子下的监控点
+	 */
+	public ArrayList<Integer> findAlarmCfgIdSBydevice_id(Integer device_id) {
+		Object[] args = new Object[] { device_id };
+		String sql = "SELECT alarmcfg_id FROM alarm_cfg WHERE device_id=?";
+		ArrayList<Integer> list = null;
+		list = (ArrayList<Integer>) jdbcTemplate.query(sql, args, new RowMapper<Integer>() {
 			public Integer mapRow(ResultSet resultSet, int i) throws SQLException {
-				Integer model=resultSet.getInt("id");
+				Integer model = resultSet.getInt("id");
 				return model;
 			}
 		});
 		return list;
 
 	}
+
 	/*
-  * 设置bind_state=0
-  * 解绑
-  * */
+	 * 设置bind_state=0 解绑
+	 */
 	public void setBind_state(final int[] alaramCfgId, final Integer state) {
 		String sql = "UPDATE alarm_cfg SET alarmcfg_id=? where bind_state=?";
-		Object[] args = new Object[]{alaramCfgId, state};
+		Object[] args = new Object[] { alaramCfgId, state };
 		if (alaramCfgId.length != 0) {
 			jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
 				@Override

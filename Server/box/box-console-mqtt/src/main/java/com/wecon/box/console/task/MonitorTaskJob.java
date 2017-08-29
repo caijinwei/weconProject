@@ -20,6 +20,8 @@ import com.wecon.box.entity.RealHisCfgData;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -38,6 +40,7 @@ import com.wecon.box.api.RealHisCfgApi;
 import com.wecon.box.api.RealHisCfgDataApi;
 import com.wecon.box.api.RedisPiBoxApi;
 import com.wecon.box.console.config.ConnectOptions;
+import com.wecon.box.console.main.MqttManager;
 import com.wecon.box.console.util.MqttConfigContext;
 import com.wecon.box.console.util.SpringContextHolder;
 import com.wecon.box.entity.AlarmCfgData;
@@ -53,6 +56,7 @@ public class MonitorTaskJob implements Job {
 	private final int REAL_DATA = 1001;
 	private final int HISTORY_DATA = 1002;
 	private final int ALARM_DATA = 1003;
+	private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(MonitorTaskJob.class.getName());
 
 	/**
 	 * 实时监控是否连上代理服务器
@@ -63,6 +67,7 @@ public class MonitorTaskJob implements Job {
 
 		try {
 			if (client != null && client.isConnected()) {
+				logger.info("The connection server is normal !");
 				System.out.println("The connection server is normal !");
 				return;
 			}
@@ -86,6 +91,7 @@ public class MonitorTaskJob implements Job {
 				}
 
 				public void connectionLost(Throwable cause) {
+					logger.info("Connection is broken  !");
 				}
 
 			});
@@ -105,10 +111,12 @@ public class MonitorTaskJob implements Job {
 		String[] idexs = topic.split("/");
 		// 如果未获取到主题直接返回
 		if (null == idexs || idexs.length < 1) {
+			logger.info("主题为空！");
 			System.out.println("主题为空！");
 			return;
 		}
 		if (message.getPayload().length < 1) {
+			logger.info("消息为空！");
 			System.out.println("消息为空！");
 			return;
 		}
@@ -124,16 +132,19 @@ public class MonitorTaskJob implements Job {
 			}
 			// 如果消息的机器码和主题中的机器码不匹配直接忽略消息
 			if (!idexs[2].equals(machineCode)) {
+				logger.info("主题中的机器码和消息的机器码不匹配！");
 				System.out.println("主题中的机器码和消息的机器码不匹配！");
 				return;
 			}
 			// 数据为空
 			if (CommonUtils.isNullOrEmpty(jsonObject.getString("data"))) {
+				logger.info("data为空！");
 				System.out.println("data为空！");
 				return;
 			}
 			// act为空
 			if (CommonUtils.isNullOrEmpty(jsonObject.getInteger("act"))) {
+				logger.info("act为空！");
 				System.out.println("act为空！");
 				return;
 			}
@@ -154,16 +165,22 @@ public class MonitorTaskJob implements Job {
 					if (newdevice == null) {
 						return;
 					}
+					if (!newdevice.machine_code.equals(machineCode)) {
+						logger.info("主题的机器码和数据中的机器码不一致");
+						return;
+					}
 					if (olddevice != null) {
 						// 已经存在，直接更新device
-						newdevice.device_id=olddevice.device_id;
+						newdevice.device_id = olddevice.device_id;
 						deviceApi.updateDevice(newdevice);
 						System.out.println("device modify success");
 					} else {
+
 						// 保存device
 						deviceApi.saveDevice(newdevice);
 						olddevice = deviceApi.getDevice(machineCode);
 						System.out.println("device add success");
+
 					}
 				}
 				// 固件版本信息
@@ -180,7 +197,7 @@ public class MonitorTaskJob implements Job {
 						DevFirm olddevFirm = devFirmApi.getDevFirm_device_id(olddevice.device_id);
 						if (null != olddevFirm) {
 							// 固件更新
-							newdevFirm.f_id=olddevFirm.f_id;
+							newdevFirm.f_id = olddevFirm.f_id;
 							devFirmApi.updateDevFirm(newdevFirm);
 						} else {
 							// 固件保存
@@ -274,6 +291,7 @@ public class MonitorTaskJob implements Job {
 						RealHisCfgData historyData = realHisCfgDataApi.getRealHisCfgData(
 								Long.parseLong(piBoxHisComAddr.addr_id), Timestamp.valueOf(piBoxHisComAddr.time));
 						if (historyData != null) {
+							logger.info("mqtt代理服务器发的缓存数据，直接忽略！");
 							System.out.println("mqtt代理服务器发的缓存数据，直接忽略！");
 							return;
 						}
@@ -292,6 +310,7 @@ public class MonitorTaskJob implements Job {
 							realHisCfgDataApi.saveRealHisCfgData(listInsertRealHisCfgData);
 							System.out.println("realHisCfgData add success !");
 						} catch (Exception e) {
+							logger.info("历史数据批量保存失败");
 							System.out.println("历史数据批量保存失败");
 							e.printStackTrace();
 						}
@@ -320,7 +339,7 @@ public class MonitorTaskJob implements Job {
 
 				List<PiBoxComAddr> listPiBoxComAddr = listPiBoxCom.get(0).addr_list;
 				if (null == listPiBoxComAddr || listPiBoxComAddr.size() < 1) {
-					
+
 					return;
 				}
 				// 获取AlarmCfgDataApi对象
@@ -333,6 +352,7 @@ public class MonitorTaskJob implements Job {
 					AlarmCfgData alarmData = alarmCfgDataApi.getAlarmCfgData(Long.parseLong(piBoxComAddr.addr_id),
 							Timestamp.valueOf(jsonAlarm.getString("time")));
 					if (alarmData != null) {
+						logger.info("mqtt代理服务器发的缓存数据，直接忽略！");
 						System.out.println("mqtt代理服务器发的缓存数据，直接忽略！");
 						return;
 
@@ -368,6 +388,7 @@ public class MonitorTaskJob implements Job {
 						PublishTask publish = new PublishTask(mqtttopic, boxmessage);
 						publish.start();
 					} catch (Exception e) {
+						logger.info("报警数据批量保存失败");
 						System.out.println("报警数据批量保存失败");
 						e.printStackTrace();
 					}
