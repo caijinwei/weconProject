@@ -1,9 +1,7 @@
 package com.wecon.box.api;
 
-import java.util.List;
-
-import org.springframework.stereotype.Component;
 import com.wecon.box.entity.PlcInfo;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -36,20 +34,20 @@ public interface PlcInfoApi {
 	 * @return
 	 */
 	public PlcInfo getPlcInfo(long plc_id);
-	
+
 	/**
 	 * 根据device_id取通讯口信列表
 	 * @param device_id
 	 * @return
 	 */
-	
+
 	public List<PlcInfo>getListPlcInfo(long device_id);
 
 	/**
 	 * 根据plc_id删除某个通讯口信息
-	 * 
+	 *
 	 * @param plc_id
-	 * 
+	 *
 	 */
 	public void delPlcInfo(long plc_id);
 
@@ -58,4 +56,20 @@ public interface PlcInfoApi {
 	*
 	* */
 	public List<PlcInfo> showAllPlcInfoByDeviceId(Integer deviceId);
+
+	/*
+	* 通讯协议是否已经存在
+	* */
+	public boolean isExistPort(long device_id,String port);
+
+	/*
+	* 解绑plc
+	* */
+	public void unBundledPlc(Integer plcId);
+
+    /*
+    * 展示单个plc
+    * @Params plc_id
+    * */
+    public PlcInfo findPlcInfoByPlcId(Integer plcId);
 }

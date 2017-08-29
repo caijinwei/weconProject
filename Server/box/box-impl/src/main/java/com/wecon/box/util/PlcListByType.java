@@ -4,8 +4,7 @@ import com.wecon.box.entity.PlcInfo;
 import com.wecon.box.entity.plcdom.Plc;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Administrator on 2017/8/24.
@@ -17,7 +16,7 @@ public class PlcListByType {
      * Ethernet="1"
      * 获取 port 通讯协议 是 USB的
      * */
-    public List<PlcInfo> getPlcListByType(String comType, String comvalue) {
+    public static List<PlcInfo> getPlcListByType(String comType, String comvalue) {
         PlcTypeParser.doParse();
         List<Plc> usbs = PlcTypeQuerier.getInstance().query(comType, comvalue);
         ArrayList<PlcInfo> plcSetings = new ArrayList<PlcInfo>();
@@ -36,6 +35,7 @@ public class PlcListByType {
             plcInfo.data_length = paseInt(c.getAttributes().get("DataLength"));
             plcInfo.stop_bit = paseInt(c.getAttributes().get("StopBit"));
             plcInfo.comtype = paseInt(c.getAttributes().get("ComType"));
+            plcInfo.driver=c.getAttributes().get("Driver");
             //这边是默认值，可输入
             plcInfo.baudrate = c.getAttributes().get("BoudRate");
             plcInfo.wait_timeout = paseInt(c.getAttributes().get("WaitTimeout"));
@@ -63,7 +63,86 @@ public class PlcListByType {
         return plcSetings;
     }
 
-    public int paseInt(String str) {
+    //
+//    public static void main(String args[]) {
+//        List<PlcInfo> list = getPlcListByType("UsbDevice", "1");
+//        Map<String, List<PlcInfo>> map = getPlcByPtype(list);
+//
+//        List<PlcInfo> ethernetList = getPlcListByType("Ethernet", "1");
+//        Map<String, List<PlcInfo>>ethernetMap = getPlcByPtype(list);
+//        JSONObject data = new JSONObject();
+//        data.put("UsbDevice", list);
+//        JSONObject data1 = new JSONObject();
+//        data1.put("Ethernet",list);
+//        System.out.println(data);
+//        System.out.println(data1);
+//    }
+/*
+* 根据通讯协议分类（将一类通讯协议分组：设备类型）
+* */
+    public Map<String, List<PlcInfo>> getPlcByPtype(List<PlcInfo> list) {
+        /*
+        *  UsbDevice="1"
+        * Ethernet="1"
+        * */
+        Map<String, List<PlcInfo>> result = new HashMap<String, List<PlcInfo>>();
+        for (PlcInfo p : list) {
+            List<PlcInfo> tmpList = new ArrayList();
+            if (result.containsKey(p.ptype)) {
+                tmpList = result.get(p.ptype);
+            }
+            tmpList.add(p);
+            result.put(p.ptype, tmpList);
+        }
+        return result;
+    }
+
+    public Map<String, List<PlcInfo>> getPlcByType(List<PlcInfo> list) {
+        Map<String, List<PlcInfo>> result = new HashMap<String, List<PlcInfo>>();
+        for (PlcInfo p : list) {
+            List<PlcInfo> tmpList = new ArrayList();
+            if (result.containsKey(p.type)) {
+                tmpList = result.get(p.type);
+            }
+            tmpList.add(p);
+            result.put(p.type, tmpList);
+        }
+        return result;
+    }
+
+    /*
+    * 获取com1 com2的所有对象
+    * 需要算法改进   获取com  com2的lIST
+    * */
+    public static List<PlcInfo> getAllComType() {
+        PlcTypeParser.doParse();
+        List<String> allType = PlcTypeQuerier.getInstance().queryValuesByKey("Type");
+         /*
+        *  UsbDevice="1"
+        * Ethernet="1"
+        * */
+        List<PlcInfo> restList = null;
+        restList = getPlcListByType("UsbDevice", "1");
+        restList.addAll(getPlcListByType("Ethernet", "1"));
+        ArrayList<PlcInfo>  comTypeList=new ArrayList<PlcInfo>();
+        for(int i=0;i<allType.size();i++)
+        {
+            for(PlcInfo p:restList)
+            {
+                if(!allType.get(i).contains(p.type))
+                {
+                    comTypeList.addAll(getPlcListByType("Type",allType.get(i)));
+                }
+            }
+        }
+        return comTypeList;
+    }
+
+    public static void main(String[] args) {
+        System.out.print(getAllComType());
+    }
+
+    public static int paseInt(String str) {
         if (null != str) {
             return Integer.parseInt(str);
         } else {
