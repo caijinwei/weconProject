@@ -42,8 +42,10 @@
 				ng-click="alarm_submit(paginationConf_current.currentPage,paginationConf_current.itemsPerPage)">当前报警</a></li>
 			<li><a href="#history-alarm" data-toggle="tab"
 				ng-click="hisalarm_submit(paginationConf_history.currentPage,paginationConf_history.itemsPerPage)">历史报警</a></li>
-			<li><a href="#alarm-record" data-toggle="tab">报警登记</a></li>
-			<li><a href="#alarm-global-setting" data-toggle="tab">全局设置</a></li>
+			<li><a href="#alarm-record" data-toggle="tab" ng-cloak
+				ng-if="accounttype==1 && deviceid>0" ng-click="alarm_group()">报警登记</a></li>
+			<li><a href="#alarm-global-setting" data-toggle="tab" ng-cloak
+				ng-if="accounttype==1 && deviceid>0">全局设置</a></li>
 		</ul>
 		<div class="tab-content">
 			<div class="tab-pane active" id="current-alarm">
@@ -176,9 +178,8 @@
 								<div class="col-md-2">
 									<select id="dataGroupSelect" id="groupSelect"
 										class=" form-control form-inline">
-										<option>分组1</option>
-										<option>分组2</option>
-										<option>分组3</option>
+										<option ng-repeat="x in dir_list" value="{{x.id}}">{{x.name}}</option>
+
 									</select>
 								</div>
 								<button type="button" class="btn btn-primary"
@@ -189,19 +190,20 @@
 								</button>
 								<button type="button" class="btn btn-primary"
 									data-toggle="modal" data-target="#addAlarmRecord"
-									style="margin: 0 10px;">
+									ng-click="showAllPlcConf(0);" style="margin: 0 10px;">
 									<span class="glyphicon glyphicon-pencil"></span> 报警登记
 								</button>
 							</div>
 						</caption>
 						<thead>
 							<tr>
-								<th class="col-md-1"><span data-action="label_encoding"></span></th>
-								<th class="col-md-1"><span data-action="label_name"></span></th>
-								<th class="col-md-3"><span data-action="label_trigger"></span></th>
-								<th class="col-md-3"><span data-action="label_alarmcontent"></span></th>
-								<th class="col-md-2"><span data-action="label_group"></span></th>
-								<th class="col-md-2"><span data-action="label_operation"></span></th>
+								<th class="col-md-1">编码<span data-action="label_encoding"></span></th>
+								<th class="col-md-1">名称<span data-action="label_name"></span></th>
+								<th class="col-md-3">触发条件<span data-action="label_trigger"></span></th>
+								<th class="col-md-3">报警内容<span
+									data-action="label_alarmcontent"></span></th>
+								<th class="col-md-2">分组<span data-action="label_group"></span></th>
+								<th class="col-md-2">操作<span data-action="label_operation"></span></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -245,40 +247,22 @@
 								<div class="container-fluid">
 									<div class="row">
 										<table class="table table-bordered table-hover">
-											<caption>
-												<button type="button" class="btn btn-primary"
-													data-toggle="modal" data-target="#addGroup">
-													<span class="glyphicon glyphicon-plus"></span> 添加
-												</button>
-											</caption>
+
 											<thead>
 												<tr>
 													<th>名称</th>
-													<th>备注</th>
 													<th>操作</th>
 												</tr>
 											</thead>
 											<tbody>
-												<tr>
-													<td>默认组</td>
-													<td>这是默认分组</td>
-													<td><a href="#" title="编辑" class="col-md-2"> <span
+												<tr ng-repeat="x in dir_list">
+													<td>{{x.name}}</td>
+													<td><a href="#" title="编辑"> <span
 															class="glyphicon glyphicon-edit" data-toggle="modal"
-															data-target="#editGroup"></span>
-													</a> <a href="#" title="删除" class="col-md-2"> <span
+															ng-click="editGroup(x);"></span>
+													</a> <a href="#" title="删除"> <span
 															class="glyphicon glyphicon-trash" data-toggle="modal"
-															data-target="#deleteGroup"></span>
-													</a></td>
-												</tr>
-												<tr>
-													<td>分组2</td>
-													<td>这是分组2</td>
-													<td><a href="#" title="编辑" class="col-md-2"> <span
-															class="glyphicon glyphicon-edit" data-toggle="modal"
-															data-target="#editGroup"></span>
-													</a> <a href="#" title="删除" class="col-md-2"> <span
-															class="glyphicon glyphicon-trash" data-toggle="modal"
-															data-target="#deleteGroup"></span>
+															ng-click="delGroup(x);"></span>
 													</a></td>
 												</tr>
 											</tbody>
@@ -287,9 +271,16 @@
 								</div>
 							</div>
 							<div class="modal-footer">
-								<button type="button" class="btn btn-info">确定</button>
+
+								<button type="button" class="btn btn-primary"
+									data-toggle="modal" data-target="#addGroup">
+									<span class="glyphicon glyphicon-plus"></span> 添加
+								</button>
+
 								<button type="button" class="btn btn-default"
-									data-dismiss="modal">取消</button>
+									data-dismiss="modal">
+									<span class="glyphicon glyphicon-minus"></span> 取消
+								</button>
 							</div>
 						</div>
 					</div>
@@ -306,10 +297,11 @@
 								<h4 class="modal-title">删除分组</h4>
 							</div>
 							<div class="modal-body">
-								<span>确认删除此分组吗？</span>
+								<span id="delid"></span>
 							</div>
 							<div class="modal-footer">
-								<button type="button" class="btn btn-danger">确认</button>
+								<button type="button" class="btn btn-danger"
+									ng-click="del_group();">确认</button>
 								<button type="button" class="btn btn-default"
 									data-dismiss="modal">取消</button>
 							</div>
@@ -330,17 +322,15 @@
 							<div class="modal-body">
 								<div class="container-fluid">
 									<div class="form-group">
-										<input id="groupName" type="text" class="form-control"
+										<input id="editid" type="text" class="form-control"
 											placeholder="名称" style="padding-left: 5px;">
 									</div>
-									<div class="form-group">
-										<input id="groupRemark" type="text" class="form-control"
-											placeholder="备注" style="padding-left: 5px;">
-									</div>
+
 								</div>
 							</div>
 							<div class="modal-footer">
-								<button type="button" class="btn btn-info">确认</button>
+								<button type="button" class="btn btn-info"
+									ng-click="edit_group();">确认</button>
 								<button type="button" class="btn btn-default"
 									data-dismiss="modal">取消</button>
 							</div>
@@ -363,21 +353,20 @@
 										<input id="newGroupName" type="text" class="form-control"
 											placeholder="名称" style="padding-left: 5px;">
 									</div>
-									<div class="form-group">
-										<input id="newGroupRemark" type="text" class="form-control"
-											placeholder="备注" style="padding-left: 5px;">
-									</div>
 								</div>
 							</div>
 							<div class="modal-footer">
-								<button type="button" class="btn btn-info">确认</button>
+								<button type="button" class="btn btn-info"
+									ng-click="add_group();">确认</button>
 								<button type="button" class="btn btn-default"
 									data-dismiss="modal">取消</button>
 							</div>
 						</div>
 					</div>
 				</div>
-				<!--添加报警记录-->
+
+
+				<!--添加/编辑报警配置-->
 				<div class="modal" id="addAlarmRecord" tabindex="-1"
 					data-backdrop="false">
 					<div class="modal-dialog">
@@ -386,73 +375,68 @@
 								<button type="button" class="close" data-dismiss="modal">
 									<span>&times;</span>
 								</button>
-								<h4 class="modal-title">新增报警记录</h4>
+								<h4 class="modal-title">{{showtype==0?"新增报警记录":"编辑报警记录"}}</h4>
 							</div>
 							<div class="modal-body">
 								<div class="container-fluid">
 									<div class="row col-md-11 col-md-offset-1"
 										style="margin: 10px 0;">
-										<span class="col-md-3">名称</span><input type="text"
-											class="col-md-9" style="height: 30px; padding-left: 5px;" />
-									</div>
-									<div class="row col-md-11 col-md-offset-1"
-										style="margin: 10px 0;">
-										<span class="col-md-3">分组</span> <select class="col-md-9"
-											style="height: 30px;">
-											<option>默认分组</option>
-											<option>分组1</option>
-											<option>分组2</option>
-										</select>
+										<span class="col-md-3">名称</span> <input id="nameid"
+											type="text" class="col-md-9"
+											style="height: 30px; padding-left: 5px;" />
 									</div>
 									<div class="row col-md-11 col-md-offset-1"
 										style="margin: 10px 0;">
 										<span class="col-md-3">连接设备</span> <select class="col-md-9"
-											style="height: 30px;">
-											<option>SIMUTOCOL LX1S</option>
-											<option>SIMUTOCOL LX2N</option>
-											<option>SIMUTOCOL LX3V</option>
+											id="conid" style="height: 30px;">
+											<option ng-repeat="x in infoDatas"
+												ng-click="condevice(x.plcId)" value="{{x.plcId}}">{{$index+1}}-{{x.port}}</option>
 										</select>
 									</div>
 									<div class="row col-md-11 col-md-offset-1"
 										style="margin: 10px 0;">
-										<span class="col-md-3">数据格式</span> <select id="datatype"
-											class="col-md-9" style="height: 30px;"
-											onchange="show_sub(this.options[this.options.selectedIndex].value)">
-											<option value="162">16位二进制</option>
-											<option value="168">16位八进制</option>
-											<option value="1616">16位十六进制</option>
-											<option value="16bcd">16位BCD码</option>
-											<option value="16110">16位有符号十进制数</option>
-											<option value="16010">16位无符号十进制数</option>
-											<option value="322">32位二进制</option>
-											<option value="328">32位八进制</option>
-											<option value="3216">32位十六进制</option>
-											<option value="32bcd">32位BCD码</option>
-											<option value="32110">32位有符号十进制数</option>
-											<option value="32010">32位无符号十进制数</option>
-											<option value="32f">32位（单精度）浮点数</option>
-											<option value="64d">64位（双精度）浮点数</option>
+										<span class="col-md-3">数据格式</span> <select id="datatypeid"
+											class="col-md-9" style="height: 30px;">
+											<option ng-repeat="x in dataTypes" value="{{x.value}}">{{x.text}}</option>
 										</select>
 									</div>
 									<div class="row col-md-11 col-md-offset-1"
 										style="margin: 10px 0;">
 										<span class="col-md-3">地址类型</span> <select class="col-md-3"
-											style="height: 30px;">
-											<option>位地址</option>
-											<option>字地址</option>
-										</select> <span class="col-md-3">寄存器地址</span> <select class="col-md-3"
-											style="height: 30px;">
-											<option>BDW</option>
-											<option>BWD</option>
-											<option>BDW</option>
+											id="addrtypeid" style="height: 30px;">
+											<option ng-repeat="x in allAddrs" ng-click="change();"
+												value="{{x.addrkey}}">{{x.addrkey==0?"位地址":x.addrkey==1?"字节地址":x.addrkey==2?"字地址":"双字"}}</option>
+
+										</select> <span class="col-md-3">寄存器地址</span> <select id="registerid"
+											class="col-md-3" style="height: 30px;">
+											<option ng-repeat="x in addrvalues"
+												ng-click="changeaddr($event);" value="{{x.addrvalue}}">{{x.addrvalue}}</option>
+
 										</select>
+									</div>
+
+									<div id="datadigits" class="row col-md-11 col-md-offset-1"
+										style="margin: 10px 0; display: none;">
+										<div id="div-integer">
+											<span class="col-md-3">整数位数</span> <select id="integerdigits"
+												class="col-md-3" style="height: 30px;" onchange="getData()">
+
+											</select>
+										</div>
+										<div id="div-decimal">
+											<span class="col-md-3">小数位数</span> <select id="decimaldigits"
+												class="col-md-3" style="height: 30px;"
+												onchange="calcuSystem()">
+
+											</select>
+										</div>
 									</div>
 									<div class="row col-md-11 col-md-offset-1"
 										style="margin: 10px 0;">
 										<div id="data-range">
 											<span class="col-md-3">数据范围</span> <input type="text"
 												class="col-md-9" style="height: 30px; padding-left: 5px;"
-												value="0" disabled />
+												id="rangid" disabled />
 										</div>
 									</div>
 									<div class="row col-md-11 col-md-offset-1"
@@ -495,15 +479,16 @@
 								</div>
 							</div>
 							<div class="modal-footer">
-								<button type="button" class="btn btn-info">确认</button>
+								<button type="button" class="btn btn-info"
+									ng-click="saveupmonitor()">确定</button>
 								<button type="button" class="btn btn-default"
 									data-dismiss="modal">取消</button>
 							</div>
 						</div>
+
 					</div>
 				</div>
 			</div>
-
 			<div class="tab-pane" id="alarm-global-setting">
 				<div class="container-fluid" style="margin-top: 20px;">
 					<div class="checkbox">
