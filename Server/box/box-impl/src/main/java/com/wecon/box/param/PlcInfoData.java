@@ -9,6 +9,7 @@ public class PlcInfoData
     public String type;
     public String port;
     public String comtype;
+    public Integer state;
 
     @Override
     public String toString() {

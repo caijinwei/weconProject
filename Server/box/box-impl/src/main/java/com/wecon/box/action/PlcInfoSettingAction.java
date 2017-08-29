@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Administrator on 2017/8/5.
@@ -64,10 +66,12 @@ public class PlcInfoSettingAction {
         plcInfo.net_isbroadcast = param.net_isbroadcast;
         plcInfo.net_port = param.net_port;
         plcInfo.net_type = param.net_type;
-
-
-        // 驱动文件夹 没有不能输入  这里写默认值
-        plcInfo.driver = "驱动文件名（测试）Action 这边先写";
+        plcInfo.driver = param.driver;
+        if (!plcInfo.port.equals("Ethernet")) {
+            if (plcInfoApi.isExistPort(plcInfo.device_id, plcInfo.port)) {
+                throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
+            }
+        }
         plcInfoApi.savePlcInfo(plcInfo);
         return new Output();
     }
@@ -88,16 +92,18 @@ public class PlcInfoSettingAction {
         List<PlcInfoData> infoDatas = new ArrayList<PlcInfoData>();
         for (PlcInfo info : showAllPlcConf) {
             PlcInfoData plcInfoData = new PlcInfoData();
-            if (info.comtype == 1) {
-                plcInfoData.comtype = "RS232";
-            } else if (info.comtype == 2) {
-                plcInfoData.comtype = "RS422";
-            } else {
-                plcInfoData.comtype = "RS485";
-            }
+//            if (info.comtype == 1) {
+//                plcInfoData.comtype = "RS232";
+//            } else if (info.comtype == 2) {
+//                plcInfoData.comtype = "RS422";
+//            } else {
+//                plcInfoData.comtype = "RS485";
+//            }
+            plcInfoData.comtype = info.comtype + "";
             plcInfoData.plcId = info.plc_id;
             plcInfoData.port = info.port;
             plcInfoData.type = info.type;
+            plcInfoData.state = info.state;
             infoDatas.add(plcInfoData);
         }
 
@@ -110,11 +116,8 @@ public class PlcInfoSettingAction {
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping("updataPlcInfo")
     public Output update(@Valid PlcInfoSettingParam param) {
-
         long account_id = AppContext.getSession().client.userId;
-        if (devBindUserApi.isRecord((int) param.plc_id, account_id) == false) {
-            throw new BusinessException(ErrorCodeOption.PiBoxDevice_IsNot_Found.key, ErrorCodeOption.PiBoxDevice_IsNot_Found.value);
-        }
+
         PlcInfo plcInfo = new PlcInfo();
         plcInfo.plc_id = param.plc_id;
         plcInfo.type = param.type;
@@ -135,7 +138,14 @@ public class PlcInfoSettingAction {
         plcInfo.net_isbroadcast = param.net_isbroadcast;
         plcInfo.net_port = param.net_port;
         plcInfo.net_type = param.net_type;
-
+        plcInfo.driver = param.driver;
+        if (!plcInfo.port.equals(plcInfoApi.findPlcInfoByPlcId((int) plcInfo.plc_id).port)) {
+            if (!plcInfo.port.equals("Ethernet")) {
+                if (plcInfoApi.isExistPort(plcInfo.device_id, plcInfo.port)) {
+                    throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
+                }
+            }
+        }
         plcInfoApi.updatePlcInfo(plcInfo);
         return new Output();
     }
@@ -149,10 +159,65 @@ public class PlcInfoSettingAction {
         * Ethernet="1"
         * 获取 port 通讯协议 是 USB的
         * */
-        JSONObject data =new JSONObject();
-        data.put("usbDevice",plcListByType.getPlcListByType("UsbDevice", "1"));
-        data.put("ethernet",plcListByType.getPlcListByType("Ethernet","1"));
+        JSONObject data = new JSONObject();
+//        List<PlcInfo> usbDeviceList = plcListByType.getPlcListByType("UsbDevice", "1");
+//        List<PlcInfo> ethernetList = plcListByType.getPlcListByType("Ethernet", "1")；
+        //     List<PlcInfo> comList = plcListByType.getAllComType();
+        /*
+        * 获取以map<pType,List<plcInfo>>\
+        * ptype为分组    的list
+        * */
+        Map<String, List<PlcInfo>> usbDeviceMapListByPtype = plcListByType.getPlcByPtype(plcListByType.getPlcListByType("UsbDevice", "1"));
+        Set<String> usbDeviceMapListKeyByPtype = usbDeviceMapListByPtype.keySet();
+        Map<String, List<PlcInfo>> ethernetMapListByPtype = plcListByType.getPlcByPtype(plcListByType.getPlcListByType("Ethernet", "1"));
+        Set<String> ethernetMapListKeyByPtype = ethernetMapListByPtype.keySet();
+        Map<String, List<PlcInfo>> comMapListByPtype = plcListByType.getPlcByPtype(plcListByType.getAllComType());
+        Set<String> comMapListKeyByPtype = comMapListByPtype.keySet();
+
+        /*
+        * 获取以map<type,List<plcInfo>>
+        * */
+        Map<String, List<PlcInfo>> usbDeviceMapListByType = plcListByType.getPlcByType(plcListByType.getPlcListByType("UsbDevice", "1"));
+        Map<String, List<PlcInfo>> ethernetMapListByType = plcListByType.getPlcByType(plcListByType.getPlcListByType("Ethernet", "1"));
+        Map<String, List<PlcInfo>> comMapListByType = plcListByType.getPlcByType(plcListByType.getAllComType());
+
+        data.put("comMapListKeyByPtype", comMapListKeyByPtype);
+        data.put("comMapListByPtype", comMapListByPtype);
+        data.put("comMapListByType", comMapListByType);
+
+        data.put("usbDeviceMapListByType", usbDeviceMapListByType);
+        data.put("ethernetMapListByType", ethernetMapListByType);
+        data.put("usbDeviceMapListByPtype", usbDeviceMapListByPtype);
+        data.put("ethernetMapListByPtype", ethernetMapListByPtype);
+        data.put("usbDeviceMapListKeyByPtype", usbDeviceMapListKeyByPtype);
+        data.put("ethernetMapListKeyByPtype", ethernetMapListKeyByPtype);
+
+        /*
+        * 获取UsebDevice
+        * */
         return new Output(data);
     }
 
+    @Label("plc解绑")
+    @WebApi(forceAuth = true, master = true, authority = {"1"})
+    @RequestMapping("unbundledPlc")
+    public Output unBundledPlc(@RequestParam("plc_id") Integer plcId) {
+        if (null == plcId) {
+            throw new BusinessException(ErrorCodeOption.Is_Not_Params_DeviceID.key, ErrorCodeOption.Is_Not_Params_DeviceID.value);
+        }
+        plcInfoApi.unBundledPlc(plcId);
+        return new Output();
+    }
+
+    @Label("单个plc展示（用于修改plc展示）")
+    @WebApi(forceAuth = true, master = true, authority = {"1"})
+    @RequestMapping("findPlcInfoById")
+    public Output findPlcInfoById(@RequestParam("plc_id") Integer plcId) {
+        if (null == plcId) {
+            throw new BusinessException(ErrorCodeOption.Is_Not_Params_DeviceID.key, ErrorCodeOption.Is_Not_Params_DeviceID.value);
+        }
+        JSONObject data = new JSONObject();
+        data.put("plcInfo", plcInfoApi.findPlcInfoByPlcId(plcId));
+        return new Output(data);
+    }
 }

@@ -189,11 +189,11 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 		}
 		String sqlCount = "select count(0) "+fromStr+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and rd.real_his_cfg_id=r.id";
 		String sql = "select r.name, rd.value, rd.monitor_time"
-				+ "  "+fromStr+ "  where 1=1 adn  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and rd.real_his_cfg_id=r.id";
+				+ "  "+fromStr+ "  where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and rd.real_his_cfg_id=r.id";
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<Map<String, Object>> page = new Page<Map<String, Object>>(pageIndex, pageSize, totalRecord);
-		String sort = " order by rd.id desc";
+		String sort = " order by r.id desc";
 		sql += condition + sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
 		List<Map<String, Object>> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgMapRowMapper());
 		page.setList(list);
@@ -252,7 +252,7 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<Map<String, Object>> page = new Page<Map<String, Object>>(pageIndex, pageSize, totalRecord);
-		String sort = " order by rd.id desc";
+		String sort = " order by r.id desc";
 		sql += condition + sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
 		List<Map<String, Object>> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgMapRowMapper());
 		page.setList(list);

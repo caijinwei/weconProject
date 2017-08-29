@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 public class PlcInfoSettingParam {
 
     @Label("plcId")
+    @NotNull
     public long plc_id;
 
     @Label("设备id")
@@ -36,70 +37,60 @@ public class PlcInfoSettingParam {
     public int comtype;
 
     @Label("波特率")
-    @NotNull
     public String baudrate;
 
     @Label("停止位")
-    @NotNull
     public int stop_bit;
 
     @Label("数据位")
-    @NotNull
     public int data_length;
 
 
-
     @Label("校验位")
-    @NotNull
     public String check_bit;
 
     @Label("重试次数")
-    @NotNull
     public int retry_times;
 
     @Label("等待超时")
-    @NotNull
     public int wait_timeout;
 
     @Label("接收超时")
-    @NotNull
     public int rev_timeout;
 
     @Label("连续长度")
-    @NotNull
     public int com_stepinterval;
 
     @Label("通讯延迟时间")
-    @NotNull
     public int com_iodelaytime;
 
     @Label("重试超时")
-    @NotNull
     public int retry_timeout;
 
     @Label("端口")
-    @NotNull
-    public int net_port;
+    public Integer net_port;
 
     @Label("网络类型")
-    @NotNull
-    public int net_type;
+    public Integer net_type;
 
     @Label("使用广播地址")
-    @NotNull
-    public int net_isbroadcast;
+    public Integer net_isbroadcast;
 
     @Label("广播地址站号")
-    @NotNull
-    public int net_broadcastaddr;
+    public Integer net_broadcastaddr;
 
     @Label("IP地址")
-    @NotNull
     public String net_ipaddr;
 
-
+    @Label("驱动配置文件名")
     @NotNull
+    public String driver;
+
     public int state;
+
+    public void setDriver(String driver) {
+        this.driver = driver;
+    }
 
     public void setDevice_id(long device_id) {
         this.device_id = device_id;
@@ -107,6 +98,26 @@ public class PlcInfoSettingParam {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public void setPlc_id(long plc_id) {
+        this.plc_id = plc_id;
+    }
+
+    public void setNet_port(Integer net_port) {
+        this.net_port = net_port;
+    }
+
+    public void setNet_type(Integer net_type) {
+        this.net_type = net_type;
+    }
+
+    public void setNet_isbroadcast(Integer net_isbroadcast) {
+        this.net_isbroadcast = net_isbroadcast;
+    }
+
+    public void setNet_broadcastaddr(Integer net_broadcastaddr) {
+        this.net_broadcastaddr = net_broadcastaddr;
     }
 
     public void setPort(String port) {

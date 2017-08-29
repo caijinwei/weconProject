@@ -1,0 +1,30 @@
+package com.wecon.box.constant;
+
+/**
+ * Created by whp on 2017/8/25.
+ */
+public class Constant {
+
+    //状态常量
+    public class State{
+        /**
+         * 已同步给盒子
+         */
+        public static final int STATE_SYNCED_BOX = 0;
+
+        /**
+         * 新增配置
+         */
+        public static final int STATE_NEW_CONFIG = 1;
+
+        /**
+         * 更新配置
+         */
+        public static final int STATE_UPDATE_CONFIG = 2;
+
+        /**
+         * 删除配置
+         */
+        public static final int STATE_DELETE_CONFIG = 3;
+    }
+}

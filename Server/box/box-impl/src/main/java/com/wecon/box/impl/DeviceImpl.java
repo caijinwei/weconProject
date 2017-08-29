@@ -21,7 +21,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -218,6 +220,48 @@ public class DeviceImpl implements DeviceApi {
             }
         });
         return list;
+    }
+
+    public List<Map<String, Object>> getDevicesByGroup(long acc_id){
+        //获取管理员下的分组列表
+        List<String[]> groupLst = jdbcTemplate.query("SELECT ad.id, ad.name FROM account_dir ad WHERE ad.type=0 and ad.account_id=?", new Object[]{acc_id}, new RowMapper() {
+            @Override
+            public Object mapRow(ResultSet rs, int i) throws SQLException {
+                return new String[]{rs.getLong("id")+"", rs.getString("name")};
+            }
+        });
+        if(null == groupLst){
+            return null;
+        }
+        //获取管理员下盒子列表
+        List<String[]> deviceLst = jdbcTemplate.query("SELECT d.device_id, d.name, d.map, d.dir_id FROM dev_bind_user dbu INNER JOIN device d ON dbu.device_id=d.device_id WHERE dbu.account_id=?", new Object[]{acc_id}, new RowMapper() {
+            @Override
+            public Object mapRow(ResultSet rs, int i) throws SQLException {
+                return new String[]{rs.getLong("device_id")+"", rs.getString("name"), rs.getString("map"), rs.getLong("dir_id")+""};
+            }
+        });
+        if(null == deviceLst){
+            return null;
+        }
+
+        List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+        for(String[] group : groupLst){
+            Map<String, Object> m = new HashMap<String, Object>();
+            List<Map> l = new ArrayList<Map>();
+            for(String[] device : deviceLst){
+                if(group[0].equals(device[3])){
+                    Map dm = new HashMap();
+                    dm.put("boxId", device[0]);
+                    dm.put("boxName", device[1]);
+                    dm.put("map", device[2]);
+                    l.add(dm);
+                }
+            }
+            m.put("groupName", group[1]);
+            m.put("boxList", l);
+            result.add(m);
+        }
+        return result;
     }
 
     /*

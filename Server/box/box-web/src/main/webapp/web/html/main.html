@@ -173,14 +173,21 @@
 					target="content_frame"> <span
 						class="glyphicon glyphicon-signal"> 历史数据</span>
 				</a></li>
-				<li><a
-					href="remotedownload.html?device_id=-200&device_name=远程下载"
-					target="content_frame"> <span class="glyphicon glyphicon-save">
-							远程下载</span>
+			</ul>
+
+			<ul class=" nav nav-pills nav-stacked" role="tablist"
+				 id="hosttab" style="margin-top: 40px;" ng-cloak ng-if="type==0">
+				<li><a href="user/allusers.html"
+					   target="content_frame"> <span
+						class="glyphicon glyphicon-user"> 用户管理</span>
 				</a></li>
-				<li><a href="baseconfig.html?device_id=-200&device_name=基本配置"
-					target="content_frame"> <span class="glyphicon glyphicon-cog">
-							基本配置</span>
+				<li><a href="#"
+					   target="content_frame"> <span
+						class="glyphicon glyphicon-tasks"> 操作日志</span>
+				</a></li>
+				<li><a href="#"
+					   target="content_frame"> <span
+						class="glyphicon glyphicon-inbox"> 盒子列表</span>
 				</a></li>
 			</ul>
 		</div>
