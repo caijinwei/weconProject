@@ -11,4 +11,5 @@ public class AccountFilter {
     public String email;
     public int type;
     public int state;
+    public String alias;
 }

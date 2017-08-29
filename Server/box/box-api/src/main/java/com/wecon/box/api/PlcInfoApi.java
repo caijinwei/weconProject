@@ -1,6 +1,7 @@
 package com.wecon.box.api;
 
 import com.wecon.box.entity.PlcInfo;
+import com.wecon.box.entity.PlcExtend;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -56,6 +57,20 @@ public interface PlcInfoApi {
 	*
 	* */
 	public List<PlcInfo> showAllPlcInfoByDeviceId(Integer deviceId);
+
+	/**
+	 * 根据状态获取PlcExtend列表
+	 * @param state
+	 * @return
+     */
+	List<PlcExtend> getPlcExtendListByState(int state);
+
+	/**
+	 * 批量更新plc状态
+	 * @param updList
+	 * @return
+     */
+	boolean batchUpdatePlcState(final List<int[]> updList);
 
 	/*
 	* 通讯协议是否已经存在

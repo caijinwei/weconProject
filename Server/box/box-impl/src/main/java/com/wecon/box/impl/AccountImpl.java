@@ -218,6 +218,12 @@ public class AccountImpl implements AccountApi {
             condition += " and account_id = ? ";
             params.add(filter.account_id);
         }
+        if (filter.alias != null && !filter.alias.isEmpty()) {
+            condition += " and (username like ? or phonenum like ? or email like ?)";
+            params.add("%" + filter.alias + "%");
+            params.add("%" + filter.alias + "%");
+            params.add("%" + filter.alias + "%");
+        }
         if (filter.username != null && !filter.username.isEmpty()) {
             condition += " and username like ? ";
             params.add("%" + filter.username + "%");

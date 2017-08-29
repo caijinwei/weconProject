@@ -14,13 +14,20 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                     $scope.$apply();
                     if (data.type == 1) {
                         $scope.searchbox();
-                    } else {
+                    } else if (data.type == 2) {
                         $('#overviewtab li').click(function () {
                             $('#overviewtab li').removeClass('active');
                             $('#overviewtab li span').removeAttr('style');
                             $(this).addClass('active');
                             $(this).find('span').css('color', 'white');
-                        })
+                        });
+                    } else {
+                        $('#hosttab li').click(function () {
+                            $('#hosttab li').removeClass('active');
+                            $('#hosttab li span').removeAttr('style');
+                            $(this).addClass('active');
+                            $(this).find('span').css('color', 'white');
+                        });
                     }
                 } else {
                     alert(code + " " + msg);
@@ -102,6 +109,25 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             $span.attr("class", "glyphicon glyphicon-folder-close");
         }
     }
+    $scope.selectbox = function (boxid) {
+        console.log("dss");
+        $('#side_nav li ul a').removeClass('active');
+        $('#customid').removeClass('custom-style');
+        $('#customspanid').attr("style", 'color:#828e9a;');
+        $('#' + boxid).addClass('active');
+
+    }
+    $scope.custom = function () {
+
+        $('#side_nav li ul a').removeClass('active');
+        $('#side_nav li ul').css("display", "none");
+        $('#side_nav li a span').attr("class",
+            "glyphicon glyphicon-folder-close");
+        $('#customid span').attr("class", 'glyphicon glyphicon-eye-open');
+        $('#customid').addClass('custom-style');
+        $('#customspanid').attr("style", 'color: white;');
+
+    }
 
     /*
      * 绑定PIBox表单中展示几个分组
@@ -129,13 +155,15 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         $("#dev_name").val("");
     }
     /*
-     * 拖拽用户分组（用户分组的修改）
-     * @RequestParam("target_acc_dir_id") Integer targetAccDirId, @RequestParam("target_ref_id") Integer targetRefId, @RequestParam("from_acc_dir_id") Integer fromAccDirId, @RequestParam("from_ref_id") Integer fromRefId)
-     * */
-    $scope.dragToUpdateDir = function (target_acc_dir_id, target_ref_id, from_acc_dir_id, from_ref_id) {
+     * 拖拽用户分组（用户分组的修改） @RequestParam("target_acc_dir_id") Integer
+     * targetAccDirId, @RequestParam("target_ref_id") Integer targetRefId,
+     * @RequestParam("from_acc_dir_id") Integer fromAccDirId,
+     * @RequestParam("from_ref_id") Integer fromRefId)
+     */
+    $scope.dragToUpdateDir = function (target_acc_dir_id, target_ref_id,
+                                       from_acc_dir_id, from_ref_id) {
 
-        var params =
-        {
+        var params = {
             target_acc_dir_id: target_acc_dir_id,
             target_ref_id: target_ref_id,
             from_acc_dir_id: from_acc_dir_id,
@@ -143,8 +171,8 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 
         }
         console.log(params);
-        T.common.ajax.request("WeconBox", "baseInfoAction/dragToUpdateDir", params,
-            function (data, code, msg) {
+        T.common.ajax.request("WeconBox", "baseInfoAction/dragToUpdateDir",
+            params, function (data, code, msg) {
                 if (code == 200) {
                 } else {
                     alert(code + " " + msg);
@@ -156,7 +184,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     }
 });
 var fromDirId;
-//允许拖拽
+// 允许拖拽
 function allowDrop(ev) {
     ev.preventDefault();
 }
@@ -164,24 +192,21 @@ function allowDrop(ev) {
 function drag(ev) {
     ev.dataTransfer.setData("Text", ev.target.id);
     fromDirId = $(ev.target).parent().attr("sid");
-    ev.stopPropagation();
 }
 function drop(ev) {
 
     ev.preventDefault();
     var data = ev.dataTransfer.getData("Text");
-//      先获取到ev.target的父节点，即分组a
+    // 先获取到ev.target的父节点，即分组a
     var parent = $(ev.target).parent();
-//        再获取到父节点的兄弟节点，即子分组ul
+    // 再获取到父节点的兄弟节点，即子分组ul
     var next = $(parent).next();
-//        再往子分组ul中追加拖放的元素
+    // 再往子分组ul中追加拖放的元素
     next.append($(document.getElementById(data)));
-    ev.stopPropagation();
 
-//   调用后台方法
+    // 调用后台方法
     var appElement = document.querySelector('[ng-controller=infoController]');
     var $scope = angular.element(appElement).scope();
-    $scope.dragToUpdateDir($('#' + data).parent().attr("sid"), $('#' + data).attr("id"), fromDirId,$('#' + data).attr("id"));
+    $scope.dragToUpdateDir($('#' + data).parent().attr("sid"), $('#' + data)
+        .attr("id"), fromDirId, $('#' + data).attr("id"));
 }
-
-

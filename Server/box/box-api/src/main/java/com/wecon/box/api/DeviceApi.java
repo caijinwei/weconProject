@@ -6,6 +6,7 @@ import com.wecon.box.filter.DeviceFilter;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lanpenghui 2017年8月1日
@@ -80,4 +81,11 @@ public interface DeviceApi {
     * 根据device_id解除盒子的绑定（分组，监控点）
     * */
     public boolean unbindDevice(final Integer accountId, final Integer deviceId);
+
+    /**
+     * 获取管理员下的所有分组及对应设备
+     * @param acc_id
+     * @return
+     */
+    List<Map<String, Object>> getDevicesByGroup(long acc_id);
 }

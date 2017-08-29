@@ -152,18 +152,14 @@ appModule
 					$scope.copymonitor = function(model) {
 						$scope.monitorid = model.id;// 监控点id
 						$scope.alais = model.ref_alais;// 监控点别名
-						// $scope.act_group($scope.deviceid);
-						// $scope.type = 1;
 
 						angular.forEach($scope.dir_list, function(data, index,
 								array) {
-							// console.log("data.id==" + data.id);
 							if (actgroupId == data.id) {
 								$("#nowgroupid").html(data.name);
 								$scope.groupName = data.name;
 							}
 						});
-						// $("#copyDataGroup").modal("show");
 
 					}
 					// 复制监控点到其他组
@@ -207,18 +203,14 @@ appModule
 					$scope.movemonitor = function(model) {
 						$scope.moveMonitorid = model.id;// 监控点id
 						$scope.moveAlais = model.ref_alais;// 监控点别名
-						// $scope.act_group($scope.deviceid);
-						// $scope.type = 1;
 
 						angular.forEach($scope.dir_list, function(data, index,
 								array) {
-							// console.log("data.id==" + data.id);
 							if (actgroupId == data.id) {
 								$("#movenowgroupid").html(data.name);
 								$scope.movegroupName = data.name;
 							}
 						});
-						// $("#copyDataGroup").modal("show");
 
 					}
 					// 移动监控点到其他组
@@ -262,8 +254,6 @@ appModule
 					// 删除监控点
 					$scope.delmonitor = function(model) {
 						$scope.delmonitorid = model.id;// 监控点id
-						// $scope.act_group($scope.deviceid);
-						// $scope.type = 1;
 						$("#delgroupid").html(
 								"确定要删除【" + model.ref_alais + "】监控点吗？");
 					}
@@ -561,4 +551,47 @@ appModule
 											alert("ajax error");
 										});
 					};
+					/*
+					 * 盒子下plc配置展示
+					 */
+					$scope.showAllPlcConf = function() {
+
+						var params = {
+							device_id : $scope.deviceid
+						};
+						T.common.ajax.request("WeconBox",
+								"plcInfoAction/showAllPlcConf", params,
+								function(data, code, msg) {
+									var test = 1;
+									if (code == 200) {
+										$scope.infoDatas = data.infoDatas;
+										$scope.$apply();
+									} else {
+										alert(code + "-" + msg);
+									}
+								}, function() {
+									alert("ajax error");
+								});
+					}
+					/**
+					 * 获取数据类型
+					 */
+					$scope.getDataType = function() {
+						
+						T.common.ajax.request("WeconBox",
+								"actDataAction/getDataType", params,
+								function(data, code, msg) {
+									var test = 1;
+									if (code == 200) {
+										$scope.dataTypes = data.DataTypeOption;
+										$scope.$apply();
+									} else {
+										alert(code + "-" + msg);
+									}
+								}, function() {
+									alert("ajax error");
+								});
+
+					}
+
 				})

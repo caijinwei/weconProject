@@ -136,10 +136,11 @@
 			</div>
 
 			<ul id="side_nav" ng-cloak ng-if="type==1">
-				<li><a
+				<li><a id="customid" ng-click="custom()"
 					href="datamonitor.html?device_id=-100&device_name=自定义监控点"
-					target="content_frame"> <span
-						class="glyphicon glyphicon-eye-open "> 自定义监控点</span>
+					target="content_frame"> 
+					<span
+						class="glyphicon glyphicon-eye-open " id="customspanid"  > 自定义监控点</span>
 				</a></li>
 
 				<li ng-repeat="x in allDatas"><a href="#"
@@ -152,14 +153,14 @@
 						<a
 							href="datamonitor.html?device_id={{y.deviceId}}&device_name={{y.deviceName}}"
 							id="{{y.deviceId}}" draggable="true" ondragstart="drag(event)"
-							class="list-group-item" target="content_frame"
-							ng-repeat="y in x.deviceList">{{y.deviceName}}</a>
+							ng-click="selectbox(y.deviceId)" class="list-group-item"
+							target="content_frame" ng-repeat="y in x.deviceList">{{y.deviceName}}</a>
 					</ul></li>
 
 			</ul>
 
-			<ul class="nav nav-pills nav-stacked" role="tablist" id="overviewtab"
-				style="margin-top: 40px;" ng-cloak ng-if="type==2">
+			<ul class=" nav nav-pills nav-stacked" role="tablist"
+				id="overviewtab" style="margin-top: 40px;" ng-cloak ng-if="type==2">
 				<li><a href="datamonitor.html?device_id=-200&device_name=数据监控"
 					target="content_frame"> <span
 						class="glyphicon glyphicon-eye-open"> 数据监控</span>
@@ -172,13 +173,21 @@
 					target="content_frame"> <span
 						class="glyphicon glyphicon-signal"> 历史数据</span>
 				</a></li>
-				<li><a href="remotedownload.html?device_id=-200&device_name=远程下载"
-					target="content_frame"> <span class="glyphicon glyphicon-save">
-							远程下载</span>
+			</ul>
+
+			<ul class=" nav nav-pills nav-stacked" role="tablist"
+				 id="hosttab" style="margin-top: 40px;" ng-cloak ng-if="type==0">
+				<li><a href="user/allusers.html"
+					   target="content_frame"> <span
+						class="glyphicon glyphicon-user"> 用户管理</span>
 				</a></li>
-				<li><a href="baseconfig.html?device_id=-200&device_name=基本配置"
-					target="content_frame"> <span class="glyphicon glyphicon-cog">
-							基本配置</span>
+				<li><a href="#"
+					   target="content_frame"> <span
+						class="glyphicon glyphicon-tasks"> 操作日志</span>
+				</a></li>
+				<li><a href="#"
+					   target="content_frame"> <span
+						class="glyphicon glyphicon-inbox"> 盒子列表</span>
 				</a></li>
 			</ul>
 		</div>

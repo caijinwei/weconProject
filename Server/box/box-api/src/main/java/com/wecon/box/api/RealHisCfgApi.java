@@ -91,7 +91,7 @@ public interface RealHisCfgApi {
 	 * @param filter
 	 * @return
 	 */
-	public Page<RealHisCfgDevice> getRealHisCfgDevicePage(RealHisCfgFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize);
+	 Page<RealHisCfgDevice> getRealHisCfgDevicePage(RealHisCfgFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize);
 
 	/**
 	 * 通过filter及外部参数分页获取历史（实时）数据配置信息列表
@@ -99,7 +99,14 @@ public interface RealHisCfgApi {
 	 * @param filter
 	 * @return
 	 */
-	public Page<RealHisCfgDevice> getRealHisCfgDevicePage(ViewAccountRoleFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize);
+	 Page<RealHisCfgDevice> getRealHisCfgDevicePage(ViewAccountRoleFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize);
+
+	/**
+	 * 根据状态获取历史（实时）数据配置信息列表
+	 * @param state
+	 * @return
+     */
+	List<RealHisCfgDevice> getRealHisCfgListByState(int state);
 
 	/*
 	* 查找id根据device_id

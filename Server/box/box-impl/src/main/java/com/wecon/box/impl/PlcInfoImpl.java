@@ -1,10 +1,12 @@
 package com.wecon.box.impl;
 
 import com.wecon.box.api.PlcInfoApi;
+import com.wecon.box.entity.PlcExtend;
 import com.wecon.box.entity.PlcInfo;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.restful.core.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -13,6 +15,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -120,9 +123,37 @@ public class PlcInfoImpl implements PlcInfoApi {
         return info;
     }
 
+	@Override
+	public List<PlcExtend> getPlcExtendListByState(int state){
+		String sql = "select p.*, d.machine_code from plc_info p, device d where p.device_id = d.device_id state = ?";
+		List<PlcExtend> list = jdbcTemplate.query(sql, new Object[] { state }, new DefaultPlcExtendRowMapper());
+		if (!list.isEmpty()) {
+			return list;
+		}
+		return null;
+	}
+
+	@Override
+	public boolean batchUpdatePlcState(final List<int[]> updList){
+		String sql = "update plc_info set state = ? where plc_id = ?";
+		jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+			public int getBatchSize() {
+				return updList.size();
+				//这个方法设定更新记录数，通常List里面存放的都是我们要更新的，所以返回list.size();
+			}
+			public void setValues(PreparedStatement ps, int i)throws SQLException {
+				int[] arg = updList.get(i);
+				ps.setInt(1, arg[0]);
+				ps.setInt(2, arg[1]);
+			}
+		});
+		return true;
+	}
 
 
-    public static final class DefaultPlcInfoRowMapper implements RowMapper<PlcInfo> {
+public static final class DefaultPlcInfoRowMapper implements RowMapper<PlcInfo> {
+
+
 
         @Override
         public PlcInfo mapRow(ResultSet rs, int i) throws SQLException {
@@ -200,5 +231,41 @@ public class PlcInfoImpl implements PlcInfoApi {
         }
     }
 
+
+
+	public static final class DefaultPlcExtendRowMapper implements RowMapper<PlcExtend> {
+		@Override
+		public PlcExtend mapRow(ResultSet rs, int i) throws SQLException {
+			PlcExtend model = new PlcExtend();
+			model.plc_id = rs.getLong("plc_id");
+			model.device_id = rs.getLong("device_id");
+			model.type = rs.getString("type");
+			model.driver = rs.getString("driver");
+			model.box_stat_no = rs.getInt("box_stat_no");
+			model.plc_stat_no = rs.getInt("plc_stat_no");
+			model.port = rs.getString("port");
+			model.comtype = rs.getInt("comtype");
+			model.baudrate = rs.getString("baudrate");
+			model.stop_bit = rs.getInt("stop_bit");
+			model.data_length = rs.getInt("data_length");
+			model.check_bit = rs.getString("check_bit");
+			model.retry_times = rs.getInt("retry_times");
+			model.wait_timeout = rs.getInt("wait_timeout");
+			model.rev_timeout = rs.getInt("rev_timeout");
+			model.com_stepinterval = rs.getInt("com_stepinterval");
+			model.com_iodelaytime = rs.getInt("com_iodelaytime");
+			model.retry_timeout = rs.getInt("retry_timeout");
+			model.net_port = rs.getInt("net_port");
+			model.net_type = rs.getInt("net_type");
+			model.net_isbroadcast = rs.getInt("net_isbroadcast");
+			model.net_broadcastaddr = rs.getInt("net_broadcastaddr");
+			model.net_ipaddr = rs.getString("net_ipaddr");
+			model.state = rs.getInt("state");
+			model.create_date = rs.getTimestamp("create_date");
+			model.update_date = rs.getTimestamp("update_date");
+			model.machine_code = rs.getString("machine_code");
+			return model;
+		}
+	}
 
 }
