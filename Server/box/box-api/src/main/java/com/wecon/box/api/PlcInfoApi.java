@@ -66,11 +66,11 @@ public interface PlcInfoApi {
 	List<PlcExtend> getPlcExtendListByState(int state);
 
 	/**
-	 * 批量更新plc状态
+	 * 批量更新状态
 	 * @param updList
 	 * @return
      */
-	boolean batchUpdatePlcState(final List<int[]> updList);
+	boolean batchUpdateState(final List<int[]> updList);
 
 	/*
 	* 通讯协议是否已经存在
@@ -87,4 +87,6 @@ public interface PlcInfoApi {
     * @Params plc_id
     * */
     public PlcInfo findPlcInfoByPlcId(Integer plcId);
+
+
 }

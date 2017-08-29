@@ -1,6 +1,7 @@
 package com.wecon.box.api;
 
 import com.wecon.box.entity.AlarmCfg;
+import com.wecon.box.entity.AlarmCfgExtend;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -20,6 +21,20 @@ public interface AlarmCfgApi {
 	 * @return
 	 */
 	public List<AlarmCfg> getAlarmCfg(long account_id);
+
+	/**
+	 * 根据状态获取报警数据配置
+	 * @param state
+	 * @return
+     */
+	List<AlarmCfgExtend> getAlarmCfgExtendListByState(int state);
+
+	/**
+	 * 批量更新状态
+	 * @param updList
+	 * @return
+	 */
+	boolean batchUpdateState(final List<int[]> updList);
 
 	/*
 	* 根据device_id 设备号ID查询alarmCfgId

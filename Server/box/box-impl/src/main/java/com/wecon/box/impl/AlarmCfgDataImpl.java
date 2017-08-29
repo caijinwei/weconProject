@@ -251,7 +251,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 		}
 		Object groupId = bParams.get("groupId");
 		if (null != groupId) {
-			fromStr += ", account_dir_ref f";
+			fromStr += ", account_dir_rel f";
 			condition.append(" and ac.alarmcfg_id=f.ref_id and f.acc_dir_id = ?");
 			params.add(groupId);
 		}
@@ -307,7 +307,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 			params.add(boxId);
 		}
 		if (null != groupId) {
-			fromStr += ", account_dir_ref f";
+			fromStr += ", account_dir_rel f";
 			condition.append(" and ac.alarmcfg_id=f.ref_id and f.acc_dir_id = ?");
 			params.add(groupId);
 		}

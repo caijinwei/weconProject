@@ -179,16 +179,16 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 			params.add(boxId);
 		}
 		if(null != groupId){
-			fromStr += ", account_dir_ref f";
+			fromStr += ", account_dir_rel f";
 			condition.append(" and r.id=f.ref_id and f.acc_dir_id = ?");
 			params.add(groupId);
 		}
 		if(null != monitorId){
-			condition.append(" and r.plc_id = ?");
+			condition.append(" and r.id = ?");
 			params.add(monitorId);
 		}
 		String sqlCount = "select count(0) "+fromStr+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and rd.real_his_cfg_id=r.id";
-		String sql = "select r.name, rd.value, rd.monitor_time"
+		String sql = "select r.id, r.name, rd.value, rd.monitor_time"
 				+ "  "+fromStr+ "  where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and rd.real_his_cfg_id=r.id";
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
@@ -238,16 +238,16 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 		Object groupId = bParams.get("groupId");
 		Object monitorId = bParams.get("monitorId");
 		if(null != groupId){
-			fromStr += ", account_dir_ref f";
+			fromStr += ", account_dir_rel f";
 			condition.append(" and r.id=f.ref_id and f.acc_dir_id = ?");
 			params.add(groupId);
 		}
 		if(null != monitorId){
-			condition.append(" and r.plc_id = ?");
+			condition.append(" and r.id = ?");
 			params.add(monitorId);
 		}
 		String sqlCount = "select count(0) "+fromStr+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and rd.real_his_cfg_id=r.id";
-		String sql = "select r.name, rd.value, rd.monitor_time"
+		String sql = "select r.id, r.name, rd.value, rd.monitor_time"
 				+ "  "+fromStr+ "  where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and rd.real_his_cfg_id=r.id";
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
@@ -279,6 +279,7 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 		@Override
 		public Map<String, Object> mapRow(ResultSet rs, int i) throws SQLException {
 			Map<String, Object> row = new HashMap<String, Object>();
+			row.put("monitorId", rs.getString("id"));
 			row.put("monitorName", rs.getString("name"));
 			row.put("number", rs.getString("value"));
 			row.put("monitorTime", rs.getTimestamp("monitor_time"));
