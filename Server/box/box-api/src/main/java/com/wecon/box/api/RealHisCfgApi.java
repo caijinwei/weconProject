@@ -3,6 +3,7 @@ package com.wecon.box.api;
 import com.wecon.box.entity.Page;
 import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.entity.RealHisCfgDevice;
+import com.wecon.box.entity.RealHisCfgExtend;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import org.springframework.stereotype.Component;
@@ -106,7 +107,14 @@ public interface RealHisCfgApi {
 	 * @param state
 	 * @return
      */
-	List<RealHisCfgDevice> getRealHisCfgListByState(int state);
+	List<RealHisCfgExtend> getRealHisCfgListByState(int state);
+
+	/**
+	 * 批量更新状态
+	 * @param updList
+	 * @return
+	 */
+	boolean batchUpdateState(final List<int[]> updList);
 
 	/*
 	* 查找id根据device_id

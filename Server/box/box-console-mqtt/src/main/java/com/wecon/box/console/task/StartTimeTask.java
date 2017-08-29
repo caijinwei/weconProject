@@ -19,7 +19,7 @@ import com.wecon.common.util.TimeTriggerUtil;
 public class StartTimeTask {
 	private static Logger logger = LoggerFactory.getLogger(StartTimeTask.class);
 	private static final String MQTT_JOB = "MqttJob";
-
+	private static final String BOX_NOTIFY_JOB = "BoxNotiryJob";
 	public void init() {
 		new Thread() {
 			public void run() {
@@ -30,7 +30,9 @@ public class StartTimeTask {
 					// 实时监控是否连接上mqtt代理服务器
 					Scheduler scheduler = QuartzManage.getScheduler();
 					Trigger trigger = TimeTriggerUtil.getTrigger(MQTT_JOB, "2", 5);
-					QuartzManage.createJob(scheduler, trigger, MQTT_JOB, null, null, MonitorTaskJob.class);
+					Trigger trigger2 = TimeTriggerUtil.getTrigger(BOX_NOTIFY_JOB, "2", 5);
+					//QuartzManage.createJob(scheduler, trigger, MQTT_JOB, null, null, MonitorTaskJob.class);
+					QuartzManage.createJob(scheduler, trigger2, BOX_NOTIFY_JOB, null, null, BoxNotifyTaskJob.class);
 					
 				} catch (Exception e) {
 					e.printStackTrace();

@@ -27,4 +27,20 @@ public class Constant {
          */
         public static final int STATE_DELETE_CONFIG = 3;
     }
+
+    public class DataType{
+        /**
+         * 实时数据类型
+         */
+        public static final int DATA_TYPE_REAL = 0;
+
+        /**
+         * 历史数据类型
+         */
+        public static final int DATA_TYPE_HISTORY = 1;
+        /**
+         * 报警数据类型
+         */
+        public static final int DATA_TYPE_ALARM = 2;
+    }
 }
