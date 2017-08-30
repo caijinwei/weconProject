@@ -2,6 +2,9 @@ package com.wecon.box.action.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import javax.validation.Valid;
 
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -10,23 +13,33 @@ import org.springframework.context.annotation.Description;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.AccountDirApi;
 import com.wecon.box.api.AccountDirRelApi;
+import com.wecon.box.api.PlcInfoApi;
 import com.wecon.box.api.RealHisCfgApi;
 import com.wecon.box.api.RedisPiBoxApi;
+import com.wecon.box.api.ViewAccountRoleApi;
 import com.wecon.box.entity.AccountDir;
 import com.wecon.box.entity.AccountDirRel;
 import com.wecon.box.entity.Page;
 import com.wecon.box.entity.PiBoxCom;
 import com.wecon.box.entity.PiBoxComAddr;
+import com.wecon.box.entity.PlcInfo;
 import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.entity.RealHisCfgDevice;
 import com.wecon.box.entity.RedisPiBoxActData;
+import com.wecon.box.entity.plcdom.AddrDom;
+import com.wecon.box.entity.plcdom.Plc;
+import com.wecon.box.entity.plcdom.Res;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
+import com.wecon.box.param.RealHisCfgParam;
 import com.wecon.box.util.OptionUtil;
+import com.wecon.box.util.PlcTypeParser;
+import com.wecon.box.util.PlcTypeQuerier;
 import com.wecon.box.util.ServerMqtt;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
@@ -52,6 +65,10 @@ public class ActDataAction {
 	private AccountDirRelApi accountDirRelApi;
 	@Autowired
 	private OptionUtil optionService;
+	@Autowired
+	private PlcInfoApi plcInfoApi;
+	@Autowired
+	private ViewAccountRoleApi viewAccountRoleApi;
 
 	/**
 	 * 通过机器码获取对应的实时数据组
@@ -123,7 +140,7 @@ public class ActDataAction {
 			realHisCfgFilter.addr_type = -1;
 			realHisCfgFilter.data_type = 0;
 			realHisCfgFilter.his_cycle = -1;
-			realHisCfgFilter.state = 1;
+			realHisCfgFilter.state = -1;
 
 			realHisCfgFilter.account_id = client.userId;
 
@@ -142,7 +159,7 @@ public class ActDataAction {
 			viewAccountRoleFilter.cfg_type = 1;
 			viewAccountRoleFilter.data_type = 0;
 			viewAccountRoleFilter.role_type = -1;
-			viewAccountRoleFilter.state = 1;
+			viewAccountRoleFilter.state = -1;
 			if (!CommonUtils.isNullOrEmpty(acc_dir_id)) {
 				viewAccountRoleFilter.dirId = Long.parseLong(acc_dir_id);
 			}
@@ -326,21 +343,32 @@ public class ActDataAction {
 	}
 
 	/**
-	 * 复制监控点到其他组
+	 * 移除监控点
 	 * 
 	 * @return
 	 */
 	@WebApi(forceAuth = true, master = true)
 	@Description("移除监控点")
 	@RequestMapping(value = "/delMonitor")
-	public Output delMonitor(@RequestParam("monitorid") String monitorid,
-			@RequestParam("acc_dir_id") String acc_dir_id) {
+	public Output delMonitor(@RequestParam("monitorid") String monitorid, @RequestParam("acc_dir_id") String acc_dir_id,
+			@RequestParam("isdel") String isdel) {
 
-		if (CommonUtils.isNullOrEmpty(monitorid) || CommonUtils.isNullOrEmpty(acc_dir_id)) {
+		if (CommonUtils.isNullOrEmpty(monitorid) || CommonUtils.isNullOrEmpty(acc_dir_id)
+				|| CommonUtils.isNullOrEmpty(isdel)) {
 			throw new BusinessException(ErrorCodeOption.Get_Data_Error.key, ErrorCodeOption.Get_Data_Error.value);
 		}
-		// 删除该分组下的监控点
-		accountDirRelApi.delAccountDir(Long.parseLong(acc_dir_id), Long.parseLong(monitorid));
+		if (1 == Integer.parseInt(isdel)) {
+			// 移除该分组下的监控点
+			accountDirRelApi.delAccountDir(Long.parseLong(acc_dir_id), Long.parseLong(monitorid));
+		} else {
+			// 1.删除分配给视图账号的配置
+			viewAccountRoleApi.deletePoint(0, Long.parseLong(monitorid));
+			// 2.更改配置状态，等待盒子发送数据把配置物理删除
+			RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(monitorid));
+			realHisCfg.state = 3;// 删除配置状态
+			realHisCfgApi.updateRealHisCfg(realHisCfg);
+
+		}
 
 		return new Output();
 
@@ -434,6 +462,225 @@ public class ActDataAction {
 	public Output getDataType() {
 		JSONObject json = new JSONObject();
 		json.put("DataTypeOption", optionService.getDataTypeOptionOptions());
+
+		return new Output(json);
+
+	}
+
+	/**
+	 * 获取地址类型和对应的寄存器类型
+	 * 
+	 * @return
+	 */
+	@Description("获取地址类型和对应的寄存器类型")
+	@WebApi(forceAuth = true, master = true)
+	@RequestMapping(value = "/getAddrType")
+	public Output getAddrType(@RequestParam("plc_id") String plc_id) {
+		JSONObject json = new JSONObject();
+		if (!CommonUtils.isNullOrEmpty(plc_id)) {
+			JSONObject data = null;
+			JSONObject attr = null;
+			JSONArray arr = null;
+			JSONArray allarr = new JSONArray();
+			PlcInfo plcInfo = plcInfoApi.getPlcInfo(Long.parseLong(plc_id));
+			PlcTypeParser.doParse();// 解析plcType文件中的数据填充到po
+			if (plcInfo != null) {
+				List<Plc> result = PlcTypeQuerier.getInstance().query("plctype", plcInfo.type);
+				Map<String, AddrDom> plcs = result.get(0).getAddrs();
+				AddrDom addrDom = null;
+				if (null != plcs.get("bitaddr")) {
+					data = new JSONObject();
+					arr = new JSONArray();
+					addrDom = plcs.get("bitaddr");
+					data.put("addrkey", 0);
+
+					List<Res> ResList = addrDom.getResList();
+					for (int i = 0; i < ResList.size(); i++) {
+						attr = new JSONObject();
+						Map<String, String> attris = ResList.get(i).getAttributes();
+						String value = attris.get("Rid");
+						String range = attris.get("MRange");
+						attr.put("addrvalue", value);
+						attr.put("range", range);
+						arr.add(attr);
+					}
+					data.put("addrRid", arr);
+					allarr.add(data);
+				}
+				if (null != plcs.get("byteaddr")) {
+					addrDom = plcs.get("byteaddr");
+					data = new JSONObject();
+					arr = new JSONArray();
+					data.put("addrkey", 1);
+					List<Res> ResList = addrDom.getResList();
+					for (int i = 0; i < ResList.size(); i++) {
+						attr = new JSONObject();
+						Map<String, String> attris = ResList.get(i).getAttributes();
+						String value = attris.get("Rid");
+						String range = attris.get("Range");
+						attr.put("addrvalue", value);
+						attr.put("range", range);
+						arr.add(attr);
+					}
+					data.put("addrRid", arr);
+					allarr.add(data);
+
+				}
+				if (null != plcs.get("wordaddr")) {
+					addrDom = plcs.get("wordaddr");
+					data = new JSONObject();
+					arr = new JSONArray();
+					data.put("addrkey", 2);
+					List<Res> ResList = addrDom.getResList();
+					for (int i = 0; i < ResList.size(); i++) {
+						attr = new JSONObject();
+						Map<String, String> attris = ResList.get(i).getAttributes();
+						String value = attris.get("Rid");
+						String range = attris.get("Range");
+						attr.put("addrvalue", value);
+						attr.put("range", range);
+						arr.add(attr);
+					}
+					data.put("addrRid", arr);
+					allarr.add(data);
+
+				}
+				if (null != plcs.get("dwordaddr")) {
+					addrDom = plcs.get("dwordaddr");
+					data = new JSONObject();
+					arr = new JSONArray();
+					data.put("addrkey", 3);
+					List<Res> ResList = addrDom.getResList();
+					for (int i = 0; i < ResList.size(); i++) {
+						attr = new JSONObject();
+						Map<String, String> attris = ResList.get(i).getAttributes();
+						String value = attris.get("Rid");
+						String range = attris.get("Range");
+						attr.put("addrvalue", value);
+						attr.put("range", range);
+						arr.add(attr);
+					}
+					data.put("addrRid", arr);
+					allarr.add(data);
+
+				}
+
+			}
+			json.put("allAddr", allarr);
+
+		}
+
+		return new Output(json);
+
+	}
+
+	@Description("添加或者修改监控点")
+	@WebApi(forceAuth = true, master = true, authority = { "1" })
+	@RequestMapping(value = "/addUpdataMonitor")
+	public Output addUpdataMonitor(@Valid RealHisCfgParam realHisCfgParam) {
+		JSONObject json = new JSONObject();
+		long account_id = AppContext.getSession().client.userId;
+		if (realHisCfgParam != null) {
+			RealHisCfg realHisCfg = null;
+			if (realHisCfgParam.id > 0) {
+				realHisCfg = realHisCfgApi.getRealHisCfg(realHisCfgParam.id);
+				realHisCfg.account_id = account_id;
+				realHisCfg.addr = realHisCfgParam.addr;
+				realHisCfg.addr_type = realHisCfgParam.addr_type;
+				realHisCfg.data_id = realHisCfgParam.data_id;
+				realHisCfg.name = realHisCfgParam.name;
+				realHisCfg.plc_id = realHisCfgParam.plc_id;
+				realHisCfg.device_id = realHisCfgParam.device_id;
+				realHisCfg.rid = realHisCfgParam.rid;
+				realHisCfg.data_limit = realHisCfgParam.rang;
+				if (!CommonUtils.isNullOrEmpty(realHisCfgParam.describe)) {
+					realHisCfg.describe = realHisCfgParam.describe;
+				}
+				realHisCfg.plc_id = realHisCfgParam.plc_id;
+				realHisCfg.data_type = realHisCfgParam.data_type;
+				if (realHisCfgParam.data_type == 0) {
+					if (realHisCfgParam.group_id < 1) {
+
+						throw new BusinessException(ErrorCodeOption.Get_Groupid_Error.key,
+								ErrorCodeOption.Get_Groupid_Error.value);
+					}
+				} else {
+					if (realHisCfgParam.his_cycle > 0) {
+						realHisCfg.his_cycle = realHisCfgParam.his_cycle;
+					}
+
+				}
+				realHisCfg.state = 2;// 更新配置
+
+				boolean issuccess = realHisCfgApi.updateRealHisCfg(realHisCfg);
+				if (issuccess) {
+					if (realHisCfgParam.data_type == 0) {
+						AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(realHisCfgParam.group_id,
+								realHisCfg.id);
+						if (accountDirRel == null) {
+							accountDirRel = new AccountDirRel();
+							accountDirRel.acc_dir_id = realHisCfgParam.group_id;
+							accountDirRel.ref_id = realHisCfg.id;
+							accountDirRel.ref_alais = realHisCfg.name;
+							accountDirRelApi.saveAccountDirRel(accountDirRel);
+						} else {
+							accountDirRel.acc_dir_id = realHisCfgParam.group_id;
+							accountDirRel.ref_id = realHisCfg.id;
+							accountDirRel.ref_alais = realHisCfg.name;
+							accountDirRelApi.upAccountDirRel(accountDirRel);
+						}
+					}
+				}
+				json.put("success", 0);
+
+			} else {
+				realHisCfg = new RealHisCfg();
+				realHisCfg.account_id = account_id;
+				realHisCfg.addr = realHisCfgParam.addr;
+				realHisCfg.addr_type = realHisCfgParam.addr_type;
+				realHisCfg.data_id = realHisCfgParam.data_id;
+				realHisCfg.name = realHisCfgParam.name;
+				realHisCfg.plc_id = realHisCfgParam.plc_id;
+				realHisCfg.device_id = realHisCfgParam.device_id;
+				realHisCfg.rid = realHisCfgParam.rid;
+				realHisCfg.data_limit = realHisCfgParam.rang;
+				realHisCfg.state = 1;// 0：已同步给盒子1：新增配置2：更新配置3：删除配置，如果同步成功再做物理删除，同时需要删除监控点绑定和权限的分配，和其他相关数据
+				if (!CommonUtils.isNullOrEmpty(realHisCfgParam.describe)) {
+					realHisCfg.describe = realHisCfgParam.describe;
+				}
+				realHisCfg.plc_id = realHisCfgParam.plc_id;
+				realHisCfg.data_type = realHisCfgParam.data_type;
+				if (realHisCfgParam.data_type == 0) {
+					if (realHisCfgParam.group_id < 1) {
+
+						throw new BusinessException(ErrorCodeOption.Get_Groupid_Error.key,
+								ErrorCodeOption.Get_Groupid_Error.value);
+					}
+				} else {
+					if (realHisCfgParam.his_cycle > 0) {
+						realHisCfg.his_cycle = realHisCfgParam.his_cycle;
+					}
+
+				}
+				long id = realHisCfgApi.saveRealHisCfg(realHisCfg);
+				if (id > 0) {
+					if (realHisCfgParam.data_type == 0) {
+						realHisCfg = realHisCfgApi.getRealHisCfg(id);
+						AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(realHisCfgParam.group_id,
+								realHisCfg.id);
+						if (accountDirRel == null) {
+							accountDirRel = new AccountDirRel();
+							accountDirRel.acc_dir_id = realHisCfgParam.group_id;
+							accountDirRel.ref_id = realHisCfg.id;
+							accountDirRel.ref_alais = realHisCfg.name;
+							accountDirRelApi.saveAccountDirRel(accountDirRel);
+						}
+					}
+				}
+				json.put("success", 1);
+			}
+
+		}
 
 		return new Output(json);
 

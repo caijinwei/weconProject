@@ -23,6 +23,7 @@ public class AlarmCfg {
 	public long alarmcfg_id;
 	public long data_id;
 	public long  account_id;
+	public long  device_id;
 	public long plc_id;
 	public String name;
 	public String addr;
@@ -31,6 +32,7 @@ public class AlarmCfg {
 	public int condition_type;
 	public int state;
 	public int bind_state;//1.绑定状态 0.解绑状态
+	public String rid;//寄存器类型
 	public Timestamp create_date;
 	public Timestamp update_date;
 	

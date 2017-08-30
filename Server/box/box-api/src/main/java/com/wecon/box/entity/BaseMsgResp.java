@@ -1,5 +1,9 @@
 package com.wecon.box.entity;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * 下发通知盒子的基本消息结构
  * Created by whp on 2017/8/24.

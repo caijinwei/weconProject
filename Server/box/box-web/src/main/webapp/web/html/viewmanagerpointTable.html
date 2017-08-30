@@ -23,9 +23,9 @@
 
 
 	<!--监控点分配模态窗口-->
-	<div class="container-fluid search-div">
+	<div class="container-fluid search-div" >
 		<div class="form-horizontal" role="form">
-			<div class="form-group" ng-cloak ng-if="accounttype==1">
+			<div class="form-group" ng-cloak ng-if="accounttype==1" >
 				<label class="col-md-2 col-sm-2 col-xs-2 control-label"
 					style="vertical-align: middle">盒子:</label>
 
@@ -45,7 +45,7 @@
 		</div>
 	</div>
 	<table class="table table-bordered table-hover" id="pointlist">
-		<thead>
+		<thead >
 			<tr>
 				<th class="col-md-1"><a ng-click="selectAll()">全选</a></th>
 				<th class="col-md-1">编号</th>
@@ -60,7 +60,7 @@
 				<td><input name="cbid" type="checkbox" ng-checked="allCheck"
 					value="{{x.id}}" /></td>
 				<td>{{x.id}}</td>
-				<td>{{x.state==1?'启用':'未启用'}}</td>
+				<td>{{x.state==0?"已同步盒子":x.state==1?"新增":x.state==2?"已变更":"已删除"}}</td>
 				<td>{{x.addr}}</td>
 				<td>{{x.name}}</td>
 				<td>{{x.describe}}</td>

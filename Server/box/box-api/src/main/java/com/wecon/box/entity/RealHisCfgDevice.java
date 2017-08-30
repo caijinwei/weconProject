@@ -12,6 +12,8 @@ public class RealHisCfgDevice extends RealHisCfg{
 	public String re_state;
 	public String re_value;
 	public int role_type;
+	public String data_value;//数据类型值
+	public String condevice;//连接设备
 	
 
 }

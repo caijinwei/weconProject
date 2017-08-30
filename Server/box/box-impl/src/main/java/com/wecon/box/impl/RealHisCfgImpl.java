@@ -4,6 +4,7 @@ import com.wecon.box.api.RealHisCfgApi;
 import com.wecon.box.entity.Page;
 import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.entity.RealHisCfgDevice;
+import com.wecon.box.entity.RealHisCfgExtend;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.common.util.CommonUtils;
@@ -28,7 +29,7 @@ import java.util.Map;
 public class RealHisCfgImpl implements RealHisCfgApi {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	private final String SEL_COL = "r.id,r.data_id,r.account_id,r.plc_id,r.name,r.addr,r.addr_type,r.describe,r.digit_count,r.data_limit,r.his_cycle,r.data_type,r.state,r.create_date,r.update_date,r.bind_state";
+	private final String SEL_COL = "r.id,r.data_id,r.account_id,r.plc_id,r.name,r.addr,r.addr_type,r.describe,r.digit_count,r.data_limit,r.his_cycle,r.data_type,r.state,r.create_date,r.update_date,r.bind_state,r.device_id,r.rid";
 
 	@Override
 	public long saveRealHisCfg(final RealHisCfg model) {
@@ -37,7 +38,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
 				PreparedStatement preState = con.prepareStatement(
-						"insert into real_his_cfg(data_id,account_id,plc_id,`name`,addr,addr_type,`describe`,digit_count,data_limit,his_cycle,data_type,state,create_date,update_date,bind_state)values(?,?,?,?,?,?,?,?,?,?,?,?,current_timestamp(),current_timestamp(),1);",
+						"insert into real_his_cfg(data_id,account_id,plc_id,`name`,addr,addr_type,`describe`,digit_count,data_limit,his_cycle,data_type,state,create_date,update_date,bind_state,device_id,rid)values(?,?,?,?,?,?,?,?,?,?,?,?,current_timestamp(),current_timestamp(),1,?,?);",
 						Statement.RETURN_GENERATED_KEYS);
 				preState.setLong(1, model.data_id);
 				preState.setLong(2, model.account_id);
@@ -51,7 +52,8 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 				preState.setInt(10, model.his_cycle);
 				preState.setInt(11, model.data_type);
 				preState.setInt(12, model.state);
-
+				preState.setLong(13, model.device_id);
+				preState.setString(14, model.rid);
 				return preState;
 			}
 		}, key);
@@ -61,11 +63,11 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 	@Override
 	public boolean updateRealHisCfg(RealHisCfg model) {
-		String sql = "update real_his_cfg SET data_id=?,account_id=?,plc_id=?,`name`=?,addr=?,addr_type=?,`describe`=?,digit_count=?,data_limit=?,his_cycle=?,data_type=?,state=?,update_date=current_timestamp(),bind_state=? where id=?";
+		String sql = "update real_his_cfg SET data_id=?,account_id=?,plc_id=?,`name`=?,addr=?,addr_type=?,`describe`=?,digit_count=?,data_limit=?,his_cycle=?,data_type=?,state=?,update_date=current_timestamp(),bind_state=?,device_id=?,rid=? where id=?";
 		jdbcTemplate.update(sql,
 				new Object[] { model.data_id, model.account_id, model.plc_id, model.name, model.addr, model.addr_type,
 						model.describe, model.digit_count, model.data_limit, model.his_cycle, model.data_type,
-						model.state, model.bind_state, model.id });
+						model.state, model.bind_state, model.device_id,model.rid,model.id });
 
 		return true;
 	}
@@ -95,6 +97,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 	@Override
 	public void delRealHisCfg(long id) {
+		
 		String sql = "delete from  real_his_cfg r where r.id=?";
 		jdbcTemplate.update(sql, new Object[] { id });
 	}
@@ -238,6 +241,10 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			condition.append(" and r.state = ? ");
 			params.add(filter.state);
 
+		}
+		if (!CommonUtils.isNullOrEmpty(filter.rid)) {
+			condition.append(" and r.rid like ? ");
+			params.add("%" + filter.rid + "%");
 		}
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
@@ -456,7 +463,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			params.add(boxId);
 		}
 		if (null != groupId) {
-			fromStr += ", account_dir_ref f";
+			fromStr += ", account_dir_rel f";
 			condition.append(" and r.id=f.ref_id and f.acc_dir_id = ?");
 			params.add(groupId);
 		}
@@ -497,7 +504,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 		Object groupId = bParams.get("groupId");
 		if (null != groupId) {
-			fromStr += ", account_dir_ref f";
+			fromStr += ", account_dir_rel f";
 			condition.append(" and r.id=f.ref_id and f.acc_dir_id = ?");
 			params.add(groupId);
 		}
@@ -517,10 +524,30 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	}
 
 	@Override
-	public List<RealHisCfgDevice> getRealHisCfgListByState(int state){
-		String sql = "select " + SEL_COL + " from real_his_cfg r ,device d, plc_info p where d.device_id=p.device_id and p.plc_id=r.plc_id and r.state = ?";
-		List<RealHisCfgDevice> list = jdbcTemplate.query(sql, new Object[]{state}, new DefaultRealCfgDeviceRowMapper());
+	public List<RealHisCfgExtend> getRealHisCfgListByState(int state){
+		String sql = "select " + SEL_COL + ",d.machine_code from real_his_cfg r ,device d, plc_info p where d.device_id=p.device_id and p.plc_id=r.plc_id and r.state = ?";
+		List<RealHisCfgExtend> list = jdbcTemplate.query(sql, new Object[]{state}, new DefaultRealCfgExtendRowMapper());
 		return list;
+	}
+
+	@Override
+	public boolean batchUpdateState(final List<int[]> updList){
+		if(null == updList || updList.size() == 0){
+			return false;
+		}
+		String sql = "update real_his_cfg set state = ? where id = ?";
+		jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+			public int getBatchSize() {
+				return updList.size();
+				//这个方法设定更新记录数，通常List里面存放的都是我们要更新的，所以返回list.size();
+			}
+			public void setValues(PreparedStatement ps, int i)throws SQLException {
+				int[] arg = updList.get(i);
+				ps.setInt(1, arg[0]);
+				ps.setInt(2, arg[1]);
+			}
+		});
+		return true;
 	}
 
 	public static final class DefaultRealHisCfgRowMapper implements RowMapper<RealHisCfg> {
@@ -544,6 +571,9 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.state = rs.getInt("state");
 			model.create_date = rs.getTimestamp("create_date");
 			model.update_date = rs.getTimestamp("update_date");
+			model.rid= rs.getString("rid");
+			model.device_id = rs.getLong("device_id");
+			model.bind_state=rs.getInt("bind_state");
 
 			return model;
 		}
@@ -571,6 +601,38 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.update_date = rs.getTimestamp("update_date");
 			model.machine_code = rs.getString("machine_code");
 			model.ref_alais = rs.getString("ref_alais");
+			model.rid= rs.getString("rid");
+			model.device_id = rs.getLong("device_id");
+			model.bind_state=rs.getInt("bind_state");
+			return model;
+		}
+	}
+
+	public static final class DefaultRealCfgExtendRowMapper implements RowMapper<RealHisCfgExtend> {
+
+		@Override
+		public RealHisCfgExtend mapRow(ResultSet rs, int i) throws SQLException {
+			RealHisCfgExtend model = new RealHisCfgExtend();
+			model.id = rs.getLong("id");
+			model.addr_id = model.id;
+			model.data_id = rs.getLong("data_id");
+			model.account_id = rs.getLong("account_id");
+			model.plc_id = rs.getLong("plc_id");
+			model.com = model.plc_id+"";
+			model.name = rs.getString("name");
+			model.addr = rs.getString("addr");
+			model.addr_type = rs.getInt("addr_type");
+			model.describe = rs.getString("describe");
+			model.digit_count = rs.getString("digit_count");
+			model.data_limit = rs.getString("data_limit");
+			model.his_cycle = rs.getInt("his_cycle");
+			model.data_type = rs.getInt("data_type");
+			model.state = rs.getInt("state");
+			model.create_date = rs.getTimestamp("create_date");
+			model.update_date = rs.getTimestamp("update_date");
+			model.upd_time = model.update_date;
+			model.machine_code = rs.getString("machine_code");
+			model.ref_alais = rs.getString("ref_alais");
 			return model;
 		}
 	}
@@ -593,11 +655,14 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.his_cycle = rs.getInt("his_cycle");
 			model.data_type = rs.getInt("data_type");
 			model.state = rs.getInt("state");
+			model.rid= rs.getString("rid");
 			model.create_date = rs.getTimestamp("create_date");
 			model.update_date = rs.getTimestamp("update_date");
 			model.machine_code = rs.getString("machine_code");
 			model.ref_alais = rs.getString("ref_alais");
 			model.role_type = rs.getInt("role_type");
+			model.device_id = rs.getLong("device_id");
+			model.bind_state=rs.getInt("bind_state");
 			return model;
 		}
 	}
@@ -610,6 +675,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.id = rs.getLong("id");
 			model.data_id = rs.getLong("data_id");
 			model.account_id = rs.getLong("account_id");
+			model.device_id = rs.getLong("device_id");
 			model.plc_id = rs.getLong("plc_id");
 			model.name = rs.getString("name");
 			model.addr = rs.getString("addr");
@@ -620,6 +686,8 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.his_cycle = rs.getInt("his_cycle");
 			model.data_type = rs.getInt("data_type");
 			model.state = rs.getInt("state");
+			model.rid= rs.getString("rid");
+			model.bind_state=rs.getInt("bind_state");
 			model.create_date = rs.getTimestamp("create_date");
 			model.update_date = rs.getTimestamp("update_date");
 			model.machine_code = rs.getString("machine_code");

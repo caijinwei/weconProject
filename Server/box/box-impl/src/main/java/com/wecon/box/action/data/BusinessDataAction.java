@@ -40,6 +40,8 @@ public class BusinessDataAction {
     private RealHisCfgDataApi realHisCfgDataApi;
     @Autowired
     private DeviceApi deviceApi;
+    @Autowired
+    private AccountDirApi accountDirApi;
     /**
      * 获取实时数据
      * @param param
@@ -256,6 +258,87 @@ public class BusinessDataAction {
         json.put("list", result);
         return new Output(json);
     }
+
+    /**
+     * 获取分组数据
+     * @return
+     */
+    @RequestMapping("data/group")
+    @WebApi(forceAuth = true, master = true)
+    public Output getGroupData(@Valid BusinessDataParam param) {
+        Client client = AppContext.getSession().client;
+        List<AccountDir> accountDirList = accountDirApi.getAccountDirList(client.userId, param.type);
+        JSONArray arr = new JSONArray();
+        if(null != accountDirList){
+            for(AccountDir ad : accountDirList){
+                JSONObject data = new JSONObject();
+                data.put("groupId", ad.id);
+                data.put("groupName", ad.name);
+                arr.add(data);
+            }
+        }
+        JSONObject json = new JSONObject();
+        json.put("list", arr);
+        return new Output(json);
+    }
+
+    /**
+     * 获取监控点列表
+     * @return
+     */
+    @RequestMapping("data/monitors")
+    @WebApi(forceAuth = true, master = true)
+    public Output getMonitorData(@Valid BusinessDataParam param) {
+        Client client = AppContext.getSession().client;
+        RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
+        Page<Map<String, Object>> realHisCfgDataPage = null;
+        Map<String, Object> bParams = new HashMap<String, Object>();
+        if(param.boxId != 0){
+            bParams.put("boxId", param.boxId);
+        }
+        param.pageIndex = 1;
+        param.pageSize = Integer.MAX_VALUE;
+        /** 管理者账号 **/
+        if (client.userInfo.getUserType() == 1) {
+            realHisCfgFilter.addr_type = -1;
+            realHisCfgFilter.data_type = 0;
+            realHisCfgFilter.his_cycle = -1;
+            realHisCfgFilter.account_id = client.userId;
+            realHisCfgDataPage = realHisCfgDataApi.getRealHisCfgDataPage(realHisCfgFilter, bParams, param.pageIndex, param.pageSize);
+        }
+        /** 视图账号 **/
+        else if (client.userInfo.getUserType() == 2) {
+            ViewAccountRoleFilter viewAccountRoleFilter = new ViewAccountRoleFilter();
+            viewAccountRoleFilter.view_id = client.userId;
+            viewAccountRoleFilter.cfg_type = 1;
+            viewAccountRoleFilter.role_type = -1;
+            viewAccountRoleFilter.data_type = 0;
+            realHisCfgDataPage = realHisCfgDataApi.getRealHisCfgDataPage(viewAccountRoleFilter, bParams, param.pageIndex, param.pageSize);
+        }
+        List<Map<String, Object>> realHisCfgDataList = realHisCfgDataPage.getList();
+        JSONObject json = new JSONObject();
+        JSONArray arr = new JSONArray();
+        /*if (realHisCfgDataList == null || realHisCfgDataList.size() < 1) {
+            return new Output(json);
+        }
+        for(Map<String, Object> row : realHisCfgDataList){
+            JSONObject data = new JSONObject();
+            data.put("monitorName", row.get("monitorName"));
+            data.put("number", row.get("number"));
+            data.put("monitorTime", row.get("monitorTime"));
+            arr.add(data);
+        }*/
+        //假数据，后面要删除
+        for(int p=1;p<5;p++){
+            JSONObject data = new JSONObject();
+            data.put("monitorId", p);
+            data.put("monitorName", "监控点"+p);
+            arr.add(data);
+        }
+
+        json.put("list", arr);
+        return new Output(json);
+    }
 }
 
 class BusinessDataParam {
@@ -273,6 +356,8 @@ class BusinessDataParam {
     public int pageIndex;
     @Label("每页条数")
     public int pageSize;
+    @Label("监控点分组类型")
+    public int type;
 
     public void setBoxId(long boxId) {
         this.boxId = boxId;
@@ -301,4 +386,9 @@ class BusinessDataParam {
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
     }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
 }

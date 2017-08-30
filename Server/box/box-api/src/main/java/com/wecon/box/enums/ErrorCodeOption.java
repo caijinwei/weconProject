@@ -39,6 +39,7 @@ public enum ErrorCodeOption {
     Is_Exist_PlcPort("通讯协议被占用",300012),
     Is_Not_Params_DeviceID("没有输入参数",300013),
 	
+    Get_Groupid_Error("获取数组ID错误",50001),
 	
     Monitor_Existed("该分组下已经存在该监控点",60001),
 	Get_Data_Error("获取参数异常",60002);

@@ -5,6 +5,7 @@ import com.wecon.box.entity.PlcExtend;
 import com.wecon.box.entity.PlcInfo;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.restful.core.BusinessException;
+import com.wecon.common.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -98,7 +99,12 @@ public class PlcInfoImpl implements PlcInfoApi {
 
     @Override
     public PlcInfo getPlcInfo(long plc_id) {
-        return null;
+    	String sql = "select " + SEL_COL + " from plc_info where plc_id=?";
+		List<PlcInfo> list = jdbcTemplate.query(sql, new Object[] { plc_id }, new DefaultPlcInfoRowMapper());
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+		return null;
     }
 
     @Override
@@ -125,7 +131,7 @@ public class PlcInfoImpl implements PlcInfoApi {
 
 	@Override
 	public List<PlcExtend> getPlcExtendListByState(int state){
-		String sql = "select p.*, d.machine_code from plc_info p, device d where p.device_id = d.device_id state = ?";
+		String sql = "select p.*, d.machine_code from plc_info p, device d where p.device_id = d.device_id and p.state = ?";
 		List<PlcExtend> list = jdbcTemplate.query(sql, new Object[] { state }, new DefaultPlcExtendRowMapper());
 		if (!list.isEmpty()) {
 			return list;
@@ -134,7 +140,10 @@ public class PlcInfoImpl implements PlcInfoApi {
 	}
 
 	@Override
-	public boolean batchUpdatePlcState(final List<int[]> updList){
+	public boolean batchUpdateState(final List<int[]> updList){
+		if(null == updList || updList.size() == 0){
+			return false;
+		}
 		String sql = "update plc_info set state = ? where plc_id = ?";
 		jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
 			public int getBatchSize() {
@@ -238,6 +247,7 @@ public static final class DefaultPlcInfoRowMapper implements RowMapper<PlcInfo> 
 		public PlcExtend mapRow(ResultSet rs, int i) throws SQLException {
 			PlcExtend model = new PlcExtend();
 			model.plc_id = rs.getLong("plc_id");
+			model.com = model.plc_id+"";
 			model.device_id = rs.getLong("device_id");
 			model.type = rs.getString("type");
 			model.driver = rs.getString("driver");
@@ -263,6 +273,7 @@ public static final class DefaultPlcInfoRowMapper implements RowMapper<PlcInfo> 
 			model.state = rs.getInt("state");
 			model.create_date = rs.getTimestamp("create_date");
 			model.update_date = rs.getTimestamp("update_date");
+			model.upd_time = TimeUtil.getYYYYMMDDHHMMSSDate(model.update_date);
 			model.machine_code = rs.getString("machine_code");
 			return model;
 		}
