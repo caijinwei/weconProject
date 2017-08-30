@@ -54,7 +54,7 @@ public class PlcInfoImpl implements PlcInfoApi {
         Object args[] = {model.device_id, model.type, model.driver, model.box_stat_no, model.plc_stat_no, model.port, model.comtype, model.baudrate, model.stop_bit, model.data_length, model.check_bit,
                 model.retry_times, model.wait_timeout, model.rev_timeout, model.com_stepinterval, model.com_iodelaytime, model.rev_timeout, model.net_port, model.net_type, model.net_isbroadcast, model.net_broadcastaddr,
                 model.net_ipaddr, model.state};
-        System.out.println("有执行到这边么");
+        System.out.println("--------------------------"+args.toString());
         return jdbcTemplate.update(sql, args);
 
     }

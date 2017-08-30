@@ -2,6 +2,7 @@ package com.wecon.box.api;
 
 import com.wecon.box.entity.Device;
 import com.wecon.box.entity.Page;
+import com.wecon.box.filter.DeviceDir;
 import com.wecon.box.filter.DeviceFilter;
 import org.springframework.stereotype.Component;
 
@@ -88,4 +89,9 @@ public interface DeviceApi {
      * @return
      */
     List<Map<String, Object>> getDevicesByGroup(long acc_id);
+
+    /*
+    *超级管理员展示数据
+    * */
+    public Page<DeviceDir> showAllDeviceDir(String accountId,int pageNum,int pageSize);
 }
