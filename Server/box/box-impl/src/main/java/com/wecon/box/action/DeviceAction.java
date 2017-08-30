@@ -3,11 +3,9 @@ package com.wecon.box.action;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.*;
-import com.wecon.box.entity.AccountDir;
-import com.wecon.box.entity.AccountDirRel;
-import com.wecon.box.entity.DevBindUser;
-import com.wecon.box.entity.Device;
+import com.wecon.box.entity.*;
 import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.box.filter.DeviceDir;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.BusinessException;
@@ -106,7 +104,7 @@ public class DeviceAction {
         model.device_id = device_id;
         devBindUserApi.saveDevBindUser(model);
         /*
-		 * 有选择分组操作 默认分组 ref_id=0
+         * 有选择分组操作 默认分组 ref_id=0
 		 *
 		 */
         if (acc_dir_id != 0) {
@@ -182,17 +180,25 @@ public class DeviceAction {
 
     @Label("用户拖拽，更新用户分组")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
-    @RequestMapping(value ="dragToUpdateDir")
-    public Output dragToUpdateDir(@RequestParam("target_acc_dir_id") Integer targetAccDirId, @RequestParam("target_ref_id") Integer targetRefId, @RequestParam("from_acc_dir_id") Integer fromAccDirId, @RequestParam("from_ref_id") Integer fromRefId)
-    {
-        AccountDirRel newAccDirRel=new AccountDirRel();
-        newAccDirRel.acc_dir_id=targetAccDirId;
-        newAccDirRel.ref_id=targetRefId;
-        AccountDirRel oldAccDirRel=new AccountDirRel();
-        oldAccDirRel.acc_dir_id=fromAccDirId;
-        oldAccDirRel.ref_id=fromRefId;
-        accountDirRelApi.updateAccountDirRel(newAccDirRel,oldAccDirRel);
+    @RequestMapping(value = "dragToUpdateDir")
+    public Output dragToUpdateDir(@RequestParam("target_acc_dir_id") Integer targetAccDirId, @RequestParam("target_ref_id") Integer targetRefId, @RequestParam("from_acc_dir_id") Integer fromAccDirId, @RequestParam("from_ref_id") Integer fromRefId) {
+        AccountDirRel newAccDirRel = new AccountDirRel();
+        newAccDirRel.acc_dir_id = targetAccDirId;
+        newAccDirRel.ref_id = targetRefId;
+        AccountDirRel oldAccDirRel = new AccountDirRel();
+        oldAccDirRel.acc_dir_id = fromAccDirId;
+        oldAccDirRel.ref_id = fromRefId;
+        accountDirRelApi.updateAccountDirRel(newAccDirRel, oldAccDirRel);
         return new Output();
     }
 
+    @Label("超级管理员查看所有device盒子")
+    @WebApi(forceAuth = true, master = true, authority = {"0"})
+    @RequestMapping(value = "showAllDeviceDir")
+    public Output showAllDeviceDir(@RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize ,@RequestParam("accountId") String accountId) {
+        Page<DeviceDir> page = deviceApi.showAllDeviceDir(accountId,pageNum, pageSize);
+        JSONObject data = new JSONObject();
+        data.put("page", page);
+        return new Output(data);
+    }
 }
