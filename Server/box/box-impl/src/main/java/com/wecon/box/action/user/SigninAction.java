@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.constant.ConstKey;
 import com.wecon.box.entity.Account;
 import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.box.enums.OpTypeOption;
+import com.wecon.box.enums.ResTypeOption;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.BusinessException;
@@ -51,8 +53,12 @@ public class SigninAction extends UserBaseAction {
         String sid = accountApi.createSession(user, client.appid, client.fuid, client.ip, client.timestamp, expire);
         JSONObject data = new JSONObject();
         data.put("sid", sid);
-        data.put("utype",user.type);
-//        data.put("uid", user.account_id);
+        data.put("utype", user.type);
+
+        //<editor-fold desc="操作日志">
+        dbLogUtil.addOperateLog(OpTypeOption.Signin, ResTypeOption.Account, user.account_id, null);
+        //</editor-fold>
+
         return new Output(data);
     }
 }

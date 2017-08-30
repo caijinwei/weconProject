@@ -163,7 +163,7 @@ public class AccountImpl implements AccountApi {
     @Override
     public boolean updateAccountState(Account model) {
         String sql = "update account set state=?,update_date=current_timestamp()  where account_id=?";
-        jdbcTemplate.update(sql, new Object[]{ model.state, model.account_id});
+        jdbcTemplate.update(sql, new Object[]{model.state, model.account_id});
         return true;
     }
 
@@ -317,6 +317,7 @@ public class AccountImpl implements AccountApi {
                     }, key);
                     //从主键持有者中获得主键值
                     long view_id = key.getKey().longValue();
+                    viewAccount.account_id = view_id;
 
                     //增加关联
                     jdbcTemplate.update("insert into account_relation(manager_id,view_id) values (?,?);", new Object[]{managerId, view_id});

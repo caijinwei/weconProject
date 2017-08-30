@@ -1,6 +1,8 @@
 package com.wecon.box.action.user;
 
 import com.wecon.box.api.AccountApi;
+import com.wecon.box.api.LogAccountApi;
+import com.wecon.box.util.DbLogUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -9,4 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class UserBaseAction {
     @Autowired
     protected AccountApi accountApi;
+
+    @Autowired
+    protected DbLogUtil dbLogUtil;
 }

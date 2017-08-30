@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.constant.ConstKey;
 import com.wecon.box.entity.Account;
 import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.box.enums.OpTypeOption;
+import com.wecon.box.enums.ResTypeOption;
 import com.wecon.box.util.BoxWebConfigContext;
 import com.wecon.box.util.EmailUtil;
 import com.wecon.box.util.VerifyUtil;
@@ -35,6 +37,9 @@ public class ChangeAction extends UserBaseAction {
     @WebApi(forceAuth = true, master = true)
     public Output changePwd(@Valid ChgPwdParam param) {
         accountApi.updateAccountPwd(AppContext.getSession().client.userId, param.oldpwd, param.newpwd);
+        //<editor-fold desc="操作日志">
+        dbLogUtil.addOperateLog(OpTypeOption.ChgPwd, ResTypeOption.Account, AppContext.getSession().client.userId, null);
+        //</editor-fold>
         return new Output();
     }
 
@@ -59,7 +64,11 @@ public class ChangeAction extends UserBaseAction {
         String url = BoxWebConfigContext.boxWebConfig.getEmailActiveUrl() + "?t=2&u=" + user.account_id + "&token=" + token;
         String content = "<h1>请点击下面链接完成激活操作！</h1><h3><a href='" + url + "'>" + url + "</a></h3>";
         EmailUtil.send(param.email, "邮箱更改激活邮件", content);
-
+        //<editor-fold desc="操作日志">
+        Account newUser = accountApi.getAccount(client.userId);
+        newUser.email = param.email;
+        dbLogUtil.updOperateLog(OpTypeOption.ChgEmail, ResTypeOption.Account, user.account_id, user, newUser);
+        //</editor-fold>
         return new Output();
     }
 
@@ -78,10 +87,14 @@ public class ChangeAction extends UserBaseAction {
         }
         Client client = AppContext.getSession().client;
         Account user = accountApi.getAccount(client.userId);
+        Account oldUser = accountApi.getAccount(client.userId);
         user.phonenum = param.phonenum;
         accountApi.updateAccountPhone(user);
         JSONObject data = new JSONObject();
         data.put("phonenum", user.phonenum);
+        //<editor-fold desc="操作日志">
+        dbLogUtil.updOperateLog(OpTypeOption.ChgPhone, ResTypeOption.Account, user.account_id, oldUser, user);
+        //</editor-fold>
         return new Output(data);
     }
 }
