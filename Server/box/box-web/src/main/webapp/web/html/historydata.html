@@ -211,7 +211,7 @@
 					<table class="table table-bordered">
 						<caption>
 							<button type="button" class="btn btn-primary" data-toggle="modal"
-								data-target="#dataRecord" ng-click="showAllPlcConf(0);">
+								data-target="#dataRecord" ng-click="addmonitor();">
 								<span class="glyphicon glyphicon-pencil"></span> 数据登记
 							</button>
 						</caption>
@@ -305,7 +305,7 @@
 								<span class="col-md-3">连接设备</span> <select class="col-md-9"
 									id="conid" style="height: 30px;">
 									<option ng-repeat="x in infoDatas"
-										ng-click="condevice(x.plcId)" value="{{x.plcId}}">{{$index+1}}-{{x.port}}</option>
+										value="{{x.plcId}}">{{$index+1}}-{{x.port}}</option>
 								</select>
 							</div>
 							<div class="row col-md-11 col-md-offset-1"
@@ -319,13 +319,13 @@
 								style="margin: 10px 0;">
 								<span class="col-md-3">地址类型</span> <select class="col-md-3"
 									id="addrtypeid" style="height: 30px;">
-									<option ng-repeat="x in allAddrs" ng-click="change();"
+									<option ng-repeat="x in allAddrs" 
 										value="{{x.addrkey}}">{{x.addrkey==0?"位地址":x.addrkey==1?"字节地址":x.addrkey==2?"字地址":"双字"}}</option>
 
 								</select> <span class="col-md-3">寄存器地址</span> <select id="registerid"
 									class="col-md-3" style="height: 30px;">
 									<option ng-repeat="x in addrvalues"
-										ng-click="changeaddr($event);" value="{{x.addrvalue}}">{{x.addrvalue}}</option>
+									value="{{x.addrvalue}}">{{x.addrvalue}}</option>
 
 								</select>
 							</div>

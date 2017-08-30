@@ -358,6 +358,12 @@ appModule
 					/**
 					 * 连接设备点击响应
 					 */
+					$("#conid").change(function() {
+
+						$scope.condevice($("#conid").val());
+
+					});
+
 					var plcId;
 					$scope.condevice = function(clickplc) {
 						plcId = clickplc;
@@ -385,14 +391,6 @@ appModule
 														$("#addrtypeid")
 																.val(
 																		minfo.addr_type);
-
-														if ($("#addrtypeid")
-																.val() == null) {
-															$("#addrtypeid")
-																	.val(
-																			data.allAddr[0].addrkey);
-
-														}
 														angular
 																.forEach(
 																		$scope.allAddrs,
@@ -415,6 +413,9 @@ appModule
 																minfo.rid);
 														if ($("#registerid")
 																.val() == null) {
+															$("#addrtypeid")
+																	.val(
+																			data.allAddr[0].addrkey);
 
 															$("#registerid")
 																	.val(
@@ -441,30 +442,55 @@ appModule
 										});
 
 					}
-
 					// 地址类型点击
-					$scope.change = function() {
+					$("#addrtypeid").change(function() {
+
+						$scope.changeaddrtype($("#addrtypeid").val());
+
+					});
+					$scope.changeaddrtype = function(value) {
 						angular.forEach($scope.allAddrs, function(data, index,
 								array) {
-							if ($("#addrtypeid").val() == data.addrkey) {
+							if (value == data.addrkey) {
 								$scope.addrvalues = data.addrRid;
 								$("#rangid").val(data.addrRid[0].range);
+								$scope.$apply();
 							}
 
 						})
 
 					}
+
+					$("#registerid").change(function() {
+
+						$scope.changeaddr($("#registerid").val());
+
+					});
 					// 寄存器地址点击
-					$scope.changeaddr = function(event) {
-						console.log("changeaddr");
+					$scope.changeaddr = function(value) {
 						angular.forEach($scope.addrvalues, function(data,
 								index, array) {
-							if ($(event.target).val() == data.addrvalue) {
+							if (value == data.addrvalue) {
 								$("#rangid").val(data.range);
 
 							}
 
 						})
+
+					}
+					var mid = -1;
+					var minfo = null;
+					// 获取修改监控点的信息
+					$scope.editmonitor = function(model) {
+						minfo = model;
+						mid = model.id;
+						$scope.showAllPlcConf(1);
+
+					}
+					$scope.addmonitor = function() {
+
+						mid = -1;
+						$scope.showAllPlcConf(0);
 
 					}
 
