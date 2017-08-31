@@ -21,5 +21,11 @@ public interface AlarmTriggerApi {
 	 * @return
 	 */
 	public List<AlarmTrigger> getAlarmTrigger(AlarmTriggerFilter filter);
+	
+	
+	public AlarmTrigger getAlarmTrigger(long alarmtrig_id);
+	public boolean upAlarmTrigger(AlarmTrigger alarmTrigger);
+	public void saveAlarmTrigger(List<AlarmTrigger> listalarmTrigger);
+	public void delAlarmTrigger(long alarmcfg_id);
 
 }

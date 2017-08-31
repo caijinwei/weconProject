@@ -1,10 +1,12 @@
 package com.wecon.box.impl;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -21,6 +23,26 @@ public class AlarmTriggerImpl implements AlarmTriggerApi {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	private final String SEL_COL = "alarmtrig_id,alarmcfg_id,type,value,create_date,update_date";
+
+	@Override
+	public void saveAlarmTrigger(final List<AlarmTrigger> listalarmTrigger) {
+
+		String sql = "insert into alarm_trigger (alarmcfg_id,type,value,create_date,update_date)values(?,?,?,current_timestamp(),current_timestamp());";
+		jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+
+			@Override
+			public void setValues(PreparedStatement ps, int i) throws SQLException {
+				ps.setLong(1, listalarmTrigger.get(i).alarmcfg_id);
+				ps.setInt(2, listalarmTrigger.get(i).type);
+				ps.setString(3, listalarmTrigger.get(i).value);
+			}
+
+			@Override
+			public int getBatchSize() {
+				return listalarmTrigger.size();
+			}
+		});
+	}
 
 	@Override
 	public List<AlarmTrigger> getAlarmTrigger(AlarmTriggerFilter filter) {
@@ -51,6 +73,33 @@ public class AlarmTriggerImpl implements AlarmTriggerApi {
 
 	}
 
+	@Override
+	public AlarmTrigger getAlarmTrigger(long alarmtrig_id) {
+
+		String sql = "select" + SEL_COL + "from alarm_trigger where alarmtrig_id=?";
+
+		List<AlarmTrigger> list = jdbcTemplate.query(sql, new Object[] { alarmtrig_id },
+				new DefaultAlarmTriggerRowMapper());
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	@Override
+	public boolean upAlarmTrigger(AlarmTrigger alarmTrigger) {
+		if (alarmTrigger == null) {
+			return false;
+		}
+		String sql = "update alarm_trigger set alarmcfg_id=?,type=?,value=?,update_date=current_timestamp() where alarmtrig_id = ?";
+
+		jdbcTemplate.update(sql, new Object[] { alarmTrigger.alarmcfg_id, alarmTrigger.type, alarmTrigger.value,
+				alarmTrigger.alarmtrig_id });
+
+		return true;
+	}
+
 	public static final class DefaultAlarmTriggerRowMapper implements RowMapper<AlarmTrigger> {
 
 		@Override
@@ -65,6 +114,13 @@ public class AlarmTriggerImpl implements AlarmTriggerApi {
 
 			return model;
 		}
+	}
+
+	@Override
+	public void delAlarmTrigger(long alarmcfg_id) {
+		String sql = "delete from  alarm_trigger where alarmcfg_id=?";
+		jdbcTemplate.update(sql, new Object[] { alarmcfg_id });
+
 	}
 
 }

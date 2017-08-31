@@ -30,8 +30,8 @@
 			href="alarmlog.html?device_id={{deviceid}}&device_name={{devicename}}">报警记录</a></li>
 		<li><a
 			href="historydata.html?device_id={{deviceid}}&device_name={{devicename}}">历史数据</a></li>
-		<li ng-if="accounttype==1 && deviceid>0"><a
-			href="remotedownload.html?device_id={{deviceid}}&device_name={{devicename}}">远程下载</a></li>
+		<!-- <li ng-if="accounttype==1 && deviceid>0"><a
+			href="remotedownload.html?device_id={{deviceid}}&device_name={{devicename}}">远程下载</a></li> -->
 		<li ng-if="accounttype==1 && deviceid>0"><a
 			href="baseconfig.html?device_id={{deviceid}}&device_name={{devicename}}">基本配置</a></li>
 	</ul>
@@ -44,8 +44,8 @@
 				ng-click="hisalarm_submit(paginationConf_history.currentPage,paginationConf_history.itemsPerPage)">历史报警</a></li>
 			<li><a href="#alarm-record" data-toggle="tab" ng-cloak
 				ng-if="accounttype==1 && deviceid>0" ng-click="alarm_group()">报警登记</a></li>
-			<li><a href="#alarm-global-setting" data-toggle="tab" ng-cloak
-				ng-if="accounttype==1 && deviceid>0">全局设置</a></li>
+			<!-- <li><a href="#alarm-global-setting" data-toggle="tab" ng-cloak
+				ng-if="accounttype==1 && deviceid>0">全局设置</a></li> -->
 		</ul>
 		<div class="tab-content">
 			<div class="tab-pane active" id="current-alarm">
@@ -156,10 +156,6 @@
 								<td>{{x.state==0?"确认":"未确认"}}</td>
 								<td>{{x.value}}</td>
 								<td>{{x.monitor_time|date:'yyyy-MM-dd HH:mm:ss'}}</td>
-								<!-- <td><a href="#" title="详情"><span
-							class="glyphicon glyphicon-info-sign"></span></a> <a href="#"
-						title="确认"><span class="glyphicon glyphicon-ok"
-							style="margin-left: 5px;"></span></a></td> -->
 							</tr>
 						</tbody>
 					</table>
@@ -176,8 +172,7 @@
 						<caption>
 							<div class="row" style="margin: 10px 0;">
 								<div class="col-md-2">
-									<select id="dataGroupSelect" id="groupSelect"
-										class=" form-control form-inline">
+									<select id="dataGroupSelect" class=" form-control form-inline">
 										<option ng-repeat="x in dir_list" value="{{x.id}}">{{x.name}}</option>
 
 									</select>
@@ -203,34 +198,31 @@
 								<th class="col-md-3">报警内容<span
 									data-action="label_alarmcontent"></span></th>
 								<th class="col-md-2">分组<span data-action="label_group"></span></th>
+								<th class="col-md-2">配置状态<span data-action="label_group"></span></th>
 								<th class="col-md-2">操作<span data-action="label_operation"></span></th>
 							</tr>
 						</thead>
 						<tbody>
-							<tr>
-								<td>1 <a href="#" title="设备已变更或移除"><span
-										class="glyphicon glyphicon-exclamation-sign"
-										style="float: right; color: #ff3a28;"></span></a>
-								</td>
-								<td>1</td>
-								<td>ON</td>
-								<td><span data-action="value_beginrecord"></span></td>
-								<td>默认组</td>
+							<tr ng-repeat="x in listalrmCfgTrigger">
+								<td>{{x.alarmcfg_id}}</td>
+								<td>{{x.name}}</td>
+								<td>{{x.triggerValue}}</td>
+								<td>{{x.text}}</td>
+								<td>{{x.dirName}}</td>
+								<td>{{x.state==0?"已同步盒子":x.state==1?"新增":x.state==2?"已变更":"已删除"}}</td>
 								<td><a href="#" style="text-decoration: none"> <span
 										class="glyphicon glyphicon-edit" data-toggle="modal"
-										data-target="#editGroupName"
+										data-target="#addAlarmRecord" ng-click="editmonitor(x);"
 										style="color: #2889d0; margin: 10px;"></span>
 								</a> <a href="#" style="text-decoration: none"> <span
-										class="glyphicon glyphicon-file" data-toggle="modal"
-										data-target="" style="color: #2889d0; margin: 10px;"></span>
-								</a> <a href="#" style="text-decoration: none"> <span
 										class="glyphicon glyphicon-trash" data-toggle="modal"
-										data-target="#deleteGroup"
+										data-target="#deleteAlarmid" ng-click="delmonitor(x);"
 										style="color: #2889d0; margin: 10px;"></span>
 								</a></td>
 							</tr>
 						</tbody>
 					</table>
+					<tm-pagination conf="paginationConf_alarmcfg"></tm-pagination>
 				</div>
 				<!--分组设置对话框-->
 				<div class="modal" id="alarmGroupSetting" tabindex="-1"
@@ -281,6 +273,29 @@
 									data-dismiss="modal">
 									<span class="glyphicon glyphicon-minus"></span> 取消
 								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--确认删除提示对话框-->
+				<div class="modal" id="deleteAlarmid" tabindex="-1"
+					data-backdrop="false">
+					<div class="modal-dialog modal-sm">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">
+									<span>&times;</span>
+								</button>
+								<h4 class="modal-title">删除报警条目</h4>
+							</div>
+							<div class="modal-body">
+								<span id="delid"></span>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-danger"
+									ng-click="del_alarmcfg();">确认</button>
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">取消</button>
 							</div>
 						</div>
 					</div>
@@ -387,6 +402,13 @@
 									</div>
 									<div class="row col-md-11 col-md-offset-1"
 										style="margin: 10px 0;">
+										<span class="col-md-3">分组</span> <select class="col-md-9"
+											id="selectgroup" style="height: 30px;">
+											<option ng-repeat="x in dir_list" value="{{x.id}}">{{x.name}}</option>
+										</select>
+									</div>
+									<div class="row col-md-11 col-md-offset-1"
+										style="margin: 10px 0;">
 										<span class="col-md-3">连接设备</span> <select class="col-md-9"
 											id="conid" style="height: 30px;">
 											<option ng-repeat="x in infoDatas" value="{{x.plcId}}">{{$index+1}}-{{x.port}}</option>
@@ -438,45 +460,60 @@
 									</div>
 									<div class="row col-md-11 col-md-offset-1"
 										style="margin: 10px 0;">
+										<span class="col-md-3">地址</span><input id="addrid" type="text"
+											class="col-md-9" style="height: 30px; padding-left: 5px;" />
+									</div>
+									<div id="bitsetting" class="row col-md-11 col-md-offset-1"
+										style="margin: 10px 0;">
+										<span class="col-md-3">位设置</span> <label class="radio-inline">
+											<input type="radio" name="bitsetting" value="6" checked>
+											ON
+										</label> <label class="radio-inline"> <input type="radio"
+											name="bitsetting" value="7"> OFF
+										</label>
+									</div>
+									<div id="firstCondition" class="row col-md-11 col-md-offset-1"
+										style="margin: 10px 0; display: none;">
 										<span class="col-md-3">条件</span> <select class="col-md-3"
-											style="height: 30px;">
-											<option>等于</option>
-											<option>不等于</option>
-											<option>大于</option>
-											<option>大于等于</option>
-											<option>小于</option>
-											<option>小于等于</option>
-										</select> <input type="number" class="col-md-3"
+											id="conditiononeid" style="height: 30px;">
+											<option value="0">等于</option>
+											<option value="1">不等于</option>
+											<option value="2">大于</option>
+											<option value="3">大于等于</option>
+											<option value="4">小于</option>
+											<option value="5">小于等于</option>
+										</select> <input type="number" class="col-md-3" id="onenumid"
 											style="height: 30px; padding-left: 5px; margin: 0px 5px;" />
-										<select id="selectWith" class="col-md-2" style="height: 30px;"
-											ng-click="displaySecond()">
-											<option value="none">无</option>
-											<option value="or">或</option>
-											<option value="and">与</option>
+										<select id="selectWith" class="col-md-2" style="height: 30px;">
+											<option value="0">无</option>
+											<option value="1">与</option>
+											<option value="2">或</option>
 										</select>
 									</div>
 									<div id="secondCondition" class="row col-md-11 col-md-offset-1"
 										style="margin: 10px 0; display: none;">
 										<span class="col-md-3"></span> <select class="col-md-3"
-											style="height: 30px;">
-											<option>等于</option>
-											<option>不等于</option>
-											<option>大于</option>
-											<option>大于等于</option>
-											<option>小于</option>
-											<option>小于等于</option>
-										</select> <input type="number" class="col-md-3"
+											id="conditiontwoid" style="height: 30px;">
+											<option value="0">等于</option>
+											<option value="1">不等于</option>
+											<option value="2">大于</option>
+											<option value="3">大于等于</option>
+											<option value="4">小于</option>
+											<option value="5">小于等于</option>
+										</select> <input type="number" class="col-md-3" id="twonumid"
 											style="height: 30px; padding-left: 5px; margin: 0px 5px;" />
 									</div>
 									<div class="row col-md-11 col-md-offset-1"
 										style="margin: 10px 0;">
 										<span class="col-md-3">报警内容</span> <input type="text"
-											class="col-md-9" style="height: 30px; padding-left: 5px;" />
+											id="alarmtextid" class="col-md-9"
+											style="height: 30px; padding-left: 5px;" />
 									</div>
 								</div>
 							</div>
 							<div class="modal-footer">
-								<button type="button" class="btn btn-info">确定</button>
+								<button type="button" class="btn btn-info"
+									ng-click="addupAlarm();">确定</button>
 								<button type="button" class="btn btn-default"
 									data-dismiss="modal">取消</button>
 							</div>
