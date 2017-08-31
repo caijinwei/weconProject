@@ -4,6 +4,7 @@ import com.wecon.box.api.*;
 import com.wecon.box.entity.Device;
 import com.wecon.box.entity.Page;
 import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.box.filter.DeviceDir;
 import com.wecon.box.filter.DeviceFilter;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.core.BusinessException;
@@ -222,34 +223,34 @@ public class DeviceImpl implements DeviceApi {
         return list;
     }
 
-    public List<Map<String, Object>> getDevicesByGroup(long acc_id){
+    public List<Map<String, Object>> getDevicesByGroup(long acc_id) {
         //获取管理员下的分组列表
         List<String[]> groupLst = jdbcTemplate.query("SELECT ad.id, ad.name FROM account_dir ad WHERE ad.type=0 and ad.account_id=?", new Object[]{acc_id}, new RowMapper() {
             @Override
             public Object mapRow(ResultSet rs, int i) throws SQLException {
-                return new String[]{rs.getLong("id")+"", rs.getString("name")};
+                return new String[]{rs.getLong("id") + "", rs.getString("name")};
             }
         });
-        if(null == groupLst){
+        if (null == groupLst) {
             return null;
         }
         //获取管理员下盒子列表
         List<String[]> deviceLst = jdbcTemplate.query("SELECT d.device_id, d.name, d.map, d.dir_id FROM dev_bind_user dbu INNER JOIN device d ON dbu.device_id=d.device_id WHERE dbu.account_id=?", new Object[]{acc_id}, new RowMapper() {
             @Override
             public Object mapRow(ResultSet rs, int i) throws SQLException {
-                return new String[]{rs.getLong("device_id")+"", rs.getString("name"), rs.getString("map"), rs.getLong("dir_id")+""};
+                return new String[]{rs.getLong("device_id") + "", rs.getString("name"), rs.getString("map"), rs.getLong("dir_id") + ""};
             }
         });
-        if(null == deviceLst){
+        if (null == deviceLst) {
             return null;
         }
 
         List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
-        for(String[] group : groupLst){
+        for (String[] group : groupLst) {
             Map<String, Object> m = new HashMap<String, Object>();
             List<Map> l = new ArrayList<Map>();
-            for(String[] device : deviceLst){
-                if(group[0].equals(device[3])){
+            for (String[] device : deviceLst) {
+                if (group[0].equals(device[3])) {
                     Map dm = new HashMap();
                     dm.put("boxId", device[0]);
                     dm.put("boxName", device[1]);
@@ -279,18 +280,17 @@ public class DeviceImpl implements DeviceApi {
 		        * */
                     devBindUserApi.delDevBindUser(accountId, deviceId);
                     /*
-		            * 删除所关联的分组
+                    * 删除所关联的分组
 		            * delete FROM account_dir_rel where ref_id=1 AND acc_dir_id IN (SELECT id FROM account_dir WHERE account_id=1)
 		            * */
                     accountDirRelApi.deleteDeviceRel(deviceId, accountId);
-
                     /*
                     *查询盒子下的监控点
                     * */
-                    ArrayList<Integer>realHisCfgIds=realHisCfgApi.findRealHisCfgIdSBydevice_id(deviceId);
-                    realHisCfgApi.setBind_state(toIntArray(realHisCfgIds),0);
-                    ArrayList<Integer>alarmCfgIds=alarmCfgApi.findAlarmCfgIdSBydevice_id(deviceId);
-                    alarmCfgApi.setBind_state(toIntArray(alarmCfgIds),0);
+                    ArrayList<Integer> realHisCfgIds = realHisCfgApi.findRealHisCfgIdSBydevice_id(deviceId);
+                    realHisCfgApi.setBind_state(toIntArray(realHisCfgIds), 0);
+                    ArrayList<Integer> alarmCfgIds = alarmCfgApi.findAlarmCfgIdSBydevice_id(deviceId);
+                    alarmCfgApi.setBind_state(toIntArray(alarmCfgIds), 0);
                     return true;
                 }
             });
@@ -301,10 +301,58 @@ public class DeviceImpl implements DeviceApi {
         }
         return true;
     }
-    int[] toIntArray(List<Integer> list){
+
+    int[] toIntArray(List<Integer> list) {
         int[] ret = new int[list.size()];
-        for(int i = 0;i <ret.length;i++)
+        for (int i = 0; i < ret.length; i++)
             ret[i] = list.get(i);
         return ret;
     }
+
+    public Page<DeviceDir> showAllDeviceDir(String accountId, int pageNum, int pageSize) {
+        System.out.println("-----------------------"+accountId);
+        StringBuffer condition = new StringBuffer("");
+        if ((!accountId.equals("")) && (accountId != null)) {
+            condition.append(" WHERE c.account_id =" + accountId);
+            System.out.println("---------------------------有执行到这里么 条件"+condition );
+        }
+        String sqlCount = "SELECT  " +
+                "  count(1)  " +
+                "FROM  " +
+                "device a  " +
+                "LEFT JOIN dev_bind_user b ON a.device_id = b.device_id  " +
+                "LEFT JOIN account c ON b.account_id=c.account_id " + condition;
+        Integer count = jdbcTemplate.queryForObject(sqlCount, Integer.class);
+        Page<DeviceDir> page = new Page<DeviceDir>(pageNum, pageSize, count);
+        String sql = "SELECT  " +
+                "a.device_id,a.`name`,a.machine_code,a.`password`,a.dev_model,a.state,a.remark,a.create_date,c.username,c.account_id  " +
+                "FROM  " +
+                "device a  " +
+                "LEFT JOIN dev_bind_user b ON a.device_id = b.device_id  " +
+                "LEFT JOIN account c ON b.account_id=c.account_id   " +
+                condition +
+                "  LIMIT ?,?  ";
+        Object[] args = new Object[]{page.getStartIndex(), page.getPageSize()};
+        List<DeviceDir> list = jdbcTemplate.query(sql, args, new RowMapper<DeviceDir>() {
+            @Override
+            public DeviceDir mapRow(ResultSet resultSet, int i) throws SQLException {
+                DeviceDir model = new DeviceDir();
+                model.create_date = resultSet.getTimestamp("create_date");
+                model.dev_model = resultSet.getString("dev_model");
+                model.device_id = resultSet.getLong("device_id");
+                model.machine_code = resultSet.getString("machine_code");
+                model.name = resultSet.getString("name");
+                model.remark = resultSet.getString("remark");
+                model.password = resultSet.getString("password");
+                model.state = resultSet.getInt("state");
+                model.accountId = resultSet.getLong("account_id");
+                model.username = resultSet.getString("username");
+                return model;
+            }
+        });
+        page.setList(list);
+        return page;
+    }
+
+
 }

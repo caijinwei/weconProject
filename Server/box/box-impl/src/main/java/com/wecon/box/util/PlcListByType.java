@@ -37,7 +37,7 @@ public class PlcListByType {
             plcInfo.comtype = paseInt(c.getAttributes().get("ComType"));
             plcInfo.driver=c.getAttributes().get("Driver");
             //这边是默认值，可输入
-            plcInfo.baudrate = c.getAttributes().get("BoudRate");
+            plcInfo.baudrate = c.getAttributes().get("BoudRate");;
             plcInfo.wait_timeout = paseInt(c.getAttributes().get("WaitTimeout"));
             plcInfo.rev_timeout = paseInt(c.getAttributes().get("RevTimeout"));
             plcInfo.box_stat_no = paseInt(c.getAttributes().get("PlcStatNo"));

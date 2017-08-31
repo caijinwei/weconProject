@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.constant.ConstKey;
 import com.wecon.box.entity.Account;
 import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.box.enums.OpTypeOption;
+import com.wecon.box.enums.ResTypeOption;
 import com.wecon.box.util.BoxWebConfigContext;
 import com.wecon.box.util.EmailUtil;
 import com.wecon.box.util.VerifyUtil;
@@ -39,10 +41,14 @@ public class SignupEmailAction extends UserBaseAction {
         //db状态为未激活
         String token = UUID.randomUUID().toString().replace("-", "");
         String redisKey = String.format(ConstKey.REDIS_EMAIL_SIGNUP_TOKEN, user.account_id);
-        RedisManager.set(ConstKey.REDIS_GROUP_NAME, redisKey, token, 3600);
+        RedisManager.set(ConstKey.REDIS_GROUP_NAME, redisKey, token, 3600 * 24 * 7);
         String url = BoxWebConfigContext.boxWebConfig.getEmailActiveUrl() + "?t=1&u=" + user.account_id + "&token=" + token;
         String content = "<h1>请点击下面链接完成激活操作！</h1><h3><a href='" + url + "'>" + url + "</a></h3>";
         EmailUtil.send(param.email, "注册激活邮件", content);
+
+        //<editor-fold desc="操作日志">
+        dbLogUtil.addOperateLog(OpTypeOption.SignupEmail, ResTypeOption.Account, user.account_id, user);
+        //</editor-fold>
 
         return new Output();
     }
@@ -64,12 +70,16 @@ public class SignupEmailAction extends UserBaseAction {
                 //验证成功，修改db状态，直接登录
                 Client client = AppContext.getSession().client;
                 Account user = accountApi.getAccount(param.uid);
+                Account oldUser = accountApi.getAccount(param.uid);
                 user.state = 1;
                 accountApi.updateAccountEmail(user);
 
                 String sid = accountApi.createSession(user, client.appid, client.fuid, client.ip, client.timestamp, ConstKey.SESSION_EXPIRE_TIME);
                 JSONObject data = new JSONObject();
                 data.put("sid", sid);
+                //<editor-fold desc="操作日志">
+                dbLogUtil.updOperateLog(OpTypeOption.EmailActive, ResTypeOption.Account, user.account_id, oldUser, user);
+                //</editor-fold>
                 return new Output(data);
             }
         } else if (param.type == 2) {
@@ -77,8 +87,12 @@ public class SignupEmailAction extends UserBaseAction {
             String redisKey = String.format(ConstKey.REDIS_EMAIL_CHANGE_TOKEN, param.uid);
             Map<String, String> map = RedisManager.hgetAll(ConstKey.REDIS_GROUP_NAME, redisKey);
             Account user = accountApi.getAccount(param.uid);
+            Account oldUser = accountApi.getAccount(param.uid);
             user.email = map.get(param.token);
             accountApi.updateAccountEmail(user);
+            //<editor-fold desc="操作日志">
+            dbLogUtil.updOperateLog(OpTypeOption.EmailActive, ResTypeOption.Account, user.account_id, oldUser, user);
+            //</editor-fold>
             return new Output();
         }
         throw new BusinessException(ErrorCodeOption.EmailActiveError.key, ErrorCodeOption.EmailActiveError.value);

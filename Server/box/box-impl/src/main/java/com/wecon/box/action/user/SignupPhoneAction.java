@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.constant.ConstKey;
 import com.wecon.box.entity.Account;
 import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.box.enums.OpTypeOption;
+import com.wecon.box.enums.ResTypeOption;
 import com.wecon.box.util.SmsUtil;
 import com.wecon.box.util.VerifyUtil;
 import com.wecon.common.redis.RedisManager;
@@ -76,6 +78,9 @@ public class SignupPhoneAction extends UserBaseAction {
         String sid = accountApi.createSession(user, client.appid, client.fuid, client.ip, client.timestamp, ConstKey.SESSION_EXPIRE_TIME);
         JSONObject data = new JSONObject();
         data.put("sid", sid);
+        //<editor-fold desc="操作日志">
+        dbLogUtil.addOperateLog(OpTypeOption.SignupPhone, ResTypeOption.Account, user.account_id, user);
+        //</editor-fold>
         return new Output(data);
     }
 }

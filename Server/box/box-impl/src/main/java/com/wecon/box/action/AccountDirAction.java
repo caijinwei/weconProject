@@ -4,6 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.AccountDirApi;
 import com.wecon.box.entity.AccountDir;
 import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.box.enums.OpTypeOption;
+import com.wecon.box.enums.ResTypeOption;
+import com.wecon.box.util.DbLogUtil;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.BusinessException;
@@ -29,6 +32,9 @@ import java.util.List;
 public class AccountDirAction {
     @Autowired
     private AccountDirApi accountDirApi;
+
+    @Autowired
+    protected DbLogUtil dbLogUtil;
 
     @Description("获取用户指定类型的分组列表")
     @RequestMapping(value = "/getuserdirs")
@@ -60,11 +66,19 @@ public class AccountDirAction {
         model.id = param.id;
         model.name = param.name;
         model.type = param.type;
-        model.device_id=param.device_id;
+        model.device_id = param.device_id;
         if (model.id > 0) {
+            AccountDir modelOld = accountDirApi.getAccountDir(model.id);
+
             accountDirApi.updateAccountDir(model);
+            //<editor-fold desc="操作日志">
+            dbLogUtil.updOperateLog(OpTypeOption.UpdDir, ResTypeOption.Dir, model.id, modelOld, model);
+            //</editor-fold>
         } else {
             accountDirApi.addAccountDir(model);
+            //<editor-fold desc="操作日志">
+            dbLogUtil.addOperateLog(OpTypeOption.AddDir, ResTypeOption.Dir, model.id, model);
+            //</editor-fold>
         }
         return new Output();
     }
@@ -76,6 +90,9 @@ public class AccountDirAction {
         AccountDir dir = accountDirApi.getAccountDir(id);
         if (dir != null && dir.account_id == AppContext.getSession().client.userId) {
             accountDirApi.delAccountDir(id);
+            //<editor-fold desc="操作日志">
+            dbLogUtil.addOperateLog(OpTypeOption.DelDir, ResTypeOption.Dir, id, dir);
+            //</editor-fold>
         } else {
             throw new BusinessException(ErrorCodeOption.OnlyOperateOneselfGroup.key, ErrorCodeOption.OnlyOperateOneselfGroup.value);
         }
@@ -117,7 +134,7 @@ class UserDirParam {
     @Label("设备ID")
     @NotNull
     public Long device_id;
-    
+
 
     public void setId(Long id) {
         this.id = id;
@@ -131,8 +148,8 @@ class UserDirParam {
         this.type = type;
     }
 
-	public void setDevice_id(Long device_id) {
-		this.device_id = device_id;
-	}
-    
+    public void setDevice_id(Long device_id) {
+        this.device_id = device_id;
+    }
+
 }

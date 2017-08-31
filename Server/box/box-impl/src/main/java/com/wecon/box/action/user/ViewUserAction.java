@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.entity.Account;
 import com.wecon.box.entity.Page;
 import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.box.enums.OpTypeOption;
+import com.wecon.box.enums.ResTypeOption;
 import com.wecon.box.filter.AccountFilter;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
@@ -22,7 +24,7 @@ import javax.validation.constraints.NotNull;
 /**
  * Created by zengzhipeng on 2017/8/7.
  */
-@Label("操作视图帐号")
+@Label("操作视图帐号、帐号查询")
 @RestController
 public class ViewUserAction extends UserBaseAction {
 
@@ -43,6 +45,9 @@ public class ViewUserAction extends UserBaseAction {
         viewUserInfo.password = param.password;
         viewUserInfo.state = param.state;
         accountApi.addViewAccount(AppContext.getSession().client.userId, viewUserInfo);
+        //<editor-fold desc="操作日志">
+        dbLogUtil.addOperateLog(OpTypeOption.AddViewUser, ResTypeOption.Account, viewUserInfo.account_id, viewUserInfo);
+        //</editor-fold>
         return new Output();
     }
 
@@ -50,8 +55,12 @@ public class ViewUserAction extends UserBaseAction {
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     public Output chgViewUserState(@Valid ViewUserChgStateParam param) {
         Account viewUserInfo = accountApi.getAccount(param.user_id);
+        Account viewUserInfoOld = accountApi.getAccount(param.user_id);
         viewUserInfo.state = param.state;
         accountApi.updateAccountState(viewUserInfo);
+        //<editor-fold desc="操作日志">
+        dbLogUtil.updOperateLog(OpTypeOption.UpdViewUser, ResTypeOption.Account, viewUserInfo.account_id, viewUserInfoOld, viewUserInfo);
+        //</editor-fold>
         return new Output();
     }
 

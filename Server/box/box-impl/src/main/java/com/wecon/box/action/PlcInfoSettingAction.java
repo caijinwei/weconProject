@@ -50,13 +50,14 @@ public class PlcInfoSettingAction {
         PlcInfo plcInfo = new PlcInfo();
         plcInfo.type = param.type;
         plcInfo.port = param.port;
-
+        plcInfo.state=param.state;
         plcInfo.baudrate = param.baudrate;
         plcInfo.box_stat_no = param.box_stat_no;
         plcInfo.check_bit = param.check_bit;
         plcInfo.com_iodelaytime = param.com_iodelaytime;
         plcInfo.com_stepinterval = param.com_stepinterval;
         plcInfo.comtype = param.comtype;
+        plcInfo.stop_bit=param.stop_bit;
         plcInfo.data_length = param.data_length;
         plcInfo.rev_timeout = param.rev_timeout;
         plcInfo.com_stepinterval = param.com_stepinterval;
@@ -72,6 +73,7 @@ public class PlcInfoSettingAction {
                 throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
             }
         }
+        System.out.println("---------------------------"+plcInfo.stop_bit);
         plcInfoApi.savePlcInfo(plcInfo);
         return new Output();
     }
@@ -123,6 +125,8 @@ public class PlcInfoSettingAction {
         plcInfo.type = param.type;
         plcInfo.port = param.port;
 
+        plcInfo.state=param.state;
+        System.out.println("------------------------------------------------------------------------------state"+plcInfo.state);
         plcInfo.baudrate = param.baudrate;
         plcInfo.box_stat_no = param.box_stat_no;
         plcInfo.check_bit = param.check_bit;
