@@ -11,7 +11,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      * */
     $scope.onInit = function () {
         $scope.device_id = T.common.util.getParameter("device_id");
-        $scope.device_name= T.common.util.getParameter("device_name");
+        $scope.device_name = T.common.util.getParameter("device_name");
         $scope.showBaseInfo();
         $scope.showPlcSetDefault();
     }
@@ -116,11 +116,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 if ($scope.plcInfoById.port == 'Ethernet') {
                     $scope.ethernetShow = 1;
                     $scope.portIfShow = 0;
-                    $('#net_ipaddr').val( $scope.plcInfoById.net_ipaddr);
-                    $('#net_type').val( $scope.plcInfoById.net_type);
-                    $('#net_port').val( $scope.plcInfoById.net_port);
-                    $('#net_isbroadcast').val( $scope.plcInfoById.net_isbroadcast);
-                    $('#net_broadcastaddr').val( $scope.plcInfoById.net_broadcastaddr);
+                    console.log('取出的对象是',$scope.plcInfoById);
+                    $('#net_ipaddr').val($scope.plcInfoById.net_ipaddr);
+                    $('#net_type').val($scope.plcInfoById.net_type);
+                    $('#net_port').val($scope.plcInfoById.net_port);
+                    $('#net_isbroadcast').val($scope.plcInfoById.net_isbroadcast);
+                    $('#net_broadcastaddr').val($scope.plcInfoById.net_broadcastaddr);
                     $("#state").val($scope.plcInfoById.state);
                 } else if ($scope.plcInfoById.port == 'COM1' || $scope.plcInfoById.port == 'COM2') {
                     $scope.ethernetShow = 0;
@@ -128,7 +129,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                     $scope.$apply();
                     $("#comtype").val($scope.plcInfoById.comtype);
                     $("#baudrate").val($scope.plcInfoById.baudrate);
-                    $("#stop_bit").val( $scope.plcInfoById.stop_bit);
+                    $("#stop_bit").val($scope.plcInfoById.stop_bit);
                     $("#data_length").val($scope.plcInfoById.data_length);
                     $("#check_bit").val($scope.plcInfoById.check_bit);
                     $scope.$apply();
@@ -144,8 +145,8 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $("#com_iodelaytime").val($scope.plcInfoById.com_iodelaytime);
                 $("#retry_timeout").val($scope.plcInfoById.retry_timeout);
                 $('#box_stat_no').val($scope.plcInfoById.box_stat_no);
-                $('#plc_stat_no').val( $scope.plcInfoById.plc_stat_no);
-                $('#retry_times').val( $scope.plcInfoById.retry_times);
+                $('#plc_stat_no').val($scope.plcInfoById.plc_stat_no);
+                $('#retry_times').val($scope.plcInfoById.retry_times);
                 $scope.$apply();
             }
             else {
@@ -198,6 +199,11 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             if (params.net_port == "" || params.net_type == "" || params.net_isbroadcast == "" || params.net_broadcastaddr == "" || params.net_ipaddr == "") {
                 alert("配置参数填未填写");
                 return;
+                params.comtype = "0";
+                params.baudrate = "0";
+                params.stop_bit = "0";
+                params.data_length = "0";
+                params.check_bit = "0";
                 if (isValidIP(params.net_ipaddr) != true) {
                     alert("情输入正确的IP地址");
                     return;
@@ -221,6 +227,11 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             params.net_broadcastaddr = "0";
             params.net_ipaddr = "0";
             params.state = "1";
+            params.comtype = "0";
+            params.baudrate = "0";
+            params.stop_bit = "0";
+            params.data_length = "0";
+            params.check_bit = "0";
         }
         /*
          * 当plc_id 不等于0
@@ -326,53 +337,37 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         var temType = $scope.temType;
         $scope.type = temType[$scope.selectedType];
         var type = temType[$scope.selectedType];
-        $('#comtype').val( type[0].comtype);
+        $('#comtype').val(type[0].comtype);
         $('#box_stat_no').val(type[0].box_stat_no);
-        $('#plc_stat_no').val( type[0].plc_stat_no);
+        $('#plc_stat_no').val(type[0].plc_stat_no);
         $('#retry_times').val(type[0].retry_times);
-        $('#wait_timeout').val( type[0].wait_timeout);
-        $('#rev_timeout').val( type[0].rev_timeout);
-        $('#driver').val( type[0].driver);
+        $('#wait_timeout').val(type[0].wait_timeout);
+        $('#rev_timeout').val(type[0].rev_timeout);
+        $('#driver').val(type[0].driver);
         $('#retry_timeout').val(type[0].retry_timeout);
         $('#com_iodelaytime').val("0");
         $('#com_stepinterval').val("0");
         if (type[0].port == 'Ethernet') {
             $scope.ethernetShow = 1;
             $scope.portIfShow = 0;
-            //$scope.$apply();
-            /*
-             * 以太网配置
-             * */
-            /*
-             * 	public int net_port;
-             public int net_type;
-             public int net_isbroadcast;
-             public int net_broadcastaddr;
-             public String net_ipaddr;
-             public int state;
-             * */
-            //$('#net_ipaddr').attr('value', type[0].net_ipaddr);
-            //$('#net_type').attr('value', type[0].net_port);
-            //$('#net_port').attr('value', type[0].net_port);
-            //$('#net_isbroadcast').attr('value', type[0].net_isbroadcast);
-            //$('#net_broadcastaddr').attr('value', type[0].net_broadcastaddr);
-            $('#net_ipaddr').val( $scope.plcInfoById.net_ipaddr);
-            $('#net_type').val( $scope.plcInfoById.net_type);
-            $('#net_port').val( $scope.plcInfoById.net_port);
-            $('#net_isbroadcast').val( $scope.plcInfoById.net_isbroadcast);
-            $('#net_broadcastaddr').val( $scope.plcInfoById.net_broadcastaddr);
+            $('#net_ipaddr').val(type[0].net_ipaddr);
+            $('#net_type').val(type[0].net_type);
+            $('#net_port').val(type[0].net_port);
+            $('#net_isbroadcast').val(type[0].net_isbroadcast);
+            $('#net_broadcastaddr').val(type[0].net_broadcastaddr);
 
         } else if (type[0].port == 'USB') {
             $scope.portIfShow = 0;
             $scope.ethernetShow = 0;
         } else {
+            $scope.portIfShow = 1;
+            $scope.ethernetShow = 0;
             $('#baudrate').val(type[0].baudrate);
             $('#stop_bit').val(type[0].stop_bit);
             $('#data_length').val(type[0].data_length);
             $('#check_bit').val(type[0].check_bit);
-            $scope.portIfShow = 1;
-            $scope.ethernetShow = 0;
         }
+
     }
     /*
      * 解绑plc
@@ -411,25 +406,27 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         }
     }
     $scope.cleanInput = function () {
-        alert("点击");
         $("#addConfig").modal("show");
-        $('#addConfig').on('show.bs.modal', function () {
-            clearForm($.this);
-            //$scope.$apply();
-        })
+        //$('#addConfig').on('show.bs.modal', function () {
+        clearForm($('#addConfig'));
+        //$scope.$apply();
 
-    }
+    };
     function clearForm(form) {
-            $("input[type!='hidden'][name!='device_id']", form).each(function () {
-                var type = this.type;
-                //var tag = this.tagName.toLowerCase();
-                if (type == 'text' || type == 'number') {
-                    this.value = "";
-                }
-            });
-            $("select", form).each(function () {
-                    this.selectedIndex = -1;
-            });
-        };
+        $("input[type!='hidden'][name!='device_id']", form).each(function () {
+            var type = this.type;
+            //var tag = this.tagName.toLowerCase();
+            if (type == 'text' || type == 'number') {
+                this.value = "";
+                $('#plc_id').val("0");
+            }
+        });
+        $("select", form).each(function () {
+            this.selectedIndex = -1;
+        });
+    };
+    $scope.chgPiboxInFoName = function () {
+        var PIBoxName = $('PIBoxName').val();
+    };
 });
 

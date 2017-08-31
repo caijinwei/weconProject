@@ -17,7 +17,6 @@
     <li><a href="datamonitor.html?device_id={{device_id}}&device_name={{device_name}}">数据监控</a></li>
     <li><a href="alarmlog.html?device_id={{device_id}}&device_name={{device_name}}">报警记录</a></li>
     <li><a href="historydata.html?device_id={{device_id}}&device_name={{device_name}}">历史数据</a></li>
-    <li><a href="remotedownload.html?device_id={{device_id}}&device_name={{device_name}}">远程下载</a></li>
     <li class="active"><a href="baseinfo.html?device_id={{device_id}}&device_name={{device_name}}">基本配置</a></li>
 </ul>
 <div class="container-fluid" style="margin-top: 40px;">
@@ -30,12 +29,11 @@
         <div class="tab-pane active" id="base-info">
             <!-- 基本信息展示-->
             <div class="container-fluid" style="margin-top: 20px;font-size: 15px;">
-
                 <div class="row" style="margin-top: 20px;">
                     <span class="col-md-1">PIBox名称</span>
-                    <span style="font-weight: bold;margin-left: 20px;">{{infoData.name}}</span>
+                    <input type="text"  style="font-weight: bold;margin-left: 20px;" id="PIBoxName" name="PIBoxName"
+                           value="{{infoData.name}}">
                 </div>
-
                 <div class="row" style="margin-top: 20px;">
                     <span class="col-md-1">设备ID</span>
                     <span style="font-weight: bold;margin-left: 20px;">{{infoData.device_id}}</span>
@@ -52,7 +50,6 @@
                     <span class="col-md-1">设备型号</span>
                     <span style="font-weight: bold;margin-left: 20px;">{{infoData.dev_model}}</span>
                 </div>
-
                 <div class="row" style="margin-top: 20px;">
                     <span class="col-md-1">地图信息</span>
                     <span style="font-weight: bold;margin-left: 20px;">（{{infoData.map}}）</span>
@@ -81,10 +78,11 @@
                     <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deletePIBox">
                         删除PIBox
                     </button>
+                    <button type="button" class="btn btn-info" ng-click="chgPiboxInFoName()">保存修改</button>
                     <!--<button type="button" class="btn btn-danger">重启PIBox</button>-->
                     <!--<button type="button" class="btn btn-danger">清除PIBox数据</button>-->
                     <!--<button type="button" class="btn btn-warning">强制同步</button>-->
-                    <!--<button type="button" class="btn btn-info">更多</button>-->
+
                     <!--<button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">-->
                     <!--<span class="caret"></span>-->
                     <!--<span class="sr-only">切换下拉菜单</span>-->

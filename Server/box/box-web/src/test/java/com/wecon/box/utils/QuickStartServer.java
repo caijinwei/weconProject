@@ -24,8 +24,7 @@ public class QuickStartServer {
 
         // 设定Spring的profile
         //System.setProperty("spring.profiles.active", "test");
-        try {
-            server.start();
+        try {server.start();
             System.out.println("[INFO] Server running at http://localhost:" + PORT + CONTEXT);
 
             // 等待用户输入回车重载应用.
