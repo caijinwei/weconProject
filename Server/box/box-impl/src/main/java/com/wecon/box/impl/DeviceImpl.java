@@ -87,18 +87,28 @@ public class DeviceImpl implements DeviceApi {
     }
     public boolean updateDeviceName(Integer deviceId,String deviceName,String remark)
     {
+        StringBuffer condition=new StringBuffer("");
         if(null==deviceId)
         {
             throw new BusinessException(ErrorCodeOption.Device_NotFound.key,ErrorCodeOption.Device_NotFound.value);
         }
-        if(null==deviceName||null==remark)
+        if(null==deviceName&&null==remark)
         {
-            deviceName="";
-            remark="";
+            return false;
         }
-        String sql="UPDATE device  SET name=?, remark=? ,update_date=current_timestamp WHERE device_id=?";
-        Object[] args=new Object[]{deviceName,remark,deviceId};
-        if(jdbcTemplate.update(sql,args)<=0)
+        if(null==remark)
+        {
+            condition.append(" name= "+deviceName);
+        }else if(null==deviceName)
+        {
+            condition.append(" remark= "+remark);
+        }else
+        {
+            condition.append(" name="+deviceName+", remark="+remark);
+        }
+
+        String sql="UPDATE device  SET "+condition+" ,update_date=current_timestamp WHERE device_id=?";
+        if(jdbcTemplate.update(sql)<=0)
         {
             return false;
         }
@@ -301,11 +311,6 @@ public class DeviceImpl implements DeviceApi {
 		        * */
                     devBindUserApi.delDevBindUser(accountId, deviceId);
                     /*
-                    * 删除所关联的分组
-		            * delete FROM account_dir_rel where ref_id=1 AND acc_dir_id IN (SELECT id FROM account_dir WHERE account_id=1)
-		            * */
-                    accountDirRelApi.deleteDeviceRel(deviceId, accountId);
-                    /*
                     *查询盒子下的监控点
                     * */
                     ArrayList<Integer> realHisCfgIds = realHisCfgApi.findRealHisCfgIdSBydevice_id(deviceId);
@@ -315,15 +320,21 @@ public class DeviceImpl implements DeviceApi {
 
                     ArrayList<Integer> alarmCfgIds = alarmCfgApi.findAlarmCfgIdSBydevice_id(deviceId);
                     alarmCfgApi.setBind_state(toIntArray(alarmCfgIds), 0);
-                    realHisCfgIds.addAll(alarmCfgIds);
-                    viewAccountRoleApi.deleteViewAccountRoleByCfgId(realHisCfgIds);
-                    //
+                    viewAccountRoleApi.deleteViewAccountRoleByCfgId(alarmCfgIds,2);
+                    viewAccountRoleApi.deleteViewAccountRoleByCfgId(realHisCfgIds,1);
+
+                    /*
+                    * 解除视图账户和监控点分组下的关系
+                    * */
+                    accountDirRelApi.deleteViewAccAndPointRel(1,accountId,realHisCfgIds);
+                    accountDirRelApi.deleteViewAccAndPointRel(2,accountId,realHisCfgIds);
+                    accountDirRelApi.deleteViewAccAndPointRel(3,accountId,alarmCfgIds);
                     return true;
                 }
             });
         } catch (Exception e) {
             Logger.getLogger(AccountImpl.class.getName()).log(Level.SEVERE, null, e);
-            throw new BusinessException(ErrorCodeOption.AccountExisted.key, ErrorCodeOption.AccountExisted.value);
+            throw new BusinessException(ErrorCodeOption.PIBox_Bound_False.key, ErrorCodeOption.PIBox_Bound_False.value);
 //            throw new RuntimeException(e);
         }
         return true;

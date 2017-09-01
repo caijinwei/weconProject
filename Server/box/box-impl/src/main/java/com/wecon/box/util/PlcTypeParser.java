@@ -69,26 +69,38 @@ public class PlcTypeParser {
     }
 
     public static void main(String[] arg) {
-        doParse();
-       // List<String> result = PlcTypeQuerier.getInstance().queryValuesByKey("plctype");
-
-
-           List<Plc> result1= PlcTypeQuerier.getInstance().query("plctype", "");
-        System.out.print(result1);
+//        doParse();
+//       // List<String> result = PlcTypeQuerier.getInstance().queryValuesByKey("plctype");
 //
-//            for(Plc plc:result){
-//                Map<String, AddrDom> a=plc.getAddrs();
 //
-//                AddrDom b=a.get("bitaddr");
-//                System.out.println(b);
+//           List<Plc> result1= PlcTypeQuerier.getInstance().query("plctype", "");
+//        System.out.print(result1);
+////
+////            for(Plc plc:result){
+////                Map<String, AddrDom> a=plc.getAddrs();
+////
+////                AddrDom b=a.get("bitaddr");
+////                System.out.println(b);
+//
+////        	List<Res> sa=b.getResList();
+////        	Map<String, String> ss=sa.get(0).getAttributes();
+////        	String gg=ss.get("Rid");
+////        	System.out.println(gg);
+//
+//
+////        }
+////        System.out.print(result);
 
-//        	List<Res> sa=b.getResList();
-//        	Map<String, String> ss=sa.get(0).getAttributes();
-//        	String gg=ss.get("Rid");
-//        	System.out.println(gg);
-        
-        	
-//        }
-//        System.out.print(result);
+        List<Integer> points=new ArrayList<Integer>();
+        points.add(1);
+        points.add(2);
+        StringBuffer pointIds=new StringBuffer("");
+
+        for(Integer i:points)
+        {
+            pointIds.append(i+",");
+        }
+        System.out.print(pointIds.substring(0,pointIds.length()-1));
+
     }
 }

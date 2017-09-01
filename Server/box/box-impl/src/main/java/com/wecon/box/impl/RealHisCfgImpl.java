@@ -770,6 +770,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	* */
 	public boolean updatePointAccAndState(long accountId,long deviceId)
 	{
+
 		String sql="UPDATE real_his_cfg a SET a.account_id=?,a.bind_state=1 WHERE a.device_id=?;";
 		Object[] args=new Object[]{accountId,deviceId};
 		Integer count=jdbcTemplate.update(sql,args);

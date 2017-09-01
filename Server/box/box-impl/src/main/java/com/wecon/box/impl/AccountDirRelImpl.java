@@ -134,4 +134,24 @@ public class AccountDirRelImpl implements AccountDirRelApi {
         return jdbcTemplate.update(sql, args);
     }
 
+    /*
+    * 解除视图账户和监控点分组下的关系
+    * DELETE FROM	account_dir_rel WHERE	acc_dir_id IN (SELECT	id	FROM	account_dir	WHERE	type=1 AND	account_id IN(SELECT view_id FROM account_relation WHERE manager_id =11)) AND ref_id IN (1,2);
+    * */
+
+    public void deleteViewAccAndPointRel(Integer type,Integer managerId,List<Integer> points)
+    {
+        StringBuffer pointIds=new StringBuffer("");
+        if(points.size()<=0)
+        {
+            return;
+        }
+
+        for(Integer i:points)
+        {
+            pointIds.append(i+",");
+        }
+        String sql="DELETE FROM account_dir_rel WHERE acc_dir_id IN (SELECT id FROM account_dir WHERE type=? AND account_id IN(SELECT view_id FROM account_relation WHERE manager_id =?)) AND ref_id IN ("+pointIds.substring(0,pointIds.length()-1)+")";
+        Object[] args=new Object[]{};
+    }
 }

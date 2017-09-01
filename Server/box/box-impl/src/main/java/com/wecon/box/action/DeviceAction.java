@@ -109,6 +109,7 @@ public class DeviceAction {
         model.account_id = AppContext.getSession().client.userId;
         model.device_id = device_id;
         devBindUserApi.saveDevBindUser(model);
+        deviceApi.updateDeviceName((int)device_id,name,"");
         /*
         * 更新实时历史监控点迁移
         * */
