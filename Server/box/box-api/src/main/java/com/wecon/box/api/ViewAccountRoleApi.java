@@ -4,6 +4,8 @@ import com.wecon.box.entity.*;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * @author lanpenghui 2017年8月1日
  */
@@ -107,4 +109,8 @@ public interface ViewAccountRoleApi {
 	public Page<ViewAccountRoleView> getAlarmViewAccountRoleViewByViewID(long view_id, Integer pageIndex,
 			Integer pageSize);
 
+	/*
+	* 解绑盒子  删除盒子下的视图
+	* */
+	public void deleteViewAccountRoleByCfgId(final List<Integer> cfgIds);
 }

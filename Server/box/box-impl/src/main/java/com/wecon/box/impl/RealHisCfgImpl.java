@@ -725,13 +725,27 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 					ps.setInt(1, realHisCfg[i]);
 					ps.setInt(2, state);
 				}
-
 				@Override
 				public int getBatchSize() {
 					return 0;
 				}
 			});
 		}
+	}
+	/*
+	* 盒子用户改变  监控点迁移
+	* */
+	public boolean updatePointAccAndState(long accountId,long deviceId)
+	{
+		String sql="UPDATE real_his_cfg a SET a.account_id=?,a.bind_state=1 WHERE a.device_id=?;";
+		Object[] args=new Object[]{accountId,deviceId};
+		Integer count=jdbcTemplate.update(sql,args);
+		if(count<=0)
+		{
+			return false;
+		}
+		return true;
+
 	}
 
 }

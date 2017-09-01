@@ -17,7 +17,7 @@
     <li><a href="datamonitor.html?device_id={{device_id}}&device_name={{device_name}}">数据监控</a></li>
     <li><a href="alarmlog.html?device_id={{device_id}}&device_name={{device_name}}">报警记录</a></li>
     <li><a href="historydata.html?device_id={{device_id}}&device_name={{device_name}}">历史数据</a></li>
-    <li class="active"><a href="baseinfo.html?device_id={{device_id}}&device_name={{device_name}}">基本配置</a></li>
+    <li class="active" ng-if="accounttype==1&&device_id>0"><a href="baseinfo.html?device_id={{device_id}}&device_name={{device_name}}">基本配置</a></li>
 </ul>
 <div class="container-fluid" style="margin-top: 40px;">
     <ul class="nav nav-tabs" role="tablist" id="baseConfigTab">

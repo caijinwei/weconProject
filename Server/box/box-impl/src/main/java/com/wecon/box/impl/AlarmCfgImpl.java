@@ -1,15 +1,7 @@
 package com.wecon.box.impl;
 
 import com.wecon.box.api.AlarmCfgApi;
-import com.wecon.box.api.AlarmTriggerApi;
-import com.wecon.box.entity.AlarmCfg;
-import com.wecon.box.entity.AlarmCfgDataAlarmCfg;
-import com.wecon.box.entity.AlarmCfgExtend;
-import com.wecon.box.entity.AlarmCfgTrigger;
-import com.wecon.box.entity.AlarmTrigger;
-import com.wecon.box.entity.Page;
-import com.wecon.box.impl.AlarmCfgDataImpl.DefaultAlarmCfgDataAlarmCfgRowMapper;
-
+import com.wecon.box.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,11 +10,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -292,5 +281,15 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			});
 		}
 	}
+	public boolean updatePointAccAndState(long accountId,long deviceId) {
 
+		Object[] args=new Object[]{accountId,deviceId};
+		String sql="UPDATE alarm_cfg a SET a.account_id = ?, a.bind_state = 1 WHERE a.device_id = ?";
+		Integer count=jdbcTemplate.update(sql,args);
+		if(count<=0)
+		{
+			return false;
+		}
+		return true;
+	}
 }

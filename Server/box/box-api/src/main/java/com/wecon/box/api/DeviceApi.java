@@ -99,4 +99,5 @@ public interface DeviceApi {
     * 更新设备名称和说明
     * */
     boolean updateDeviceName(Integer deviceId,String deviceName,String remark);
+
 }

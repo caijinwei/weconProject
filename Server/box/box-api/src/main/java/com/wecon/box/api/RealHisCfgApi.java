@@ -125,5 +125,9 @@ public interface RealHisCfgApi {
 	* 解绑device
 	* */
 	public void setBind_state(final int[] realHisCfg, final Integer state);
+	/*
+	* 盒子用户改变  监控点迁移
+	* */
+	public boolean updatePointAccAndState(long accountId,long deviceId);
 
 	}

@@ -69,4 +69,9 @@ public interface AlarmCfgApi {
 	public void setBind_state(final int[] alaramCfgId, final Integer state);
 
 	Page<AlarmCfgTrigger> getRealHisCfgDataList(long account_id,long groupId, int pageIndex, int pageSize);
+
+	/*
+	* 盒子跟换用户  监控点迁移
+	* */
+	public boolean updatePointAccAndState(long accountId,long deviceId) ;
 }

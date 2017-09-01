@@ -39,6 +39,10 @@ public class DeviceAction {
     AccountDirRelApi accountDirRelApi;
     @Autowired
     private AccountDirApi accountDirApi;
+    @Autowired
+    AlarmCfgApi alarmCfgApi;
+    @Autowired
+    RealHisCfgApi realHisCfgApi;
 
     /**
      * 盒子基本信息的展示
@@ -50,13 +54,17 @@ public class DeviceAction {
     @RequestMapping(value = "showBaseInfo")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     public Output showBaseInfo(@RequestParam("device_id") Integer device_id) {
-        long account_id = AppContext.getSession().client.userId;
+
+        Client client=AppContext.getSession().client;
+        long account_id =client.userId;
+        Integer userType=client.userInfo.getUserType();
         if (devBindUserApi.isRecord(device_id, account_id) == false) {
             throw new BusinessException(ErrorCodeOption.PiBoxDevice_IsNot_Found.key, ErrorCodeOption.PiBoxDevice_IsNot_Found.value);
         }
         Device device = deviceApi.getDevice(device_id);
         JSONObject data = new JSONObject();
         data.put("device", device);
+        data.put("userType",userType);
         if (device == null || data.size() == 0) {
             throw new BusinessException(ErrorCodeOption.PiBoxDevice_IsNot_Found.key, ErrorCodeOption.PiBoxDevice_IsNot_Found.value);
         }
@@ -79,18 +87,16 @@ public class DeviceAction {
     @RequestMapping(value = "/boundBox")
     public Output boundBox(@RequestParam("machine_code") String machine_code, @RequestParam("password") String password,
                            @RequestParam("name") String name, @RequestParam("acc_dir_id") Integer acc_dir_id) {
-
 		/*
          * 验证是否该盒子是否存在
 		 */
         Device device = deviceApi.getDevice(machine_code);
         if (device == null) {
             throw new BusinessException(ErrorCodeOption.Device_NotFound.key, ErrorCodeOption.Device_NotFound.value);
-        } else if (!device.password.equals(password) || !device.name.equals(name)) {
+        } else if (!device.password.equals(password)) {
             throw new BusinessException(ErrorCodeOption.Device_NotFound.key, ErrorCodeOption.Device_NotFound.value);
         }
         long device_id = device.device_id;
-
 		/*
          * 该设备没有被别的用户绑定过
 		 */
@@ -103,6 +109,12 @@ public class DeviceAction {
         model.account_id = AppContext.getSession().client.userId;
         model.device_id = device_id;
         devBindUserApi.saveDevBindUser(model);
+        /*
+        * 更新实时历史监控点迁移
+        * */
+        alarmCfgApi.updatePointAccAndState(model.account_id,model.device_id);
+        realHisCfgApi.updatePointAccAndState(model.account_id,model.device_id);
+
         /*
          * 有选择分组操作 默认分组 ref_id=0
 		 *
