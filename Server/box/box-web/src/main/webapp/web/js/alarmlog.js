@@ -194,8 +194,10 @@ appModule
 														}
 													}
 												}
-												$("#dataGroupSelect").val(
-														data.alarmGroup[0].id);
+												/*
+												 * $("#dataGroupSelect").val(
+												 * data.alarmGroup[0].id);
+												 */
 												$scope
 														.showAlarmCfg(
 																$scope.paginationConf_alarmcfg.currentPage,

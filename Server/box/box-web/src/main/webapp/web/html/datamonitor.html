@@ -28,7 +28,7 @@
 			href="historydata.html?device_id={{deviceid}}&device_name={{devicename}}">历史数据</a></li>
 		<!-- <li ng-if="accounttype==1 && deviceid>0"><a
 			href="remotedownload.html?device_id={{deviceid}}&device_name={{devicename}}">远程下载</a></li> -->
-		<li ng-if="accounttype==1 && deviceid>0"><a
+		<li ng-cloak ng-if="accounttype==1 && deviceid>0"><a
 			href="baseinfo.html?device_id={{deviceid}}&device_name={{devicename}}">基本配置</a></li>
 	</ul>
 	<div class="container-fluid" style="margin-top: 40px;">
@@ -69,7 +69,7 @@
 								data-target="#dispatchpoint" ng-click="showRestList()">
 								<span class="fa fa-indent"></span> 分配监控点
 							</button>
-						<!-- 	<button type="button" class="btn btn-primary" data-toggle="modal"
+							<!-- 	<button type="button" class="btn btn-primary" data-toggle="modal"
 								ng-cloak ng-if="accounttype==1 && deviceid>0"
 								data-target="#addpoint" ng-click="showAllPlcConf(0);">
 								<span class="glyphicon glyphicon-list"
@@ -90,17 +90,17 @@
 						<tbody>
 							<tr ng-repeat="x in actDatas">
 								<td>{{x.id}}</td>
-								<td>{{x.re_state==0?"在线":"超时"}}</td>
+								<td>{{x.re_state==0?"超时":"在线"}}</td>
 								<td><a href="#" id="act_name_{{x.id}}"
 									ng-click="editable_name(x);mc_change();">{{x.ref_alais==''?x.name:x.ref_alais}}</a></td>
 								<td><a href="#" id="act_value_{{x.id}}"
 									ng-click="editable_value(x);mc_change();">{{x.re_value}}</a></td>
-								<td>{{x.state==0?"已同步盒子":x.state==1?"新增":x.state==2?"已变更":"已删除"}}</td>
+								<td>{{x.state==0?"已同步盒子":x.state==1?"新增":x.state==2?"已变更":x.state==3?"已删除":x.state}}</td>
 								<td>{{x.describe}}</td>
 								<td><a href="#" title="编辑" data-toggle="modal"
-									data-target="#addpoint" ng-cloak ng-if="accounttype==1&& deviceid>0"
-									ng-click="editmonitor(x);"> <span
-										class="glyphicon glyphicon-edit"></span> 编辑
+									data-target="#addpoint" ng-cloak
+									ng-if="accounttype==1&& deviceid>0" ng-click="editmonitor(x);">
+										<span class="glyphicon glyphicon-edit"></span> 编辑
 								</a> <a href="#" title="复制" data-toggle="modal"
 									data-target="#copyDataGroup"
 									ng-click="mc_change();copymonitor(x);"> <span
@@ -113,7 +113,8 @@
 									data-target="#deletePoint" ng-click="mc_change();remonitor(x);">
 										<span class="glyphicon glyphicon-trash"></span> 移除
 								</a> <a href="#" title="删除" data-toggle="modal"
-									data-target="#deletePoint"
+									data-target="#deletePoint" ng-cloak
+									ng-if="accounttype==1&& deviceid>0"
 									ng-click="mc_change();delmonitor(x);"> <span
 										class="glyphicon glyphicon-trash"></span> 删除
 								</a></td>
