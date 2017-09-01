@@ -1,10 +1,9 @@
 package com.wecon.box.api;
 
 import com.wecon.box.entity.AccountDirRel;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
-
-import org.springframework.stereotype.Component;
 
 /**
  * @author lanpenghui 2017年8月1日
@@ -33,8 +32,7 @@ public interface AccountDirRelApi {
 	/**
 	 * 更新别名
 	 * 
-	 * @param acc_dir_id
-	 * @param ref_id
+	 * @param model
 	 * @return
 	 */
 	public boolean upAccountDirRel(AccountDirRel model);
@@ -65,5 +63,12 @@ public interface AccountDirRelApi {
 	 * 更新分组信息
 	 */
 	public int updateAccountDirRel(AccountDirRel newAccDirRel, AccountDirRel oldAccDirRel);
+
+	   /*
+    * 解除视图账户和监控点分组下的关系
+    * DELETE FROM	account_dir_rel WHERE	acc_dir_id IN (SELECT	id	FROM	account_dir	WHERE	type=1 AND	account_id IN(SELECT view_id FROM account_relation WHERE manager_id =11)) AND ref_id IN (1,2);
+    * */
+
+	public void deleteViewAccAndPointRel(Integer type,Integer managerId,List<Integer> points);
 
 }

@@ -331,14 +331,15 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
 	/*
 	* 解绑盒子  删除盒子下的视图
 	* */
-	public void deleteViewAccountRoleByCfgId(final List<Integer> cfgIds)
+	public void deleteViewAccountRoleByCfgId(final List<Integer> cfgIds,final Integer type)
 	{
-		String sql="DELETE FROM view_account_role WHERE cfg_id=?";
+		String sql="DELETE FROM view_account_role WHERE cfg_id=? AND cfg_type=?";
 		if (cfgIds.size() != 0) {
 			jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
 				@Override
 				public void setValues(PreparedStatement ps, int i) throws SQLException {
 					ps.setInt(1,cfgIds.get(i));
+					ps.setInt(2,type);
 				}
 				@Override
 				public int getBatchSize() {

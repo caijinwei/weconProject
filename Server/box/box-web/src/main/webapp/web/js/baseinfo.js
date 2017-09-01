@@ -45,7 +45,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             if (code == 200) {
                 $("#deletePIBox").modal('hide');
                 alert("解除绑定成功！")
-                $scope.showBaseInfo();
+                //$scope.showBaseInfo();
                 $scope.$apply();
             }
             else {

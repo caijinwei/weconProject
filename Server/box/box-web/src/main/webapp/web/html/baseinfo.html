@@ -23,7 +23,7 @@
     <ul class="nav nav-tabs" role="tablist" id="baseConfigTab">
         <li class="active"><a href="#base-info" data-toggle="tab">基本信息</a></li>
         <li><a href="#com-port" data-toggle="tab" ng-click="initPlcSetting()">通讯口配置</a></li>
-        <li><a href="#entry-statistic" data-toggle="tab">条目统计</a></li>
+        <!--<li><a href="#entry-statistic" data-toggle="tab">条目统计</a></li>-->
     </ul>
     <div class="tab-content">
         <div class="tab-pane active" id="base-info">
@@ -31,7 +31,7 @@
             <div class="container-fluid" style="margin-top: 20px;font-size: 15px;">
                 <div class="row" style="margin-top: 20px;">
                     <span class="col-md-1">PIBox名称</span>、
-                    <div class="form-group col-md-1" style="display: inline-block;">
+                    <div class="form-group col-md-4" style="display: inline-block;">
                         <input type="text" class="form-control" style="margin-left: 20px;"
                                id="PIBoxName" name="PIBoxName"
                                value="{{infoData.name}}">
@@ -140,6 +140,7 @@
                         </caption>
                         <thead>
                         <tr>
+                            <th>plcID</th>
                             <th>编号</th>
                             <th>通讯接口</th>
                             <th>串口协议</th>
@@ -152,6 +153,7 @@
 
 
                         <tr ng-repeat="x in infoDatas">
+                            <td>{{x.plcId}}</td>
                             <td>{{$index + 1}}</td>
                             <td>{{x.port}}</td>
                             <td>{{x.comtype==0?'RS232':(x.comtype==1?'RS485':'RS422')}}</td>

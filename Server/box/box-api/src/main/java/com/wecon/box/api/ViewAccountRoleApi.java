@@ -112,5 +112,5 @@ public interface ViewAccountRoleApi {
 	/*
 	* 解绑盒子  删除盒子下的视图
 	* */
-	public void deleteViewAccountRoleByCfgId(final List<Integer> cfgIds);
+	public void deleteViewAccountRoleByCfgId(final List<Integer> cfgIds,final Integer type);
 }
