@@ -6,7 +6,6 @@ import com.wecon.box.entity.AlarmCfgExtend;
 import com.wecon.box.entity.AlarmCfgTrigger;
 import com.wecon.box.entity.AlarmTrigger;
 import com.wecon.box.entity.Page;
-
 import com.wecon.common.util.TimeUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +16,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -203,6 +199,38 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 		return true;
 	}
 
+	@Override
+	public boolean batchDeleteByPlcId(final List<Integer> ids) {
+		if (null == ids || ids.size() == 0) {
+			return false;
+		}
+
+		StringBuilder idSb = new StringBuilder();
+		for(int id : ids){
+			idSb.append(",").append(id);
+		}
+		String sql = "delete from alarm_cfg where plc_id in("+idSb.substring(1)+")";
+		jdbcTemplate.update(sql);
+
+		return true;
+	}
+
+	@Override
+	public boolean batchDeleteById(final List<Integer> ids) {
+		if (null == ids || ids.size() == 0) {
+			return false;
+		}
+
+		StringBuilder idSb = new StringBuilder();
+		for(int id : ids){
+			idSb.append(",").append(id);
+		}
+		String sql = "delete from alarm_cfg where alarmcfg_id in("+idSb.substring(1)+")";
+		jdbcTemplate.update(sql);
+
+		return true;
+	}
+
 	public static final class DefaultAlarmTriggerRowMapper implements RowMapper<AlarmTrigger> {
 		@Override
 		public AlarmTrigger mapRow(ResultSet rs, int i) throws SQLException {
@@ -301,5 +329,15 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			});
 		}
 	}
+	public boolean updatePointAccAndState(long accountId,long deviceId) {
 
+		Object[] args=new Object[]{accountId,deviceId};
+		String sql="UPDATE alarm_cfg a SET a.account_id = ?, a.bind_state = 1 WHERE a.device_id = ?";
+		Integer count=jdbcTemplate.update(sql,args);
+		if(count<=0)
+		{
+			return false;
+		}
+		return true;
+	}
 }

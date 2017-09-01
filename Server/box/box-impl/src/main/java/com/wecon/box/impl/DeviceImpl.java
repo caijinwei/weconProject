@@ -35,6 +35,8 @@ import java.util.logging.Logger;
 public class DeviceImpl implements DeviceApi {
 
     @Autowired
+    ViewAccountRoleApi viewAccountRoleApi;
+    @Autowired
     AlarmCfgApi alarmCfgApi;
     @Autowired
     RealHisCfgApi realHisCfgApi;
@@ -81,6 +83,25 @@ public class DeviceImpl implements DeviceApi {
 
         jdbcTemplate.update(sql, new Object[]{model.machine_code, model.password, model.dev_model, model.name,
                 model.remark, model.map, model.state, model.dir_id, model.device_id});
+        return true;
+    }
+    public boolean updateDeviceName(Integer deviceId,String deviceName,String remark)
+    {
+        if(null==deviceId)
+        {
+            throw new BusinessException(ErrorCodeOption.Device_NotFound.key,ErrorCodeOption.Device_NotFound.value);
+        }
+        if(null==deviceName||null==remark)
+        {
+            deviceName="";
+            remark="";
+        }
+        String sql="UPDATE device  SET name=?, remark=? ,update_date=current_timestamp WHERE device_id=?";
+        Object[] args=new Object[]{deviceName,remark,deviceId};
+        if(jdbcTemplate.update(sql,args)<=0)
+        {
+            return false;
+        }
         return true;
     }
 
@@ -289,8 +310,14 @@ public class DeviceImpl implements DeviceApi {
                     * */
                     ArrayList<Integer> realHisCfgIds = realHisCfgApi.findRealHisCfgIdSBydevice_id(deviceId);
                     realHisCfgApi.setBind_state(toIntArray(realHisCfgIds), 0);
+                    //viewAccountRoleApi.deleteViewAccountRoleByCfgId(realHisCfgIds,1);
+
+
                     ArrayList<Integer> alarmCfgIds = alarmCfgApi.findAlarmCfgIdSBydevice_id(deviceId);
                     alarmCfgApi.setBind_state(toIntArray(alarmCfgIds), 0);
+                    realHisCfgIds.addAll(alarmCfgIds);
+                    viewAccountRoleApi.deleteViewAccountRoleByCfgId(realHisCfgIds);
+                    //
                     return true;
                 }
             });
@@ -353,6 +380,5 @@ public class DeviceImpl implements DeviceApi {
         page.setList(list);
         return page;
     }
-
 
 }

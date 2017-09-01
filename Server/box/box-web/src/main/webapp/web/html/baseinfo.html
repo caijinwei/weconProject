@@ -17,7 +17,7 @@
     <li><a href="datamonitor.html?device_id={{device_id}}&device_name={{device_name}}">数据监控</a></li>
     <li><a href="alarmlog.html?device_id={{device_id}}&device_name={{device_name}}">报警记录</a></li>
     <li><a href="historydata.html?device_id={{device_id}}&device_name={{device_name}}">历史数据</a></li>
-    <li class="active"><a href="baseinfo.html?device_id={{device_id}}&device_name={{device_name}}">基本配置</a></li>
+    <li class="active" ng-if="accounttype==1&&device_id>0"><a href="baseinfo.html?device_id={{device_id}}&device_name={{device_name}}">基本配置</a></li>
 </ul>
 <div class="container-fluid" style="margin-top: 40px;">
     <ul class="nav nav-tabs" role="tablist" id="baseConfigTab">
@@ -30,9 +30,12 @@
             <!-- 基本信息展示-->
             <div class="container-fluid" style="margin-top: 20px;font-size: 15px;">
                 <div class="row" style="margin-top: 20px;">
-                    <span class="col-md-1">PIBox名称</span>
-                    <input type="text"  style="font-weight: bold;margin-left: 20px;" id="PIBoxName" name="PIBoxName"
-                           value="{{infoData.name}}">
+                    <span class="col-md-1">PIBox名称</span>、
+                    <div class="form-group col-md-1" style="display: inline-block;">
+                        <input type="text" class="form-control" style="margin-left: 20px;"
+                               id="PIBoxName" name="PIBoxName"
+                               value="{{infoData.name}}">
+                    </div>
                 </div>
                 <div class="row" style="margin-top: 20px;">
                     <span class="col-md-1">设备ID</span>
@@ -68,7 +71,7 @@
                     <span class="col-md-1">备注信息</span>
 
                     <div class="form-group col-md-5" style="display: inline-block;">
-                        <textarea class="form-control" rows="4">{{infoData.remark}}</textarea>
+                        <textarea class="form-control" id="remark" rows="4">{{infoData.remark}}</textarea>
                     </div>
                 </div>
 
@@ -78,7 +81,7 @@
                     <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deletePIBox">
                         删除PIBox
                     </button>
-                    <button type="button" class="btn btn-info" ng-click="chgPiboxInFoName()">保存修改</button>
+                    <button type="button" class="btn btn-info" ng-click="chgPiboxInFoName(infoData.device_id)">保存修改</button>
                     <!--<button type="button" class="btn btn-danger">重启PIBox</button>-->
                     <!--<button type="button" class="btn btn-danger">清除PIBox数据</button>-->
                     <!--<button type="button" class="btn btn-warning">强制同步</button>-->
@@ -203,10 +206,10 @@
                                             <span class="col-md-5"><span style="color: red">*</span>通讯协议</span>
                                             <select class="col-md-7" name="port" style="height: 30px;" id="port"
                                                     ng-change="chgPort()" ng-model="selectedPort">
-                                                <option>COM1</option>
-                                                <option>COM2</option>
-                                                <option>Ethernet</option>
-                                                <option>USB</option>
+                                                <option value="COM1">COM1</option>
+                                                <option value="COM2">COM2</option>
+                                                <option value="Ethernet">Ethernet</option>
+                                                <option value="USB">USB</option>
                                             </select>
                                         </div>
                                     </div>

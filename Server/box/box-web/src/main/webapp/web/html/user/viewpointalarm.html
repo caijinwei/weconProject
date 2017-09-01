@@ -48,7 +48,7 @@
                 <td>{{x.id}}</td>
                 <td>{{x.name}}</td>
                 <td>{{x.addr}}</td>
-                <td>{{x.state==1?'启用':'未启用'}}</td>
+                <td>{{x.state==0?'已同步给盒子':(x.state=='1'?'新增配置':(x.state='2'?'更新配置':'删除配置'))}}</td>
                 <td>
                     {{x.role_type==0?'无权限':(x.role_type==1?'只读':(x.role_type==2?'只写':'读写'))}}
                 </td>

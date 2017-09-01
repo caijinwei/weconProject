@@ -49,6 +49,20 @@ public interface AlarmCfgDataApi {
 	public void delAlarmCfgData(long alarm_cfg_id);
 
 	/**
+	 * 批量删除报警配置数据根据plc_id
+	 * @param ids
+	 * @return
+     */
+	boolean batchDeleteByPlcId(List<Integer> ids);
+
+	/**
+	 * 批量删除报警配置数据根据alarm_cfg_id
+	 * @param ids
+	 * @return
+     */
+	boolean batchDeleteById(final List<Integer> ids);
+
+	/**
 	 * 分页查询报警数据
 	 * 
 	 * @param filter

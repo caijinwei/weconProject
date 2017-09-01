@@ -6,6 +6,7 @@ import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.restful.core.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -62,12 +64,12 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
 	public Page<RealHisCfg> getViewRealHisCfgByViewAndAccId(long view_id, long account_id, Integer type,
 			Integer pageIndex, Integer pageSize) {
 		Object[] args0 = new Object[] { account_id, type, view_id };
-		String sqlCount = "select count(*) from real_his_cfg a WHERE account_id=? AND a.data_type=? AND id NOT IN(SELECT cfg_id FROM view_account_role where view_id=?);";
+		String sqlCount = "select count(*) from real_his_cfg a WHERE account_id=? AND a.data_type=? AND a.bind_state=1  AND id NOT IN(SELECT cfg_id FROM view_account_role where view_id=?);";
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, args0, Integer.class);
 		Page<RealHisCfg> page = new Page<RealHisCfg>(pageIndex, pageSize, totalRecord);
 
 		Object[] args = new Object[] { account_id, type, view_id, page.getStartIndex(), page.getPageSize() };
-		String sql = "select a.id, a.state,a.name , a.digit_count,a.addr , a.addr_type,a.describe from real_his_cfg a WHERE account_id=?  AND a.data_type=? AND id NOT IN(SELECT cfg_id FROM view_account_role where view_id=?)LIMIT ?,?";
+		String sql = "select a.id, a.state,a.name , a.digit_count,a.addr , a.addr_type,a.describe from real_his_cfg a WHERE account_id=?  AND a.data_type=? AND a.bind_state=1  AND id NOT IN(SELECT cfg_id FROM view_account_role where view_id=?)LIMIT ?,?";
 		List<RealHisCfg> list = jdbcTemplate.query(sql, args, new RowMapper() {
 			@Override
 			public Object mapRow(ResultSet resultSet, int i) throws SQLException {
@@ -326,4 +328,23 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
 	 * java.lang.Integer)
 	 */
 
+	/*
+	* 解绑盒子  删除盒子下的视图
+	* */
+	public void deleteViewAccountRoleByCfgId(final List<Integer> cfgIds)
+	{
+		String sql="DELETE FROM view_account_role WHERE cfg_id=?";
+		if (cfgIds.size() != 0) {
+			jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+				@Override
+				public void setValues(PreparedStatement ps, int i) throws SQLException {
+					ps.setInt(1,cfgIds.get(i));
+				}
+				@Override
+				public int getBatchSize() {
+					return 0;
+				}
+			});
+		}
+	}
 }

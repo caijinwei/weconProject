@@ -93,6 +93,38 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 	}
 
 	@Override
+	public boolean batchDeleteByPlcId(List<Integer> ids) {
+		if (null == ids || ids.size() == 0) {
+			return false;
+		}
+
+		StringBuilder idSb = new StringBuilder();
+		for(int id : ids){
+			idSb.append(",").append(id);
+		}
+		String sql = "delete from real_his_cfg_data where real_his_cfg_id in(select id from real_his_cfg where plc_id in("+idSb.substring(1)+"))";
+		jdbcTemplate.update(sql);
+
+		return true;
+	}
+
+	@Override
+	public boolean batchDeleteById(final List<Integer> ids) {
+		if (null == ids || ids.size() == 0) {
+			return false;
+		}
+
+		StringBuilder idSb = new StringBuilder();
+		for(int id : ids){
+			idSb.append(",").append(id);
+		}
+		String sql = "delete from real_his_cfg_data where real_his_cfg_id in("+idSb.substring(1)+")";
+		jdbcTemplate.update(sql);
+
+		return true;
+	}
+
+	@Override
 	public Page<RealHisCfgData> getRealHisCfgDataList(RealHisCfgDataFilter filter, int pageIndex, int pageSize) {
 		String sqlCount = "select count(0) from real_his_cfg_data where 1=1";
 		String sql = "select " + SEL_COL + " from real_his_cfg_data where 1=1";

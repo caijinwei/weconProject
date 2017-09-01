@@ -38,7 +38,6 @@ public class DevBindUserImpl implements DevBindUserApi {
         if (filter.account_id > 0) {
             condition.append("and account_id=? ");
             params.add(filter.account_id);
-
         }
         if (filter.device_id > 0) {
             condition.append("and device_id=? ");

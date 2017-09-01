@@ -112,7 +112,7 @@ public class AccountDirRelImpl implements AccountDirRelApi {
      */
     public void deleteDeviceRel(Integer device_id, long account_id) {
         Object[] args = new Object[]{device_id, account_id};
-        String sql = "delete FROM account_dir_rel where ref_id=? AND acc_dir_id IN (SELECT id FROM account_dir WHERE account_id=?)";
+        String sql = "delete FROM account_dir_rel where ref_id in (xx,xxx) AND acc_dir_id IN (SELECT id FROM account_dir WHERE account_id in ?)";
         jdbcTemplate.update(sql, args);
     }
 

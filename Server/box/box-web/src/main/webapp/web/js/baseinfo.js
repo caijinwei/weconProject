@@ -12,17 +12,18 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     $scope.onInit = function () {
         $scope.device_id = T.common.util.getParameter("device_id");
         $scope.device_name = T.common.util.getParameter("device_name");
+        $("#loadingModal").modal("show");
         $scope.showBaseInfo();
         $scope.showPlcSetDefault();
+        $("#loadingModal").modal("hide");
     }
     $scope.showBaseInfo = function () {
         $scope.device_id = T.common.util.getParameter("device_id");
-        console.log("1111" + $scope.device_id);
         var params = {device_id: $scope.device_id};
         T.common.ajax.request("WeconBox", "baseInfoAction/showBaseInfo", params, function (data, code, msg) {
-
             if (code == 200) {
                 $scope.infoData = data.device;
+                $scope.accounttype = data.userType;
                 $scope.$apply();
             }
             else {
@@ -92,31 +93,36 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         var params = {plc_id: plc_id};
         T.common.ajax.request("WeconBox", "plcInfoAction/findPlcInfoById", params, function (data, code, msg) {
             if (code == 200) {
-
                 $scope.plcInfoById = data.plcInfo;
-                $("#port").val($scope.plcInfoById.port),
-                    $scope.chgPort();
-                var tem1Type;
+                $scope.selectedPort=   $scope.plcInfoById.port;
+                $("#port").val($scope.plcInfoById.port);
                 if ($scope.selectedPort == "USB") {
+                    $scope.temPtype = $scope.usbDeviceMapListByPtype;
+                    $scope.pTypeSet = $scope.usbDeviceMapListKeyByPtype;
                     $scope.temType = $scope.usbDeviceMapListByType;
                 } else if ($scope.selectedPort == "Ethernet") {
+                    $scope.temPtype = $scope.ethernetMapListByPtype;
+                    $scope.pTypeSet = $scope.ethernetMapListKeyByPtype;
                     $scope.temType = $scope.ethernetMapListByType;
                 } else {
+                    $scope.temPtype = $scope.comMapListByPtype;
+                    $scope.pTypeSet = $scope.comMapListKeyByPtype;
                     $scope.temType = $scope.comMapListByType;
                 }
                 var temType = $scope.plcInfoById.type;
                 $scope.$apply();
+                $scope.selectedPtype = $scope.plcInfoById.ptype;
+                /*
+                 * 修改Ptype
+                 * */
                 $scope.selectedPtype = $scope.temType[temType][0].ptype;
-                //console.log( '执行到这边   数据是',$scope.temType[temType][0].ptype);
-                $scope.chgPtype();
+                var TemPtype=$scope.selectedPtype;
+                $scope.pType=$scope.temPtype[TemPtype];
                 $scope.$apply();
-                $scope.selectedType = temType;
-                $('#type').attr('value', temType);
-                $scope.$apply();
+
                 if ($scope.plcInfoById.port == 'Ethernet') {
                     $scope.ethernetShow = 1;
                     $scope.portIfShow = 0;
-                    console.log('取出的对象是',$scope.plcInfoById);
                     $('#net_ipaddr').val($scope.plcInfoById.net_ipaddr);
                     $('#net_type').val($scope.plcInfoById.net_type);
                     $('#net_port').val($scope.plcInfoById.net_port);
@@ -147,6 +153,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $('#box_stat_no').val($scope.plcInfoById.box_stat_no);
                 $('#plc_stat_no').val($scope.plcInfoById.plc_stat_no);
                 $('#retry_times').val($scope.plcInfoById.retry_times);
+                $scope.selectedType=temType;
                 $scope.$apply();
             }
             else {
@@ -199,16 +206,16 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             if (params.net_port == "" || params.net_type == "" || params.net_isbroadcast == "" || params.net_broadcastaddr == "" || params.net_ipaddr == "") {
                 alert("配置参数填未填写");
                 return;
-                params.comtype = "0";
-                params.baudrate = "0";
-                params.stop_bit = "0";
-                params.data_length = "0";
-                params.check_bit = "0";
                 if (isValidIP(params.net_ipaddr) != true) {
                     alert("情输入正确的IP地址");
                     return;
                 }
             }
+            params.comtype = "0";
+            params.baudrate = "0";
+            params.stop_bit = "0";
+            params.data_length = "0";
+            params.check_bit = "0";
         } else if ($scope.selectedPort == 'COM1' || $scope.selectedPort == 'COM2') {
             params.net_port = "0";
             params.net_type = "0";
@@ -254,7 +261,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         } else {
             T.common.ajax.request("WeconBox", "plcInfoAction/addPlcInfo", params, function (data, code, msg) {
                 if (code == 200) {
-//                    console.log(data);
                     alert("添加配置成功");
                     $("#addConfig").modal("hide");
                     $scope.showPlcList();
@@ -306,13 +312,15 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         });
     }
     /*
-     * 修改 port通讯协议   以后改 switch
+     * 修改 port通讯协议
+     * 以后改 switch
      * */
     $scope.chgPort = function () {
         if ($scope.selectedPort == "USB") {
             $scope.temPtype = $scope.usbDeviceMapListByPtype;
             $scope.pTypeSet = $scope.usbDeviceMapListKeyByPtype;
             $scope.temType = $scope.usbDeviceMapListByType;
+
         } else if ($scope.selectedPort == "Ethernet") {
             $scope.temPtype = $scope.ethernetMapListByPtype;
             $scope.pTypeSet = $scope.ethernetMapListKeyByPtype;
@@ -322,11 +330,14 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             $scope.pTypeSet = $scope.comMapListKeyByPtype;
             $scope.temType = $scope.comMapListByType;
         }
+        $scope.selectedPtype = "";
+        $scope.selectedType = "";
     }
     /*
      * 修改设备类型
      * */
     $scope.chgPtype = function () {
+        $scope.selectedType = "";
         var temPtype = $scope.temPtype;
         $scope.pType = temPtype[$scope.selectedPtype];
     }
@@ -334,6 +345,20 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      * 修改驱动名称
      * */
     $scope.chgType = function () {
+        //if ($scope.selectedPort == "USB") {
+        //    $scope.temPtype = $scope.usbDeviceMapListByPtype;
+        //    $scope.pTypeSet = $scope.usbDeviceMapListKeyByPtype;
+        //    $scope.temType = $scope.usbDeviceMapListByType;
+        //
+        //} else if ($scope.selectedPort == "Ethernet") {
+        //    $scope.temPtype = $scope.ethernetMapListByPtype;
+        //    $scope.pTypeSet = $scope.ethernetMapListKeyByPtype;
+        //    $scope.temType = $scope.ethernetMapListByType;
+        //} else {
+        //    $scope.temPtype = $scope.comMapListByPtype;
+        //    $scope.pTypeSet = $scope.comMapListKeyByPtype;
+        //    $scope.temType = $scope.comMapListByType;
+        //}
         var temType = $scope.temType;
         $scope.type = temType[$scope.selectedType];
         var type = temType[$scope.selectedType];
@@ -347,28 +372,47 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         $('#retry_timeout').val(type[0].retry_timeout);
         $('#com_iodelaytime').val("0");
         $('#com_stepinterval').val("0");
-        if (type[0].port == 'Ethernet') {
-            $scope.ethernetShow = 1;
+        if ($('#port').val() == 'Ethernet') {
             $scope.portIfShow = 0;
+            $scope.ethernetShow = 1;
             $('#net_ipaddr').val(type[0].net_ipaddr);
             $('#net_type').val(type[0].net_type);
             $('#net_port').val(type[0].net_port);
             $('#net_isbroadcast').val(type[0].net_isbroadcast);
             $('#net_broadcastaddr').val(type[0].net_broadcastaddr);
-
-        } else if (type[0].port == 'USB') {
-            $scope.portIfShow = 0;
-            $scope.ethernetShow = 0;
-        } else {
+        } else if ($('#port').val() == 'COM1' || $('#port').val() == "COM2") {
             $scope.portIfShow = 1;
             $scope.ethernetShow = 0;
             $('#baudrate').val(type[0].baudrate);
             $('#stop_bit').val(type[0].stop_bit);
             $('#data_length').val(type[0].data_length);
             $('#check_bit').val(type[0].check_bit);
+        } else {
+            $scope.portIfShow = 0;
+            $scope.ethernetShow = 0;
         }
 
     }
+    $scope.chgPiboxInFoName = function (device_id) {
+        var piBoxName = $('#PIBoxName').val();
+        var remark = $("#remark").val();
+        var params = {
+            deviceId: device_id,
+            piBoxName: piBoxName,
+            remark: remark
+        }
+        T.common.ajax.request("WeconBox", "baseInfoAction/chgPiboxInFoName", params, function (data, code, msg) {
+            if (code == 200) {
+                alert("保存成功！");
+                //$scope.$apply();
+            }
+            else {
+                alert(code + "-" + msg);
+            }
+        }, function () {
+            alert("ajax error");
+        });
+    };
     /*
      * 解绑plc
      * */
@@ -407,10 +451,9 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     }
     $scope.cleanInput = function () {
         $("#addConfig").modal("show");
-        //$('#addConfig').on('show.bs.modal', function () {
         clearForm($('#addConfig'));
-        //$scope.$apply();
-
+        $("#port").val("COM1");
+        $scope.chgPort();
     };
     function clearForm(form) {
         $("input[type!='hidden'][name!='device_id']", form).each(function () {
@@ -425,8 +468,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             this.selectedIndex = -1;
         });
     };
-    $scope.chgPiboxInFoName = function () {
-        var PIBoxName = $('PIBoxName').val();
-    };
+
 });
 
