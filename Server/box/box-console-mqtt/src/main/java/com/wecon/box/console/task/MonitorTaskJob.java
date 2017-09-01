@@ -180,7 +180,7 @@ public class MonitorTaskJob implements Job {
 						newdevice.device_id = olddevice.device_id;
 						newdevice.map = olddevice.map;
 						newdevice.name = olddevice.name;
-						newdevice.remark = olddevice.name;
+						newdevice.remark = olddevice.remark;
 						deviceApi.updateDevice(newdevice);
 						System.out.println("device modify success");
 					} else {
@@ -214,6 +214,22 @@ public class MonitorTaskJob implements Job {
 						}
 					}
 				}
+				// 反馈成功信息
+				MqttMessage baseboxmessage = new MqttMessage();
+				JSONObject basejson = new JSONObject();
+				basejson.put("act", "1");
+				basejson.put("feedback_act", BASE_DATA);
+				basejson.put("machine_code", jsonObject.getString("machine_code"));
+				basejson.put("code", "1");
+				basejson.put("msg", "success");
+				baseboxmessage.setPayload(basejson.toString().getBytes());
+				baseboxmessage.setQos(2);
+				baseboxmessage.setRetained(true);
+				// 需要反馈盒子的主题
+				String baseboxtopic = "pibox/stc/" + jsonObject.getString("machine_code");
+				MqttTopic basemqtttopic = client.getTopic(baseboxtopic);
+				PublishTask basepublish = new PublishTask(basemqtttopic, baseboxmessage);
+				basepublish.start();
 				break;
 			// 实时数据
 			case REAL_DATA:
