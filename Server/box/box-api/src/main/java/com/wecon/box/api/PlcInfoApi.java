@@ -72,6 +72,13 @@ public interface PlcInfoApi {
      */
 	boolean batchUpdateState(final List<int[]> updList);
 
+	/**
+	 * 批量删除Plc
+	 * @param ids
+	 * @return
+     */
+	boolean batchDeletePlc(final List<Integer> ids);
+
 	/*
 	* 通讯协议是否已经存在
 	* */

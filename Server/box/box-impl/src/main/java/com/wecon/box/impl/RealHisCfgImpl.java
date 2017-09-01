@@ -8,6 +8,7 @@ import com.wecon.box.entity.RealHisCfgExtend;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.common.util.CommonUtils;
+import com.wecon.common.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -550,6 +551,38 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		return true;
 	}
 
+	@Override
+	public boolean batchDeleteByPlcId(final List<Integer> ids) {
+		if (null == ids || ids.size() == 0) {
+			return false;
+		}
+
+		StringBuilder idSb = new StringBuilder();
+		for(int id : ids){
+			idSb.append(",").append(id);
+		}
+		String sql = "delete from real_his_cfg where plc_id in("+idSb.substring(1)+")";
+		jdbcTemplate.update(sql);
+
+		return true;
+	}
+
+	@Override
+	public boolean batchDeleteById(final List<Integer> ids) {
+		if (null == ids || ids.size() == 0) {
+			return false;
+		}
+
+		StringBuilder idSb = new StringBuilder();
+		for(int id : ids){
+			idSb.append(",").append(id);
+		}
+		String sql = "delete from real_his_cfg where id in("+idSb.substring(1)+")";
+		jdbcTemplate.update(sql);
+
+		return true;
+	}
+
 	public static final class DefaultRealHisCfgRowMapper implements RowMapper<RealHisCfg> {
 
 		@Override
@@ -630,9 +663,9 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.state = rs.getInt("state");
 			model.create_date = rs.getTimestamp("create_date");
 			model.update_date = rs.getTimestamp("update_date");
-			model.upd_time = model.update_date;
+			model.upd_time = TimeUtil.getYYYYMMDDHHMMSSDate(model.update_date);
 			model.machine_code = rs.getString("machine_code");
-			model.ref_alais = rs.getString("ref_alais");
+			//model.ref_alais = rs.getString("ref_alais");
 			return model;
 		}
 	}

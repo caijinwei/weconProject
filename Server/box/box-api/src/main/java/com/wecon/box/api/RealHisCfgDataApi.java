@@ -48,6 +48,20 @@ public interface RealHisCfgDataApi {
 	public void delRealHisCfgData(long real_his_cfg_id);
 
 	/**
+	 * 批量删除实时历史配置数据根据plc_id
+	 * @param ids
+	 * @return
+     */
+	boolean batchDeleteByPlcId(List<Integer> ids);
+
+	/**
+	 * 批量删除实时历史配置数据根据real_his_cfg_id
+	 * @param ids
+	 * @return
+     */
+	boolean batchDeleteById(final List<Integer> ids);
+
+	/**
 	 * 获取某条历史（实时）数据的分页列表
 	 * 
 	 * @param filter

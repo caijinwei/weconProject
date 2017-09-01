@@ -9,5 +9,5 @@ import java.sql.Timestamp;
 public class RealHisCfgExtend extends RealHisCfgDevice{
 	public String com;
 	public long addr_id;
-	public Timestamp upd_time;
+	public String upd_time;
 }

@@ -36,7 +36,8 @@
 	</ul>
 	<div class="container-fluid" style="margin-top: 40px;">
 		<ul class="nav nav-tabs" role="tablist" id="historyDataTab">
-			<li class="active"><a href="#original-data" data-toggle="tab">原始数据</a></li>
+			<li class="active"><a href="#original-data" data-toggle="tab"
+				ng-click="commointor_submit();">原始数据</a></li>
 			<!-- 	<li><a href="#statistic-analysis" data-toggle="tab">统计分析</a></li> -->
 			<li><a href="#data-record" data-toggle="tab"
 				ng-if="accounttype==1 && deviceid>0"
@@ -220,6 +221,7 @@
 						</caption>
 						<thead>
 							<tr>
+								<th>编码</th>
 								<th>状态</th>
 								<th>名称</th>
 								<th>周期(秒)</th>
@@ -231,6 +233,7 @@
 						</thead>
 						<tbody>
 							<tr ng-repeat="x in hisConfs">
+								<td>{{x.id}}</td>
 								<td>{{x.state==0?"已同步盒子":x.state==1?"新增":x.state==2?"已变更":"已删除"}}</td>
 								<td>{{x.name}}</td>
 								<td>{{x.his_cycle}}</td>

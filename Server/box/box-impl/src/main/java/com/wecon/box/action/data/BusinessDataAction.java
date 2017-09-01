@@ -82,16 +82,16 @@ public class BusinessDataAction {
         JSONArray arr = new JSONArray();
 
         //假数据，后面要删除
-        for(int p=1;p<5;p++){
+        /*for(int p=1;p<5;p++){
             JSONObject data = new JSONObject();
             data.put("id", p);
             data.put("state", 1);
             data.put("monitorName", "监控点"+p);
             data.put("number", 60);
             arr.add(data);
-        }
+        }*/
 
-        /*if (realHisCfgDeviceList == null || realHisCfgDeviceList.size() < 1) {
+        if (realHisCfgDeviceList == null || realHisCfgDeviceList.size() < 1) {
             return new Output(json);
         }
         for (int i = 0; i < realHisCfgDeviceList.size(); i++) {
@@ -119,7 +119,7 @@ public class BusinessDataAction {
                 }
             }
             arr.add(data);
-        }*/
+        }
         json.put("list", arr);
         return new Output(json);
     }
@@ -162,7 +162,7 @@ public class BusinessDataAction {
         List<Map<String, Object>> realHisCfgDataList = realHisCfgDataPage.getList();
         JSONObject json = new JSONObject();
         JSONArray arr = new JSONArray();
-        /*if (realHisCfgDataList == null || realHisCfgDataList.size() < 1) {
+        if (realHisCfgDataList == null || realHisCfgDataList.size() < 1) {
             return new Output(json);
         }
         for(Map<String, Object> row : realHisCfgDataList){
@@ -171,15 +171,15 @@ public class BusinessDataAction {
             data.put("number", row.get("number"));
             data.put("monitorTime", row.get("monitorTime"));
             arr.add(data);
-        }*/
+        }
         //假数据，后面要删除
-        for(int p=1;p<5;p++){
+        /*for(int p=1;p<5;p++){
             JSONObject data = new JSONObject();
             data.put("monitorName", "监控点"+p);
             data.put("number", 56);
             data.put("monitorTime", System.currentTimeMillis());
             arr.add(data);
-        }
+        }*/
 
         json.put("list", arr);
         return new Output(json);
@@ -217,9 +217,9 @@ public class BusinessDataAction {
         }
 
         JSONObject json = new JSONObject();
-        /*List<AlarmCfgDataAlarmCfg> alarmCfgDataList = alarmCfgDataPage.getList();
+        JSONArray arr = new JSONArray();
+        List<AlarmCfgDataAlarmCfg> alarmCfgDataList = alarmCfgDataPage.getList();
         if(null != alarmCfgDataList){
-            JSONArray arr = new JSONArray();
             for(AlarmCfgDataAlarmCfg alarmCfg : alarmCfgDataList){
                 JSONObject data = new JSONObject();
                 data.put("monitorName", alarmCfg.name);
@@ -229,9 +229,9 @@ public class BusinessDataAction {
                 arr.add(data);
             }
             json.put("list", arr);
-        }*/
+        }
         //假数据，后面要删除
-        JSONArray arr = new JSONArray();
+        /*JSONArray arr = new JSONArray();
         for(int p=1;p<5;p++){
             JSONObject data = new JSONObject();
             data.put("monitorName", "监控点"+p);
@@ -239,7 +239,7 @@ public class BusinessDataAction {
             data.put("number", 48);
             data.put("monitorTime", System.currentTimeMillis());
             arr.add(data);
-        }
+        }*/
         json.put("list", arr);
 
         return new Output(json);
@@ -296,6 +296,9 @@ public class BusinessDataAction {
         if(param.boxId != 0){
             bParams.put("boxId", param.boxId);
         }
+        if(param.groupId != 0){
+            bParams.put("groupId", param.groupId);
+        }
         param.pageIndex = 1;
         param.pageSize = Integer.MAX_VALUE;
         /** 管理者账号 **/
@@ -318,23 +321,22 @@ public class BusinessDataAction {
         List<Map<String, Object>> realHisCfgDataList = realHisCfgDataPage.getList();
         JSONObject json = new JSONObject();
         JSONArray arr = new JSONArray();
-        /*if (realHisCfgDataList == null || realHisCfgDataList.size() < 1) {
+        if (realHisCfgDataList == null || realHisCfgDataList.size() < 1) {
             return new Output(json);
         }
         for(Map<String, Object> row : realHisCfgDataList){
             JSONObject data = new JSONObject();
-            data.put("monitorName", row.get("monitorName"));
-            data.put("number", row.get("number"));
+            data.put("monitorId", row.get("monitorId"));
             data.put("monitorTime", row.get("monitorTime"));
             arr.add(data);
-        }*/
+        }
         //假数据，后面要删除
-        for(int p=1;p<5;p++){
+       /* for(int p=1;p<5;p++){
             JSONObject data = new JSONObject();
             data.put("monitorId", p);
             data.put("monitorName", "监控点"+p);
             arr.add(data);
-        }
+        }*/
 
         json.put("list", arr);
         return new Output(json);

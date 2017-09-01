@@ -20,7 +20,6 @@ import com.wecon.box.entity.RealHisCfgData;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -33,6 +32,7 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+
 import com.wecon.box.api.AlarmCfgDataApi;
 import com.wecon.box.api.DevFirmApi;
 import com.wecon.box.api.DeviceApi;
@@ -40,7 +40,6 @@ import com.wecon.box.api.RealHisCfgApi;
 import com.wecon.box.api.RealHisCfgDataApi;
 import com.wecon.box.api.RedisPiBoxApi;
 import com.wecon.box.console.config.ConnectOptions;
-import com.wecon.box.console.main.MqttManager;
 import com.wecon.box.console.util.MqttConfigContext;
 import com.wecon.box.console.util.SpringContextHolder;
 import com.wecon.box.entity.AlarmCfgData;
@@ -76,7 +75,7 @@ public class MonitorTaskJob implements Job {
 					MqttConfigContext.mqttConfig.getPassword());
 			System.out.println("to connect mqtt......");
 			logger.info("to connect mqtt......");
-			
+
 			client = new MqttClient(MqttConfigContext.mqttConfig.getHost(), "WECON_REVEIVE", new MemoryPersistence());
 			client.connect(options);
 			// 订阅盒子的所有发送主题
@@ -94,16 +93,16 @@ public class MonitorTaskJob implements Job {
 				}
 
 				public void connectionLost(Throwable cause) {
-					if(!client.isConnected()){
+					if (!client.isConnected()) {
 						logger.info("Connection is broken  !");
 					}
-					
+
 				}
 
 			});
 
 		} catch (MqttException e) {
-			logger.info("MqttException e=="+e.getMessage());
+			logger.info("MqttException e==" + e.getMessage());
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
