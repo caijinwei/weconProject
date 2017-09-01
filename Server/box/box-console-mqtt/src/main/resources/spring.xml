@@ -55,38 +55,40 @@
 	</bean>
 
 
- <!-- 数据源定义 -->
-    <bean id="ds-master" class="org.apache.commons.dbcp.BasicDataSource">
-        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-        <property name="url" value="${datasource.master.url}" />
-        <property name="username" value="${datasource.master.user}" />
-        <property name="password" value="${datasource.master.passwd}" />
-    </bean>
-    <bean id="ds-slave1" class="org.apache.commons.dbcp.BasicDataSource">
-        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
-        <property name="url" value="${datasource.slave.url}" />
-        <property name="username" value="${datasource.slave.user}" />
-        <property name="password" value="${datasource.slave.passwd}" />
-    </bean>
+	<!-- 数据源定义 -->
+	<bean id="ds-master" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="${datasource.master.url}" />
+		<property name="username" value="${datasource.master.user}" />
+		<property name="password" value="${datasource.master.passwd}" />
+	</bean>
+	<bean id="ds-slave1" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="${datasource.slave.url}" />
+		<property name="username" value="${datasource.slave.user}" />
+		<property name="password" value="${datasource.slave.passwd}" />
+	</bean>
 
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-        <property name="url" value="${datasource.master.url}"/>
-        <property name="username" value="${datasource.master.user}"/>
-        <property name="password" value="${datasource.master.passwd}"/>
-    </bean>
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="${datasource.master.url}" />
+		<property name="username" value="${datasource.master.user}" />
+		<property name="password" value="${datasource.master.passwd}" />
+	</bean>
 
-    <!-- jdbc注入 -->
-    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-        <property name="dataSource">
-            <ref bean="dataSource" />
-        </property>
-    </bean>
-    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource">
-            <ref bean="dataSource" />
-        </property>
-    </bean>
+	<!-- jdbc注入 -->
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+	</bean>
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+	</bean>
 
 	<mvc:interceptors>
 		<mvc:interceptor>

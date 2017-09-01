@@ -41,22 +41,7 @@ appModule
 								}
 							}
 						}
-						$scope.paginationConf_alarmcfg = {
-							currentPage : 1,
-							itemsPerPage : 10,
-							totalItems : $scope.count,
-							pagesLength : 15,
-							perPageOptions : [ 5, 10, 20, 50, 100 ],
-							rememberPerPage : 'perPageItems',
-							onChange : function() {
-								if (this.currentPage != 0) {
 
-									$scope.showAlarmCfg(this.currentPage,
-											this.itemsPerPage);
-
-								}
-							}
-						}
 						$('.form_datetime').datetimepicker({
 							weekStart : 1,
 							todayBtn : 1,
@@ -190,6 +175,25 @@ appModule
 												$scope.dir_list = data.alarmGroup;
 												$scope.accounttype = data.type;
 												$scope.$apply();
+												$scope.paginationConf_alarmcfg = {
+													currentPage : 1,
+													itemsPerPage : 10,
+													totalItems : $scope.count,
+													pagesLength : 15,
+													perPageOptions : [ 5, 10,
+															20, 50, 100 ],
+													rememberPerPage : 'perPageItems',
+													onChange : function() {
+														if (this.currentPage != 0) {
+
+															$scope
+																	.showAlarmCfg(
+																			this.currentPage,
+																			this.itemsPerPage);
+
+														}
+													}
+												}
 												$("#dataGroupSelect").val(
 														data.alarmGroup[0].id);
 												$scope
