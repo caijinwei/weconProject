@@ -71,7 +71,7 @@ public class HisDataAction {
 			viewAccountRoleFilter.cfg_type = 1;
 			viewAccountRoleFilter.data_type = 1;
 			viewAccountRoleFilter.role_type = -1;
-			viewAccountRoleFilter.state = 0;
+			viewAccountRoleFilter.state = -1;
 			viewAccountRoleFilter.dirId = -1;
 			realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(viewAccountRoleFilter);
 
@@ -108,7 +108,7 @@ public class HisDataAction {
 		realHisCfgDataFilter.real_his_cfg_id = Long.parseLong(real_his_cfg_id);
 		realHisCfgDataFilter.start_date = start_date;
 		realHisCfgDataFilter.end_date = end_date;
-		realHisCfgDataFilter.state = 1;
+		realHisCfgDataFilter.state = -1;
 
 		realHisCfgDataList = realHisCfgDataApi.getRealHisCfgDataList(realHisCfgDataFilter, pageIndex, pageSize);
 
