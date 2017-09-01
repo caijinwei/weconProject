@@ -79,17 +79,28 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Page<AlarmCfgTrigger> getRealHisCfgDataList(long account_id, long groupId, int pageIndex, int pageSize) {
-		String sqlCount = "select count(0) from `alarm_cfg` ac,`account_dir` ad,`account_dir_rel` adr where 1=1 and ac.`alarmcfg_id`=adr.`ref_id` and ad.`id`=adr.`acc_dir_id` and ad.`type`=3 and ac.`account_id`=ad.`account_id` and ac.`account_id`=? and ad.`id`=?  ";
+		String sqlCount = "select count(0) from `alarm_cfg` ac,`account_dir` ad,`account_dir_rel` adr where 1=1 and ac.`alarmcfg_id`=adr.`ref_id` and ad.`id`=adr.`acc_dir_id` and ad.`type`=3 and ac.`account_id`=ad.`account_id` ";
 
-		String sql = " select ac.alarmcfg_id,ac.data_id,ac.account_id,ac.name,ac.addr,ac.addr_type,ac.text,ac.condition_type,ac.state,ac.device_id,ac.rid,ac.bind_state,ac.plc_id,ac.data_limit,ac.create_date,ac.update_date,adr.`ref_alais`,ad.`name` dirname,ad.`id` from `alarm_cfg` ac,`account_dir` ad,`account_dir_rel` adr where 1=1 and ac.`alarmcfg_id`=adr.`ref_id` and ad.`id`=adr.`acc_dir_id` and ad.`type`=3 and ac.`account_id`=ad.`account_id` and ac.`account_id`=? and ad.`id`=?";
+		String sql = " select ac.alarmcfg_id,ac.data_id,ac.account_id,ac.name,ac.addr,ac.addr_type,ac.text,ac.condition_type,ac.state,ac.device_id,ac.rid,ac.bind_state,ac.plc_id,ac.data_limit,ac.create_date,ac.update_date,adr.`ref_alais`,ad.`name` dirname,ad.`id` from `alarm_cfg` ac,`account_dir` ad,`account_dir_rel` adr where 1=1 and ac.`alarmcfg_id`=adr.`ref_id` and ad.`id`=adr.`acc_dir_id` and ad.`type`=3 and ac.`account_id`=ad.`account_id`";
 
-		int totalRecord = jdbcTemplate.queryForObject(sqlCount, new Object[] { account_id, groupId }, Integer.class);
+		StringBuffer condition = new StringBuffer("");
+		List<Object> params = new ArrayList<Object>();
+		if (account_id > 0) {
+			condition.append(" and ac.`account_id`=? ");
+			params.add(account_id);
+		}
+		if (groupId > 0) {
+			condition.append(" and ad.`id`=? ");
+			params.add(groupId);
+		}
+		sqlCount += condition;
+		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<AlarmCfgTrigger> page = new Page<AlarmCfgTrigger>(pageIndex, pageSize, totalRecord);
 		String sort = " order by  ac.`alarmcfg_id` desc";
-		sql += sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
+		sql += condition + sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
 
 		@SuppressWarnings("rawtypes")
-		List<AlarmCfgTrigger> list = jdbcTemplate.query(sql, new Object[] { account_id, groupId }, new RowMapper() {
+		List<AlarmCfgTrigger> list = jdbcTemplate.query(sql, params.toArray(), new RowMapper() {
 
 			@Override
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -135,9 +146,9 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 
 	}
 
-	public List<AlarmCfgExtend> getAlarmCfgExtendListByState(int state){
-		String sql = "select a.alarmcfg_id,a.plc_id,a.data_id,a.account_id,a.name,a.addr,a.addr_type,a.text,a.condition_type,a.state,a.create_date,a.update_date,d.machine_code" +
-				" from alarm_cfg a ,device d where a.device_id=d.device_id and a.state = ?";
+	public List<AlarmCfgExtend> getAlarmCfgExtendListByState(int state) {
+		String sql = "select a.alarmcfg_id,a.plc_id,a.data_id,a.account_id,a.name,a.addr,a.addr_type,a.text,a.condition_type,a.state,a.create_date,a.update_date,d.machine_code"
+				+ " from alarm_cfg a ,device d where a.device_id=d.device_id and a.state = ?";
 		String triSql = "select at.type, at.value from alarm_trigger at, alarm_cfg ac where at.alarmcfg_id=ac.alarmcfg_id and ac.state = ?";
 		List<AlarmCfgExtend> alarmCfgExtendLst = jdbcTemplate.query(sql, new Object[] { state },
 				new DefaultAlarmCfgExtendRowMapper());
@@ -167,7 +178,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 		jdbcTemplate.update(sql,
 				new Object[] { alarmCfg.data_id, alarmCfg.account_id, alarmCfg.name, alarmCfg.addr, alarmCfg.addr_type,
 						alarmCfg.text, alarmCfg.condition_type, alarmCfg.state, alarmCfg.bind_state, alarmCfg.plc_id,
-						alarmCfg.device_id, alarmCfg.rid,alarmCfg.data_limit, alarmCfg.alarmcfg_id });
+						alarmCfg.device_id, alarmCfg.rid, alarmCfg.data_limit, alarmCfg.alarmcfg_id });
 		return true;
 	}
 

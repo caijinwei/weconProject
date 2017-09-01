@@ -31,7 +31,7 @@
 			href="historydata.html?device_id={{deviceid}}&device_name={{devicename}}">历史数据</a></li>
 		<!-- <li ng-if="accounttype==1 && deviceid>0"><a
 			href="remotedownload.html?device_id={{deviceid}}&device_name={{devicename}}">远程下载</a></li> -->
-		<li ng-if="accounttype==1 && deviceid>0"><a
+		<li ng-cloak ng-if="accounttype==1 && deviceid>0"><a
 			href="baseinfo.html?device_id={{deviceid}}&device_name={{devicename}}">基本配置</a></li>
 	</ul>
 	<div class="container-fluid" style="margin-top: 40px;">
@@ -39,7 +39,7 @@
 			<li class="active"><a href="#original-data" data-toggle="tab"
 				ng-click="commointor_submit();">原始数据</a></li>
 			<!-- 	<li><a href="#statistic-analysis" data-toggle="tab">统计分析</a></li> -->
-			<li><a href="#data-record" data-toggle="tab"
+			<li><a href="#data-record" data-toggle="tab" ng-cloak
 				ng-if="accounttype==1 && deviceid>0"
 				ng-click="showhisconf(paginationConf_register.currentPage,paginationConf_register.itemsPerPage);">数据登记</a></li>
 			<!-- <li><a href="#history-global-setting" data-toggle="tab"
@@ -234,7 +234,8 @@
 						<tbody>
 							<tr ng-repeat="x in hisConfs">
 								<td>{{x.id}}</td>
-								<td>{{x.state==0?"已同步盒子":x.state==1?"新增":x.state==2?"已变更":"已删除"}}</td>
+								<td>{{x.state==0?"已同步盒子":x.state==1?"新增":x.state==2?"已变更":x.state==3?"已删除":x.state}}</td>
+								</td>
 								<td>{{x.name}}</td>
 								<td>{{x.his_cycle}}</td>
 								<td>{{x.condevice}}</td>
