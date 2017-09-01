@@ -320,27 +320,25 @@ public class AlarmDataAction {
 					alarmCfg.name = alarmCfgParam.name;
 					alarmCfg.text = alarmCfgParam.text;
 					alarmCfg.condition_type = alarmCfgParam.condition_type;
-					alarmCfg.state = 1;
+					alarmCfg.state = 2;
 					alarmCfg.device_id = alarmCfgParam.device_id;
 					alarmCfg.data_limit = alarmCfgParam.rang;
 					boolean issuccess = alarmCfgApi.upAlarmCfg(alarmCfg);
 					if (issuccess) {
 						// 获取分组信息
 						if (alarmCfgParam.group_id > 0) {
-							AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(alarmCfgParam.group_id,
+							AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(-1,
 									alarmCfgParam.alarmcfg_id);
-							if (accountDirRel == null) {
-								accountDirRel = new AccountDirRel();
-								accountDirRel.acc_dir_id = alarmCfgParam.group_id;
-								accountDirRel.ref_id = alarmCfgParam.alarmcfg_id;
-								accountDirRel.ref_alais = alarmCfgParam.name;
-								accountDirRelApi.saveAccountDirRel(accountDirRel);
-							} else {
-								accountDirRel.acc_dir_id = alarmCfgParam.group_id;
-								accountDirRel.ref_id = alarmCfgParam.alarmcfg_id;
-								accountDirRel.ref_alais = alarmCfgParam.name;
-								accountDirRelApi.upAccountDirRel(accountDirRel);
+
+							if (accountDirRel != null) {
+
+								accountDirRelApi.delAccountDir(accountDirRel.acc_dir_id, accountDirRel.ref_id);
 							}
+							AccountDirRel dirRel = new AccountDirRel();
+							dirRel.acc_dir_id = alarmCfgParam.group_id;
+							dirRel.ref_id = alarmCfgParam.alarmcfg_id;
+							dirRel.ref_alais = alarmCfgParam.name;
+							accountDirRelApi.saveAccountDirRel(dirRel);
 
 						}
 						if (!CommonUtils.isNullOrEmpty(alarmCfgParam.value)

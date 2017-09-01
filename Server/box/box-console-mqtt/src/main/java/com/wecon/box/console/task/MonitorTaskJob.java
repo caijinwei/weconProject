@@ -75,11 +75,14 @@ public class MonitorTaskJob implements Job {
 			MqttConnectOptions options = ConnectOptions.getConnectOptions(MqttConfigContext.mqttConfig.getUsername(),
 					MqttConfigContext.mqttConfig.getPassword());
 			System.out.println("to connect mqtt......");
+			logger.info("to connect mqtt......");
+			
 			client = new MqttClient(MqttConfigContext.mqttConfig.getHost(), "WECON_REVEIVE", new MemoryPersistence());
 			client.connect(options);
 			// 订阅盒子的所有发送主题
 			client.subscribe("pibox/cts/#");
 			System.out.println("MQTT connection is successful !");
+			logger.info("MQTT connection is successful !");
 			client.setCallback(new MqttCallback() {
 
 				public void messageArrived(String topic, MqttMessage message) throws Exception {
@@ -87,16 +90,20 @@ public class MonitorTaskJob implements Job {
 				}
 
 				public void deliveryComplete(IMqttDeliveryToken token) {
-
+					logger.info("deliveryComplete执行");
 				}
 
 				public void connectionLost(Throwable cause) {
-					logger.info("Connection is broken  !");
+					if(!client.isConnected()){
+						logger.info("Connection is broken  !");
+					}
+					
 				}
 
 			});
 
 		} catch (MqttException e) {
+			logger.info("MqttException e=="+e.getMessage());
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
