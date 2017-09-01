@@ -100,4 +100,6 @@ public interface DeviceApi {
     * */
     boolean updateDeviceName(Integer deviceId,String deviceName,String remark);
 
+
+
 }

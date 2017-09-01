@@ -300,7 +300,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 		ArrayList<Integer> list = null;
 		list = (ArrayList<Integer>) jdbcTemplate.query(sql, args, new RowMapper<Integer>() {
 			public Integer mapRow(ResultSet resultSet, int i) throws SQLException {
-				Integer model = resultSet.getInt("id");
+				Integer model = resultSet.getInt("alarmcfg_id");
 				return model;
 			}
 		});

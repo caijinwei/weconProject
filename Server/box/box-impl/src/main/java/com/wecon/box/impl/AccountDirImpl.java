@@ -160,6 +160,13 @@ public class AccountDirImpl implements AccountDirApi {
         return list;
     }
 
+    @Override
+    public void updateAccountBydeviceAndType(long accountId,long deviceId) {
+        String sql="UPDATE account_dir SET account_id=? WHERE device_id=?";
+        Object[] args=new Object[]{accountId,deviceId};
+        jdbcTemplate.update(sql,args);
+    }
+
     public static final class DefaultAccountDirRowMapper implements RowMapper<AccountDir> {
 
         @Override

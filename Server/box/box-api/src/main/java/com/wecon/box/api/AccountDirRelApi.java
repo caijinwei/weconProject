@@ -71,4 +71,10 @@ public interface AccountDirRelApi {
 
 	public void deleteViewAccAndPointRel(Integer type,Integer managerId,List<Integer> points);
 
+
+	/*
+  * 删除管理员与盒子分组关系
+  * DELETE FROM account_dir_rel WHERE ref_id=1111 AND acc_dir_id IN (SELECT id FROM account_dir WHERE type=0 AND account_id=12);
+   * */
+	public void deleteAccDeviceRel(Integer deviceId, Integer accountId);
 }
