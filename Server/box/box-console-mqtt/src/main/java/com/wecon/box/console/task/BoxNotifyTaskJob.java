@@ -32,7 +32,7 @@ import java.util.Map;
  * Created by whp on 2017/8/24.
  */
 public class BoxNotifyTaskJob implements Job {
-    public MqttClient mqttClient;
+    public static MqttClient mqttClient;
     private String serverTopic = "pibox/stc/#";
     private final String clientId = "WECON_BOX_NOTIFY";
 
@@ -270,7 +270,7 @@ public class BoxNotifyTaskJob implements Job {
                     plcInfoApi.batchUpdateState(getFeedbackArgs(updComList, "com"));
                     break;
                 case ACT_UPDATE_REAL_HISTORY_CONFIG : //更新实时和历史监控点配置
-                    List<Map> updRealHisCfgList = fbData.get("upd_ real_his_cfg_list");
+                    List<Map> updRealHisCfgList = fbData.get("upd_real_his_cfg_list");
                     realHisCfgApi.batchUpdateState(getFeedbackArgs(updRealHisCfgList, "addr_id"));
                     break;
                 case ACT_UPDATE_ALARM_DATA_CONFIG : //更新报警数据配置
@@ -279,6 +279,10 @@ public class BoxNotifyTaskJob implements Job {
                     break;
                 case ACT_DELETE_MONITOR_CONFIG : //删除监控点配置
                     List<Map> delCfgList = fbData.get("del_cfg_list");
+                    break;
+                case ACT_DELETE_PLC_CONFIG : //删除监控点配置
+                    List<Map> delComList = fbData.get("del_com_list");
+                    break;
             }
         }catch (NumberFormatException e){
             e.printStackTrace();
@@ -312,7 +316,7 @@ public class BoxNotifyTaskJob implements Job {
         try {
             mqttClient = new MqttClient(MqttConfigContext.mqttConfig.getHost(), clientId, new MemoryPersistence());
             mqttClient.connect(mqttConnectOptions);
-            logger.error("mqtt connect success!");
+            logger.debug("mqtt connect success!");
         }catch (MqttException e){
             e.printStackTrace();
             logger.error("mqtt connect fail!");
