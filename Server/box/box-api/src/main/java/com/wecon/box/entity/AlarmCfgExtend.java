@@ -9,7 +9,7 @@ import java.util.List;
 public class AlarmCfgExtend extends AlarmCfg{
     public String com;
     public long addr_id;
-    public Timestamp upd_time;
+    public String upd_time;
     public String machine_code;
     public List<AlarmTrigger> condition_list;
 
@@ -28,4 +28,5 @@ public class AlarmCfgExtend extends AlarmCfg{
     public void setCondition_list(List<AlarmTrigger> condition_list) {
         this.condition_list = condition_list;
     }
+
 }

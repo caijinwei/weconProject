@@ -296,6 +296,9 @@ public class BusinessDataAction {
         if(param.boxId != 0){
             bParams.put("boxId", param.boxId);
         }
+        if(param.groupId != 0){
+            bParams.put("groupId", param.groupId);
+        }
         param.pageIndex = 1;
         param.pageSize = Integer.MAX_VALUE;
         /** 管理者账号 **/

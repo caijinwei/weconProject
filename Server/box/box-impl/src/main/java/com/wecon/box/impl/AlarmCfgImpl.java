@@ -1,14 +1,13 @@
 package com.wecon.box.impl;
 
 import com.wecon.box.api.AlarmCfgApi;
-import com.wecon.box.api.AlarmTriggerApi;
 import com.wecon.box.entity.AlarmCfg;
-import com.wecon.box.entity.AlarmCfgDataAlarmCfg;
 import com.wecon.box.entity.AlarmCfgExtend;
 import com.wecon.box.entity.AlarmCfgTrigger;
 import com.wecon.box.entity.AlarmTrigger;
 import com.wecon.box.entity.Page;
-import com.wecon.box.impl.AlarmCfgDataImpl.DefaultAlarmCfgDataAlarmCfgRowMapper;
+
+import com.wecon.common.util.TimeUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -136,10 +135,9 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 
 	}
 
-	@Override
-	public List<AlarmCfgExtend> getAlarmCfgExtendListByState(int state) {
-		String sql = "select a.alarmcfg_id,a.data_id,a.account_id,a.name,a.addr,a.addr_type,a.text,a.condition_type,a.state,a.create_date,a.update_date,d.machine_code"
-				+ " from alarm_cfg a ,device d where a.device_id=d.device_id and a.state = ?";
+	public List<AlarmCfgExtend> getAlarmCfgExtendListByState(int state){
+		String sql = "select a.alarmcfg_id,a.plc_id,a.data_id,a.account_id,a.name,a.addr,a.addr_type,a.text,a.condition_type,a.state,a.create_date,a.update_date,d.machine_code" +
+				" from alarm_cfg a ,device d where a.device_id=d.device_id and a.state = ?";
 		String triSql = "select at.type, at.value from alarm_trigger at, alarm_cfg ac where at.alarmcfg_id=ac.alarmcfg_id and ac.state = ?";
 		List<AlarmCfgExtend> alarmCfgExtendLst = jdbcTemplate.query(sql, new Object[] { state },
 				new DefaultAlarmCfgExtendRowMapper());
@@ -223,7 +221,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			model.condition_type = rs.getInt("condition_type");
 			model.create_date = rs.getTimestamp("create_date");
 			model.update_date = rs.getTimestamp("update_date");
-			model.upd_time = model.update_date;
+			model.upd_time = TimeUtil.getYYYYMMDDHHMMSSDate(model.update_date);
 			model.machine_code = rs.getString("machine_code");
 			return model;
 		}
