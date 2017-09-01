@@ -178,6 +178,9 @@ public class MonitorTaskJob implements Job {
 					if (olddevice != null) {
 						// 已经存在，直接更新device
 						newdevice.device_id = olddevice.device_id;
+						newdevice.map = olddevice.map;
+						newdevice.name = olddevice.name;
+						newdevice.remark = olddevice.name;
 						deviceApi.updateDevice(newdevice);
 						System.out.println("device modify success");
 					} else {
