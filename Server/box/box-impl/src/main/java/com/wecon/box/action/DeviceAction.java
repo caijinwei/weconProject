@@ -201,4 +201,21 @@ public class DeviceAction {
         data.put("page", page);
         return new Output(data);
     }
+
+    @Label("修改盒子别名和备注")
+    @WebApi(forceAuth = true, master = true, authority = {"1"})
+    @RequestMapping("chgPiboxInFoName")
+    public Output chgPiboxInFoName(@RequestParam("deviceId")Integer deviceId ,@RequestParam("piBoxName")String piBoxName,@RequestParam("remark")String remark)
+    {
+        Device device=deviceApi.getDevice(deviceId);
+        if(null==deviceId||null==device)
+        {
+            throw new BusinessException(ErrorCodeOption.Device_NotFound.key,ErrorCodeOption.Device_NotFound.value);
+        }
+        if(deviceApi.updateDeviceName(deviceId,piBoxName,remark)==false)
+        {
+            throw  new BusinessException(ErrorCodeOption.UpdateFalse_DeviceName_Remark.key,ErrorCodeOption.UpdateFalse_DeviceName_Remark.value);
+        }
+        return new Output();
+    }
 }

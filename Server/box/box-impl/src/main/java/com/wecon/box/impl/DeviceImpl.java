@@ -83,6 +83,25 @@ public class DeviceImpl implements DeviceApi {
                 model.remark, model.map, model.state, model.dir_id, model.device_id});
         return true;
     }
+    public boolean updateDeviceName(Integer deviceId,String deviceName,String remark)
+    {
+        if(null==deviceId)
+        {
+            throw new BusinessException(ErrorCodeOption.Device_NotFound.key,ErrorCodeOption.Device_NotFound.value);
+        }
+        if(null==deviceName||null==remark)
+        {
+            deviceName="";
+            remark="";
+        }
+        String sql="UPDATE device  SET name=?, remark=? ,update_date=current_timestamp WHERE device_id=?";
+        Object[] args=new Object[]{deviceId};
+        if(jdbcTemplate.update(sql,args)<=0)
+        {
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public Device getDevice(final long device_id) {
@@ -353,6 +372,4 @@ public class DeviceImpl implements DeviceApi {
         page.setList(list);
         return page;
     }
-
-
 }

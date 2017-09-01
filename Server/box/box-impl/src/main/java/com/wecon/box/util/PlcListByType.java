@@ -14,7 +14,6 @@ public class PlcListByType {
     /*
      * UsbDevice="1"
      * Ethernet="1"
-     * 获取 port 通讯协议 是 USB的
      * */
     public static List<PlcInfo> getPlcListByType(String comType, String comvalue) {
         PlcTypeParser.doParse();
@@ -63,20 +62,7 @@ public class PlcListByType {
         return plcSetings;
     }
 
-    //
-//    public static void main(String args[]) {
-//        List<PlcInfo> list = getPlcListByType("UsbDevice", "1");
-//        Map<String, List<PlcInfo>> map = getPlcByPtype(list);
-//
-//        List<PlcInfo> ethernetList = getPlcListByType("Ethernet", "1");
-//        Map<String, List<PlcInfo>>ethernetMap = getPlcByPtype(list);
-//        JSONObject data = new JSONObject();
-//        data.put("UsbDevice", list);
-//        JSONObject data1 = new JSONObject();
-//        data1.put("Ethernet",list);
-//        System.out.println(data);
-//        System.out.println(data1);
-//    }
+
 /*
 * 根据通讯协议分类（将一类通讯协议分组：设备类型）
 * */
@@ -115,8 +101,9 @@ public class PlcListByType {
     * 需要算法改进   获取com  com2的lIST
     * */
     public static List<PlcInfo> getAllComType() {
+        List<PlcInfo> result=new ArrayList<PlcInfo>();
         PlcTypeParser.doParse();
-        List<String> allType = PlcTypeQuerier.getInstance().queryValuesByKey("Type");
+        List<PlcInfo> allType=getPlcListByType("plctype","");
          /*
         *  UsbDevice="1"
         * Ethernet="1"
@@ -124,22 +111,41 @@ public class PlcListByType {
         List<PlcInfo> restList = null;
         restList = getPlcListByType("UsbDevice", "1");
         restList.addAll(getPlcListByType("Ethernet", "1"));
-        ArrayList<PlcInfo>  comTypeList=new ArrayList<PlcInfo>();
+
+       // allType.removeAll(restList);
         for(int i=0;i<allType.size();i++)
         {
             for(PlcInfo p:restList)
             {
-                if(!allType.get(i).contains(p.type))
+                if(allType.get(i).type.equals(p.type))
                 {
-                    comTypeList.addAll(getPlcListByType("Type",allType.get(i)));
+                    allType.remove(i);
                 }
             }
         }
-        return comTypeList;
+        for(PlcInfo p:allType)
+        {
+            System.out.println(p.type);
+        }
+        return allType;
     }
 
+    public static PlcInfo getPlcInfoByKey(List<PlcInfo> list,String key)
+    {
+        for(PlcInfo p:list)
+        {
+            if(key.equals(p.type))
+            {
+                return p;
+            }
+        }
+        return null;
+    }
+
+
     public static void main(String[] args) {
-        System.out.print(getAllComType());
+        getAllComType();
+       // getAllComType1();
     }
 
     public static int paseInt(String str) {

@@ -38,6 +38,7 @@ public enum ErrorCodeOption {
     Get_ActList_Error("获取实时数据配置列表失败",30008),
     Is_Exist_PlcPort("通讯协议被占用",300012),
     Is_Not_Params_DeviceID("没有输入参数",300013),
+    UpdateFalse_DeviceName_Remark("设备别名和备注保存失败",300014),
 	
     Get_Groupid_Error("获取数组ID错误",50001),
 	

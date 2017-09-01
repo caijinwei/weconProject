@@ -94,4 +94,9 @@ public interface DeviceApi {
     *超级管理员展示数据
     * */
     public Page<DeviceDir> showAllDeviceDir(String accountId,int pageNum,int pageSize);
+
+    /*
+    * 更新设备名称和说明
+    * */
+    boolean updateDeviceName(Integer deviceId,String deviceName,String remark);
 }

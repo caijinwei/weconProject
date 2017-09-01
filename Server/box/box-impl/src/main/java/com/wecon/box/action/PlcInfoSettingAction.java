@@ -178,6 +178,7 @@ public class PlcInfoSettingAction {
         Map<String, List<PlcInfo>> comMapListByPtype = plcListByType.getPlcByPtype(plcListByType.getAllComType());
         Set<String> comMapListKeyByPtype = comMapListByPtype.keySet();
 
+
         /*
         * 获取以map<type,List<plcInfo>>
         * */
@@ -224,4 +225,6 @@ public class PlcInfoSettingAction {
         data.put("plcInfo", plcInfoApi.findPlcInfoByPlcId(plcId));
         return new Output(data);
     }
+
+
 }
