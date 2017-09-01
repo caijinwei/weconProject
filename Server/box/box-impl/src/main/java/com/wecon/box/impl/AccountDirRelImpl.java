@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -56,8 +57,19 @@ public class AccountDirRelImpl implements AccountDirRelApi {
     @Override
     public AccountDirRel getAccountDirRel(long acc_dir_id, long ref_id) {
 
-        String sql = "select " + SEL_COL + " from account_dir_rel where acc_dir_id=? and ref_id=?";
-        List<AccountDirRel> list = jdbcTemplate.query(sql, new Object[]{acc_dir_id, ref_id},
+        String sql = "select " + SEL_COL + " from account_dir_rel where 1=1  ";
+        StringBuffer condition = new StringBuffer("");
+		List<Object> params = new ArrayList<Object>();
+		if (acc_dir_id > 0) {
+			condition.append("and acc_dir_id=? ");
+			params.add(acc_dir_id);
+		}
+		if (ref_id > 0) {
+			condition.append(" and ref_id=? ");
+			params.add(ref_id);
+		}
+		sql=sql+ condition; 
+        List<AccountDirRel> list = jdbcTemplate.query(sql, params.toArray(),
                 new DefaultAccountDirRelRowMapper());
         if (!list.isEmpty()) {
             return list.get(0);

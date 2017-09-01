@@ -1,7 +1,3 @@
-
-
-
-
 package com.wecon.box.console.main;
 
 import org.apache.logging.log4j.LogManager;

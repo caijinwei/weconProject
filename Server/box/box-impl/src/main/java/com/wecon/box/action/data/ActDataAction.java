@@ -362,7 +362,7 @@ public class ActDataAction {
 			accountDirRelApi.delAccountDir(Long.parseLong(acc_dir_id), Long.parseLong(monitorid));
 		} else {
 			// 1.删除分配给视图账号的配置
-			viewAccountRoleApi.deletePoint(0, Long.parseLong(monitorid));
+			viewAccountRoleApi.deletePoint(1, Long.parseLong(monitorid));
 			// 2.更改配置状态，等待盒子发送数据把配置物理删除
 			RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(monitorid));
 			realHisCfg.state = 3;// 删除配置状态
@@ -504,7 +504,10 @@ public class ActDataAction {
 						attr.put("range", range);
 						arr.add(attr);
 					}
-					data.put("addrRid", arr);
+					if(arr.size()>0){
+						data.put("addrRid", arr);
+					}
+					
 					allarr.add(data);
 				}
 				if (null != plcs.get("byteaddr")) {
@@ -522,7 +525,9 @@ public class ActDataAction {
 						attr.put("range", range);
 						arr.add(attr);
 					}
-					data.put("addrRid", arr);
+					if(arr.size()>0){
+						data.put("addrRid", arr);
+					}
 					allarr.add(data);
 
 				}
@@ -541,7 +546,9 @@ public class ActDataAction {
 						attr.put("range", range);
 						arr.add(attr);
 					}
-					data.put("addrRid", arr);
+					if(arr.size()>0){
+						data.put("addrRid", arr);
+					}
 					allarr.add(data);
 
 				}
@@ -560,7 +567,9 @@ public class ActDataAction {
 						attr.put("range", range);
 						arr.add(attr);
 					}
-					data.put("addrRid", arr);
+					if(arr.size()>0){
+						data.put("addrRid", arr);
+					}
 					allarr.add(data);
 
 				}

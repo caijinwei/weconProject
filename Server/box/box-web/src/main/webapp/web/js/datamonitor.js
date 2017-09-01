@@ -673,9 +673,12 @@ appModule
 												if (data.allAddr != "") {
 
 													$scope.addrvalues = data.allAddr[0].addrRid;
-													$("#rangid")
-															.val(
-																	data.allAddr[0].addrRid[0].range);
+													if (data.allAddr[0].addrRid != null) {
+														$("#rangid")
+																.val(
+																		data.allAddr[0].addrRid[0].range);
+													}
+
 													$scope.$apply();
 													if (mtype == 1) {
 
@@ -702,19 +705,23 @@ appModule
 
 														$("#registerid").val(
 																minfo.rid);
+
 														if ($("#registerid")
 																.val() == null) {
+
 															$("#addrtypeid")
 																	.val(
 																			data.allAddr[0].addrkey);
+															if ($scope.addrvalues != null) {
+																$("#registerid")
+																		.val(
+																				$scope.addrvalues[0].addrvalue);
 
-															$("#registerid")
-																	.val(
-																			$scope.addrvalues[0].addrvalue);
+																$("#rangid")
+																		.val(
+																				$scope.addrvalues[0].range);
 
-															$("#rangid")
-																	.val(
-																			$scope.addrvalues[0].range);
+															}
 
 														} else {
 															$("#rangid")
@@ -790,7 +797,7 @@ appModule
 
 						if ($("#nameid").val() == ""
 								|| $("#addrid").val() == "") {
-							alert("参数为配置完整！");
+							alert("参数未配置完整！");
 							return;
 						}
 
