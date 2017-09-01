@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 @Component
 public class DeviceImpl implements DeviceApi {
 
+
     @Autowired
     ViewAccountRoleApi viewAccountRoleApi;
     @Autowired
@@ -85,31 +86,31 @@ public class DeviceImpl implements DeviceApi {
                 model.remark, model.map, model.state, model.dir_id, model.device_id});
         return true;
     }
-    public boolean updateDeviceName(Integer deviceId,String deviceName,String remark)
-    {
-        StringBuffer condition=new StringBuffer("");
-        if(null==deviceId)
-        {
-            throw new BusinessException(ErrorCodeOption.Device_NotFound.key,ErrorCodeOption.Device_NotFound.value);
+
+    public boolean updateDeviceName(Integer deviceId, String deviceName, String remark) {
+        StringBuffer condition = new StringBuffer("");
+        List<Object> params = new ArrayList<Object>();
+
+
+        if (null == deviceId) {
+            throw new BusinessException(ErrorCodeOption.Device_NotFound.key, ErrorCodeOption.Device_NotFound.value);
         }
-        if(null==deviceName&&null==remark)
-        {
+        if (CommonUtils.isNullOrEmpty(deviceName) && CommonUtils.isNullOrEmpty(remark)) {
             return false;
         }
-        if(null==remark)
-        {
-            condition.append(" name= "+deviceName);
-        }else if(null==deviceName)
-        {
-            condition.append(" remark= "+remark);
-        }else
-        {
-            condition.append(" name="+deviceName+", remark="+remark);
+        if (!CommonUtils.isNullOrEmpty(deviceName)) {
+            condition.append(" name= ? ");
+            params.add(remark);
+        }
+        if (!CommonUtils.isNullOrEmpty(remark)) {
+            condition.append(", remark= ? ");
+            params.add(deviceName);
         }
 
-        String sql="UPDATE device  SET "+condition+" ,update_date=current_timestamp WHERE device_id=?";
-        if(jdbcTemplate.update(sql)<=0)
-        {
+        params.add(deviceId);
+        String sql = "UPDATE device  SET " + condition + " update_date=current_timestamp WHERE device_id=?";
+
+        if (jdbcTemplate.update(sql, params) <= 0) {
             return false;
         }
         return true;
@@ -320,15 +321,20 @@ public class DeviceImpl implements DeviceApi {
 
                     ArrayList<Integer> alarmCfgIds = alarmCfgApi.findAlarmCfgIdSBydevice_id(deviceId);
                     alarmCfgApi.setBind_state(toIntArray(alarmCfgIds), 0);
-                    viewAccountRoleApi.deleteViewAccountRoleByCfgId(alarmCfgIds,2);
-                    viewAccountRoleApi.deleteViewAccountRoleByCfgId(realHisCfgIds,1);
+                    viewAccountRoleApi.deleteViewAccountRoleByCfgId(alarmCfgIds, 2);
+                    viewAccountRoleApi.deleteViewAccountRoleByCfgId(realHisCfgIds, 1);
 
+                    /*
+                    * 删除管理员与盒子分组关系
+                    * DELETE FROM account_dir_rel WHERE ref_id=1111 AND acc_dir_id IN (SELECT id FROM account_dir WHERE type=0 AND account_id=12);
+                    * */
+                    accountDirRelApi.deleteAccDeviceRel(deviceId,accountId);
                     /*
                     * 解除视图账户和监控点分组下的关系
                     * */
-                    accountDirRelApi.deleteViewAccAndPointRel(1,accountId,realHisCfgIds);
-                    accountDirRelApi.deleteViewAccAndPointRel(2,accountId,realHisCfgIds);
-                    accountDirRelApi.deleteViewAccAndPointRel(3,accountId,alarmCfgIds);
+                    accountDirRelApi.deleteViewAccAndPointRel(1, accountId, realHisCfgIds);
+                    accountDirRelApi.deleteViewAccAndPointRel(2, accountId, realHisCfgIds);
+                    accountDirRelApi.deleteViewAccAndPointRel(3, accountId, alarmCfgIds);
                     return true;
                 }
             });
@@ -348,11 +354,11 @@ public class DeviceImpl implements DeviceApi {
     }
 
     public Page<DeviceDir> showAllDeviceDir(String accountId, int pageNum, int pageSize) {
-        System.out.println("-----------------------"+accountId);
+        System.out.println("-----------------------" + accountId);
         StringBuffer condition = new StringBuffer("");
         if ((!accountId.equals("")) && (accountId != null)) {
             condition.append(" WHERE c.account_id =" + accountId);
-            System.out.println("---------------------------有执行到这里么 条件"+condition );
+            System.out.println("---------------------------有执行到这里么 条件" + condition);
         }
         String sqlCount = "SELECT  " +
                 "  count(1)  " +
@@ -391,5 +397,6 @@ public class DeviceImpl implements DeviceApi {
         page.setList(list);
         return page;
     }
+
 
 }

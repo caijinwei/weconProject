@@ -2,6 +2,9 @@ package com.wecon.box.impl;
 
 import com.wecon.box.api.AccountDirRelApi;
 import com.wecon.box.entity.AccountDirRel;
+import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.common.util.CommonUtils;
+import com.wecon.restful.core.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -154,4 +157,19 @@ public class AccountDirRelImpl implements AccountDirRelApi {
         String sql="DELETE FROM account_dir_rel WHERE acc_dir_id IN (SELECT id FROM account_dir WHERE type=? AND account_id IN(SELECT view_id FROM account_relation WHERE manager_id =?)) AND ref_id IN ("+pointIds.substring(0,pointIds.length()-1)+")";
         Object[] args=new Object[]{};
     }
+    /*
+  * 删除管理员与盒子分组关系
+  * DELETE FROM account_dir_rel WHERE ref_id=1111 AND acc_dir_id IN (SELECT id FROM account_dir WHERE type=0 AND account_id=12);
+   * */
+    @Override
+    public void deleteAccDeviceRel(Integer deviceId, Integer accountId) {
+        if (!CommonUtils.isNotNull(deviceId) && !CommonUtils.isNotNull(accountId))
+            throw new BusinessException(ErrorCodeOption.Delete_AccDevice_Rel_False.key, ErrorCodeOption.Delete_AccDevice_Rel_False.value);
+        String sql = "DELETE FROM account_dir_rel WHERE ref_id=? AND acc_dir_id IN (SELECT id FROM account_dir WHERE type=0 AND account_id=?)";
+        Object[] args=new Object[]{deviceId,accountId};
+        jdbcTemplate.update(sql,args);
+
+    }
+
+
 }

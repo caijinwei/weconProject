@@ -55,4 +55,9 @@ public interface AccountDirApi {
 
     List<AccountDir> getAccountDirList(long account_id, int type, long device_id);
 
+    /*
+    * 更新用户id
+    * */
+    public void updateAccountBydeviceAndType(long accountId,long deviceId);
+
 }

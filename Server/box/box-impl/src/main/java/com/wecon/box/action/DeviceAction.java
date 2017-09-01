@@ -109,7 +109,9 @@ public class DeviceAction {
         model.account_id = AppContext.getSession().client.userId;
         model.device_id = device_id;
         devBindUserApi.saveDevBindUser(model);
-        deviceApi.updateDeviceName((int)device_id,name,"");
+        Device modelUpdName=deviceApi.getDevice(device_id);
+        modelUpdName.name=name;
+        deviceApi.updateDevice(modelUpdName);
         /*
         * 更新实时历史监控点迁移
         * */
@@ -126,6 +128,11 @@ public class DeviceAction {
             accountDirRel.acc_dir_id = acc_dir_id;
             accountDirRelApi.saveAccountDirRel(accountDirRel);
         }
+
+        /*
+        * 更新监控点分组迁移
+        * */
+        accountDirApi.updateAccountBydeviceAndType( AppContext.getSession().client.userId,device_id);
         return new Output();
     }
 
