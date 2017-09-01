@@ -12,28 +12,30 @@
     <script src="../lib/mqtt/bmqtt.js"></script>
 
     <style>
-        .myform{
+        .myform {
             margin-top: 15px;
         }
 
         #mqtt-log-containor {
-            height:80%;
+            height: 80%;
             width: 100%;
             margin-top: 15px;
             /*background: #000;*/
             /*color:green;*/
         }
-        #mqtt-log{
+
+        #mqtt-log {
             width: 100%;
             height: 600px;
             overflow: auto;
         }
-        #clear{
+
+        #clear {
             color: white;
         }
 
     </style>
-    <script >
+    <script>
         var client;
 
         $(document).ready(function () {
@@ -43,7 +45,7 @@
             $("#connectBtn").show();
 
 
-            $("#clear").on('click',function () {
+            $("#clear").on('click', function () {
 
                 $("#mqtt-log").empty()
                 log("Clear :)")
@@ -52,23 +54,23 @@
             $('#unsubscribeBtn').on('click', function () {
 
                 var topic = $("#mqtt-topic").val();
-                if(topic<1){
+                if (topic < 1) {
                     log('topic 不能为null')
                     return
                 }
                 client.unsubscribe(topic);
-                log('>>>退订topic = '+topic)
+                log('>>>退订topic = ' + topic)
             })
 
             $('#subscribeBtn').on('click', function () {
 
                 var topic = $("#mqtt-topic").val();
-                if(topic<1){
+                if (topic < 1) {
                     log('topic 不能为null')
                     return
                 }
                 client.subscribe(topic);
-                log('>>>订阅topic = '+topic)
+                log('>>>订阅topic = ' + topic)
             })
             $('#disconnectBtn').on('click', function () {
 
@@ -82,17 +84,17 @@
             $('#publishBtn').on('click', function () {
 
                 var topic = $("#mqtt-topic").val();
-                if(topic<1){
+                if (topic < 1) {
                     log('topic 不能为null')
                     return
                 }
                 var msg = $("#mqtt-msg").val();
-                if(msg<1){
+                if (msg < 1) {
                     log('msg 不能为null')
                     return
                 }
                 client.publish(topic, msg);
-                log('>>>发布消息 = '+msg)
+                log('>>>发布消息 = ' + msg)
             })
 
             $('#connectBtn').on('click', function () {
@@ -100,7 +102,7 @@
                 var host = $("#mqtt-host").val();
                 var port = $("#mqtt-port").val();
 
-                if(host.length<1||port<1){
+                if (host.length < 1 || port < 1) {
                     log('host和port不能为空...')
                     return;
                 }
@@ -110,9 +112,9 @@
                 $("#disconnectBtn").show();
                 $("#subscribe").show();
 
-                client = mqtt.connect('ws://' + host + ':' + port+ '',{
-                    username:"admin",
-                    password:"password"
+                client = mqtt.connect('ws://' + host + ':' + port + '', {
+                    username: "admin",
+                    password: "password"
                 });
                 client.on('connect', function () {
 
@@ -142,9 +144,9 @@
         });
 
         function log(data) {
-
-            $('#mqtt-log').prepend('<p>'+data+'</p>');
-
+            var date = new Date();
+            var t = date.toLocaleString();
+            $('#mqtt-log').prepend('<p>' + t + " " + data + '</p>');
         }
     </script>
 </head>
@@ -178,6 +180,7 @@
 
         </form>
         <br>
+
         <form class="form-inline">
             <div class="form-group">
                 <label class="sr-only" for="mqtt-msg">MQTT Message</label>

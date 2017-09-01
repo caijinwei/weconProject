@@ -65,7 +65,10 @@ appModule.controller("listController", function ($scope, $http, $compile) {
      * 列表操作
      */
     $scope.methods = {
-        view: function (model) {
+        viewMsg: function (model) {
+            $("#newWinModal").modal('show');
+            $("#viewDetailDiv").text(JSON.stringify(JSON.parse(model.message), null, "\t"));
+
         }
     }
     /**
