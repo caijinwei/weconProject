@@ -192,6 +192,38 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 		return true;
 	}
 
+	@Override
+	public boolean batchDeleteByPlcId(final List<Integer> ids) {
+		if (null == ids || ids.size() == 0) {
+			return false;
+		}
+
+		StringBuilder idSb = new StringBuilder();
+		for(int id : ids){
+			idSb.append(",").append(id);
+		}
+		String sql = "delete from alarm_cfg where plc_id in("+idSb.substring(1)+")";
+		jdbcTemplate.update(sql);
+
+		return true;
+	}
+
+	@Override
+	public boolean batchDeleteById(final List<Integer> ids) {
+		if (null == ids || ids.size() == 0) {
+			return false;
+		}
+
+		StringBuilder idSb = new StringBuilder();
+		for(int id : ids){
+			idSb.append(",").append(id);
+		}
+		String sql = "delete from alarm_cfg where alarmcfg_id in("+idSb.substring(1)+")";
+		jdbcTemplate.update(sql);
+
+		return true;
+	}
+
 	public static final class DefaultAlarmTriggerRowMapper implements RowMapper<AlarmTrigger> {
 		@Override
 		public AlarmTrigger mapRow(ResultSet rs, int i) throws SQLException {

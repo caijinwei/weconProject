@@ -159,6 +159,21 @@ public class PlcInfoImpl implements PlcInfoApi {
 		return true;
 	}
 
+    @Override
+    public boolean batchDeletePlc(final List<Integer> ids){
+        if(null == ids || ids.size() == 0){
+            return false;
+        }
+        StringBuilder idSb = new StringBuilder();
+        for(int id : ids){
+            idSb.append(",").append(id);
+        }
+        String sql = "delete from plc_info where plc_id in("+idSb.substring(1)+")";
+        jdbcTemplate.update(sql);
+
+        return true;
+    }
+
 
 public static final class DefaultPlcInfoRowMapper implements RowMapper<PlcInfo> {
 

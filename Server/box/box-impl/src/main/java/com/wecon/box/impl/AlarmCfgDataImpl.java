@@ -102,6 +102,38 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 	}
 
 	@Override
+	public boolean batchDeleteByPlcId(List<Integer> ids) {
+		if (null == ids || ids.size() == 0) {
+			return false;
+		}
+
+		StringBuilder idSb = new StringBuilder();
+		for(int id : ids){
+			idSb.append(",").append(id);
+		}
+		String sql = "delete from alarm_cfg_data where alarm_cfg_id in(select alarmcfg_id from alarm_cfg where plc_id in("+idSb.substring(1)+"))";
+		jdbcTemplate.update(sql);
+
+		return true;
+	}
+
+	@Override
+	public boolean batchDeleteById(final List<Integer> ids) {
+		if (null == ids || ids.size() == 0) {
+			return false;
+		}
+
+		StringBuilder idSb = new StringBuilder();
+		for(int id : ids){
+			idSb.append(",").append(id);
+		}
+		String sql = "delete from alarm_cfg_data where alarm_cfg_id in("+idSb.substring(1)+")";
+		jdbcTemplate.update(sql);
+
+		return true;
+	}
+
+	@Override
 	public Page<AlarmCfgDataAlarmCfg> getRealHisCfgDataList(AlarmCfgDataFilter filter, int pageIndex, int pageSize) {
 		String sqlCount = "select count(0) from alarm_cfg ac ,alarm_cfg_data acd,alarm_trigger atr,plc_info pli where 1=1 and  ac.alarmcfg_id=atr.alarmcfg_id and  ac.alarmcfg_id=acd.alarm_cfg_id and ac.bind_state=1 and pli.`plc_id`=ac.plc_id";
 		String sql = " select " + SEL_COL + ",ac.name,ac.text "

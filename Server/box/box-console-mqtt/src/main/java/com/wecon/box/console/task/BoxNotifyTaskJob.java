@@ -3,9 +3,7 @@ package com.wecon.box.console.task;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.TypeReference;
-import com.wecon.box.api.AlarmCfgApi;
-import com.wecon.box.api.PlcInfoApi;
-import com.wecon.box.api.RealHisCfgApi;
+import com.wecon.box.api.*;
 import com.wecon.box.console.config.ConnectOptions;
 import com.wecon.box.console.util.MqttConfigContext;
 import com.wecon.box.console.util.SpringContextHolder;
@@ -257,6 +255,8 @@ public class BoxNotifyTaskJob implements Job {
         PlcInfoApi plcInfoApi = SpringContextHolder.getBean(PlcInfoApi.class);
         RealHisCfgApi realHisCfgApi = SpringContextHolder.getBean(RealHisCfgApi.class);
         AlarmCfgApi alarmCfgApi = SpringContextHolder.getBean(AlarmCfgApi.class);
+        AlarmCfgDataApi alarmCfgDataApi = SpringContextHolder.getBean(AlarmCfgDataApi.class);
+        RealHisCfgDataApi realHisCfgDataApi = SpringContextHolder.getBean(RealHisCfgDataApi.class);
 
         try {
             //使用Map泛型主要是为了兼容所有类型反馈，比较灵活
@@ -267,21 +267,37 @@ public class BoxNotifyTaskJob implements Job {
             switch (fbAct){
                 case ACT_UPDATE_PLC_CONFIG : //更新通讯口配置反馈
                     List<Map> updComList = fbData.get("upd_com_list");
-                    plcInfoApi.batchUpdateState(getFeedbackArgs(updComList, "com"));
+                    plcInfoApi.batchUpdateState(getFeedbackUpdArgs(updComList, "com"));
                     break;
                 case ACT_UPDATE_REAL_HISTORY_CONFIG : //更新实时和历史监控点配置
                     List<Map> updRealHisCfgList = fbData.get("upd_real_his_cfg_list");
-                    realHisCfgApi.batchUpdateState(getFeedbackArgs(updRealHisCfgList, "addr_id"));
+                    realHisCfgApi.batchUpdateState(getFeedbackUpdArgs(updRealHisCfgList, "addr_id"));
                     break;
                 case ACT_UPDATE_ALARM_DATA_CONFIG : //更新报警数据配置
                     List<Map> updAlarmCfgList = fbData.get("upd_alarm_cfg_list");
-                    alarmCfgApi.batchUpdateState(getFeedbackArgs(updAlarmCfgList, "addr_id"));
+                    alarmCfgApi.batchUpdateState(getFeedbackUpdArgs(updAlarmCfgList, "addr_id"));
                     break;
                 case ACT_DELETE_MONITOR_CONFIG : //删除监控点配置
                     List<Map> delCfgList = fbData.get("del_cfg_list");
+                    List<Integer> alarmCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", 2);
+                    List<Integer> realCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", 0);
+                    List<Integer> hisCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", 1);
+                    realCfgIds.addAll(hisCfgIds);
+                    //删除监控点配置、数据
+                    realHisCfgApi.batchDeleteById(realCfgIds);
+                    realHisCfgDataApi.batchDeleteById(realCfgIds);
+                    alarmCfgApi.batchDeleteById(alarmCfgIds);
+                    alarmCfgDataApi.batchDeleteById(alarmCfgIds);
                     break;
-                case ACT_DELETE_PLC_CONFIG : //删除监控点配置
+                case ACT_DELETE_PLC_CONFIG : //删除通讯口配置
                     List<Map> delComList = fbData.get("del_com_list");
+                    List<Integer> ids = getFeedbackDelArgs(delComList, "com", 5);
+                    //删除通讯口数据，实时历史报警配置、数据
+                    plcInfoApi.batchDeletePlc(ids);
+                    alarmCfgApi.batchDeleteByPlcId(ids);
+                    realHisCfgApi.batchDeleteByPlcId(ids);
+                    alarmCfgDataApi.batchDeleteByPlcId(ids);
+                    realHisCfgDataApi.batchDeleteByPlcId(ids);
                     break;
             }
         }catch (NumberFormatException e){
@@ -289,20 +305,49 @@ public class BoxNotifyTaskJob implements Job {
         }catch (NullPointerException e){
             e.printStackTrace();
         }catch (JSONException e){
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
-    private List<int[]> getFeedbackArgs(List<Map> updCfgList, String idKey){
+    private List<int[]> getFeedbackUpdArgs(List<Map> updCfgList, String idKey){
         if(null != updCfgList){
             List<int[]> updArgList = new ArrayList<int[]>();
             for(Map m : updCfgList){
-                if(UPD_STATE_SUCCESS == Integer.parseInt(m.get("upd_state").toString())){
-                    updArgList.add(new int[]{Constant.State.STATE_SYNCED_BOX,
-                            Integer.parseInt(m.get(idKey).toString())});
+                try {
+                    if(UPD_STATE_SUCCESS == Integer.parseInt(m.get("upd_state").toString())){
+                        updArgList.add(new int[]{Constant.State.STATE_SYNCED_BOX,
+                                Integer.parseInt(m.get(idKey).toString())});
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
             }
             return updArgList;
+        }
+        return null;
+    }
+
+    private List<Integer> getFeedbackDelArgs(List<Map> delCfgList, String idKey, int delType){
+        if(null != delCfgList){
+            List<Integer> delArgList = new ArrayList<Integer>();
+            for(Map m : delCfgList){
+                try {
+                    if(UPD_STATE_SUCCESS == Integer.parseInt(m.get("upd_state").toString())){
+                        Object delTypeOj = m.get("del_type");
+                        int id = Integer.parseInt(m.get(idKey).toString());
+                        if(null != delTypeOj){
+                            if(Integer.parseInt(delTypeOj.toString()) == delType){
+                                delArgList.add(id);
+                            }
+                        }else{
+                            delArgList.add(id);
+                        }
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+            return delArgList;
         }
         return null;
     }
