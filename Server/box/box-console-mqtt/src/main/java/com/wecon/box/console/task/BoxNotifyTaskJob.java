@@ -12,12 +12,13 @@ import com.wecon.box.entity.*;
 import com.wecon.box.util.Converter;
 import com.wecon.box.util.GroupOp;
 import com.wecon.common.util.CommonUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.apache.log4j.Logger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,11 +43,11 @@ public class BoxNotifyTaskJob implements Job {
 
     private final int UPD_STATE_SUCCESS = 1;
 
-    private static Logger logger = Logger.getLogger(BoxNotifyTaskJob.class);
+    private static Logger logger = LogManager.getLogger(MonitorTaskJob.class.getName());
 
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         if (mqttClient != null && mqttClient.isConnected()) {
-            logger.debug("mqtt connection is normal !");
+            logger.info("mqtt connection is normal !");
             notifyHandle();
             return;
         }
@@ -72,10 +73,10 @@ public class BoxNotifyTaskJob implements Job {
      */
     private void updatePlcCfgHandle(){
         try {
-            logger.debug("updatePlcCfgHandle，开始从DB获取数据");
+            logger.info("updatePlcCfgHandle，开始从DB获取数据");
             PlcInfoApi plcInfoApi = SpringContextHolder.getBean(PlcInfoApi.class);
             List<PlcExtend> plcExtendLst = plcInfoApi.getPlcExtendListByState(Constant.State.STATE_UPDATE_CONFIG, Constant.State.STATE_NEW_CONFIG);
-            logger.debug("updatePlcCfgHandle，获取更新条数："+(null==plcExtendLst?"0":plcExtendLst.size()));
+            logger.info("updatePlcCfgHandle，获取更新条数："+(null==plcExtendLst?"0":plcExtendLst.size()));
             if(null != plcExtendLst){
                 Map<String, List<Map>> groupPlcExtends = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(plcExtendLst));
                 if(null != groupPlcExtends){
@@ -90,7 +91,7 @@ public class BoxNotifyTaskJob implements Job {
                         //发布数据给盒子
                         serverTopic = serverTopic.replace("#", entry.getKey());
                         publish(JSON.toJSONString(baseMsgResp));
-                        logger.debug("updatePlcCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
+                        logger.info("updatePlcCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
                     }
                 }
             }
@@ -104,32 +105,39 @@ public class BoxNotifyTaskJob implements Job {
      * 更新实时和历史监控点配置
      */
     private void updateRealHisCfgHandle(){
-        RealHisCfgApi realHisCfgApi = SpringContextHolder.getBean(RealHisCfgApi.class);
-        List<RealHisCfgExtend> realHisCfgList = realHisCfgApi.getRealHisCfgListByState(Constant.State.STATE_UPDATE_CONFIG);
-        if(null != realHisCfgList){
-            Map<String, List<Map>> groupRealHisCfg = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(realHisCfgList));
-            if(null != groupRealHisCfg){
-                for(Map.Entry<String, List<Map>> entry : groupRealHisCfg.entrySet()){
-                    BaseMsgResp<Map<String, List<BaseCfgCom<Map>>>> baseMsgResp = new BaseMsgResp<Map<String, List<BaseCfgCom<Map>>>>();
-                    baseMsgResp.setAct(ACT_UPDATE_REAL_HISTORY_CONFIG);
-                    baseMsgResp.setFeedback(BaseMsgResp.TYPE_FEEDBACK_NEED);
-                    baseMsgResp.setMachine_code(entry.getKey());
-                    Map<String, List<Map>> cfgComMap = GroupOp.groupCfgFilterByCom(entry.getValue());
-                    List<BaseCfgCom<Map>> cfgComList = new ArrayList<BaseCfgCom<Map>>();
-                    for(Map.Entry<String, List<Map>> cfgEntry : cfgComMap.entrySet()){
-                        BaseCfgCom<Map> cfgCom = new BaseCfgCom<Map>();
-                        cfgCom.setCom(cfgEntry.getKey());
-                        cfgCom.setCfg_list(cfgEntry.getValue());
-                        cfgComList.add(cfgCom);
+        try {
+            logger.info("updateRealHisCfgHandle，开始从DB获取数据");
+            RealHisCfgApi realHisCfgApi = SpringContextHolder.getBean(RealHisCfgApi.class);
+            List<RealHisCfgExtend> realHisCfgList = realHisCfgApi.getRealHisCfgListByState(Constant.State.STATE_UPDATE_CONFIG);
+            logger.info("updateRealHisCfgHandle，获取更新条数："+(null==realHisCfgList?"0":realHisCfgList.size()));
+            if(null != realHisCfgList){
+                Map<String, List<Map>> groupRealHisCfg = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(realHisCfgList));
+                if(null != groupRealHisCfg){
+                    for(Map.Entry<String, List<Map>> entry : groupRealHisCfg.entrySet()){
+                        BaseMsgResp<Map<String, List<BaseCfgCom<Map>>>> baseMsgResp = new BaseMsgResp<Map<String, List<BaseCfgCom<Map>>>>();
+                        baseMsgResp.setAct(ACT_UPDATE_REAL_HISTORY_CONFIG);
+                        baseMsgResp.setFeedback(BaseMsgResp.TYPE_FEEDBACK_NEED);
+                        baseMsgResp.setMachine_code(entry.getKey());
+                        Map<String, List<Map>> cfgComMap = GroupOp.groupCfgFilterByCom(entry.getValue());
+                        List<BaseCfgCom<Map>> cfgComList = new ArrayList<BaseCfgCom<Map>>();
+                        for(Map.Entry<String, List<Map>> cfgEntry : cfgComMap.entrySet()){
+                            BaseCfgCom<Map> cfgCom = new BaseCfgCom<Map>();
+                            cfgCom.setCom(cfgEntry.getKey());
+                            cfgCom.setCfg_list(cfgEntry.getValue());
+                            cfgComList.add(cfgCom);
+                        }
+                        Map<String, List<BaseCfgCom<Map>>> realHisCfgResp = new HashMap<String, List<BaseCfgCom<Map>>>();
+                        realHisCfgResp.put("upd_real_his_cfg_list", cfgComList);
+                        baseMsgResp.setData(realHisCfgResp);
+                        //发布数据给盒子
+                        serverTopic = serverTopic.replace("#", entry.getKey());
+                        publish(JSON.toJSONString(baseMsgResp));
+                        logger.info("updateRealHisCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
                     }
-                    Map<String, List<BaseCfgCom<Map>>> realHisCfgResp = new HashMap<String, List<BaseCfgCom<Map>>>();
-                    realHisCfgResp.put("upd_real_his_cfg_list", cfgComList);
-                    baseMsgResp.setData(realHisCfgResp);
-                    //发布数据给盒子
-                    serverTopic = serverTopic.replace("#", entry.getKey());
-                    publish(JSON.toJSONString(baseMsgResp));
                 }
             }
+        }catch (Exception e){
+            logger.error("updateRealHisCfgHandle，通知盒子失败，"+e.getMessage());
         }
     }
 
@@ -137,59 +145,73 @@ public class BoxNotifyTaskJob implements Job {
      * 更新报警数据配置
      */
     private void updateAlarmCfgHandle(){
-        AlarmCfgApi alarmCfgApi = SpringContextHolder.getBean(AlarmCfgApi.class);
-        List<AlarmCfgExtend> alarmCfgExtendList = alarmCfgApi.getAlarmCfgExtendListByState(Constant.State.STATE_UPDATE_CONFIG);
-        if(null != alarmCfgExtendList){
-            Map<String, List<Map>> groupAlarmCfg = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(alarmCfgExtendList));
-            if(null != groupAlarmCfg){
-                for(Map.Entry<String, List<Map>> entry : groupAlarmCfg.entrySet()){
-                    BaseMsgResp<Map<String, List<BaseCfgCom<Map>>>> baseMsgResp = new BaseMsgResp<Map<String, List<BaseCfgCom<Map>>>>();
-                    baseMsgResp.setAct(ACT_UPDATE_ALARM_DATA_CONFIG);
-                    baseMsgResp.setFeedback(BaseMsgResp.TYPE_FEEDBACK_NEED);
-                    baseMsgResp.setMachine_code(entry.getKey());
-                    Map<String, List<Map>> cfgComMap = GroupOp.groupCfgFilterByCom(entry.getValue());
-                    List<BaseCfgCom<Map>> cfgComList = new ArrayList<BaseCfgCom<Map>>();
-                    for(Map.Entry<String, List<Map>> cfgEntry : cfgComMap.entrySet()){
-                        BaseCfgCom<Map> cfgCom = new BaseCfgCom<Map>();
-                        cfgCom.setCom(cfgEntry.getKey());
-                        cfgCom.setCfg_list(cfgEntry.getValue());
-                        cfgComList.add(cfgCom);
+        try {
+            logger.info("updateAlarmCfgHandle，开始从DB获取数据");
+            AlarmCfgApi alarmCfgApi = SpringContextHolder.getBean(AlarmCfgApi.class);
+            List<AlarmCfgExtend> alarmCfgExtendList = alarmCfgApi.getAlarmCfgExtendListByState(Constant.State.STATE_UPDATE_CONFIG);
+            logger.info("updateAlarmCfgHandle，获取更新条数："+(null==alarmCfgExtendList?"0":alarmCfgExtendList.size()));
+            if(null != alarmCfgExtendList){
+                Map<String, List<Map>> groupAlarmCfg = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(alarmCfgExtendList));
+                if(null != groupAlarmCfg){
+                    for(Map.Entry<String, List<Map>> entry : groupAlarmCfg.entrySet()){
+                        BaseMsgResp<Map<String, List<BaseCfgCom<Map>>>> baseMsgResp = new BaseMsgResp<Map<String, List<BaseCfgCom<Map>>>>();
+                        baseMsgResp.setAct(ACT_UPDATE_ALARM_DATA_CONFIG);
+                        baseMsgResp.setFeedback(BaseMsgResp.TYPE_FEEDBACK_NEED);
+                        baseMsgResp.setMachine_code(entry.getKey());
+                        Map<String, List<Map>> cfgComMap = GroupOp.groupCfgFilterByCom(entry.getValue());
+                        List<BaseCfgCom<Map>> cfgComList = new ArrayList<BaseCfgCom<Map>>();
+                        for(Map.Entry<String, List<Map>> cfgEntry : cfgComMap.entrySet()){
+                            BaseCfgCom<Map> cfgCom = new BaseCfgCom<Map>();
+                            cfgCom.setCom(cfgEntry.getKey());
+                            cfgCom.setCfg_list(cfgEntry.getValue());
+                            cfgComList.add(cfgCom);
+                        }
+                        Map<String, List<BaseCfgCom<Map>>> realHisCfgResp = new HashMap<String, List<BaseCfgCom<Map>>>();
+                        realHisCfgResp.put("upd_alarm_cfg_list", cfgComList);
+                        baseMsgResp.setData(realHisCfgResp);
+                        //发布数据给盒子
+                        serverTopic = serverTopic.replace("#", entry.getKey());
+                        publish(JSON.toJSONString(baseMsgResp));
+                        logger.info("updateAlarmCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
                     }
-                    Map<String, List<BaseCfgCom<Map>>> realHisCfgResp = new HashMap<String, List<BaseCfgCom<Map>>>();
-                    realHisCfgResp.put("upd_alarm_cfg_list", cfgComList);
-                    baseMsgResp.setData(realHisCfgResp);
-                    //发布数据给盒子
-                    serverTopic = serverTopic.replace("#", entry.getKey());
-                    publish(JSON.toJSONString(baseMsgResp));
                 }
             }
+        }catch (Exception e){
+            logger.error("updateAlarmCfgHandle，通知盒子失败，"+e.getMessage());
         }
+
     }
 
     /**
      * 删除监控点配置
      */
     private void deleteAllCfgHandle(){
-        RealHisCfgApi realHisCfgApi = SpringContextHolder.getBean(RealHisCfgApi.class);
-        AlarmCfgApi alarmCfgApi = SpringContextHolder.getBean(AlarmCfgApi.class);
-        List<RealHisCfgExtend> realHisCfgList = realHisCfgApi.getRealHisCfgListByState(Constant.State.STATE_DELETE_CONFIG);
-        List<AlarmCfgExtend> alarmCfgExtendList = alarmCfgApi.getAlarmCfgExtendListByState(Constant.State.STATE_DELETE_CONFIG);
-        if(null != realHisCfgList){
-            List<RealHisCfgDevice> realCfgList = new ArrayList<RealHisCfgDevice>();
-            List<RealHisCfgDevice> hisCfgList = new ArrayList<RealHisCfgDevice>();
-            for(RealHisCfgDevice r : realHisCfgList){
-                if(r.data_type == Constant.DataType.DATA_TYPE_REAL){
-                    realCfgList.add(r);
-                }else if(r.data_type == Constant.DataType.DATA_TYPE_HISTORY){
-                    hisCfgList.add(r);
+        try {
+            logger.info("deleteAllCfgHandle，开始从DB获取数据");
+            RealHisCfgApi realHisCfgApi = SpringContextHolder.getBean(RealHisCfgApi.class);
+            AlarmCfgApi alarmCfgApi = SpringContextHolder.getBean(AlarmCfgApi.class);
+            List<RealHisCfgExtend> realHisCfgList = realHisCfgApi.getRealHisCfgListByState(Constant.State.STATE_DELETE_CONFIG);
+            List<AlarmCfgExtend> alarmCfgExtendList = alarmCfgApi.getAlarmCfgExtendListByState(Constant.State.STATE_DELETE_CONFIG);
+            if(null != realHisCfgList){
+                List<RealHisCfgDevice> realCfgList = new ArrayList<RealHisCfgDevice>();
+                List<RealHisCfgDevice> hisCfgList = new ArrayList<RealHisCfgDevice>();
+                for(RealHisCfgDevice r : realHisCfgList){
+                    if(r.data_type == Constant.DataType.DATA_TYPE_REAL){
+                        realCfgList.add(r);
+                    }else if(r.data_type == Constant.DataType.DATA_TYPE_HISTORY){
+                        hisCfgList.add(r);
+                    }
                 }
+                deleteRealHisCfgPublish(Converter.convertListOjToMap(realCfgList), Constant.DataType.DATA_TYPE_REAL);
+                deleteRealHisCfgPublish(Converter.convertListOjToMap(hisCfgList), Constant.DataType.DATA_TYPE_HISTORY);
             }
-            deleteRealHisCfgPublish(Converter.convertListOjToMap(realCfgList), Constant.DataType.DATA_TYPE_REAL);
-            deleteRealHisCfgPublish(Converter.convertListOjToMap(hisCfgList), Constant.DataType.DATA_TYPE_HISTORY);
+            if(null != alarmCfgExtendList){
+                deleteRealHisCfgPublish(Converter.convertListOjToMap(alarmCfgExtendList), Constant.DataType.DATA_TYPE_ALARM);
+            }
+        }catch (Exception e){
+            logger.error("deleteAllCfgHandle，通知盒子失败，"+e.getMessage());
         }
-        if(null != alarmCfgExtendList){
-            deleteRealHisCfgPublish(Converter.convertListOjToMap(alarmCfgExtendList), Constant.DataType.DATA_TYPE_ALARM);
-        }
+
     }
 
     private void deleteRealHisCfgPublish(List<Map> cfgList, int delType){
@@ -215,6 +237,7 @@ public class BoxNotifyTaskJob implements Job {
                 //发布数据给盒子
                 serverTopic = serverTopic.replace("#", entry.getKey());
                 publish(JSON.toJSONString(baseMsgResp));
+                logger.info("deleteAllCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
             }
         }
     }
@@ -223,25 +246,33 @@ public class BoxNotifyTaskJob implements Job {
      * 删除通讯口配置
      */
     private void deletePlcCfgHandle(){
-        PlcInfoApi plcInfoApi = SpringContextHolder.getBean(PlcInfoApi.class);
-        List<PlcExtend> plcExtendLst = plcInfoApi.getPlcExtendListByState(Constant.State.STATE_DELETE_CONFIG);
-        if(null != plcExtendLst){
-            Map<String, List<Map>> groupPlcExtends = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(plcExtendLst), "com", "upd_time");
-            if(null != groupPlcExtends){
-                for(Map.Entry<String, List<Map>> entry : groupPlcExtends.entrySet()){
-                    BaseMsgResp<Map<String, List<Map>>> baseMsgResp = new BaseMsgResp<Map<String, List<Map>>>();
-                    baseMsgResp.setAct(ACT_DELETE_PLC_CONFIG);
-                    baseMsgResp.setFeedback(BaseMsgResp.TYPE_FEEDBACK_NEED);
-                    baseMsgResp.setMachine_code(entry.getKey());
-                    Map<String, List<Map>> plcExtendResp = new HashMap<String, List<Map>>();
-                    plcExtendResp.put("del_com_list", entry.getValue());
-                    baseMsgResp.setData(plcExtendResp);
-                    //发布数据给盒子
-                    serverTopic = serverTopic.replace("#", entry.getKey());
-                    publish(JSON.toJSONString(baseMsgResp));
+        try {
+            logger.info("deletePlcCfgHandle，开始从DB获取数据");
+            PlcInfoApi plcInfoApi = SpringContextHolder.getBean(PlcInfoApi.class);
+            List<PlcExtend> plcExtendLst = plcInfoApi.getPlcExtendListByState(Constant.State.STATE_DELETE_CONFIG);
+            logger.info("deletePlcCfgHandle，获取删除条数："+(null==plcExtendLst?"0":plcExtendLst.size()));
+            if(null != plcExtendLst){
+                Map<String, List<Map>> groupPlcExtends = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(plcExtendLst), "com", "upd_time");
+                if(null != groupPlcExtends){
+                    for(Map.Entry<String, List<Map>> entry : groupPlcExtends.entrySet()){
+                        BaseMsgResp<Map<String, List<Map>>> baseMsgResp = new BaseMsgResp<Map<String, List<Map>>>();
+                        baseMsgResp.setAct(ACT_DELETE_PLC_CONFIG);
+                        baseMsgResp.setFeedback(BaseMsgResp.TYPE_FEEDBACK_NEED);
+                        baseMsgResp.setMachine_code(entry.getKey());
+                        Map<String, List<Map>> plcExtendResp = new HashMap<String, List<Map>>();
+                        plcExtendResp.put("del_com_list", entry.getValue());
+                        baseMsgResp.setData(plcExtendResp);
+                        //发布数据给盒子
+                        serverTopic = serverTopic.replace("#", entry.getKey());
+                        publish(JSON.toJSONString(baseMsgResp));
+                        logger.info("deletePlcCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
+                    }
                 }
             }
+        }catch (Exception e){
+            logger.error("deletePlcCfgHandle，通知盒子失败，"+e.getMessage());
         }
+
     }
 
     /**
@@ -361,7 +392,7 @@ public class BoxNotifyTaskJob implements Job {
         try {
             mqttClient = new MqttClient(MqttConfigContext.mqttConfig.getHost(), clientId, new MemoryPersistence());
             mqttClient.connect(mqttConnectOptions);
-            logger.debug("mqtt connect success!");
+            logger.info("mqtt connect success!");
         }catch (MqttException e){
             e.printStackTrace();
             logger.error("mqtt connect fail!");
@@ -400,16 +431,16 @@ public class BoxNotifyTaskJob implements Job {
     public class SubscribeCallback implements MqttCallback {
         public void connectionLost(Throwable cause) {
             // 连接丢失后，一般在这里面进行重连
-            logger.debug("连接断开，可以做重连");
+            logger.info("连接断开，可以做重连");
         }
 
         public void deliveryComplete(IMqttDeliveryToken token) {
-            logger.debug("deliveryComplete---------" + token.isComplete());
+            logger.info("deliveryComplete---------" + token.isComplete());
         }
 
         public void messageArrived(String topic, MqttMessage message) throws Exception {
             // subscribe后得到的消息会执行到这里面
-            logger.debug("接收消息内容 : "+ new String(message.getPayload()));
+            logger.info("接收消息内容 : "+ new String(message.getPayload()));
             callBackHandle(new String(message.getPayload()));
         }
     }
