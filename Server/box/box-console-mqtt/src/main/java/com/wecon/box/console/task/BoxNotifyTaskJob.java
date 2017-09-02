@@ -43,7 +43,7 @@ public class BoxNotifyTaskJob implements Job {
 
     private final int UPD_STATE_SUCCESS = 1;
 
-    private static Logger logger = LogManager.getLogger(MonitorTaskJob.class.getName());
+    private static Logger logger = LogManager.getLogger(BoxNotifyTaskJob.class.getName());
 
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         if (mqttClient != null && mqttClient.isConnected()) {
