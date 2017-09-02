@@ -1,5 +1,6 @@
 package com.wecon.box.console.main;
 
+import com.wecon.box.console.task.BoxNotifyTask;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -18,6 +19,10 @@ public class MqttManager {
 		logger.info("run profile:" + profile);
 		System.setProperty("spring.profiles.active", profile);
 		ApplicationContext applicationContext = new ClassPathXmlApplicationContext("spring.xml");
+
+		BoxNotifyTask notifyTask = new BoxNotifyTask();
+		notifyTask.start();
+
 //		GetPublishClient getPublishClient=applicationContext.getBean(GetPublishClient.class);
 //		MqttClient client=getPublishClient.conMqtt();
 //		System.out.println(client);
