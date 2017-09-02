@@ -81,7 +81,6 @@ public class DeviceImpl implements DeviceApi {
     @Override
     public boolean updateDevice(final Device model) {
         String sql = "update device set machine_code=?,password=?,dev_model=?,name=?,remark=?,map=?,state=?,dir_id=?,update_date=current_timestamp() where device_id=?";
-
         jdbcTemplate.update(sql, new Object[]{model.machine_code, model.password, model.dev_model, model.name,
                 model.remark, model.map, model.state, model.dir_id, model.device_id});
         return true;

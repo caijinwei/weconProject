@@ -42,6 +42,8 @@ public enum ErrorCodeOption {
     PIBox_Bound_False("设备绑定失败",300015),
     PIBox_Bound_PointMove_False("设备绑定失败",300016),
     Delete_AccDevice_Rel_False("设备解绑失败",300017),
+    DeviceId_Is_Unknown("盒子设备ID非法",300018),
+
 
     Get_Groupid_Error("获取数组ID错误",50001),
 	
