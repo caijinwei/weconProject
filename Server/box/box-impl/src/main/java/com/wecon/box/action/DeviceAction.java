@@ -113,6 +113,8 @@ public class DeviceAction {
         Device modelUpdName=deviceApi.getDevice(device_id);
         modelUpdName.name=name;
         deviceApi.updateDevice(modelUpdName);
+        
+        
         /*
         * 更新实时历史监控点迁移
         * */
