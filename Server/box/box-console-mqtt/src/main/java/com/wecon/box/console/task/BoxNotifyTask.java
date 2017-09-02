@@ -28,9 +28,8 @@ import java.util.Map;
  */
 public class BoxNotifyTask extends Thread {
     public static MqttClient mqttClient;
-    private String serverTopic = "pibox/stc/#";
     private final String clientId = "WECON_BOX_NOTIFY";
-
+    private String serverTopicPrefix = "pibox/stc/";
     private final int ACT_UPDATE_PLC_CONFIG = 2001; //更新通讯口配置
     private final int ACT_UPDATE_REAL_HISTORY_CONFIG = 2002; //更新实时和历史监控点配置
     private final int ACT_UPDATE_ALARM_DATA_CONFIG = 2003; //更新报警数据配置
@@ -91,8 +90,7 @@ public class BoxNotifyTask extends Thread {
                         plcExtendResp.put("upd_com_list", entry.getValue());
                         baseMsgResp.setData(plcExtendResp);
                         //发布数据给盒子
-                        serverTopic = serverTopic.replace("#", entry.getKey());
-                        publish(JSON.toJSONString(baseMsgResp));
+                        publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
                         logger.info("updatePlcCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
                     }
                 }
@@ -132,8 +130,7 @@ public class BoxNotifyTask extends Thread {
                         realHisCfgResp.put("upd_real_his_cfg_list", cfgComList);
                         baseMsgResp.setData(realHisCfgResp);
                         //发布数据给盒子
-                        serverTopic = serverTopic.replace("#", entry.getKey());
-                        publish(JSON.toJSONString(baseMsgResp));
+                        publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
                         logger.info("updateRealHisCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
                     }
                 }
@@ -172,8 +169,7 @@ public class BoxNotifyTask extends Thread {
                         realHisCfgResp.put("upd_alarm_cfg_list", cfgComList);
                         baseMsgResp.setData(realHisCfgResp);
                         //发布数据给盒子
-                        serverTopic = serverTopic.replace("#", entry.getKey());
-                        publish(JSON.toJSONString(baseMsgResp));
+                        publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
                         logger.info("updateAlarmCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
                     }
                 }
@@ -237,8 +233,7 @@ public class BoxNotifyTask extends Thread {
                 realHisCfgResp.put("del_cfg_list", cfgComList);
                 baseMsgResp.setData(realHisCfgResp);
                 //发布数据给盒子
-                serverTopic = serverTopic.replace("#", entry.getKey());
-                publish(JSON.toJSONString(baseMsgResp));
+                publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
                 logger.info("deleteAllCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
             }
         }
@@ -265,8 +260,7 @@ public class BoxNotifyTask extends Thread {
                         plcExtendResp.put("del_com_list", entry.getValue());
                         baseMsgResp.setData(plcExtendResp);
                         //发布数据给盒子
-                        serverTopic = serverTopic.replace("#", entry.getKey());
-                        publish(JSON.toJSONString(baseMsgResp));
+                        publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
                         logger.info("deletePlcCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
                     }
                 }
@@ -406,7 +400,7 @@ public class BoxNotifyTask extends Thread {
      * 发布消息
      * @param message
      */
-    private void publish(String message){
+    private void publish(String message, String serverTopic){
         MqttTopic mqttTopic = mqttClient.getTopic(serverTopic);
         MqttMessage mqttMessage = new MqttMessage();
         mqttMessage.setQos(2);
