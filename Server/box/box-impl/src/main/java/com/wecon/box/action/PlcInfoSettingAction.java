@@ -164,9 +164,6 @@ public class PlcInfoSettingAction {
         plcInfo.plc_id = param.plc_id;
         plcInfo.type = param.type;
         plcInfo.port = param.port;
-
-
-        System.out.println("------------------------------------------------------------------------------state" + plcInfo.state);
         plcInfo.baudrate = param.baudrate;
         plcInfo.box_stat_no = param.box_stat_no;
         plcInfo.check_bit = param.check_bit;
@@ -189,10 +186,18 @@ public class PlcInfoSettingAction {
         plcInfo.retry_times = param.retry_times;
         plcInfo.wait_timeout = param.wait_timeout;
 
-        if (!plcInfo.port.equals(plcInfoApi.findPlcInfoByPlcId((int) plcInfo.plc_id).port)) {
+        if (plcInfo.plc_id <= 0) {
             if (!plcInfo.port.equals("Ethernet")) {
                 if (plcInfoApi.isExistPort(plcInfo.device_id, plcInfo.port)) {
                     throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
+                }
+            }
+        } else {
+            if (!plcInfo.port.equals(plcInfoApi.findPlcInfoByPlcId((int) plcInfo.plc_id).port)) {
+                if (!plcInfo.port.equals("Ethernet")) {
+                    if (plcInfoApi.isExistPort(plcInfo.device_id, plcInfo.port)) {
+                        throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
+                    }
                 }
             }
         }
@@ -203,7 +208,6 @@ public class PlcInfoSettingAction {
             plcInfo.state = 1;
             plcInfoApi.savePlcInfo(plcInfo);
         }
-
         return new Output();
     }
 
