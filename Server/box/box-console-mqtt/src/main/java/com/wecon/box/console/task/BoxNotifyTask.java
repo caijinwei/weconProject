@@ -45,14 +45,11 @@ public class BoxNotifyTask extends Thread {
         logger.info("BoxNotifyTask run start");
         while (true) {
             try {
-                if (mqttClient != null && mqttClient.isConnected()) {
-                    logger.info("mqtt connection is normal !");
-//                    notifyHandle();
-                    sleep(sleepTime);
-                    continue;
+                if (mqttClient == null || !mqttClient.isConnected()) {
+                    logger.info("mqtt connection is disconnection !");
+                    connect();
+                    subscribe();
                 }
-                connect();
-                subscribe();
                 notifyHandle();
                 sleep(sleepTime);
 
@@ -316,9 +313,9 @@ public class BoxNotifyTask extends Thread {
                     break;
                 case ACT_DELETE_MONITOR_CONFIG : //删除监控点配置
                     List<Map> delCfgList = fbData.get("del_cfg_list");
-                    List<Integer> alarmCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", 2);
-                    List<Integer> realCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", 0);
-                    List<Integer> hisCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", 1);
+                    List<Integer> alarmCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_ALARM);
+                    List<Integer> realCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_REAL);
+                    List<Integer> hisCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_HISTORY);
                     realCfgIds.addAll(hisCfgIds);
                     //删除监控点配置、数据
                     realHisCfgApi.batchDeleteById(realCfgIds);
