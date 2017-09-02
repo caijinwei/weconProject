@@ -46,7 +46,7 @@ public class BoxNotifyTaskJob implements Job {
 
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         if (mqttClient != null && mqttClient.isConnected()) {
-            logger.debug("mqtt connection is normal !");
+            logger.info("mqtt connection is normal !");
             notifyHandle();
             return;
         }
@@ -72,10 +72,10 @@ public class BoxNotifyTaskJob implements Job {
      */
     private void updatePlcCfgHandle(){
         try {
-            logger.debug("updatePlcCfgHandle，开始从DB获取数据");
+            logger.info("updatePlcCfgHandle，开始从DB获取数据");
             PlcInfoApi plcInfoApi = SpringContextHolder.getBean(PlcInfoApi.class);
             List<PlcExtend> plcExtendLst = plcInfoApi.getPlcExtendListByState(Constant.State.STATE_UPDATE_CONFIG);
-            logger.debug("updatePlcCfgHandle，获取更新条数："+(null==plcExtendLst?"0":plcExtendLst.size()));
+            logger.info("updatePlcCfgHandle，获取更新条数："+(null==plcExtendLst?"0":plcExtendLst.size()));
             if(null != plcExtendLst){
                 Map<String, List<Map>> groupPlcExtends = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(plcExtendLst));
                 if(null != groupPlcExtends){
@@ -90,7 +90,7 @@ public class BoxNotifyTaskJob implements Job {
                         //发布数据给盒子
                         serverTopic = serverTopic.replace("#", entry.getKey());
                         publish(JSON.toJSONString(baseMsgResp));
-                        logger.debug("updatePlcCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
+                        logger.info("updatePlcCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
                     }
                 }
             }
@@ -361,7 +361,7 @@ public class BoxNotifyTaskJob implements Job {
         try {
             mqttClient = new MqttClient(MqttConfigContext.mqttConfig.getHost(), clientId, new MemoryPersistence());
             mqttClient.connect(mqttConnectOptions);
-            logger.debug("mqtt connect success!");
+            logger.info("mqtt connect success!");
         }catch (MqttException e){
             e.printStackTrace();
             logger.error("mqtt connect fail!");
@@ -400,16 +400,16 @@ public class BoxNotifyTaskJob implements Job {
     public class SubscribeCallback implements MqttCallback {
         public void connectionLost(Throwable cause) {
             // 连接丢失后，一般在这里面进行重连
-            logger.debug("连接断开，可以做重连");
+            logger.info("连接断开，可以做重连");
         }
 
         public void deliveryComplete(IMqttDeliveryToken token) {
-            logger.debug("deliveryComplete---------" + token.isComplete());
+            logger.info("deliveryComplete---------" + token.isComplete());
         }
 
         public void messageArrived(String topic, MqttMessage message) throws Exception {
             // subscribe后得到的消息会执行到这里面
-            logger.debug("接收消息内容 : "+ new String(message.getPayload()));
+            logger.info("接收消息内容 : "+ new String(message.getPayload()));
             callBackHandle(new String(message.getPayload()));
         }
     }
