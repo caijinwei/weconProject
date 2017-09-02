@@ -295,6 +295,7 @@ public class BoxNotifyTaskJob implements Job {
                     new TypeReference<BaseMsgFeedback<Map<String, List<Map>>>>(){});
             int fbAct = baseMsgFeedback.getFeedback_act();
             Map<String, List<Map>> fbData = baseMsgFeedback.getData();
+            logger.info("接收盒子反馈消息，feedback_act："+fbAct+"。"+message);
             switch (fbAct){
                 case ACT_UPDATE_PLC_CONFIG : //更新通讯口配置反馈
                     List<Map> updComList = fbData.get("upd_com_list");
