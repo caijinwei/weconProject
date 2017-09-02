@@ -322,3 +322,9 @@ input[type="submit"] {
 	height: 40px;
 	width: 300px;
 }
+
+
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak,
+.x-ng-cloak {
+	display: none !important;
+}

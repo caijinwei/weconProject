@@ -50,14 +50,14 @@ public class PlcInfoSettingAction {
         PlcInfo plcInfo = new PlcInfo();
         plcInfo.type = param.type;
         plcInfo.port = param.port;
-        plcInfo.state=param.state;
+        plcInfo.state = param.state;
         plcInfo.baudrate = param.baudrate;
         plcInfo.box_stat_no = param.box_stat_no;
         plcInfo.check_bit = param.check_bit;
         plcInfo.com_iodelaytime = param.com_iodelaytime;
         plcInfo.com_stepinterval = param.com_stepinterval;
         plcInfo.comtype = param.comtype;
-        plcInfo.stop_bit=param.stop_bit;
+        plcInfo.stop_bit = param.stop_bit;
         plcInfo.data_length = param.data_length;
         plcInfo.rev_timeout = param.rev_timeout;
         plcInfo.com_stepinterval = param.com_stepinterval;
@@ -73,7 +73,7 @@ public class PlcInfoSettingAction {
                 throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
             }
         }
-        System.out.println("---------------------------"+plcInfo.stop_bit);
+        System.out.println("---------------------------" + plcInfo.stop_bit);
         plcInfoApi.savePlcInfo(plcInfo);
         return new Output();
     }
@@ -125,8 +125,8 @@ public class PlcInfoSettingAction {
         plcInfo.type = param.type;
         plcInfo.port = param.port;
 
-        plcInfo.state=param.state;
-        System.out.println("------------------------------------------------------------------------------state"+plcInfo.state);
+        plcInfo.state = param.state;
+        System.out.println("------------------------------------------------------------------------------state" + plcInfo.state);
         plcInfo.baudrate = param.baudrate;
         plcInfo.box_stat_no = param.box_stat_no;
         plcInfo.check_bit = param.check_bit;
@@ -151,6 +151,59 @@ public class PlcInfoSettingAction {
             }
         }
         plcInfoApi.updatePlcInfo(plcInfo);
+        return new Output();
+    }
+
+    @Label("更新通讯口配置")
+    @WebApi(forceAuth = true, master = true, authority = {"1"})
+    @RequestMapping("savePlcInfo")
+    public Output savePlcInfo(@Valid PlcInfoSettingParam param) {
+        long account_id = AppContext.getSession().client.userId;
+
+        PlcInfo plcInfo = new PlcInfo();
+        plcInfo.plc_id = param.plc_id;
+        plcInfo.type = param.type;
+        plcInfo.port = param.port;
+
+
+        System.out.println("------------------------------------------------------------------------------state" + plcInfo.state);
+        plcInfo.baudrate = param.baudrate;
+        plcInfo.box_stat_no = param.box_stat_no;
+        plcInfo.check_bit = param.check_bit;
+        plcInfo.com_iodelaytime = param.com_iodelaytime;
+        plcInfo.com_stepinterval = param.com_stepinterval;
+        plcInfo.comtype = param.comtype;
+        plcInfo.data_length = param.data_length;
+        plcInfo.rev_timeout = param.rev_timeout;
+        plcInfo.com_stepinterval = param.com_stepinterval;
+        plcInfo.device_id = param.device_id;
+        plcInfo.net_broadcastaddr = param.net_broadcastaddr;
+        plcInfo.net_ipaddr = param.net_ipaddr;
+        plcInfo.net_isbroadcast = param.net_isbroadcast;
+        plcInfo.net_port = param.net_port;
+        plcInfo.net_type = param.net_type;
+        plcInfo.driver = param.driver;
+
+        plcInfo.plc_stat_no = param.plc_stat_no;
+        plcInfo.stop_bit = param.stop_bit;
+        plcInfo.retry_times = param.retry_times;
+        plcInfo.wait_timeout = param.wait_timeout;
+
+        if (!plcInfo.port.equals(plcInfoApi.findPlcInfoByPlcId((int) plcInfo.plc_id).port)) {
+            if (!plcInfo.port.equals("Ethernet")) {
+                if (plcInfoApi.isExistPort(plcInfo.device_id, plcInfo.port)) {
+                    throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
+                }
+            }
+        }
+        if (plcInfo.plc_id > 0) {
+            plcInfo.state = 2;
+            plcInfoApi.updatePlcInfo(plcInfo);
+        } else {
+            plcInfo.state = 1;
+            plcInfoApi.savePlcInfo(plcInfo);
+        }
+
         return new Output();
     }
 

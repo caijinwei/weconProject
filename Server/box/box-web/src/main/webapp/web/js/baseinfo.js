@@ -244,36 +244,19 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
          * 当plc_id 不等于0
          * 对plc_id的通讯口就行修改编辑
          * */
-        if ($("#plc_id").val() != 0) {
-            T.common.ajax.request("WeconBox", "plcInfoAction/updataPlcInfo", params, function (data, code, msg) {
-                if (code == 200) {
-                    alert("配置修改成功");
-                    $("#addConfig").modal("hide");
-                    $scope.showPlcList();
-                    $scope.$apply();
-                }
-                else {
-                    alert(code + "-" + msg);
-                }
-            }, function () {
-                alert("ajax error");
-            });
-        } else {
-            T.common.ajax.request("WeconBox", "plcInfoAction/addPlcInfo", params, function (data, code, msg) {
-                if (code == 200) {
-                    alert("添加配置成功");
-                    $("#addConfig").modal("hide");
-                    $scope.showPlcList();
-                    $scope.$apply();
-                }
-                else {
-                    alert(code + "-" + msg);
-                }
-            }, function () {
-                alert("ajax error");
-            });
-        }
-        ;
+        T.common.ajax.request("WeconBox", "plcInfoAction/savePlcInfo", params, function (data, code, msg) {
+            if (code == 200) {
+                alert("操作成功");
+                $("#addConfig").modal("hide");
+                $scope.showPlcList();
+                $scope.$apply();
+            }
+            else {
+                alert(code + "-" + msg);
+            }
+        }, function () {
+            alert("ajax error");
+        });
     }
     /*
      * 设置 点击的plc_id
