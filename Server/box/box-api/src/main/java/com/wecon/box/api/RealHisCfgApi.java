@@ -107,7 +107,7 @@ public interface RealHisCfgApi {
 	 * @param state
 	 * @return
      */
-	List<RealHisCfgExtend> getRealHisCfgListByState(int state);
+	List<RealHisCfgExtend> getRealHisCfgListByState(Object... state);
 
 	/**
 	 * 批量更新状态

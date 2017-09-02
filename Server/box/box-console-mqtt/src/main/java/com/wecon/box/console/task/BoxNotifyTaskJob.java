@@ -108,7 +108,7 @@ public class BoxNotifyTaskJob implements Job {
         try {
             logger.info("updateRealHisCfgHandle，开始从DB获取数据");
             RealHisCfgApi realHisCfgApi = SpringContextHolder.getBean(RealHisCfgApi.class);
-            List<RealHisCfgExtend> realHisCfgList = realHisCfgApi.getRealHisCfgListByState(Constant.State.STATE_UPDATE_CONFIG);
+            List<RealHisCfgExtend> realHisCfgList = realHisCfgApi.getRealHisCfgListByState(Constant.State.STATE_UPDATE_CONFIG, Constant.State.STATE_NEW_CONFIG);
             logger.info("updateRealHisCfgHandle，获取更新条数："+(null==realHisCfgList?"0":realHisCfgList.size()));
             if(null != realHisCfgList){
                 Map<String, List<Map>> groupRealHisCfg = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(realHisCfgList));
@@ -148,7 +148,7 @@ public class BoxNotifyTaskJob implements Job {
         try {
             logger.info("updateAlarmCfgHandle，开始从DB获取数据");
             AlarmCfgApi alarmCfgApi = SpringContextHolder.getBean(AlarmCfgApi.class);
-            List<AlarmCfgExtend> alarmCfgExtendList = alarmCfgApi.getAlarmCfgExtendListByState(Constant.State.STATE_UPDATE_CONFIG);
+            List<AlarmCfgExtend> alarmCfgExtendList = alarmCfgApi.getAlarmCfgExtendListByState(Constant.State.STATE_UPDATE_CONFIG, Constant.State.STATE_NEW_CONFIG);
             logger.info("updateAlarmCfgHandle，获取更新条数："+(null==alarmCfgExtendList?"0":alarmCfgExtendList.size()));
             if(null != alarmCfgExtendList){
                 Map<String, List<Map>> groupAlarmCfg = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(alarmCfgExtendList));

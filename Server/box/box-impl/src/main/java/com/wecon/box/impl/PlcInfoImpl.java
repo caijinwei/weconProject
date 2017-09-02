@@ -99,12 +99,12 @@ public class PlcInfoImpl implements PlcInfoApi {
 
     @Override
     public PlcInfo getPlcInfo(long plc_id) {
-    	String sql = "select " + SEL_COL + " from plc_info where plc_id=?";
-		List<PlcInfo> list = jdbcTemplate.query(sql, new Object[] { plc_id }, new DefaultPlcInfoRowMapper());
-		if (!list.isEmpty()) {
-			return list.get(0);
-		}
-		return null;
+        String sql = "select " + SEL_COL + " from plc_info where plc_id=?";
+        List<PlcInfo> list = jdbcTemplate.query(sql, new Object[] { plc_id }, new DefaultPlcInfoRowMapper());
+        if (!list.isEmpty()) {
+            return list.get(0);
+        }
+        return null;
     }
 
     @Override
@@ -125,39 +125,48 @@ public class PlcInfoImpl implements PlcInfoApi {
     @Override
     public PlcInfo findPlcInfoByPlcId(Integer plcId) {
         String sql="select "+SEL_COL+"  FROM plc_info where plc_id=?";
-       PlcInfo info=jdbcTemplate.queryForObject(sql,new Object[]{plcId},new DefaultPlcInfoRowMapper());
+        PlcInfo info=jdbcTemplate.queryForObject(sql,new Object[]{plcId},new DefaultPlcInfoRowMapper());
         return info;
     }
 
-	@Override
-	public List<PlcExtend> getPlcExtendListByState(int... state){
-		String sql = "select p.*, d.machine_code from plc_info p, device d where p.device_id = d.device_id and (p.state = ? or p.state = ?)";
-		List<PlcExtend> list = jdbcTemplate.query(sql, new Object[] {state[0], state[1] }, new DefaultPlcExtendRowMapper());
-		if (!list.isEmpty()) {
-			return list;
-		}
-		return null;
-	}
+    @Override
+    public List<PlcExtend> getPlcExtendListByState(Object... state){
+        String sql = "select p.*, d.machine_code from plc_info p, device d where p.device_id = d.device_id";
+        if(null != state && state.length > 0){
+            sql += " and p.state in (";
+            StringBuffer inSb = new StringBuffer();
+            for(Object o : state){
+                inSb.append(",?");
+            }
+            sql += inSb.substring(1);
+            sql += ")";
+        }
+        List<PlcExtend> list = jdbcTemplate.query(sql, state, new DefaultPlcExtendRowMapper());
+        if (!list.isEmpty()) {
+            return list;
+        }
+        return null;
+    }
 
-	@Override
-	public boolean batchUpdateState(final List<int[]> updList){
-		if(null == updList || updList.size() == 0){
-			return false;
-		}
-		String sql = "update plc_info set state = ? where plc_id = ?";
-		jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
-			public int getBatchSize() {
-				return updList.size();
-				//这个方法设定更新记录数，通常List里面存放的都是我们要更新的，所以返回list.size();
-			}
-			public void setValues(PreparedStatement ps, int i)throws SQLException {
-				int[] arg = updList.get(i);
-				ps.setInt(1, arg[0]);
-				ps.setInt(2, arg[1]);
-			}
-		});
-		return true;
-	}
+    @Override
+    public boolean batchUpdateState(final List<int[]> updList){
+        if(null == updList || updList.size() == 0){
+            return false;
+        }
+        String sql = "update plc_info set state = ? where plc_id = ?";
+        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            public int getBatchSize() {
+                return updList.size();
+                //这个方法设定更新记录数，通常List里面存放的都是我们要更新的，所以返回list.size();
+            }
+            public void setValues(PreparedStatement ps, int i)throws SQLException {
+                int[] arg = updList.get(i);
+                ps.setInt(1, arg[0]);
+                ps.setInt(2, arg[1]);
+            }
+        });
+        return true;
+    }
 
     @Override
     public boolean batchDeletePlc(final List<Integer> ids){
@@ -175,7 +184,7 @@ public class PlcInfoImpl implements PlcInfoApi {
     }
 
 
-public static final class DefaultPlcInfoRowMapper implements RowMapper<PlcInfo> {
+    public static final class DefaultPlcInfoRowMapper implements RowMapper<PlcInfo> {
 
 
 
@@ -257,41 +266,41 @@ public static final class DefaultPlcInfoRowMapper implements RowMapper<PlcInfo> 
 
 
 
-	public static final class DefaultPlcExtendRowMapper implements RowMapper<PlcExtend> {
-		@Override
-		public PlcExtend mapRow(ResultSet rs, int i) throws SQLException {
-			PlcExtend model = new PlcExtend();
-			model.plc_id = rs.getLong("plc_id");
-			model.com = model.plc_id+"";
-			model.device_id = rs.getLong("device_id");
-			model.type = rs.getString("type");
-			model.driver = rs.getString("driver");
-			model.box_stat_no = rs.getInt("box_stat_no");
-			model.plc_stat_no = rs.getInt("plc_stat_no");
-			model.port = rs.getString("port");
-			model.comtype = rs.getInt("comtype");
-			model.baudrate = rs.getString("baudrate");
-			model.stop_bit = rs.getInt("stop_bit");
-			model.data_length = rs.getInt("data_length");
-			model.check_bit = rs.getString("check_bit");
-			model.retry_times = rs.getInt("retry_times");
-			model.wait_timeout = rs.getInt("wait_timeout");
-			model.rev_timeout = rs.getInt("rev_timeout");
-			model.com_stepinterval = rs.getInt("com_stepinterval");
-			model.com_iodelaytime = rs.getInt("com_iodelaytime");
-			model.retry_timeout = rs.getInt("retry_timeout");
-			model.net_port = rs.getInt("net_port");
-			model.net_type = rs.getInt("net_type");
-			model.net_isbroadcast = rs.getInt("net_isbroadcast");
-			model.net_broadcastaddr = rs.getInt("net_broadcastaddr");
-			model.net_ipaddr = rs.getString("net_ipaddr");
-			model.state = rs.getInt("state");
-			model.create_date = rs.getTimestamp("create_date");
-			model.update_date = rs.getTimestamp("update_date");
-			model.upd_time = TimeUtil.getYYYYMMDDHHMMSSDate(model.update_date);
-			model.machine_code = rs.getString("machine_code");
-			return model;
-		}
-	}
+    public static final class DefaultPlcExtendRowMapper implements RowMapper<PlcExtend> {
+        @Override
+        public PlcExtend mapRow(ResultSet rs, int i) throws SQLException {
+            PlcExtend model = new PlcExtend();
+            model.plc_id = rs.getLong("plc_id");
+            model.com = model.plc_id+"";
+            model.device_id = rs.getLong("device_id");
+            model.type = rs.getString("type");
+            model.driver = rs.getString("driver");
+            model.box_stat_no = rs.getInt("box_stat_no");
+            model.plc_stat_no = rs.getInt("plc_stat_no");
+            model.port = rs.getString("port");
+            model.comtype = rs.getInt("comtype");
+            model.baudrate = rs.getString("baudrate");
+            model.stop_bit = rs.getInt("stop_bit");
+            model.data_length = rs.getInt("data_length");
+            model.check_bit = rs.getString("check_bit");
+            model.retry_times = rs.getInt("retry_times");
+            model.wait_timeout = rs.getInt("wait_timeout");
+            model.rev_timeout = rs.getInt("rev_timeout");
+            model.com_stepinterval = rs.getInt("com_stepinterval");
+            model.com_iodelaytime = rs.getInt("com_iodelaytime");
+            model.retry_timeout = rs.getInt("retry_timeout");
+            model.net_port = rs.getInt("net_port");
+            model.net_type = rs.getInt("net_type");
+            model.net_isbroadcast = rs.getInt("net_isbroadcast");
+            model.net_broadcastaddr = rs.getInt("net_broadcastaddr");
+            model.net_ipaddr = rs.getString("net_ipaddr");
+            model.state = rs.getInt("state");
+            model.create_date = rs.getTimestamp("create_date");
+            model.update_date = rs.getTimestamp("update_date");
+            model.upd_time = TimeUtil.getYYYYMMDDHHMMSSDate(model.update_date);
+            model.machine_code = rs.getString("machine_code");
+            return model;
+        }
+    }
 
 }
