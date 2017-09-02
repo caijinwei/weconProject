@@ -74,7 +74,7 @@ public class BoxNotifyTaskJob implements Job {
         try {
             logger.debug("updatePlcCfgHandle，开始从DB获取数据");
             PlcInfoApi plcInfoApi = SpringContextHolder.getBean(PlcInfoApi.class);
-            List<PlcExtend> plcExtendLst = plcInfoApi.getPlcExtendListByState(Constant.State.STATE_UPDATE_CONFIG);
+            List<PlcExtend> plcExtendLst = plcInfoApi.getPlcExtendListByState(Constant.State.STATE_UPDATE_CONFIG, Constant.State.STATE_NEW_CONFIG);
             logger.debug("updatePlcCfgHandle，获取更新条数："+(null==plcExtendLst?"0":plcExtendLst.size()));
             if(null != plcExtendLst){
                 Map<String, List<Map>> groupPlcExtends = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(plcExtendLst));
