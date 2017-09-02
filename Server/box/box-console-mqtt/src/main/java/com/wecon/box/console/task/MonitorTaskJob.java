@@ -294,53 +294,57 @@ public class MonitorTaskJob implements Job {
 				if (listpiBoxHisCom == null) {
 					return;
 				}
-				if (listpiBoxHisCom.get(0).addr_list == null || listpiBoxHisCom.get(0).addr_list.size() < 1) {
-					return;
-				}
-				// 得到上报的串口ID
-				String com = listpiBoxHisCom.get(0).com;
-				if (!CommonUtils.isNullOrEmpty(com)) {
-					// 数据配置接口
-					RealHisCfgApi RealHisCfgApi = SpringContextHolder.getBean(RealHisCfgApi.class);
-					// 通过串口ID和配置信息启用状态0-未启用 1-启用 得到配置信息列表
-					List<RealHisCfg> listrealHisCfg = RealHisCfgApi.getRealHisCfg(Long.parseLong(com), 1);
-					if (listrealHisCfg == null || listrealHisCfg.size() < 1) {
-						return;
+				for (int i = 0; i < listpiBoxHisCom.size(); i++) {
+					if (listpiBoxHisCom.get(i).addr_list == null || listpiBoxHisCom.get(i).addr_list.size() < 1) {
+						continue;
 					}
-					List<PiBoxHisComAddr> listPiBoxHisComAddr = listpiBoxHisCom.get(0).addr_list;
-					// 保存历史数据列表
-					List<RealHisCfgData> listInsertRealHisCfgData = new ArrayList<RealHisCfgData>();
-
-					RealHisCfgData realHisCfgData;
-					for (PiBoxHisComAddr piBoxHisComAddr : listPiBoxHisComAddr) {
-						RealHisCfgData historyData = realHisCfgDataApi.getRealHisCfgData(
-								Long.parseLong(piBoxHisComAddr.addr_id), Timestamp.valueOf(piBoxHisComAddr.time));
-						if (historyData != null) {
-							logger.info("mqtt代理服务器发的缓存数据，直接忽略！");
-							System.out.println("mqtt代理服务器发的缓存数据，直接忽略！");
+					// 得到上报的串口ID
+					String com = listpiBoxHisCom.get(i).com;
+					if (!CommonUtils.isNullOrEmpty(com)) {
+						// 数据配置接口
+						RealHisCfgApi RealHisCfgApi = SpringContextHolder.getBean(RealHisCfgApi.class);
+						// 通过串口ID和配置信息状态获取
+						List<RealHisCfg> listrealHisCfg = RealHisCfgApi.getRealHisCfg(Long.parseLong(com), -1);
+						if (listrealHisCfg == null || listrealHisCfg.size() < 1) {
 							return;
 						}
-						realHisCfgData = new RealHisCfgData();
-						realHisCfgData.monitor_time = Timestamp.valueOf(piBoxHisComAddr.time);
-						realHisCfgData.real_his_cfg_id = Long.parseLong(piBoxHisComAddr.addr_id);
-						realHisCfgData.value = piBoxHisComAddr.value;
-						if (!CommonUtils.isNullOrEmpty(piBoxHisComAddr.state)) {
-							realHisCfgData.state = Integer.parseInt(piBoxHisComAddr.state);
+						List<PiBoxHisComAddr> listPiBoxHisComAddr = listpiBoxHisCom.get(i).addr_list;
+						// 保存历史数据列表
+						List<RealHisCfgData> listInsertRealHisCfgData = new ArrayList<RealHisCfgData>();
+
+						RealHisCfgData realHisCfgData;
+						for (PiBoxHisComAddr piBoxHisComAddr : listPiBoxHisComAddr) {
+							RealHisCfgData historyData = realHisCfgDataApi.getRealHisCfgData(
+									Long.parseLong(piBoxHisComAddr.addr_id), Timestamp.valueOf(piBoxHisComAddr.time));
+							if (historyData != null) {
+								logger.info("mqtt代理服务器发的缓存数据，直接忽略！");
+								System.out.println("mqtt代理服务器发的缓存数据，直接忽略！");
+								return;
+							}
+							realHisCfgData = new RealHisCfgData();
+							realHisCfgData.monitor_time = Timestamp.valueOf(piBoxHisComAddr.time);
+							realHisCfgData.real_his_cfg_id = Long.parseLong(piBoxHisComAddr.addr_id);
+							realHisCfgData.value = piBoxHisComAddr.value;
+							if (!CommonUtils.isNullOrEmpty(piBoxHisComAddr.state)) {
+								realHisCfgData.state = Integer.parseInt(piBoxHisComAddr.state);
+							}
+							listInsertRealHisCfgData.add(realHisCfgData);
 						}
-						listInsertRealHisCfgData.add(realHisCfgData);
-					}
-					if (listInsertRealHisCfgData.size() > 0) {
-						try {
-							// 批量保存数据
-							realHisCfgDataApi.saveRealHisCfgData(listInsertRealHisCfgData);
-							System.out.println("realHisCfgData add success !");
-						} catch (Exception e) {
-							logger.info("历史数据批量保存失败");
-							System.out.println("历史数据批量保存失败");
-							e.printStackTrace();
+						if (listInsertRealHisCfgData.size() > 0) {
+							try {
+								// 批量保存数据
+								realHisCfgDataApi.saveRealHisCfgData(listInsertRealHisCfgData);
+								System.out.println("realHisCfgData add success !");
+							} catch (Exception e) {
+								logger.info("历史数据批量保存失败");
+								System.out.println("历史数据批量保存失败");
+								e.printStackTrace();
+							}
 						}
 					}
+
 				}
+
 				break;
 			// 报警数据
 			case ALARM_DATA:
@@ -361,63 +365,65 @@ public class MonitorTaskJob implements Job {
 				if (null == listPiBoxCom || listPiBoxCom.size() < 1) {
 					return;
 				}
-
-				List<PiBoxComAddr> listPiBoxComAddr = listPiBoxCom.get(0).addr_list;
-				if (null == listPiBoxComAddr || listPiBoxComAddr.size() < 1) {
-
-					return;
-				}
-				// 获取AlarmCfgDataApi对象
-				AlarmCfgDataApi alarmCfgDataApi = SpringContextHolder.getBean(AlarmCfgDataApi.class);
-				// 保存报警数据列表
-				List<AlarmCfgData> listInsertAlarmCfgData = new ArrayList<AlarmCfgData>();
-				AlarmCfgData alarmCfgData = null;
-
-				for (PiBoxComAddr piBoxComAddr : listPiBoxComAddr) {
-					AlarmCfgData alarmData = alarmCfgDataApi.getAlarmCfgData(Long.parseLong(piBoxComAddr.addr_id),
-							Timestamp.valueOf(jsonAlarm.getString("time")));
-					if (alarmData != null) {
-						logger.info("mqtt代理服务器发的缓存数据，直接忽略！");
-						System.out.println("mqtt代理服务器发的缓存数据，直接忽略！");
-						return;
-
+				for (int j = 0; j < listPiBoxCom.size(); j++) {
+					List<PiBoxComAddr> listPiBoxComAddr = listPiBoxCom.get(j).addr_list;
+					if (null == listPiBoxComAddr || listPiBoxComAddr.size() < 1) {
+						continue;
 					}
-					alarmCfgData = new AlarmCfgData();
-					alarmCfgData.alarm_cfg_id = Long.parseLong(piBoxComAddr.addr_id);
-					alarmCfgData.value = piBoxComAddr.value;
-					alarmCfgData.monitor_time = Timestamp.valueOf(jsonAlarm.getString("time"));
-					alarmCfgData.state = Integer.valueOf(piBoxComAddr.state);
-					listInsertAlarmCfgData.add(alarmCfgData);
-				}
-				if (listInsertAlarmCfgData.size() > 0) {
+					// 获取AlarmCfgDataApi对象
+					AlarmCfgDataApi alarmCfgDataApi = SpringContextHolder.getBean(AlarmCfgDataApi.class);
+					// 保存报警数据列表
+					List<AlarmCfgData> listInsertAlarmCfgData = new ArrayList<AlarmCfgData>();
+					AlarmCfgData alarmCfgData = null;
 
-					try {
-						// 批量保存报警数据成功
-						alarmCfgDataApi.saveAlarmCfgData(listInsertAlarmCfgData);
-						System.out.println("alarmCfgData add success !");
-						// 反馈成功消息给盒子
-						MqttMessage boxmessage = new MqttMessage();
-						JSONObject json = new JSONObject();
-						json.put("act", "1");
-						json.put("feedback_act", ALARM_DATA);
-						json.put("machine_code", jsonObject.getString("machine_code"));
-						json.put("code", "1");
-						json.put("msg", "success");
-						System.out.println("报警反馈==" + json.toJSONString());
-						boxmessage.setPayload(json.toString().getBytes());
-						boxmessage.setQos(2);
-						boxmessage.setRetained(true);
-						// 需要反馈盒子的主题
-						String boxtopic = "pibox/stc/" + jsonObject.getString("machine_code");
-						MqttTopic mqtttopic = client.getTopic(boxtopic);
-						PublishTask publish = new PublishTask(mqtttopic, boxmessage);
-						publish.start();
-					} catch (Exception e) {
-						logger.info("报警数据批量保存失败");
-						System.out.println("报警数据批量保存失败");
-						e.printStackTrace();
+					for (PiBoxComAddr piBoxComAddr : listPiBoxComAddr) {
+						AlarmCfgData alarmData = alarmCfgDataApi.getAlarmCfgData(Long.parseLong(piBoxComAddr.addr_id),
+								Timestamp.valueOf(jsonAlarm.getString("time")));
+						if (alarmData != null) {
+							logger.info("mqtt代理服务器发的缓存数据，直接忽略！");
+							System.out.println("mqtt代理服务器发的缓存数据，直接忽略！");
+							return;
+
+						}
+						alarmCfgData = new AlarmCfgData();
+						alarmCfgData.alarm_cfg_id = Long.parseLong(piBoxComAddr.addr_id);
+						alarmCfgData.value = piBoxComAddr.value;
+						alarmCfgData.monitor_time = Timestamp.valueOf(jsonAlarm.getString("time"));
+						alarmCfgData.state = Integer.valueOf(piBoxComAddr.state);
+						listInsertAlarmCfgData.add(alarmCfgData);
 					}
+					if (listInsertAlarmCfgData.size() > 0) {
+
+						try {
+							// 批量保存报警数据成功
+							alarmCfgDataApi.saveAlarmCfgData(listInsertAlarmCfgData);
+							System.out.println("alarmCfgData add success !");
+							// 反馈成功消息给盒子
+							MqttMessage boxmessage = new MqttMessage();
+							JSONObject json = new JSONObject();
+							json.put("act", "1");
+							json.put("feedback_act", ALARM_DATA);
+							json.put("machine_code", jsonObject.getString("machine_code"));
+							json.put("code", "1");
+							json.put("msg", "success");
+							System.out.println("报警反馈==" + json.toJSONString());
+							boxmessage.setPayload(json.toString().getBytes());
+							boxmessage.setQos(2);
+							boxmessage.setRetained(true);
+							// 需要反馈盒子的主题
+							String boxtopic = "pibox/stc/" + jsonObject.getString("machine_code");
+							MqttTopic mqtttopic = client.getTopic(boxtopic);
+							PublishTask publish = new PublishTask(mqtttopic, boxmessage);
+							publish.start();
+						} catch (Exception e) {
+							logger.info("报警数据批量保存失败");
+							System.out.println("报警数据批量保存失败");
+							e.printStackTrace();
+						}
+					}
+
 				}
+
 				break;
 
 			default:
