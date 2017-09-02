@@ -40,7 +40,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
             timer = new Timer(true);
             long delay = 0;
             OrderTimeTask orderTimeTask = new OrderTimeTask(session, msg, timer);
-            timer.schedule(orderTimeTask, delay, 10000);
+            timer.schedule(orderTimeTask, delay, 3000);
         }
     }
 
@@ -72,7 +72,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
         @WebApi(forceAuth = false, master = true)
         public void run() {
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String msgtime = "10秒报时：" + df.format(new Date());
+            String msgtime = "3秒报时：" + df.format(new Date());
             try {
                 if (session == null || !session.isOpen()) {
                     System.out.println("timer is closed");

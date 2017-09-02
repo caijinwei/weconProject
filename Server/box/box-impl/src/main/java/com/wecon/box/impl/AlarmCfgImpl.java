@@ -74,16 +74,21 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Page<AlarmCfgTrigger> getRealHisCfgDataList(long account_id, long groupId, int pageIndex, int pageSize) {
-		String sqlCount = "select count(0) from `alarm_cfg` ac,`account_dir` ad,`account_dir_rel` adr where 1=1 and ac.`alarmcfg_id`=adr.`ref_id` and ad.`id`=adr.`acc_dir_id` and ad.`type`=3 and ac.`account_id`=ad.`account_id` ";
+	public Page<AlarmCfgTrigger> getRealHisCfgDataList(long account_id, long groupId, long device_id, int pageIndex,
+			int pageSize) {
+		String sqlCount = "select count(0) from `alarm_cfg` ac,`account_dir` ad,`account_dir_rel` adr where 1=1 and ac.`alarmcfg_id`=adr.`ref_id` and ad.`id`=adr.`acc_dir_id` and ad.`type`=3 and ac.`account_id`=ad.`account_id` AND  ac.`device_id`=ad.`device_id` ";
 
-		String sql = " select ac.alarmcfg_id,ac.data_id,ac.account_id,ac.name,ac.addr,ac.addr_type,ac.text,ac.condition_type,ac.state,ac.device_id,ac.rid,ac.bind_state,ac.plc_id,ac.data_limit,ac.create_date,ac.update_date,adr.`ref_alais`,ad.`name` dirname,ad.`id` from `alarm_cfg` ac,`account_dir` ad,`account_dir_rel` adr where 1=1 and ac.`alarmcfg_id`=adr.`ref_id` and ad.`id`=adr.`acc_dir_id` and ad.`type`=3 and ac.`account_id`=ad.`account_id`";
+		String sql = " select ac.alarmcfg_id,ac.data_id,ac.account_id,ac.name,ac.addr,ac.addr_type,ac.text,ac.condition_type,ac.state,ac.device_id,ac.rid,ac.bind_state,ac.plc_id,ac.data_limit,ac.create_date,ac.update_date,adr.`ref_alais`,ad.`name` dirname,ad.`id` from `alarm_cfg` ac,`account_dir` ad,`account_dir_rel` adr where 1=1 and ac.`alarmcfg_id`=adr.`ref_id` and ad.`id`=adr.`acc_dir_id` and ad.`type`=3 and ac.`account_id`=ad.`account_id` and  ac.`device_id`=ad.`device_id`";
 
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
 		if (account_id > 0) {
 			condition.append(" and ac.`account_id`=? ");
 			params.add(account_id);
+		}
+		if (device_id > 0) {
+			condition.append(" and ac.`device_id`=? ");
+			params.add(device_id);
 		}
 		if (groupId > 0) {
 			condition.append(" and ad.`id`=? ");
@@ -206,10 +211,10 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 		}
 
 		StringBuilder idSb = new StringBuilder();
-		for(int id : ids){
+		for (int id : ids) {
 			idSb.append(",").append(id);
 		}
-		String sql = "delete from alarm_cfg where plc_id in("+idSb.substring(1)+")";
+		String sql = "delete from alarm_cfg where plc_id in(" + idSb.substring(1) + ")";
 		jdbcTemplate.update(sql);
 
 		return true;
@@ -222,10 +227,10 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 		}
 
 		StringBuilder idSb = new StringBuilder();
-		for(int id : ids){
+		for (int id : ids) {
 			idSb.append(",").append(id);
 		}
-		String sql = "delete from alarm_cfg where alarmcfg_id in("+idSb.substring(1)+")";
+		String sql = "delete from alarm_cfg where alarmcfg_id in(" + idSb.substring(1) + ")";
 		jdbcTemplate.update(sql);
 
 		return true;
@@ -329,13 +334,13 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			});
 		}
 	}
-	public boolean updatePointAccAndState(long accountId,long deviceId) {
 
-		Object[] args=new Object[]{accountId,deviceId};
-		String sql="UPDATE alarm_cfg a SET a.account_id = ?, a.bind_state = 1 WHERE a.device_id = ?";
-		Integer count=jdbcTemplate.update(sql,args);
-		if(count<=0)
-		{
+	public boolean updatePointAccAndState(long accountId, long deviceId) {
+
+		Object[] args = new Object[] { accountId, deviceId };
+		String sql = "UPDATE alarm_cfg a SET a.account_id = ?, a.bind_state = 1 WHERE a.device_id = ?";
+		Integer count = jdbcTemplate.update(sql, args);
+		if (count <= 0) {
 			return false;
 		}
 		return true;

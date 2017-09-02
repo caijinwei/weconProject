@@ -130,9 +130,9 @@ public class PlcInfoImpl implements PlcInfoApi {
     }
 
 	@Override
-	public List<PlcExtend> getPlcExtendListByState(int state){
-		String sql = "select p.*, d.machine_code from plc_info p, device d where p.device_id = d.device_id and p.state = ?";
-		List<PlcExtend> list = jdbcTemplate.query(sql, new Object[] { state }, new DefaultPlcExtendRowMapper());
+	public List<PlcExtend> getPlcExtendListByState(int... state){
+		String sql = "select p.*, d.machine_code from plc_info p, device d where p.device_id = d.device_id and (p.state = ? or p.state = ?)";
+		List<PlcExtend> list = jdbcTemplate.query(sql, new Object[] {state[0], state[1] }, new DefaultPlcExtendRowMapper());
 		if (!list.isEmpty()) {
 			return list;
 		}

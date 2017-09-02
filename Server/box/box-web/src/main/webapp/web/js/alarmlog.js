@@ -722,6 +722,7 @@ appModule
 							pageIndex = 1;
 						var params = {
 							group_id : $("#dataGroupSelect").val(),
+							device_id:$scope.deviceid,
 							pageIndex : pageIndex,
 							pageSize : pageSize
 

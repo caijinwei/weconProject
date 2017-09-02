@@ -173,17 +173,17 @@ public class AlarmDataAction {
 	@Description("获取组下的报警配置")
 	@WebApi(forceAuth = true, master = true, authority = { "1" })
 	@RequestMapping(value = "/getAlarmCfg")
-	public Output getAlarmCfg(@RequestParam("group_id") String group_id, @RequestParam("pageIndex") Integer pageIndex,
-			@RequestParam("pageSize") Integer pageSize) {
+	public Output getAlarmCfg(@RequestParam("group_id") String group_id, @RequestParam("device_id") String device_id,
+			@RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
 		long account_id = AppContext.getSession().client.userId;
 		JSONObject json = new JSONObject();
 		Page<AlarmCfgTrigger> listalrmCfgTrigger = new Page<AlarmCfgTrigger>(pageIndex, pageSize, 0);
-		if (CommonUtils.isNullOrEmpty(group_id)) {
+		if (CommonUtils.isNullOrEmpty(group_id) || CommonUtils.isNullOrEmpty(device_id)) {
 			json.put("listalrmCfgTrigger", listalrmCfgTrigger);
 			return new Output(json);
 		}
-		listalrmCfgTrigger = alarmCfgApi.getRealHisCfgDataList(account_id, Long.parseLong(group_id), pageIndex,
-				pageSize);
+		listalrmCfgTrigger = alarmCfgApi.getRealHisCfgDataList(account_id, Long.parseLong(group_id),
+				Long.parseLong(device_id), pageIndex, pageSize);
 		if (listalrmCfgTrigger.getList().size() > 0) {
 			for (int i = 0; i < listalrmCfgTrigger.getList().size(); i++) {
 				AlarmCfgTrigger alarmCfgTrigger = listalrmCfgTrigger.getList().get(i);

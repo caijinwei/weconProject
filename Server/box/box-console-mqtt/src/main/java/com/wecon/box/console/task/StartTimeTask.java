@@ -34,7 +34,6 @@ public class StartTimeTask {
 
 					Trigger trigger2 = TimeTriggerUtil.getTrigger(BOX_NOTIFY_JOB, "1", 20);
 					QuartzManage.createJob(scheduler, trigger2, BOX_NOTIFY_JOB, null, null, BoxNotifyTaskJob.class);
-
 				} catch (Exception e) {
 					e.printStackTrace();
 					logger.error("启动定时任务失败，原因是：" + e.getMessage(), e);

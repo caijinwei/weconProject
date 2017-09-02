@@ -105,11 +105,19 @@
                     {{x.username}}
                 </td>
                 <td>{{x.client_ip}}</td>
-                <td style="max-width: 100px;"><div style="cursor: pointer;" ng-click="viewDetail($event);" ng-mouseover="previewDetail($event);" ng-mouseleave="previewDetailOut($event);">{{x.url}}</div></td>
+                <td style="max-width: 100px;">
+                    <div style="cursor: pointer;" ng-click="viewDetail($event);" ng-mouseover="previewDetail($event);"
+                         ng-mouseleave="previewDetailOut($event);">{{x.url}}
+                    </div>
+                </td>
                 <td>{{x.op_type_name}}</td>
                 <td>{{x.res_type_name}}</td>
                 <td>{{x.res_id}}</td>
-                <td style="max-width: 250px;"><div style="cursor: pointer;" ng-click="viewDetail($event);" ng-mouseover="previewDetail($event);" ng-mouseleave="previewDetailOut($event);">{{x.message}}</div></td>
+                <td style="max-width: 250px;">
+                    <div style="cursor: pointer;" ng-click="methods.viewMsg(x);" ng-mouseover="previewDetail($event);"
+                         ng-mouseleave="previewDetailOut($event);">{{x.message}}
+                    </div>
+                </td>
                 <td>{{x.op_time|date:'yyyy-MM-dd HH:mm':'UTC'}}</td>
             </tr>
             </tbody>
@@ -129,12 +137,17 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title" id="myModalLabel">完整信息</h4>
                 </div>
-                <div class="modal-body" id="viewDetailDiv" style="word-wrap: break-word;">
 
+                <div class="modal-body" style="word-wrap: break-word;">
+                    <pre id="viewDetailDiv">
+
+                    </pre>
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
                 </div>
@@ -142,7 +155,9 @@
         </div>
     </div>
 
-    <div class="table-bordered" style="position: absolute;z-index:5;background-color:#d9d9d9; width: 400px;word-wrap: break-word; padding: 5px;display: none;" id="divPreview"></div>
+    <div class="table-bordered"
+         style="position: absolute;z-index:5;background-color:#d9d9d9; width: 400px;word-wrap: break-word; padding: 5px;display: none;"
+         id="divPreview"></div>
 
 </div>
 <script src="../lib/jquery/jquery-3.2.1.min.js"></script>
