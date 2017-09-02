@@ -71,7 +71,7 @@ public class BoxNotifyTaskJob implements Job {
     /**
      * 更新通讯口配置通知盒子
      */
-    private void updatePlcCfgHandle(){
+    private synchronized void updatePlcCfgHandle(){
         try {
             logger.info("updatePlcCfgHandle，开始从DB获取数据");
             PlcInfoApi plcInfoApi = SpringContextHolder.getBean(PlcInfoApi.class);
@@ -104,7 +104,7 @@ public class BoxNotifyTaskJob implements Job {
     /**
      * 更新实时和历史监控点配置
      */
-    private void updateRealHisCfgHandle(){
+    private synchronized void updateRealHisCfgHandle(){
         try {
             logger.info("updateRealHisCfgHandle，开始从DB获取数据");
             RealHisCfgApi realHisCfgApi = SpringContextHolder.getBean(RealHisCfgApi.class);
@@ -144,7 +144,7 @@ public class BoxNotifyTaskJob implements Job {
     /**
      * 更新报警数据配置
      */
-    private void updateAlarmCfgHandle(){
+    private synchronized void updateAlarmCfgHandle(){
         try {
             logger.info("updateAlarmCfgHandle，开始从DB获取数据");
             AlarmCfgApi alarmCfgApi = SpringContextHolder.getBean(AlarmCfgApi.class);
@@ -185,7 +185,7 @@ public class BoxNotifyTaskJob implements Job {
     /**
      * 删除监控点配置
      */
-    private void deleteAllCfgHandle(){
+    private synchronized void deleteAllCfgHandle(){
         try {
             logger.info("deleteAllCfgHandle，开始从DB获取数据");
             RealHisCfgApi realHisCfgApi = SpringContextHolder.getBean(RealHisCfgApi.class);
@@ -214,7 +214,7 @@ public class BoxNotifyTaskJob implements Job {
 
     }
 
-    private void deleteRealHisCfgPublish(List<Map> cfgList, int delType){
+    private synchronized void deleteRealHisCfgPublish(List<Map> cfgList, int delType){
         Map<String, List<Map>> groupCfgMap = GroupOp.groupCfgByMachineCode(cfgList);
         if(null != groupCfgMap){
             for(Map.Entry<String, List<Map>> entry : groupCfgMap.entrySet()){
@@ -245,7 +245,7 @@ public class BoxNotifyTaskJob implements Job {
     /**
      * 删除通讯口配置
      */
-    private void deletePlcCfgHandle(){
+    private synchronized void deletePlcCfgHandle(){
         try {
             logger.info("deletePlcCfgHandle，开始从DB获取数据");
             PlcInfoApi plcInfoApi = SpringContextHolder.getBean(PlcInfoApi.class);
@@ -279,7 +279,7 @@ public class BoxNotifyTaskJob implements Job {
      * 处理盒子返回的消息
      * @param message
      */
-    private void callBackHandle(String message){
+    private synchronized void callBackHandle(String message){
         if(CommonUtils.isNullOrEmpty(message)){
             return;
         }
