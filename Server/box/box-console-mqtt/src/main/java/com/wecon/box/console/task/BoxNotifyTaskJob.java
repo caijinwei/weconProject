@@ -12,13 +12,12 @@ import com.wecon.box.entity.*;
 import com.wecon.box.util.Converter;
 import com.wecon.box.util.GroupOp;
 import com.wecon.common.util.CommonUtils;
-import org.apache.logging.log4j.LogManager;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-//import org.apache.log4j.Logger;
+import org.apache.log4j.Logger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,13 +42,11 @@ public class BoxNotifyTaskJob implements Job {
 
     private final int UPD_STATE_SUCCESS = 1;
 
-//    private static Logger logger = Logger.getLogger(BoxNotifyTaskJob.class);
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(BoxNotifyTaskJob.class.getName());
+    private static Logger logger = Logger.getLogger(BoxNotifyTaskJob.class);
 
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        logger.info("BoxNotifyTaskJob begin !");
         if (mqttClient != null && mqttClient.isConnected()) {
-            logger.info("mqtt connection is normal !");
+            logger.debug("mqtt connection is normal !");
             notifyHandle();
             return;
         }
@@ -75,10 +72,10 @@ public class BoxNotifyTaskJob implements Job {
      */
     private void updatePlcCfgHandle(){
         try {
-            logger.info("updatePlcCfgHandle，开始从DB获取数据");
+            logger.debug("updatePlcCfgHandle，开始从DB获取数据");
             PlcInfoApi plcInfoApi = SpringContextHolder.getBean(PlcInfoApi.class);
-            List<PlcExtend> plcExtendLst = plcInfoApi.getPlcExtendListByState(Constant.State.STATE_UPDATE_CONFIG);
-            logger.info("updatePlcCfgHandle，获取更新条数："+(null==plcExtendLst?"0":plcExtendLst.size()));
+            List<PlcExtend> plcExtendLst = plcInfoApi.getPlcExtendListByState(Constant.State.STATE_UPDATE_CONFIG, Constant.State.STATE_NEW_CONFIG);
+            logger.debug("updatePlcCfgHandle，获取更新条数："+(null==plcExtendLst?"0":plcExtendLst.size()));
             if(null != plcExtendLst){
                 Map<String, List<Map>> groupPlcExtends = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(plcExtendLst));
                 if(null != groupPlcExtends){
@@ -93,7 +90,7 @@ public class BoxNotifyTaskJob implements Job {
                         //发布数据给盒子
                         serverTopic = serverTopic.replace("#", entry.getKey());
                         publish(JSON.toJSONString(baseMsgResp));
-                        logger.info("updatePlcCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
+                        logger.debug("updatePlcCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
                     }
                 }
             }
@@ -364,7 +361,7 @@ public class BoxNotifyTaskJob implements Job {
         try {
             mqttClient = new MqttClient(MqttConfigContext.mqttConfig.getHost(), clientId, new MemoryPersistence());
             mqttClient.connect(mqttConnectOptions);
-            logger.info("mqtt connect success!");
+            logger.debug("mqtt connect success!");
         }catch (MqttException e){
             e.printStackTrace();
             logger.error("mqtt connect fail!");
@@ -403,16 +400,16 @@ public class BoxNotifyTaskJob implements Job {
     public class SubscribeCallback implements MqttCallback {
         public void connectionLost(Throwable cause) {
             // 连接丢失后，一般在这里面进行重连
-            logger.info("连接断开，可以做重连");
+            logger.debug("连接断开，可以做重连");
         }
 
         public void deliveryComplete(IMqttDeliveryToken token) {
-            logger.info("deliveryComplete---------" + token.isComplete());
+            logger.debug("deliveryComplete---------" + token.isComplete());
         }
 
         public void messageArrived(String topic, MqttMessage message) throws Exception {
             // subscribe后得到的消息会执行到这里面
-            logger.info("接收消息内容 : "+ new String(message.getPayload()));
+            logger.debug("接收消息内容 : "+ new String(message.getPayload()));
             callBackHandle(new String(message.getPayload()));
         }
     }
