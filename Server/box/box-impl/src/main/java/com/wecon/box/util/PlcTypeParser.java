@@ -69,6 +69,8 @@ public class PlcTypeParser {
     }
 
     public static void main(String[] arg) {
+
+
 //        doParse();
 //       // List<String> result = PlcTypeQuerier.getInstance().queryValuesByKey("plctype");
 //

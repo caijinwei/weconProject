@@ -6,6 +6,7 @@ import com.wecon.box.api.*;
 import com.wecon.box.entity.*;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.filter.DeviceDir;
+import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.BusinessException;
@@ -232,10 +233,15 @@ public class DeviceAction {
         {
             throw new BusinessException(ErrorCodeOption.Device_NotFound.key,ErrorCodeOption.Device_NotFound.value);
         }
-        if(deviceApi.updateDeviceName(deviceId,piBoxName,remark)==false)
+        if(CommonUtils.isNotNull(piBoxName))
         {
-            throw  new BusinessException(ErrorCodeOption.UpdateFalse_DeviceName_Remark.key,ErrorCodeOption.UpdateFalse_DeviceName_Remark.value);
+            device.name=piBoxName;
         }
+        if(CommonUtils.isNotNull(remark))
+        {
+            device.remark=remark;
+        }
+        deviceApi.updateDevice(device);
         return new Output();
     }
 }
