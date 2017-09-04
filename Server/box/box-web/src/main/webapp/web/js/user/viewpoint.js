@@ -40,13 +40,11 @@ appModule.controller("listController", function ($scope, $http, $compile) {
      * */
     $scope.showAlreadPoint = function (type, viewid) {
         $scope.showPointBut(type, viewid, $scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
-
     }
     $scope.showPointBut = function (type, view_id, pageIndex, pageSize) {
         if (pageIndex == 0) {
             pageIndex = 1;
         }
-        console.log("  $scope.type",$scope.type);
         //disabled
         var params =
         {

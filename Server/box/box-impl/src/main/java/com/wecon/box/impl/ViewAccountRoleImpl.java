@@ -6,7 +6,6 @@ import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.restful.core.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -15,7 +14,6 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -333,19 +331,13 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
 	* */
 	public void deleteViewAccountRoleByCfgId(final List<Integer> cfgIds,final Integer type)
 	{
+		System.out.println("这边-----------执行次数");
 		String sql="DELETE FROM view_account_role WHERE cfg_id=? AND cfg_type=?";
-		if (cfgIds.size() != 0) {
-			jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
-				@Override
-				public void setValues(PreparedStatement ps, int i) throws SQLException {
-					ps.setInt(1,cfgIds.get(i));
-					ps.setInt(2,type);
-				}
-				@Override
-				public int getBatchSize() {
-					return 0;
-				}
-			});
+		for(int i=0;i<cfgIds.size();i++)
+		{
+			Object[] args=new Object[]{cfgIds.get(i),type};
+			System.out.println("这边-----------执行次数");
+			jdbcTemplate.update(sql,args);
 		}
 	}
 }

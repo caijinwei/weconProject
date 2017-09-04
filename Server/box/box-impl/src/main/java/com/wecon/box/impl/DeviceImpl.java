@@ -315,7 +315,8 @@ public class DeviceImpl implements DeviceApi {
                     *查询盒子下的监控点
                     * */
                     ArrayList<Integer> realHisCfgIds = realHisCfgApi.findRealHisCfgIdSBydevice_id(deviceId);
-                    if (realHisCfgIds.size() <= 0) {
+                    System.out.println("---------------------------------------"+realHisCfgIds.size());
+                    if (realHisCfgIds.size() >= 0) {
                         /*
                         * 设置实时历史监控点bound状态为0
                         * */
@@ -324,7 +325,6 @@ public class DeviceImpl implements DeviceApi {
                         * 删除视图账户监控点分组
                         * */
                         viewAccountRoleApi.deleteViewAccountRoleByCfgId(realHisCfgIds, 1);
-
                         /*
                         * 解除视图账户和监控点分组下的关系
                         * */
@@ -334,7 +334,7 @@ public class DeviceImpl implements DeviceApi {
 
 
                     ArrayList<Integer> alarmCfgIds = alarmCfgApi.findAlarmCfgIdSBydevice_id(deviceId);
-                    if(alarmCfgIds.size()<=0) {
+                    if(alarmCfgIds.size()>=0) {
                          /*
                         * 设置实时历史监控点bound状态为0
                         * */
