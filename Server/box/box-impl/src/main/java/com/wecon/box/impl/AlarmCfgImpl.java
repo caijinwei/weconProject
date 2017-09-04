@@ -151,7 +151,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 	public List<AlarmCfgExtend> getAlarmCfgExtendListByState(Object... state) {
 		String sql = "select a.alarmcfg_id,a.plc_id,a.data_id,a.account_id,a.name,a.addr,a.addr_type,a.text,a.condition_type,a.state,a.create_date,a.update_date,a.rid,d.machine_code"
 				+ " from alarm_cfg a ,device d where a.device_id=d.device_id";
-		String triSql = "select at.type, at.value from alarm_trigger at, alarm_cfg a where at.alarmcfg_id=a.alarmcfg_id";
+		String triSql = "select at.alarmcfg_id,at.type, at.value from alarm_trigger at, alarm_cfg a where at.alarmcfg_id=a.alarmcfg_id";
 		if(null != state && state.length > 0){
 			sql += " and a.state in (";
 			triSql += " and a.state in (";
@@ -253,6 +253,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 		@Override
 		public AlarmTrigger mapRow(ResultSet rs, int i) throws SQLException {
 			AlarmTrigger model = new AlarmTrigger();
+			model.alarmcfg_id = rs.getLong("alarmcfg_id");
 			model.type = rs.getInt("type");
 			model.value = rs.getString("value");
 			return model;

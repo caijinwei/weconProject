@@ -527,8 +527,18 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 	@Override
 	public List<RealHisCfgExtend> getRealHisCfgListByState(Object... state){
-		String sql = "select " + SEL_COL + ",d.machine_code from real_his_cfg r ,device d, plc_info p where d.device_id=p.device_id and p.plc_id=r.plc_id and r.state = ?";
-		List<RealHisCfgExtend> list = jdbcTemplate.query(sql, new Object[]{state}, new DefaultRealCfgExtendRowMapper());
+		String sql = "select " + SEL_COL
+				+ ",d.machine_code from real_his_cfg r ,device d, plc_info p where d.device_id=p.device_id and p.plc_id=r.plc_id";
+		if (null != state && state.length > 0) {
+			sql += " and r.state in (";
+			StringBuffer inSb = new StringBuffer();
+			for (Object o : state) {
+				inSb.append(",?");
+			}
+			sql += inSb.substring(1);
+			sql += ")";
+		}
+		List<RealHisCfgExtend> list = jdbcTemplate.query(sql, state, new DefaultRealCfgExtendRowMapper());
 		return list;
 	}
 
@@ -667,6 +677,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.upd_time = TimeUtil.getYYYYMMDDHHMMSSDate(model.update_date);
 			model.machine_code = rs.getString("machine_code");
 			//model.ref_alais = rs.getString("ref_alais");
+			model.rid = rs.getString("rid");
 			return model;
 		}
 	}
