@@ -44,6 +44,8 @@ import com.wecon.common.util.CommonUtils;
  */
 public class MonitorTask extends Thread {
 	public static MqttClient client;
+    private final String clientId = "WECON_REVEIVE";
+	private String serverTopic = "pibox/cts/#";
 	private final int BASE_DATA = 1000;
 	private final int REAL_DATA = 1001;
 	private final int HISTORY_DATA = 1002;
@@ -79,10 +81,10 @@ public class MonitorTask extends Thread {
 			System.out.println("to connect mqtt......");
 			logger.info("to connect mqtt......");
 
-			client = new MqttClient(MqttConfigContext.mqttConfig.getHost(), "WECON_REVEIVE", new MemoryPersistence());
+			client = new MqttClient(MqttConfigContext.mqttConfig.getHost(), clientId, new MemoryPersistence());
 			client.connect(options);
 			// 订阅盒子的所有发送主题
-			client.subscribe("pibox/cts/#");
+			client.subscribe(serverTopic);
 			System.out.println("MQTT connection is successful !");
 			logger.info("MQTT connection is successful !");
 			client.setCallback(new MqttCallback() {
@@ -180,11 +182,13 @@ public class MonitorTask extends Thread {
 					}
 					if (olddevice != null) {
 						// 已经存在，直接更新device
-						newdevice.device_id = olddevice.device_id;
-						newdevice.map = olddevice.map;
-						newdevice.name = olddevice.name;
-						newdevice.remark = olddevice.remark;
-						deviceApi.updateDevice(newdevice);
+						olddevice.password = newdevice.password;
+						olddevice.state = newdevice.state;
+						olddevice.dev_model = newdevice.dev_model;
+						logger.info("接收的基础数据=" + jsonBase.getString("device_info"));
+						logger.info("基础数据的机器码=" + olddevice.machine_code);
+						logger.info("基础数据从数据库中获取的name=" + olddevice.name);
+						deviceApi.updateDevice(olddevice);
 						System.out.println("device modify success");
 					} else {
 
