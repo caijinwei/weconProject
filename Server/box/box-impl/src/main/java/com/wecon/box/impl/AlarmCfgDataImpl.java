@@ -183,7 +183,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<AlarmCfgDataAlarmCfg> page = new Page<AlarmCfgDataAlarmCfg>(pageIndex, pageSize, totalRecord);
-		String sort = " order by alarm_cfg_id desc";
+		String sort = " order by acd.monitor_time desc";
 		sql += condition + sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
 		List<AlarmCfgDataAlarmCfg> list = jdbcTemplate.query(sql, params.toArray(),
 				new DefaultAlarmCfgDataAlarmCfgRowMapper());
@@ -243,7 +243,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<AlarmCfgDataAlarmCfg> page = new Page<AlarmCfgDataAlarmCfg>(pageIndex, pageSize, totalRecord);
-		String sort = " order by alarm_cfg_id desc";
+		String sort = " order by acd.monitor_time desc";
 		sql += condition + sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
 		List<AlarmCfgDataAlarmCfg> list = jdbcTemplate.query(sql, params.toArray(),
 				new DefaultAlarmCfgDataAlarmCfgRowMapper());
