@@ -200,7 +200,7 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
 		int totalCount = jdbcTemplate.queryForObject(sqlCount, args, Integer.class);
 		Page<ViewAccountRoleView> page = new Page<ViewAccountRoleView>(pageIndex, pageSize, totalCount);
 		Object[] args1 = new Object[] { data_type, view_id, page.getStartIndex(), page.getPageSize() };
-		String sql = "SELECT a.cfg_id,a.role_type,b.name,b.addr,b.state FROM view_account_role a INNER JOIN real_his_cfg b ON a.cfg_id = b.id WHERE a.cfg_type = '1' AND b.data_type = ? AND a.view_id =? LIMIT ?,?";
+		String sql = "SELECT a.cfg_id,a.role_type,b.name,b.addr,b.state FROM view_account_role a INNER JOIN real_his_cfg b ON a.cfg_id = b.id WHERE a.cfg_type = '1' AND b.data_type = ? AND b.bind_state=1 AND a.view_id =? LIMIT ?,?";
 		List<ViewAccountRoleView> list = new ArrayList<ViewAccountRoleView>();
 		list = jdbcTemplate.query(sql, args1, new RowMapper() {
 			@Override
@@ -230,7 +230,7 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
 		int totalCount = jdbcTemplate.queryForObject(sqlCount, args, Integer.class);
 		Page<ViewAccountRoleView> page = new Page<ViewAccountRoleView>(pageIndex, pageSize, totalCount);
 		Object[] args1 = new Object[] { view_id, page.getStartIndex(), page.getPageSize() };
-		String sql = "SELECT a.cfg_id,a.role_type,b.name,b.addr,b.state FROM view_account_role a INNER JOIN alarm_cfg b ON a.cfg_id = b.alarmcfg_id WHERE a.cfg_type = '2'  AND a.view_id=? LIMIT ?,?";
+		String sql = "SELECT a.cfg_id,a.role_type,b.name,b.addr,b.state FROM view_account_role a INNER JOIN alarm_cfg b ON a.cfg_id = b.alarmcfg_id WHERE a.cfg_type = '2' AND b.bind_state=1  AND a.view_id=? LIMIT ?,?";
 		List<ViewAccountRoleView> list = new ArrayList<ViewAccountRoleView>();
 		list = jdbcTemplate.query(sql, args1, new RowMapper() {
 			@Override

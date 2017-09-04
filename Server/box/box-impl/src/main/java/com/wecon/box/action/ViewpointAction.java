@@ -91,7 +91,6 @@ public class ViewpointAction {
         data.put("page", page);
         return new Output(data);
     }
-
     /*
     *   有赋值权限
     *   public void setViewPoint(Integer viewId, String[] ids, String[] rights ,Integer cgf_type)
@@ -105,7 +104,6 @@ public class ViewpointAction {
         viewAccountRoleApi.setViewPoint(viewId, ids, rightParams, 1);
         return new Output();
     }
-
     /*
     *  没有权限
     *          设rights=null

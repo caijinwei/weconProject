@@ -334,7 +334,6 @@ public class AccountImpl implements AccountApi {
     }
 
     public static final class DefaultAccountRowMapper implements RowMapper<Account> {
-
         @Override
         public Account mapRow(ResultSet rs, int i) throws SQLException {
             Account model = new Account();

@@ -144,4 +144,5 @@ public interface RealHisCfgApi {
 	* */
 	public boolean updatePointAccAndState(long accountId,long deviceId);
 
+
 	}

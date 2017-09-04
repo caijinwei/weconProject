@@ -224,6 +224,24 @@ public class DeviceAction {
         data.put("page", page);
         return new Output(data);
     }
+    @Label("超级管理员查看是否绑定的device")
+    @WebApi(forceAuth = true, master = true, authority = {"0"})
+    @RequestMapping(value = "showDeviceByBoundState")
+    public Output showAllDeviceDir(@RequestParam("bind_state")Integer bind_state,@RequestParam("pageNum")Integer pageNum,@RequestParam("pageSize")Integer pageSize)
+    {
+        JSONObject data = new JSONObject();
+        if(bind_state==1)
+        {
+            Page<DeviceDir> page =page=deviceApi.getDeviceByBound(pageNum, pageSize);
+            data.put("page", page);
+        }else
+        {
+            Page<DeviceDir> page =page=deviceApi.getDeviceByUnbound(pageNum, pageSize);
+            data.put("page", page);
+        }
+
+        return new Output(data);
+    }
 
     @Label("修改盒子别名和备注")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
@@ -247,3 +265,4 @@ public class DeviceAction {
         return new Output();
     }
 }
+

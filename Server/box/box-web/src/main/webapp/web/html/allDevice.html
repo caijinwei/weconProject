@@ -22,6 +22,17 @@
                     <input type="text" class="form-control" id="account_id" placeholder="帐号Id">
                 </div>
             </div>
+            <div class="col-xs-4 col-sm-4 col-md-4 form-group">
+                <label class="col-sm-4 control-label" for="bind_state">盒子绑定状态</label>
+
+                <div class="col-sm-8">
+                    <select  class="form-control" id="bind_state" >
+                        <option value="-1">全部盒子</option>
+                        <option value="1">绑定</option>
+                        <option value="0">未绑定</option>
+                    </select>
+                </div>
+            </div>
             <!--<div class="col-xs-4 col-sm-4 col-md-4 form-group">-->
                 <!--<label class="col-sm-4 control-label" for="alias">用户名/手机号/邮箱</label>-->
 
@@ -45,7 +56,7 @@
         </div>
         <div>
             <button type="button" class="btn btn-primary"
-                    ng-click="getDevByAcc()">查询
+                    ng-click="search()">查询
             </button>
         </div>
 
@@ -70,7 +81,7 @@
                     <td>{{x.machine_code}}</td>
                     <td>{{x.name}}</td>
                     <td>{{x.dev_model}}</td>
-                    <td>{{x.state}}</td>
+                    <td>{{x.state=='1'?'绑定':'未绑定'}}</td>
                     <td>{{x.username}}</td>
                     <td>
                         {{x.accountId}}
