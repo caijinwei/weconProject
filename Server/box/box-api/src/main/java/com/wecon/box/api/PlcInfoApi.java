@@ -63,7 +63,7 @@ public interface PlcInfoApi {
 	 * @param state
 	 * @return
      */
-	List<PlcExtend> getPlcExtendListByState(int... state);
+	List<PlcExtend> getPlcExtendListByState(Object... state);
 
 	/**
 	 * 批量更新状态

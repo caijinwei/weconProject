@@ -1,26 +1,11 @@
-/**
- * @功能说明: 监控任务
- * @创建人 : lph
- * @创建时间: 2017年07月26日
- * @修改人 :
- * @修改时间:
- * @修改描述:
- * @Copyright (c)2017 福州富昌维控电子科技有限公司-版权所有
- */
 package com.wecon.box.console.task;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
-import com.wecon.box.entity.PiBoxComAddr;
-import com.wecon.box.entity.PiBoxHisCom;
-import com.wecon.box.entity.PiBoxHisComAddr;
-import com.wecon.box.entity.RealHisCfg;
-import com.wecon.box.entity.RealHisCfgData;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -29,10 +14,10 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.wecon.box.api.AlarmCfgDataApi;
 import com.wecon.box.api.DevFirmApi;
 import com.wecon.box.api.DeviceApi;
@@ -46,30 +31,48 @@ import com.wecon.box.entity.AlarmCfgData;
 import com.wecon.box.entity.DevFirm;
 import com.wecon.box.entity.Device;
 import com.wecon.box.entity.PiBoxCom;
+import com.wecon.box.entity.PiBoxComAddr;
+import com.wecon.box.entity.PiBoxHisCom;
+import com.wecon.box.entity.PiBoxHisComAddr;
+import com.wecon.box.entity.RealHisCfg;
+import com.wecon.box.entity.RealHisCfgData;
 import com.wecon.box.entity.RedisPiBoxActData;
 import com.wecon.common.util.CommonUtils;
 
-public class MonitorTaskJob implements Job {
+/**
+ * @author lanpenghui 2017年9月2日下午5:09:01
+ */
+public class MonitorTask extends Thread {
 	public static MqttClient client;
 	private final int BASE_DATA = 1000;
 	private final int REAL_DATA = 1001;
 	private final int HISTORY_DATA = 1002;
 	private final int ALARM_DATA = 1003;
-	private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(MonitorTaskJob.class.getName());
+
+	private static final Logger logger = LogManager.getLogger(MonitorTask.class);
+	private static int sleepTime = 1000 * 30;
+
+	public void run() {
+		logger.info("MonitorTask run start");
+		while (true) {
+			try {
+				if (client == null || !client.isConnected()) {
+					logger.info("mqtt connection is disconnection !");
+					connect();
+				}
+				sleep(sleepTime);
+
+			} catch (Exception e) {
+				logger.error(e);
+			}
+		}
+	}
 
 	/**
-	 * 实时监控是否连上代理服务器
-	 *
-	 * @param job
+	 * 
 	 */
-	public void execute(JobExecutionContext job) throws JobExecutionException {
-
+	private void connect() {
 		try {
-			if (client != null && client.isConnected()) {
-				logger.info("The connection server is normal !");
-				System.out.println("The connection server is normal !");
-				return;
-			}
 
 			MqttConnectOptions options = ConnectOptions.getConnectOptions(MqttConfigContext.mqttConfig.getUsername(),
 					MqttConfigContext.mqttConfig.getPassword());
@@ -107,7 +110,6 @@ public class MonitorTaskJob implements Job {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 
 	}
 
@@ -439,5 +441,4 @@ public class MonitorTaskJob implements Job {
 		}
 
 	}
-
 }

@@ -101,11 +101,11 @@ public interface DeviceApi {
     boolean updateDeviceName(Integer deviceId,String deviceName,String remark);
 
 
-//    /*
-//    *@params bound_state
-//    * 根据绑定状态展示所有device
-//    * */
-//    public Page<DeviceDir> getDeviceByBound(Integer pageNum, Integer pageSize);
-//
-//    public Page<DeviceDir> getDeviceByUnbound(Integer pageNum,Integer pageSize);
+    /*
+    *@params bound_state
+    * 根据绑定状态展示所有device
+    * */
+    public Page<DeviceDir> getDeviceByBound(Integer pageNum, Integer pageSize);
+
+    public Page<DeviceDir> getDeviceByUnbound(Integer pageNum,Integer pageSize);
 }

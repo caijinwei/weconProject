@@ -113,6 +113,8 @@ public class DeviceAction {
         Device modelUpdName=deviceApi.getDevice(device_id);
         modelUpdName.name=name;
         deviceApi.updateDevice(modelUpdName);
+        
+        
         /*
         * 更新实时历史监控点迁移
         * */
@@ -224,19 +226,20 @@ public class DeviceAction {
     }
     @Label("超级管理员查看是否绑定的device")
     @WebApi(forceAuth = true, master = true, authority = {"0"})
-    @RequestMapping(value = "showAllDeviceDir")
+    @RequestMapping(value = "showDeviceByBoundState")
     public Output showAllDeviceDir(@RequestParam("bind_state")Integer bind_state,@RequestParam("pageNum")Integer pageNum,@RequestParam("pageSize")Integer pageSize)
     {
-        Page<DeviceDir> page = null;
+        JSONObject data = new JSONObject();
         if(bind_state==1)
         {
-//            page=deviceApi.getDeviceByBound(pageNum, pageSize);
+            Page<DeviceDir> page =page=deviceApi.getDeviceByBound(pageNum, pageSize);
+            data.put("page", page);
         }else
         {
-//            page=deviceApi.getDeviceByUnbound(pageNum, pageSize);
+            Page<DeviceDir> page =page=deviceApi.getDeviceByUnbound(pageNum, pageSize);
+            data.put("page", page);
         }
-        JSONObject data = new JSONObject();
-        data.put("page", page);
+
         return new Output(data);
     }
 

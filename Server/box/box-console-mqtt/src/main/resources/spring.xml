@@ -41,8 +41,8 @@
 	<bean id="springContextHolder" class="com.wecon.box.console.util.SpringContextHolder"
 		lazy-init="false" />
 	<!-- 启动定时任务 -->
-	<bean id="monitorTask" class="com.wecon.box.console.task.StartTimeTask"
-		init-method="init" />
+<!-- 	<bean id="monitorTask" class="com.wecon.box.console.task.StartTimeTask"
+		init-method="init" /> -->
 	<bean id="getPublishClient" class="com.wecon.box.console.task.GetPublishClient" />
 	<!--mqtt配置 -->
 	<bean id="mqttConfig" class="com.wecon.box.console.config.MqttConfig">

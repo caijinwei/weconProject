@@ -282,8 +282,8 @@ appModule
 					}
 					// 获取删除分组名称
 					$scope.delGroup = function(model) {
-						var text = "确定删除【" + model.name + "】分组?"
-						$("#delid").html(text);
+						var text = "删除【" + model.name + "】组和组内数据，是否继续?"
+						$("#delgroupid").html(text);
 						$scope.delAlarmGroupId = model.id;
 
 						$("#deleteGroup").modal("show");
@@ -302,7 +302,7 @@ appModule
 
 										$("#deleteGroup").modal("hide");
 										$scope.alarm_group();
-										alert("修改成功")
+										alert("删除成功")
 
 									} else {
 
@@ -722,7 +722,7 @@ appModule
 							pageIndex = 1;
 						var params = {
 							group_id : $("#dataGroupSelect").val(),
-							device_id:$scope.deviceid,
+							device_id : $scope.deviceid,
 							pageIndex : pageIndex,
 							pageSize : pageSize
 

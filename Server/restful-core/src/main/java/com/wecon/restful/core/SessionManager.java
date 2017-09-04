@@ -37,7 +37,8 @@ public class SessionManager {
                     try {
                         SessionState.UserInfo tmpUserInfo = SessionState.UserInfo.parseFrom(value);
                         if (tmpUserInfo.getProductId() == userInfo.getProductId()) {
-                            RedisManager.del(RedisGroupName, it);
+                            //测试阶段先注释
+//                            RedisManager.del(RedisGroupName, it);
                             break;
                         }
                     } catch (Exception ex) {

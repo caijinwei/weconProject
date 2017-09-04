@@ -16,25 +16,20 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import org.springframework.context.ApplicationContext;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 实现服务端与盒子通信的定时任务，每隔一段时间从数据库扫描获取需要
- * 下发给盒子的数据，通过mqtt实现发布消息给盒子并订阅盒子反馈的消息
- * 如果mqtt连接断开或失效则重连
- * Created by whp on 2017/8/24.
+ * Created by zengzhipeng on 2017/9/2.
  */
-public class BoxNotifyTaskJob implements Job {
+public class BoxNotifyTask extends Thread {
     public static MqttClient mqttClient;
-    private String serverTopic = "pibox/stc/#";
     private final String clientId = "WECON_BOX_NOTIFY";
-
+    private String serverTopicPrefix = "pibox/stc/";
     private final int ACT_UPDATE_PLC_CONFIG = 2001; //更新通讯口配置
     private final int ACT_UPDATE_REAL_HISTORY_CONFIG = 2002; //更新实时和历史监控点配置
     private final int ACT_UPDATE_ALARM_DATA_CONFIG = 2003; //更新报警数据配置
@@ -42,19 +37,25 @@ public class BoxNotifyTaskJob implements Job {
     private final int ACT_DELETE_PLC_CONFIG = 2005; //删除通讯口配置
 
     private final int UPD_STATE_SUCCESS = 1;
+    private static final Logger logger = LogManager.getLogger(BoxNotifyTask.class);
+    private static int sleepTime = 1000 * 30;
 
-    private static Logger logger = LogManager.getLogger(BoxNotifyTaskJob.class.getName());
+    public void run() {
+        logger.info("BoxNotifyTask run start");
+        while (true) {
+            try {
+                if (mqttClient == null || !mqttClient.isConnected()) {
+                    logger.info("mqtt connection is disconnection !");
+                    connect();
+                    subscribe();
+                }
+                notifyHandle();
+                sleep(sleepTime);
 
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        if (mqttClient != null && mqttClient.isConnected()) {
-            logger.info("mqtt connection is normal !");
-            notifyHandle();
-            return;
+            } catch (Exception e) {
+                logger.error(e);
+            }
         }
-
-        connect();
-        subscribe();
-        notifyHandle();
     }
 
     /**
@@ -89,8 +90,7 @@ public class BoxNotifyTaskJob implements Job {
                         plcExtendResp.put("upd_com_list", entry.getValue());
                         baseMsgResp.setData(plcExtendResp);
                         //发布数据给盒子
-                        serverTopic = serverTopic.replace("#", entry.getKey());
-                        publish(JSON.toJSONString(baseMsgResp));
+                        publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
                         logger.info("updatePlcCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
                     }
                 }
@@ -130,8 +130,7 @@ public class BoxNotifyTaskJob implements Job {
                         realHisCfgResp.put("upd_real_his_cfg_list", cfgComList);
                         baseMsgResp.setData(realHisCfgResp);
                         //发布数据给盒子
-                        serverTopic = serverTopic.replace("#", entry.getKey());
-                        publish(JSON.toJSONString(baseMsgResp));
+                        publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
                         logger.info("updateRealHisCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
                     }
                 }
@@ -170,8 +169,7 @@ public class BoxNotifyTaskJob implements Job {
                         realHisCfgResp.put("upd_alarm_cfg_list", cfgComList);
                         baseMsgResp.setData(realHisCfgResp);
                         //发布数据给盒子
-                        serverTopic = serverTopic.replace("#", entry.getKey());
-                        publish(JSON.toJSONString(baseMsgResp));
+                        publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
                         logger.info("updateAlarmCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
                     }
                 }
@@ -235,8 +233,7 @@ public class BoxNotifyTaskJob implements Job {
                 realHisCfgResp.put("del_cfg_list", cfgComList);
                 baseMsgResp.setData(realHisCfgResp);
                 //发布数据给盒子
-                serverTopic = serverTopic.replace("#", entry.getKey());
-                publish(JSON.toJSONString(baseMsgResp));
+                publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
                 logger.info("deleteAllCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
             }
         }
@@ -263,8 +260,7 @@ public class BoxNotifyTaskJob implements Job {
                         plcExtendResp.put("del_com_list", entry.getValue());
                         baseMsgResp.setData(plcExtendResp);
                         //发布数据给盒子
-                        serverTopic = serverTopic.replace("#", entry.getKey());
-                        publish(JSON.toJSONString(baseMsgResp));
+                        publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
                         logger.info("deletePlcCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
                     }
                 }
@@ -311,9 +307,9 @@ public class BoxNotifyTaskJob implements Job {
                     break;
                 case ACT_DELETE_MONITOR_CONFIG : //删除监控点配置
                     List<Map> delCfgList = fbData.get("del_cfg_list");
-                    List<Integer> alarmCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", 2);
-                    List<Integer> realCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", 0);
-                    List<Integer> hisCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", 1);
+                    List<Integer> alarmCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_ALARM);
+                    List<Integer> realCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_REAL);
+                    List<Integer> hisCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_HISTORY);
                     realCfgIds.addAll(hisCfgIds);
                     //删除监控点配置、数据
                     realHisCfgApi.batchDeleteById(realCfgIds);
@@ -404,7 +400,7 @@ public class BoxNotifyTaskJob implements Job {
      * 发布消息
      * @param message
      */
-    private void publish(String message){
+    private void publish(String message, String serverTopic){
         MqttTopic mqttTopic = mqttClient.getTopic(serverTopic);
         MqttMessage mqttMessage = new MqttMessage();
         mqttMessage.setQos(2);
@@ -443,6 +439,15 @@ public class BoxNotifyTaskJob implements Job {
             // subscribe后得到的消息会执行到这里面
             logger.info("接收消息内容 : "+ new String(message.getPayload()));
             callBackHandle(new String(message.getPayload()));
+        }
+    }
+
+    private void sleep(int sleepTime) throws InterruptedException {
+        logger.info("sleep:" + sleepTime);
+        int slept = 0;
+        while (slept <= sleepTime) {
+            Thread.sleep(200);
+            slept += 200;
         }
     }
 }

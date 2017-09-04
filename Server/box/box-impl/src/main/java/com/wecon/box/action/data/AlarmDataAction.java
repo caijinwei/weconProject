@@ -22,7 +22,6 @@ import com.wecon.box.entity.AlarmCfgDataAlarmCfg;
 import com.wecon.box.entity.AlarmCfgTrigger;
 import com.wecon.box.entity.AlarmTrigger;
 import com.wecon.box.entity.Page;
-import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.filter.AlarmCfgDataFilter;
 import com.wecon.box.filter.AlarmTriggerFilter;

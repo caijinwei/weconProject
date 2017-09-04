@@ -129,6 +129,7 @@ public class QuartzManage {
 		JobDetail job = scheduler.getJobDetail(jobName, JOB_GROUP_NAME);
 		if (job == null) {
 			JobDetail jobDetail = new JobDetail(jobName, JOB_GROUP_NAME, jobClass);
+			
 			jobDetail.getJobDataMap().put("key", colBean);
 			scheduler.scheduleJob(jobDetail, trigger);
 		} else {

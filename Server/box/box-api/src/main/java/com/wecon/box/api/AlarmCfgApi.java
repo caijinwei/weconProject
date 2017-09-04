@@ -46,7 +46,7 @@ public interface AlarmCfgApi {
 	 * @param state
 	 * @return
 	 */
-	List<AlarmCfgExtend> getAlarmCfgExtendListByState(int state);
+	List<AlarmCfgExtend> getAlarmCfgExtendListByState(Object...  state);
 
 	public boolean upAlarmCfg(AlarmCfg alarmCfg);
 

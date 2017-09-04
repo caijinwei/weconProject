@@ -27,9 +27,16 @@ appModule.controller("listController", function ($scope, $http, $compile) {
     /*
      * 根据用户id查询
      * */
-    $scope.getDevByAcc = function () {
-        var accoountId = $("#account_id").val();
-        $scope.showAllDeviceDir(accoountId, $scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+    $scope.search = function () {
+        alert(111);
+        var accountId = $("#account_id").val();
+        var bind_state=$("#bind_state").val();
+        alert(bind_state);
+        if(bind_state!="")
+        {
+            $scope.showDeviceByBoundState(bind_state,$scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+        }
+        $scope.showAllDeviceDir(accountId, $scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
     }
     /*
      * 展示所有deviceDir
@@ -61,11 +68,10 @@ appModule.controller("listController", function ($scope, $http, $compile) {
     /*
      * 设置绑定状态
      * */
-    $scope.showDeviceByBoundState = function () {
+    $scope.showDeviceByBoundState = function (bind_state, pageNum, pageSize) {
         if (pageNum <= 0) {
             pageNum = 1;
         }
-        var bind_state=$("#bind_state").val();
         if(bind_state==-1)
         {
             $scope.showAllDeviceDir("",$scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);

@@ -50,7 +50,7 @@ public class DeviceImpl implements DeviceApi {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    private final String SEL_COL = "device_id,machine_code,`password`,dev_model,name,remark,map,state,dir_id,create_date,update_date";
+    private final String SEL_COL = "device_id,machine_code,`password`,dev_model,`name`,remark,map,state,dir_id,create_date,update_date";
 
     @Override
     public long saveDevice(final Device model) {
@@ -59,7 +59,7 @@ public class DeviceImpl implements DeviceApi {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement preState = con.prepareStatement(
-                        "insert into device (machine_code,`password`,dev_model,name,remark,map,state,dir_id,create_date,update_date)values(?,?,?,?,?,?,?,?,current_timestamp(),?);",
+                        "insert into device (machine_code,`password`,dev_model,`name`,remark,map,state,dir_id,create_date,update_date)values(?,?,?,?,?,?,?,?,current_timestamp(),?);",
                         Statement.RETURN_GENERATED_KEYS);
                 preState.setString(1, model.machine_code);
                 preState.setString(2, model.password);
@@ -80,7 +80,7 @@ public class DeviceImpl implements DeviceApi {
 
     @Override
     public boolean updateDevice(final Device model) {
-        String sql = "update device set machine_code=?,password=?,dev_model=?,name=?,remark=?,map=?,state=?,dir_id=?,update_date=current_timestamp() where device_id=?";
+        String sql = "update device set machine_code=?,password=?,dev_model=?,`name`=?,remark=?,map=?,state=?,dir_id=?,update_date=current_timestamp() where device_id=?";
         jdbcTemplate.update(sql, new Object[]{model.machine_code, model.password, model.dev_model, model.name,
                 model.remark, model.map, model.state, model.dir_id, model.device_id});
         return true;
@@ -98,7 +98,7 @@ public class DeviceImpl implements DeviceApi {
             return false;
         }
         if (!CommonUtils.isNullOrEmpty(deviceName)) {
-            condition.append(" name= ? ");
+            condition.append(" `name`= ? ");
             params.add(remark);
         }
         if (!CommonUtils.isNullOrEmpty(remark)) {
@@ -138,7 +138,7 @@ public class DeviceImpl implements DeviceApi {
 
     @Override
     public List<Device> getDeviceList(long account_id, long account_dir_id) {
-        String sql = "select d.device_id,d.machine_code,d.`password`,d.dev_model,d.name,d.remark,d.map,d.state,d.dir_id,d.create_date,d.update_date from  account_dir ad,account_dir_rel adr,device d ,dev_bind_user dbu WHERE 1=1 and ad.`id`=adr.`acc_dir_id`AND ad.`type`=0 AND adr.`ref_id`=d.device_id AND dbu.account_id=ad.`account_id`AND dbu.device_id=d.device_id";
+        String sql = "select d.device_id,d.machine_code,d.`password`,d.dev_model,d.`name`,d.remark,d.map,d.state,d.dir_id,d.create_date,d.update_date from  account_dir ad,account_dir_rel adr,device d ,dev_bind_user dbu WHERE 1=1 and ad.`id`=adr.`acc_dir_id`AND ad.`type`=0 AND adr.`ref_id`=d.device_id AND dbu.account_id=ad.`account_id`AND dbu.device_id=d.device_id";
         StringBuffer condition = new StringBuffer("");
         List<Object> params = new ArrayList<Object>();
         if (account_id > 0) {
@@ -237,7 +237,7 @@ public class DeviceImpl implements DeviceApi {
 * 查询管理账户的盒子
 * @Params acc_id
 *         管理账户id
-* sql:SELECT a.device_id, b.`name` FROM dev_bind_user a INNER JOIN device b ON a.device_id=b.device_id WHERE a.account_id='1000017';
+* sql:SELECT a.device_id, b.name FROM dev_bind_user a INNER JOIN device b ON a.device_id=b.device_id WHERE a.account_id='1000017';
 * */
     public List<Device> getDeviceNameByAccId(long acc_id) {
         String sql = "SELECT a.device_id, b.`name` FROM dev_bind_user a INNER JOIN device b ON a.device_id=b.device_id WHERE a.account_id=?";
@@ -257,7 +257,7 @@ public class DeviceImpl implements DeviceApi {
 
     public List<Map<String, Object>> getDevicesByGroup(long acc_id) {
         //获取管理员下的分组列表
-        List<String[]> groupLst = jdbcTemplate.query("SELECT ad.id, ad.name FROM account_dir ad WHERE ad.type=0 and ad.account_id=?", new Object[]{acc_id}, new RowMapper() {
+        List<String[]> groupLst = jdbcTemplate.query("SELECT ad.id, ad.`name` FROM account_dir ad WHERE ad.type=0 and ad.account_id=?", new Object[]{acc_id}, new RowMapper() {
             @Override
             public Object mapRow(ResultSet rs, int i) throws SQLException {
                 return new String[]{rs.getLong("id") + "", rs.getString("name")};
@@ -267,7 +267,7 @@ public class DeviceImpl implements DeviceApi {
             return null;
         }
         //获取管理员下盒子列表
-        List<String[]> deviceLst = jdbcTemplate.query("SELECT d.device_id, d.name, d.map, d.dir_id FROM dev_bind_user dbu INNER JOIN device d ON dbu.device_id=d.device_id WHERE dbu.account_id=?", new Object[]{acc_id}, new RowMapper() {
+        List<String[]> deviceLst = jdbcTemplate.query("SELECT d.device_id, d.`name`, d.map, d.dir_id FROM dev_bind_user dbu INNER JOIN device d ON dbu.device_id=d.device_id WHERE dbu.account_id=?", new Object[]{acc_id}, new RowMapper() {
             @Override
             public Object mapRow(ResultSet rs, int i) throws SQLException {
                 return new String[]{rs.getLong("device_id") + "", rs.getString("name"), rs.getString("map"), rs.getLong("dir_id") + ""};
@@ -315,26 +315,47 @@ public class DeviceImpl implements DeviceApi {
                     *查询盒子下的监控点
                     * */
                     ArrayList<Integer> realHisCfgIds = realHisCfgApi.findRealHisCfgIdSBydevice_id(deviceId);
-                    realHisCfgApi.setBind_state(toIntArray(realHisCfgIds), 0);
-                    //viewAccountRoleApi.deleteViewAccountRoleByCfgId(realHisCfgIds,1);
+                    if (realHisCfgIds.size() <= 0) {
+                        /*
+                        * 设置实时历史监控点bound状态为0
+                        * */
+                        realHisCfgApi.setBind_state(toIntArray(realHisCfgIds), 0);
+                        /*
+                        * 删除视图账户监控点分组
+                        * */
+                        viewAccountRoleApi.deleteViewAccountRoleByCfgId(realHisCfgIds, 1);
+
+                        /*
+                        * 解除视图账户和监控点分组下的关系
+                        * */
+                        accountDirRelApi.deleteViewAccAndPointRel(1, accountId, realHisCfgIds);
+                        accountDirRelApi.deleteViewAccAndPointRel(2, accountId, realHisCfgIds);
+                    }
 
 
                     ArrayList<Integer> alarmCfgIds = alarmCfgApi.findAlarmCfgIdSBydevice_id(deviceId);
-                    alarmCfgApi.setBind_state(toIntArray(alarmCfgIds), 0);
-                    viewAccountRoleApi.deleteViewAccountRoleByCfgId(alarmCfgIds, 2);
-                    viewAccountRoleApi.deleteViewAccountRoleByCfgId(realHisCfgIds, 1);
-
+                    if(alarmCfgIds.size()<=0) {
+                         /*
+                        * 设置实时历史监控点bound状态为0
+                        * */
+                        alarmCfgApi.setBind_state(toIntArray(alarmCfgIds), 0);
+                          /*
+                        * 删除视图账户监控点分组
+                        * */
+                        viewAccountRoleApi.deleteViewAccountRoleByCfgId(alarmCfgIds, 2);
+                          /*
+                        * 解除视图账户和监控点分组下的关系
+                        * */
+                        accountDirRelApi.deleteViewAccAndPointRel(3, accountId, alarmCfgIds);
+                    }
                     /*
                     * 删除管理员与盒子分组关系
                     * DELETE FROM account_dir_rel WHERE ref_id=1111 AND acc_dir_id IN (SELECT id FROM account_dir WHERE type=0 AND account_id=12);
                     * */
                     accountDirRelApi.deleteAccDeviceRel(deviceId, accountId);
-                    /*
-                    * 解除视图账户和监控点分组下的关系
-                    * */
-                    accountDirRelApi.deleteViewAccAndPointRel(1, accountId, realHisCfgIds);
-                    accountDirRelApi.deleteViewAccAndPointRel(2, accountId, realHisCfgIds);
-                    accountDirRelApi.deleteViewAccAndPointRel(3, accountId, alarmCfgIds);
+
+
+
                     return true;
                 }
             });
@@ -395,56 +416,68 @@ public class DeviceImpl implements DeviceApi {
         page.setList(list);
         return page;
     }
-//
-//    @Override
-//    public Page<DeviceDir> getDeviceByBound(Integer pageNum, Integer pageSize) {
-//        String sqlCount = "SELECT count(1) FROM device a INNER JOIN dev_bind_user b ON a.device_id = b.device_id";
-//        Integer count = jdbcTemplate.queryForObject(sqlCount, Integer.class);
-//        Page<DeviceDir> page=new Page<DeviceDir>(pageNum,pageSize,count);
-//        if(count<=0)
-//        {
-//            page.setList(new ArrayList<DeviceDir>());
-//            return page;
-//        }
-//        String sql = "SELECT a.device_id,a.`name`,a.machine_code,a.`password`,a.dev_model,a.state,a.remark,a.create_date,c.username,c.account_id  FROM device a INNER JOIN dev_bind_user b ON a.device_id = b.device_id  LIMIT ?,?";
-//        Object[] args = new Object[]{page.getStartIndex(), page.getPageSize()};
-//        page.setList(jdbcTemplate.query(sql, args, new DefaultDeviceDirRowMapper()));
-//        return page;
-//    }
 
-//    @Override
-//    public Page<DeviceDir> getDeviceByUnbound(Integer pageNum, Integer pageSize) {
-//        String sqlCount = "SELECT count(1) FROM device a where a.device_id not IN(SELECT device_id FROM dev_bind_user where 1=1);";
-//        Integer count = jdbcTemplate.queryForObject(sqlCount, Integer.class);
-//        Page<DeviceDir> page=new Page<DeviceDir>(pageNum,pageSize,count);
-//        if(count<=0)
-//        {
-//            page.setList(new ArrayList<DeviceDir>());
-//            return page;
-//        }
-//        String sql = "SELECT a.device_id,a.`name`,a.machine_code,a.`password`,a.dev_model,a.state,a.remark,a.create_date  FROM device a where a.device_id not IN(SELECT device_id FROM dev_bind_user where 1=1)  LIMIT ?,?";
-//        Object[] args = new Object[]{page.getStartIndex(), page.getPageSize()};
-//        page.setList(jdbcTemplate.query(sql, args, new DefaultDeviceDirRowMapper()));
-//        return page;
-//    }
-//
-//
-//    public static final class DefaultDeviceDirRowMapper implements RowMapper<DeviceDir> {
-//        public DeviceDir mapRow(ResultSet resultSet, int i) throws SQLException {
-//            DeviceDir model = new DeviceDir();
-//            model.create_date = resultSet.getTimestamp("create_date");
-//            model.dev_model = resultSet.getString("dev_model");
-//            model.device_id = resultSet.getLong("device_id");
-//            model.machine_code = resultSet.getString("machine_code");
-//            model.name = resultSet.getString("name");
-//            model.remark = resultSet.getString("remark");
-//            model.password = resultSet.getString("password");
-//            model.state = resultSet.getInt("state");
-//            model.accountId = resultSet.getLong("account_id");
-//            model.username = resultSet.getString("username");
-//            return model;
-//        }
-//    }
+    @Override
+    public Page<DeviceDir> getDeviceByBound(Integer pageNum, Integer pageSize) {
+        String sqlCount = "SELECT count(1) FROM device a INNER JOIN dev_bind_user b ON a.device_id = b.device_id";
+        Integer count = jdbcTemplate.queryForObject(sqlCount, Integer.class);
+        Page<DeviceDir> page = new Page<DeviceDir>(pageNum, pageSize, count);
+        if (count <= 0) {
+            page.setList(new ArrayList<DeviceDir>());
+            return page;
+        }
+        String sql = "SELECT a.device_id,a.`name`,a.machine_code,a.`password`,a.dev_model,a.state,a.remark,a.create_date,c.username,c.account_id  FROM device a INNER JOIN dev_bind_user b ON a.device_id = b.device_id  LEFT JOIN account c ON b.account_id=c.account_id  LIMIT ?,?";
+        Object[] args = new Object[]{page.getStartIndex(), page.getPageSize()};
+        page.setList(jdbcTemplate.query(sql, args, new DefaultDeviceDirRowMapper()));
+        return page;
+    }
+
+    @Override
+    public Page<DeviceDir> getDeviceByUnbound(Integer pageNum, Integer pageSize) {
+        String sqlCount = "SELECT count(1) FROM device a where a.device_id not IN(SELECT device_id FROM dev_bind_user where 1=1);";
+        Integer count = jdbcTemplate.queryForObject(sqlCount, Integer.class);
+        Page<DeviceDir> page = new Page<DeviceDir>(pageNum, pageSize, count);
+        if (count <= 0) {
+            page.setList(new ArrayList<DeviceDir>());
+            return page;
+        }
+        String sql = "SELECT a.device_id,a.`name`,a.machine_code,a.`password`,a.dev_model,a.state,a.remark,a.create_date  FROM device a  where a.device_id not IN(SELECT device_id FROM dev_bind_user b where 1=1)  LIMIT ?,?";
+        Object[] args = new Object[]{page.getStartIndex(), page.getPageSize()};
+        page.setList(jdbcTemplate.query(sql, args, new RowMapper<DeviceDir>() {
+            @Override
+            public DeviceDir mapRow(ResultSet resultSet, int i) throws SQLException {
+                DeviceDir model = new DeviceDir();
+                model.create_date = resultSet.getTimestamp("create_date");
+                model.dev_model = resultSet.getString("dev_model");
+                model.device_id = resultSet.getLong("device_id");
+                model.machine_code = resultSet.getString("machine_code");
+                model.name = resultSet.getString("name");
+                model.remark = resultSet.getString("remark");
+                model.password = resultSet.getString("password");
+                model.state = resultSet.getInt("state");
+                return model;
+            }
+        }));
+        return page;
+    }
+
+
+    public static final class DefaultDeviceDirRowMapper implements RowMapper<DeviceDir> {
+        public DeviceDir mapRow(ResultSet resultSet, int i) throws SQLException {
+            DeviceDir model = new DeviceDir();
+            model.create_date = resultSet.getTimestamp("create_date");
+            model.dev_model = resultSet.getString("dev_model");
+            model.device_id = resultSet.getLong("device_id");
+            model.machine_code = resultSet.getString("machine_code");
+            model.name = resultSet.getString("name");
+            model.remark = resultSet.getString("remark");
+            model.password = resultSet.getString("password");
+            model.state = resultSet.getInt("state");
+            model.accountId = resultSet.getLong("account_id");
+            model.username = resultSet.getString("username");
+            return model;
+        }
+    }
 }
 
 
