@@ -447,7 +447,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	@Override
 	public Page<RealHisCfgDevice> getRealHisCfgDevicePage(RealHisCfgFilter filter, Map<String, Object> bParams,
 			int pageIndex, int pageSize) {
-		String fromStr = "from real_his_cfg r ,device d, plc_info p";
+		String fromStr = "from real_his_cfg r ,device d, plc_info p, account_dir_rel adr, account_dir ad ";
 		StringBuffer condition = new StringBuffer();
 		List<Object> params = new ArrayList<Object>();
 
@@ -455,34 +455,26 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			condition.append(" and r.account_id = ? ");
 			params.add(filter.account_id);
 		}
-		if (filter.addr_type > -1) {
-			condition.append(" and r.addr_type = ? ");
-			params.add(filter.addr_type);
-		}
+
 		if (filter.data_type > -1) {
 			condition.append(" and r.data_type = ? ");
 			params.add(filter.data_type);
-		}
-		if (filter.his_cycle > -1) {
-			condition.append(" and r.his_cycle = ? ");
-			params.add(filter.his_cycle);
 		}
 
 		Object boxId = bParams.get("boxId");
 		Object groupId = bParams.get("groupId");
 		if (null != boxId) {
-			condition.append(" and d.device_id = ? ");
+			condition.append(" and ad.device_id = ? ");
 			params.add(boxId);
 		}
 		if (null != groupId) {
-			fromStr += ", account_dir_rel f";
-			condition.append(" and r.id=f.ref_id and f.acc_dir_id = ?");
+			condition.append(" and adr.acc_dir_id = ?");
 			params.add(groupId);
 		}
-		String sqlCount = "select count(0) " + fromStr
-				+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id";
-		String sql = "select " + SEL_COL + ",d.machine_code" + "  " + fromStr
-				+ "  where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id";
+		String sqlCount = "select count(distinct r.id) " + fromStr
+				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and r.id=adr.ref_id and r.bind_state=1";
+		String sql = "select distinct " + SEL_COL + ",d.machine_code,adr.ref_alais" + "  " + fromStr
+				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and r.id=adr.ref_id and r.bind_state=1";
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<RealHisCfgDevice> page = new Page<RealHisCfgDevice>(pageIndex, pageSize, totalRecord);
@@ -497,7 +489,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	@Override
 	public Page<RealHisCfgDevice> getRealHisCfgDevicePage(ViewAccountRoleFilter filter, Map<String, Object> bParams,
 			int pageIndex, int pageSize) {
-		String fromStr = "from real_his_cfg r ,device d, plc_info p, view_account_role v";
+		String fromStr = "from real_his_cfg r ,device d, plc_info p, view_account_role v, account_dir_rel adr, account_dir ad ";
 		StringBuffer condition = new StringBuffer();
 		List<Object> params = new ArrayList<Object>();
 
@@ -505,25 +497,26 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			condition.append(" and v.view_id = ? ");
 			params.add(filter.view_id);
 		}
-		if (filter.role_type > -1) {
-			condition.append(" and v.role_type = ? ");
-			params.add(filter.role_type);
-		}
+
 		if (filter.data_type > -1) {
 			condition.append(" and r.data_type = ? ");
 			params.add(filter.data_type);
 		}
 
 		Object groupId = bParams.get("groupId");
+		Object boxId = bParams.get("boxId");
 		if (null != groupId) {
-			fromStr += ", account_dir_rel f";
-			condition.append(" and r.id=f.ref_id and f.acc_dir_id = ?");
+			condition.append(" and adr.acc_dir_id = ?");
 			params.add(groupId);
 		}
-		String sqlCount = "select count(0) " + fromStr
-				+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1";
-		String sql = "select " + SEL_COL + ",d.machine_code" + "  " + fromStr
-				+ "  where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1";
+		if (null != boxId) {
+			condition.append(" and ad.device_id = ? ");
+			params.add(boxId);
+		}
+		String sqlCount = "select count(distinct r.id) " + fromStr
+				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and r.id=adr.ref_id and r.bind_state=1";
+		String sql = "select distinct " + SEL_COL + ",d.machine_code" + "  " + fromStr
+				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and r.id=adr.ref_id and r.bind_state=1";
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<RealHisCfgDevice> page = new Page<RealHisCfgDevice>(pageIndex, pageSize, totalRecord);
