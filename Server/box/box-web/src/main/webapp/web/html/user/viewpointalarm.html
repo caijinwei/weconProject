@@ -39,7 +39,6 @@
                 <th class="col-md-2">名称</th>
                 <th class="col-md-2">地址</th>
                 <th class="col-md-2">状态</th>
-                <th class="col-md-2">权限</th>
                 <th class="col-md-3">操作</th>
             </tr>
             </thead>
@@ -49,9 +48,6 @@
                 <td>{{x.name}}</td>
                 <td>{{x.addr}}</td>
                 <td>{{x.state==0?'已同步给盒子':(x.state=='1'?'新增配置':(x.state='2'?'更新配置':'删除配置'))}}</td>
-                <td>
-                    {{x.role_type==0?'无权限':(x.role_type==1?'只读':(x.role_type==2?'只写':'读写'))}}
-                </td>
                 <td>
 
                         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delectOpint"

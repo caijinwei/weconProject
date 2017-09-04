@@ -748,22 +748,12 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	/*
 	 * 设置bind_state=0 解绑
 	 */
-	public void setBind_state(final int[] realHisCfg, final Integer state) {
-		String sql = "UPDATE real_his_cfg SET id=? where bind_state=?";
-		Object[] args = new Object[] { realHisCfg, state };
-		if (realHisCfg.length != 0) {
-			jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
-				@Override
-				public void setValues(PreparedStatement ps, int i) throws SQLException {
-					ps.setInt(1, realHisCfg[i]);
-					ps.setInt(2, state);
-				}
-				@Override
-				public int getBatchSize() {
-					return 0;
-				}
-			});
-		}
+	public void setBind_state(int[] realHisCfg, Integer state) {
+		String sql = "UPDATE real_his_cfg SET bind_state=? where id =?";
+			for(int i=0;i<realHisCfg.length;i++) {
+				Object []args =new Object[]{state,realHisCfg[i]};
+				jdbcTemplate.update(sql, args);
+			}
 	}
 	/*
 	* 盒子用户改变  监控点迁移
