@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="gb2312"?>
 <plcdesc filever="2.0">
-	<plc plctype="WECON SIMUTOCOL" Driver="libsimutocol.so" remark="" plcver="3.0" ComType="0" BoudRate="9600" StopBit="1" DataLength="8" CheckBit="NONE" WaitTimeout="10" RevTimeout="10" Type="WECON" 
+	<!--<plc plctype="WECON SIMUTOCOL" Driver="libsimutocol.so" remark="" plcver="3.0" ComType="0" BoudRate="9600" StopBit="1" DataLength="8" CheckBit="NONE" WaitTimeout="10" RevTimeout="10" Type="WECON"
 	Help="不与任何PLC进行通讯" 
 	EN_Help="Do not communicate with any PLC" 
 	IT_Help="Nessuna comunicazione con il PLC" 
@@ -17,7 +17,7 @@
 			<res Index="9122" Rid="HSX" MJinzhi="d" MRange="0 49999" BitCount="2" BJinzhi="d" BRange="0 15" Help="HMI系统寄存器"/>
 			<res Index="9123" Rid="HUX" MJinzhi="d" MRange="0 99999" BitCount="2" BJinzhi="d" BRange="0 15" Help="用户接口寄存器，UI设置专用，脚本无效"/>
 		</bitaddr>
-	</plc>
+	</plc>-->
 	<plc plctype="ModBus RTU Slave(All Fuction)" Driver="libModbusRTU_All.so" remark="" plcver="3.0" ComType="1" BoudRate="9600" StopBit="1" DataLength="8" CheckBit="NONE" WaitTimeout="300" RevTimeout="50" PlcStatNo="1" Type="ModBus" 
 	Help="HMI主动发送数据给设备,设备是master被动的发送数据,协议地址从0开始,并且包含所有功能码" 
 	EN_Help="HMI send data to device actively, the device is master, receive data passively, address start from 0, contain all function code" 
