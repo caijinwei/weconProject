@@ -25,7 +25,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $scope.infoData = data.device;
                 $scope.accounttype = data.userType;
                 var map = data.device.map;
-                if (map != "" || map != null) {
+                if (map != "" && map != null) {
                     var maps = map.split(",");
                     $scope.map_a = maps[0];
                     $scope.map_o = maps[1];

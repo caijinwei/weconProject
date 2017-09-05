@@ -116,4 +116,34 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     $scope.ws_log = function (data) {
         $('#wsLog').prepend('<p>' + data + '</p>');
     }
+
+    var ws;
+    $scope.ws_connect2 = function () {
+        if ("WebSocket" in window) {
+            alert("WebSocket is supported by your Browser!");
+        }
+        ws = new WebSocket("ws://localhost:8080/wecon-box/api/" + 'actdata-websocket/');
+        ws.onopen = function () {
+            $scope.ws_log('>>>open');
+        };
+        ws.onmessage = function (evt) {
+            $scope.ws_log('server message ->' + evt.data);
+        };
+        ws.onclose = function (evt) {
+            $scope.ws_log('>>>close' + " " + evt.data);
+            console.log(evt);
+        };
+        ws.onerror = function (evt) {
+            $scope.ws_log('>>>error' + " " + evt.data);
+            console.log(evt);
+        };
+    }
+    $scope.ws_send2 = function () {
+        ws.send($("#wsMsg").val());
+        $scope.ws_log('client message ->' + $("#wsMsg").val());
+    }
+    $scope.ws_close2 = function () {
+        s
+        ws.close();
+    }
 })
