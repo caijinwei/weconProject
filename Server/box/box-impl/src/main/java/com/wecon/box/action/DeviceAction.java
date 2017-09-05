@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -56,16 +57,16 @@ public class DeviceAction {
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     public Output showBaseInfo(@RequestParam("device_id") Integer device_id) {
 
-        Client client=AppContext.getSession().client;
-        long account_id =client.userId;
-        Integer userType=client.userInfo.getUserType();
+        Client client = AppContext.getSession().client;
+        long account_id = client.userId;
+        Integer userType = client.userInfo.getUserType();
         if (devBindUserApi.isRecord(device_id, account_id) == false) {
             throw new BusinessException(ErrorCodeOption.PiBoxDevice_IsNot_Found.key, ErrorCodeOption.PiBoxDevice_IsNot_Found.value);
         }
         Device device = deviceApi.getDevice(device_id);
         JSONObject data = new JSONObject();
         data.put("device", device);
-        data.put("userType",userType);
+        data.put("userType", userType);
         if (device == null || data.size() == 0) {
             throw new BusinessException(ErrorCodeOption.PiBoxDevice_IsNot_Found.key, ErrorCodeOption.PiBoxDevice_IsNot_Found.value);
         }
@@ -88,7 +89,7 @@ public class DeviceAction {
     @RequestMapping(value = "/boundBox")
     public Output boundBox(@RequestParam("machine_code") String machine_code, @RequestParam("password") String password,
                            @RequestParam("name") String name, @RequestParam("acc_dir_id") Integer acc_dir_id) {
-		/*
+        /*
          * 验证是否该盒子是否存在
 		 */
         Device device = deviceApi.getDevice(machine_code);
@@ -110,16 +111,16 @@ public class DeviceAction {
         model.account_id = AppContext.getSession().client.userId;
         model.device_id = device_id;
         devBindUserApi.saveDevBindUser(model);
-        Device modelUpdName=deviceApi.getDevice(device_id);
-        modelUpdName.name=name;
+        Device modelUpdName = deviceApi.getDevice(device_id);
+        modelUpdName.name = name;
         deviceApi.updateDevice(modelUpdName);
         
         
         /*
         * 更新实时历史监控点迁移
         * */
-        alarmCfgApi.updatePointAccAndState(model.account_id,model.device_id);
-        realHisCfgApi.updatePointAccAndState(model.account_id,model.device_id);
+        alarmCfgApi.updatePointAccAndState(model.account_id, model.device_id);
+        realHisCfgApi.updatePointAccAndState(model.account_id, model.device_id);
 
         /*
          * 有选择分组操作 默认分组 ref_id=0
@@ -135,7 +136,7 @@ public class DeviceAction {
         /*
         * 更新监控点分组迁移
         * */
-        accountDirApi.updateAccountBydeviceAndType( AppContext.getSession().client.userId,device_id);
+        accountDirApi.updateAccountBydeviceAndType(AppContext.getSession().client.userId, device_id);
         return new Output();
     }
 
@@ -149,9 +150,7 @@ public class DeviceAction {
         JSONArray allarr = new JSONArray();
         JSONObject data = null;
         JSONObject devicedata = null;
-
         List<Device> deviceList = null;
-
         List<AccountDir> accountDirList = accountDirApi.getAccountDirList(client.userId, 0);
 
         if (accountDirList == null || accountDirList.size() < 1) {
@@ -218,48 +217,53 @@ public class DeviceAction {
     @Label("超级管理员查看所有device盒子")
     @WebApi(forceAuth = true, master = true, authority = {"0"})
     @RequestMapping(value = "showAllDeviceDir")
-    public Output showAllDeviceDir(@RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize ,@RequestParam("accountId") String accountId) {
-        Page<DeviceDir> page = deviceApi.showAllDeviceDir(accountId,pageNum, pageSize);
+    public Output showAllDeviceDir(@RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize, @RequestParam("accountId") String accountId, @RequestParam("bind_state") Integer bind_state,@RequestParam("machine_code")String machine_code) {
+        Page<DeviceDir> page =null;
         JSONObject data = new JSONObject();
+        if (bind_state!=-1) {
+            if (bind_state == 1) {
+                page = deviceApi.getDeviceByBound(pageNum, pageSize);
+            } else {
+                page = page = deviceApi.getDeviceByUnbound(machine_code,pageNum, pageSize);
+            }
+        }else if(!machine_code.equals("-1"))
+        {
+            page=new Page<DeviceDir>(1,1,1);
+            ArrayList<DeviceDir> list=new ArrayList<DeviceDir>();
+            list.add(deviceApi.getDeviceDir(machine_code));
+            if(list.size()<=0)
+            {
+                page=new Page<DeviceDir>(1,5,0);
+            }else {
+                page=new Page<DeviceDir>(1,5,1);
+            }
+            page.setList(list);
+        }
+        else{
+            page=deviceApi.showAllDeviceDir(accountId, pageNum, pageSize);
+        }
         data.put("page", page);
         return new Output(data);
     }
-    @Label("超级管理员查看是否绑定的device")
-    @WebApi(forceAuth = true, master = true, authority = {"0"})
-    @RequestMapping(value = "showDeviceByBoundState")
-    public Output showAllDeviceDir(@RequestParam("bind_state")Integer bind_state,@RequestParam("pageNum")Integer pageNum,@RequestParam("pageSize")Integer pageSize)
-    {
-        JSONObject data = new JSONObject();
-        if(bind_state==1)
-        {
-            Page<DeviceDir> page =page=deviceApi.getDeviceByBound(pageNum, pageSize);
-            data.put("page", page);
-        }else
-        {
-            Page<DeviceDir> page =page=deviceApi.getDeviceByUnbound(pageNum, pageSize);
-            data.put("page", page);
-        }
 
-        return new Output(data);
-    }
 
-    @Label("修改盒子别名和备注")
+
+    @Label("修改盒子别名和备注,地图")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping("chgPiboxInFoName")
-    public Output chgPiboxInFoName(@RequestParam("deviceId")Integer deviceId ,@RequestParam("piBoxName")String piBoxName,@RequestParam("remark")String remark)
-    {
-        Device device=deviceApi.getDevice(deviceId);
-        if(null==deviceId||null==device)
-        {
-            throw new BusinessException(ErrorCodeOption.Device_NotFound.key,ErrorCodeOption.Device_NotFound.value);
+    public Output chgPiboxInFoName(@RequestParam("deviceId") Integer deviceId, @RequestParam("piBoxName") String piBoxName, @RequestParam("remark") String remark, @RequestParam("map") String map) {
+        Device device = deviceApi.getDevice(deviceId);
+        if (null == deviceId || null == device) {
+            throw new BusinessException(ErrorCodeOption.Device_NotFound.key, ErrorCodeOption.Device_NotFound.value);
         }
-        if(CommonUtils.isNotNull(piBoxName))
-        {
-            device.name=piBoxName;
+        if (CommonUtils.isNotNull(piBoxName)) {
+            device.name = piBoxName;
         }
-        if(CommonUtils.isNotNull(remark))
-        {
-            device.remark=remark;
+        if (CommonUtils.isNotNull(remark)) {
+            device.remark = remark;
+        }
+        if (CommonUtils.isNotNull(map)) {
+            device.map = map;
         }
         deviceApi.updateDevice(device);
         return new Output();

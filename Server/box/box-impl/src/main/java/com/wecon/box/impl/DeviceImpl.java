@@ -137,6 +137,20 @@ public class DeviceImpl implements DeviceApi {
     }
 
     @Override
+    public DeviceDir getDeviceDir(String machine_code) {
+        String sql = "SELECT  " +
+                "a.device_id,a.`name`,a.machine_code,a.`password`,a.dev_model,a.state,a.remark,a.create_date,c.username,c.account_id  " +
+                "FROM  " +
+                "device a  " +
+                "LEFT JOIN dev_bind_user b ON a.device_id = b.device_id  " +
+                "LEFT JOIN account c ON b.account_id=c.account_id   " +
+                " where a.machine_code=?  LIMIT 1  ";
+        Object[] args = new Object[]{machine_code};
+        jdbcTemplate.query(sql, args, new DefaultDeviceDirRowMapper());
+        return null;
+    }
+
+    @Override
     public List<Device> getDeviceList(long account_id, long account_dir_id) {
         String sql = "select d.device_id,d.machine_code,d.`password`,d.dev_model,d.`name`,d.remark,d.map,d.state,d.dir_id,d.create_date,d.update_date from  account_dir ad,account_dir_rel adr,device d ,dev_bind_user dbu WHERE 1=1 and ad.`id`=adr.`acc_dir_id`AND ad.`type`=0 AND adr.`ref_id`=d.device_id AND dbu.account_id=ad.`account_id`AND dbu.device_id=d.device_id";
         StringBuffer condition = new StringBuffer("");
@@ -315,7 +329,6 @@ public class DeviceImpl implements DeviceApi {
                     *查询盒子下的监控点
                     * */
                     ArrayList<Integer> realHisCfgIds = realHisCfgApi.findRealHisCfgIdSBydevice_id(deviceId);
-                    System.out.println("---------------------------------------"+realHisCfgIds.size());
                     if (realHisCfgIds.size() >= 0) {
                         /*
                         * 设置实时历史监控点bound状态为0
@@ -334,7 +347,7 @@ public class DeviceImpl implements DeviceApi {
 
 
                     ArrayList<Integer> alarmCfgIds = alarmCfgApi.findAlarmCfgIdSBydevice_id(deviceId);
-                    if(alarmCfgIds.size()>=0) {
+                    if (alarmCfgIds.size() >= 0) {
                          /*
                         * 设置实时历史监控点bound状态为0
                         * */
@@ -353,7 +366,6 @@ public class DeviceImpl implements DeviceApi {
                     * DELETE FROM account_dir_rel WHERE ref_id=1111 AND acc_dir_id IN (SELECT id FROM account_dir WHERE type=0 AND account_id=12);
                     * */
                     accountDirRelApi.deleteAccDeviceRel(deviceId, accountId);
-
 
 
                     return true;
@@ -394,7 +406,7 @@ public class DeviceImpl implements DeviceApi {
                 "LEFT JOIN dev_bind_user b ON a.device_id = b.device_id  " +
                 "LEFT JOIN account c ON b.account_id=c.account_id   " +
                 condition +
-                "  LIMIT ?,?  ";
+                " order by a.device_id desc  LIMIT ?,?  ";
         Object[] args = new Object[]{page.getStartIndex(), page.getPageSize()};
         List<DeviceDir> list = jdbcTemplate.query(sql, args, new RowMapper<DeviceDir>() {
             @Override
@@ -426,23 +438,37 @@ public class DeviceImpl implements DeviceApi {
             page.setList(new ArrayList<DeviceDir>());
             return page;
         }
-        String sql = "SELECT a.device_id,a.`name`,a.machine_code,a.`password`,a.dev_model,a.state,a.remark,a.create_date,c.username,c.account_id  FROM device a INNER JOIN dev_bind_user b ON a.device_id = b.device_id  LEFT JOIN account c ON b.account_id=c.account_id  LIMIT ?,?";
+        String sql = "SELECT a.device_id,a.`name`,a.machine_code,a.`password`,a.dev_model,a.state,a.remark,a.create_date,c.username,c.account_id  FROM device a INNER JOIN dev_bind_user b ON a.device_id = b.device_id  LEFT JOIN account c ON b.account_id=c.account_id  order by a.device_id desc  LIMIT ?,?";
         Object[] args = new Object[]{page.getStartIndex(), page.getPageSize()};
         page.setList(jdbcTemplate.query(sql, args, new DefaultDeviceDirRowMapper()));
         return page;
     }
 
     @Override
-    public Page<DeviceDir> getDeviceByUnbound(Integer pageNum, Integer pageSize) {
-        String sqlCount = "SELECT count(1) FROM device a where a.device_id not IN(SELECT device_id FROM dev_bind_user where 1=1);";
-        Integer count = jdbcTemplate.queryForObject(sqlCount, Integer.class);
-        Page<DeviceDir> page = new Page<DeviceDir>(pageNum, pageSize, count);
+    public Page<DeviceDir> getDeviceByUnbound(String machineCode, Integer pageNum, Integer pageSize) {
+        StringBuffer condition = new StringBuffer("");
+        Object[] args=null;
+        Integer count=null;
+        Page<DeviceDir> page = null;
+        if (CommonUtils.isNotNull(machineCode) && !machineCode.equals("-1")) {
+            condition.append("and a.machine_code=? ");
+            String sqlCount = "SELECT count(1) FROM device a where a.device_id not IN(SELECT device_id FROM dev_bind_user where 1=1) " + condition;
+            Object[] argsCount = new Object[]{machineCode};
+            count = jdbcTemplate.queryForObject(sqlCount, argsCount, Integer.class);
+            page = new Page<DeviceDir>(pageNum, pageSize, count);
+            args = new Object[]{page.getStartIndex(), page.getPageSize(), machineCode};
+        } else {
+            String sqlCount = "SELECT count(1) FROM device a where a.device_id not IN(SELECT device_id FROM dev_bind_user where 1=1) " + condition;
+            Object[] argsCount = new Object[]{};
+            count = jdbcTemplate.queryForObject(sqlCount, argsCount, Integer.class);
+            page = new Page<DeviceDir>(pageNum, pageSize, count);
+            args = new Object[]{page.getStartIndex(), page.getPageSize()};
+        }
         if (count <= 0) {
             page.setList(new ArrayList<DeviceDir>());
             return page;
         }
-        String sql = "SELECT a.device_id,a.`name`,a.machine_code,a.`password`,a.dev_model,a.state,a.remark,a.create_date  FROM device a  where a.device_id not IN(SELECT device_id FROM dev_bind_user b where 1=1)  LIMIT ?,?";
-        Object[] args = new Object[]{page.getStartIndex(), page.getPageSize()};
+        String sql = "SELECT a.device_id,a.`name`,a.machine_code,a.`password`,a.dev_model,a.state,a.remark,a.create_date  FROM device a  where a.device_id not IN(SELECT device_id FROM dev_bind_user b where 1=1)  " + condition + "  order by a.device_id desc  LIMIT ?,?";
         page.setList(jdbcTemplate.query(sql, args, new RowMapper<DeviceDir>() {
             @Override
             public DeviceDir mapRow(ResultSet resultSet, int i) throws SQLException {

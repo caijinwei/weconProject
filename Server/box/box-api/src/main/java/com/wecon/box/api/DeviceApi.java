@@ -45,6 +45,12 @@ public interface DeviceApi {
      * @return
      */
     public Device getDevice(String machine_code);
+
+    /*
+    * 根据machine_code获取deviceDir信息
+    * @param machine_code
+    * */
+    public DeviceDir getDeviceDir(String machine_code);
 	/**
 	 * 通过用户获取绑定的机器
 	 * @param account_id
@@ -107,5 +113,7 @@ public interface DeviceApi {
     * */
     public Page<DeviceDir> getDeviceByBound(Integer pageNum, Integer pageSize);
 
-    public Page<DeviceDir> getDeviceByUnbound(Integer pageNum,Integer pageSize);
+    //public Page<DeviceDir> getDeviceByUnbound(Integer pageNum,Integer pageSize);
+
+    public Page<DeviceDir> getDeviceByUnbound(String machineCode, Integer pageNum, Integer pageSize);
 }
