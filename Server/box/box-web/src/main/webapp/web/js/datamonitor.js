@@ -33,17 +33,6 @@ appModule
 						function showAddGroup() {
 							$('#identifier').modal('show');
 						}
-						// 添加导航项，关闭模态框
-						function addGroup() {
-							var name = $('#newGroupName').val();
-							var length = $('#monitorTab').children().length;
-							var lastPosition = length - 3;
-							($("#monitorTab li:eq(" + lastPosition + ")"))
-									.after("<li><a href=\"#data-item-1\" data-toggle=\"tab\">"
-											+ name + "</a></li>");
-							$("#addDataGroup").modal("hide");
-						}
-
 					}
 
 					$scope.act_group = function(deviceid) {
@@ -325,7 +314,7 @@ appModule
 														.val();
 												var length = $('#monitorTab')
 														.children().length;
-												var lastPosition = length - 3;
+												var lastPosition = length - 2;
 												($("#monitorTab li:eq("
 														+ lastPosition + ")"))
 														.after("<li><a href=\"#data-item-1\" data-toggle=\"tab\">"
