@@ -281,10 +281,12 @@ public class DeviceImpl implements DeviceApi {
             return null;
         }
         //获取管理员下盒子列表
-        List<String[]> deviceLst = jdbcTemplate.query("SELECT d.device_id, d.`name`, d.map, d.dir_id FROM dev_bind_user dbu INNER JOIN device d ON dbu.device_id=d.device_id WHERE dbu.account_id=?", new Object[]{acc_id}, new RowMapper() {
+        List<String[]> deviceLst = jdbcTemplate.query("SELECT d.device_id, d.`name`, d.map, adr.acc_dir_id " +
+                "FROM dev_bind_user dbu, device d, account_dir_rel adr " +
+                "WHERE adr.ref_id=d.device_id and dbu.device_id=d.device_id and dbu.account_id=?", new Object[]{acc_id}, new RowMapper() {
             @Override
             public Object mapRow(ResultSet rs, int i) throws SQLException {
-                return new String[]{rs.getLong("device_id") + "", rs.getString("name"), rs.getString("map"), rs.getLong("dir_id") + ""};
+                return new String[]{rs.getLong("device_id") + "", rs.getString("name"), rs.getString("map"), rs.getLong("acc_dir_id") + ""};
             }
         });
         if (null == deviceLst) {

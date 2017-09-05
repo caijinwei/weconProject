@@ -102,16 +102,18 @@
 									ng-if="accounttype==1&& deviceid>0" ng-click="editmonitor(x);">
 										<span class="glyphicon glyphicon-edit"></span> 编辑
 								</a> <a href="#" title="复制" data-toggle="modal"
-									data-target="#copyDataGroup"
+									data-target="#copyDataGroup" ng-cloak
+									ng-if="accounttype==1&& deviceid<0"
 									ng-click="mc_change();copymonitor(x);"> <span
 										class="glyphicon glyphicon-file"></span> 复制
 								</a> <a href="#" title="移动分组" data-toggle="modal"
 									data-target="#moveDataGroup"
 									ng-click="mc_change();movemonitor(x);"> <span
 										class="glyphicon glyphicon-resize-horizontal"></span> 移动
-								</a> <a href="#" title="移除" data-toggle="modal"
-									data-target="#deletePoint" ng-click="mc_change();remonitor(x);">
-										<span class="glyphicon glyphicon-trash"></span> 移除
+								</a> <a href="#" title="移除" data-toggle="modal" ng-cloak
+									ng-if="accounttype==1&& deviceid<0" data-target="#deletePoint"
+									ng-click="mc_change();remonitor(x);"> <span
+										class="glyphicon glyphicon-trash"></span> 移除
 								</a> <a href="#" title="删除" data-toggle="modal"
 									data-target="#deletePoint" ng-cloak
 									ng-if="accounttype==1&& deviceid>0"

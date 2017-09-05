@@ -68,7 +68,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		jdbcTemplate.update(sql,
 				new Object[] { model.data_id, model.account_id, model.plc_id, model.name, model.addr, model.addr_type,
 						model.describe, model.digit_count, model.data_limit, model.his_cycle, model.data_type,
-						model.state, model.bind_state, model.device_id,model.rid,model.id });
+						model.state, model.bind_state, model.device_id, model.rid, model.id });
 
 		return true;
 	}
@@ -86,9 +86,20 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 	@Override
 	public List<RealHisCfg> getRealHisCfg(long plc_id, int state) {
-		String sql = "select " + SEL_COL + " from real_his_cfg r where r.plc_id=? and r.state=?";
-		List<RealHisCfg> list = jdbcTemplate.query(sql, new Object[] { plc_id, state },
-				new DefaultRealHisCfgRowMapper());
+		List<Object> params = new ArrayList<Object>();
+		String sql = "select " + SEL_COL + " from real_his_cfg r where r.plc_id=?";
+		params.add(plc_id);
+
+		StringBuffer condition = new StringBuffer("");
+
+		if (state > -1) {
+			condition.append("  and r.state=? ");
+			params.add(state);
+		}
+
+		sql = sql + condition;
+
+		List<RealHisCfg> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgRowMapper());
 		if (!list.isEmpty()) {
 			return list;
 		}
@@ -98,7 +109,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 	@Override
 	public void delRealHisCfg(long id) {
-		
+
 		String sql = "delete from  real_his_cfg r where r.id=?";
 		jdbcTemplate.update(sql, new Object[] { id });
 	}
@@ -436,7 +447,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	@Override
 	public Page<RealHisCfgDevice> getRealHisCfgDevicePage(RealHisCfgFilter filter, Map<String, Object> bParams,
 			int pageIndex, int pageSize) {
-		String fromStr = "from real_his_cfg r ,device d, plc_info p";
+		String fromStr = "from real_his_cfg r ,device d, plc_info p, account_dir_rel adr, account_dir ad ";
 		StringBuffer condition = new StringBuffer();
 		List<Object> params = new ArrayList<Object>();
 
@@ -444,34 +455,26 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			condition.append(" and r.account_id = ? ");
 			params.add(filter.account_id);
 		}
-		if (filter.addr_type > -1) {
-			condition.append(" and r.addr_type = ? ");
-			params.add(filter.addr_type);
-		}
+
 		if (filter.data_type > -1) {
 			condition.append(" and r.data_type = ? ");
 			params.add(filter.data_type);
-		}
-		if (filter.his_cycle > -1) {
-			condition.append(" and r.his_cycle = ? ");
-			params.add(filter.his_cycle);
 		}
 
 		Object boxId = bParams.get("boxId");
 		Object groupId = bParams.get("groupId");
 		if (null != boxId) {
-			condition.append(" and d.device_id = ? ");
+			condition.append(" and ad.device_id = ? ");
 			params.add(boxId);
 		}
 		if (null != groupId) {
-			fromStr += ", account_dir_rel f";
-			condition.append(" and r.id=f.ref_id and f.acc_dir_id = ?");
+			condition.append(" and adr.acc_dir_id = ?");
 			params.add(groupId);
 		}
-		String sqlCount = "select count(0) " + fromStr
-				+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id";
-		String sql = "select " + SEL_COL + ",d.machine_code" + "  " + fromStr
-				+ "  where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id";
+		String sqlCount = "select count(distinct r.id) " + fromStr
+				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and r.id=adr.ref_id and r.bind_state=1";
+		String sql = "select distinct " + SEL_COL + ",d.machine_code,adr.ref_alais" + "  " + fromStr
+				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and r.id=adr.ref_id and r.bind_state=1";
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<RealHisCfgDevice> page = new Page<RealHisCfgDevice>(pageIndex, pageSize, totalRecord);
@@ -486,7 +489,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	@Override
 	public Page<RealHisCfgDevice> getRealHisCfgDevicePage(ViewAccountRoleFilter filter, Map<String, Object> bParams,
 			int pageIndex, int pageSize) {
-		String fromStr = "from real_his_cfg r ,device d, plc_info p, view_account_role v";
+		String fromStr = "from real_his_cfg r ,device d, plc_info p, view_account_role v, account_dir_rel adr, account_dir ad ";
 		StringBuffer condition = new StringBuffer();
 		List<Object> params = new ArrayList<Object>();
 
@@ -494,25 +497,26 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			condition.append(" and v.view_id = ? ");
 			params.add(filter.view_id);
 		}
-		if (filter.role_type > -1) {
-			condition.append(" and v.role_type = ? ");
-			params.add(filter.role_type);
-		}
+
 		if (filter.data_type > -1) {
 			condition.append(" and r.data_type = ? ");
 			params.add(filter.data_type);
 		}
 
 		Object groupId = bParams.get("groupId");
+		Object boxId = bParams.get("boxId");
 		if (null != groupId) {
-			fromStr += ", account_dir_rel f";
-			condition.append(" and r.id=f.ref_id and f.acc_dir_id = ?");
+			condition.append(" and adr.acc_dir_id = ?");
 			params.add(groupId);
 		}
-		String sqlCount = "select count(0) " + fromStr
-				+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1";
-		String sql = "select " + SEL_COL + ",d.machine_code" + "  " + fromStr
-				+ "  where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1";
+		if (null != boxId) {
+			condition.append(" and ad.device_id = ? ");
+			params.add(boxId);
+		}
+		String sqlCount = "select count(distinct r.id) " + fromStr
+				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and r.id=adr.ref_id and r.bind_state=1";
+		String sql = "select distinct " + SEL_COL + ",d.machine_code" + "  " + fromStr
+				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and r.id=adr.ref_id and r.bind_state=1";
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<RealHisCfgDevice> page = new Page<RealHisCfgDevice>(pageIndex, pageSize, totalRecord);
@@ -524,9 +528,8 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 	}
 
-
 	@Override
-	public List<RealHisCfgExtend> getRealHisCfgListByState(Object... state){
+	public List<RealHisCfgExtend> getRealHisCfgListByState(Object... state) {
 		String sql = "select " + SEL_COL
 				+ ",d.machine_code from real_his_cfg r ,device d, plc_info p where d.device_id=p.device_id and p.plc_id=r.plc_id";
 		if (null != state && state.length > 0) {
@@ -543,17 +546,18 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	}
 
 	@Override
-	public boolean batchUpdateState(final List<int[]> updList){
-		if(null == updList || updList.size() == 0){
+	public boolean batchUpdateState(final List<int[]> updList) {
+		if (null == updList || updList.size() == 0) {
 			return false;
 		}
 		String sql = "update real_his_cfg set state = ? where id = ?";
 		jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
 			public int getBatchSize() {
 				return updList.size();
-				//这个方法设定更新记录数，通常List里面存放的都是我们要更新的，所以返回list.size();
+				// 这个方法设定更新记录数，通常List里面存放的都是我们要更新的，所以返回list.size();
 			}
-			public void setValues(PreparedStatement ps, int i)throws SQLException {
+
+			public void setValues(PreparedStatement ps, int i) throws SQLException {
 				int[] arg = updList.get(i);
 				ps.setInt(1, arg[0]);
 				ps.setInt(2, arg[1]);
@@ -569,10 +573,10 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		}
 
 		StringBuilder idSb = new StringBuilder();
-		for(int id : ids){
+		for (int id : ids) {
 			idSb.append(",").append(id);
 		}
-		String sql = "delete from real_his_cfg where plc_id in("+idSb.substring(1)+")";
+		String sql = "delete from real_his_cfg where plc_id in(" + idSb.substring(1) + ")";
 		jdbcTemplate.update(sql);
 
 		return true;
@@ -585,10 +589,10 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		}
 
 		StringBuilder idSb = new StringBuilder();
-		for(int id : ids){
+		for (int id : ids) {
 			idSb.append(",").append(id);
 		}
-		String sql = "delete from real_his_cfg where id in("+idSb.substring(1)+")";
+		String sql = "delete from real_his_cfg where id in(" + idSb.substring(1) + ")";
 		jdbcTemplate.update(sql);
 
 		return true;
@@ -615,9 +619,9 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.state = rs.getInt("state");
 			model.create_date = rs.getTimestamp("create_date");
 			model.update_date = rs.getTimestamp("update_date");
-			model.rid= rs.getString("rid");
+			model.rid = rs.getString("rid");
 			model.device_id = rs.getLong("device_id");
-			model.bind_state=rs.getInt("bind_state");
+			model.bind_state = rs.getInt("bind_state");
 
 			return model;
 		}
@@ -645,9 +649,9 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.update_date = rs.getTimestamp("update_date");
 			model.machine_code = rs.getString("machine_code");
 			model.ref_alais = rs.getString("ref_alais");
-			model.rid= rs.getString("rid");
+			model.rid = rs.getString("rid");
 			model.device_id = rs.getLong("device_id");
-			model.bind_state=rs.getInt("bind_state");
+			model.bind_state = rs.getInt("bind_state");
 			return model;
 		}
 	}
@@ -662,7 +666,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.data_id = rs.getLong("data_id");
 			model.account_id = rs.getLong("account_id");
 			model.plc_id = rs.getLong("plc_id");
-			model.com = model.plc_id+"";
+			model.com = model.plc_id + "";
 			model.name = rs.getString("name");
 			model.addr = rs.getString("addr");
 			model.addr_type = rs.getInt("addr_type");
@@ -676,7 +680,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.update_date = rs.getTimestamp("update_date");
 			model.upd_time = TimeUtil.getYYYYMMDDHHMMSSDate(model.update_date);
 			model.machine_code = rs.getString("machine_code");
-			//model.ref_alais = rs.getString("ref_alais");
+			// model.ref_alais = rs.getString("ref_alais");
 			model.rid = rs.getString("rid");
 			return model;
 		}
@@ -700,14 +704,14 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.his_cycle = rs.getInt("his_cycle");
 			model.data_type = rs.getInt("data_type");
 			model.state = rs.getInt("state");
-			model.rid= rs.getString("rid");
+			model.rid = rs.getString("rid");
 			model.create_date = rs.getTimestamp("create_date");
 			model.update_date = rs.getTimestamp("update_date");
 			model.machine_code = rs.getString("machine_code");
 			model.ref_alais = rs.getString("ref_alais");
 			model.role_type = rs.getInt("role_type");
 			model.device_id = rs.getLong("device_id");
-			model.bind_state=rs.getInt("bind_state");
+			model.bind_state = rs.getInt("bind_state");
 			return model;
 		}
 	}
@@ -731,8 +735,8 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.his_cycle = rs.getInt("his_cycle");
 			model.data_type = rs.getInt("data_type");
 			model.state = rs.getInt("state");
-			model.rid= rs.getString("rid");
-			model.bind_state=rs.getInt("bind_state");
+			model.rid = rs.getString("rid");
+			model.bind_state = rs.getInt("bind_state");
 			model.create_date = rs.getTimestamp("create_date");
 			model.update_date = rs.getTimestamp("update_date");
 			model.machine_code = rs.getString("machine_code");
@@ -762,22 +766,21 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	 */
 	public void setBind_state(int[] realHisCfg, Integer state) {
 		String sql = "UPDATE real_his_cfg SET bind_state=? where id =?";
-			for(int i=0;i<realHisCfg.length;i++) {
-				Object []args =new Object[]{state,realHisCfg[i]};
-				jdbcTemplate.update(sql, args);
-			}
+		for (int i = 0; i < realHisCfg.length; i++) {
+			Object[] args = new Object[] { state, realHisCfg[i] };
+			jdbcTemplate.update(sql, args);
+		}
 	}
-	/*
-	* 盒子用户改变  监控点迁移
-	* */
-	public boolean updatePointAccAndState(long accountId,long deviceId)
-	{
 
-		String sql="UPDATE real_his_cfg a SET a.account_id=?,a.bind_state=1 WHERE a.device_id=?;";
-		Object[] args=new Object[]{accountId,deviceId};
-		Integer count=jdbcTemplate.update(sql,args);
-		if(count<=0)
-		{
+	/*
+	 * 盒子用户改变 监控点迁移
+	 */
+	public boolean updatePointAccAndState(long accountId, long deviceId) {
+
+		String sql = "UPDATE real_his_cfg a SET a.account_id=?,a.bind_state=1 WHERE a.device_id=?;";
+		Object[] args = new Object[] { accountId, deviceId };
+		Integer count = jdbcTemplate.update(sql, args);
+		if (count <= 0) {
 			return false;
 		}
 		return true;

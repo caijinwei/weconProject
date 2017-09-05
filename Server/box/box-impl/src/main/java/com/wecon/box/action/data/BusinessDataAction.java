@@ -4,11 +4,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.*;
 import com.wecon.box.entity.*;
+import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.filter.AlarmCfgDataFilter;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
+import com.wecon.restful.core.BusinessException;
 import com.wecon.restful.core.Client;
 import com.wecon.restful.core.Output;
 import com.wecon.restful.doc.Label;
@@ -59,9 +61,7 @@ public class BusinessDataAction {
         }
         /** 管理者账号 **/
         if (client.userInfo.getUserType() == 1) {
-            realHisCfgFilter.addr_type = -1;
             realHisCfgFilter.data_type = 0;
-            realHisCfgFilter.his_cycle = -1;
             realHisCfgFilter.account_id = client.userId;
             realHisCfgDevicePage = realHisCfgApi.getRealHisCfgDevicePage(realHisCfgFilter, bParams, param.pageIndex, param.pageSize);
         }
@@ -69,8 +69,6 @@ public class BusinessDataAction {
         else if (client.userInfo.getUserType() == 2) {
             ViewAccountRoleFilter viewAccountRoleFilter = new ViewAccountRoleFilter();
             viewAccountRoleFilter.view_id = client.userId;
-            viewAccountRoleFilter.cfg_type = 1;
-            viewAccountRoleFilter.role_type = -1;
             viewAccountRoleFilter.data_type = 0;
             realHisCfgDevicePage = realHisCfgApi.getRealHisCfgDevicePage(viewAccountRoleFilter, bParams, param.pageIndex, param.pageSize);
         }
@@ -79,16 +77,16 @@ public class BusinessDataAction {
         JSONArray arr = new JSONArray();
 
         //假数据，后面要删除
-        for(int p=1;p<5;p++){
+        /*for(int p=1;p<5;p++){
             JSONObject data = new JSONObject();
             data.put("id", p);
             data.put("state", 1);
             data.put("monitorName", "监控点"+p);
             data.put("number", 60);
             arr.add(data);
-        }
+        }*/
 
-        /*if (realHisCfgDeviceList == null || realHisCfgDeviceList.size() < 1) {
+        if (realHisCfgDeviceList == null || realHisCfgDeviceList.size() < 1) {
             return new Output(json);
         }
         for (int i = 0; i < realHisCfgDeviceList.size(); i++) {
@@ -96,27 +94,29 @@ public class BusinessDataAction {
             String device_machine = realHisCfgDevice.machine_code;
             // 通过机器码去redis中获取数据
             RedisPiBoxActData redisPiBoxActData = redisPiBoxApi.getRedisPiBoxActData(device_machine);
-            List<PiBoxCom> actTimeDataList = redisPiBoxActData.act_time_data_list;
+            List<PiBoxCom> actTimeDataList = null == redisPiBoxActData ? null : redisPiBoxActData.act_time_data_list;
 
             JSONObject data = new JSONObject();
             data.put("id", realHisCfgDevice.id);
             data.put("state", realHisCfgDevice.state);
             data.put("monitorName", realHisCfgDevice.name);
-            for (int j = 0; j < actTimeDataList.size(); j++) {
-                PiBoxCom piBoxCom = actTimeDataList.get(j);
-                if (Long.parseLong(piBoxCom.com) == realHisCfgDevice.plc_id) {
-                    List<PiBoxComAddr> addrList = piBoxCom.addr_list;
-                    for (int k = 0; k < addrList.size(); k++) {
-                        PiBoxComAddr piBoxComAddr = addrList.get(k);
-                        if (Long.parseLong(piBoxComAddr.addr_id) == realHisCfgDevice.id) {
-                            data.put("state", piBoxComAddr.state);
-                            data.put("value", piBoxComAddr.value);
+            if(null != actTimeDataList){
+                for (int j = 0; j < actTimeDataList.size(); j++) {
+                    PiBoxCom piBoxCom = actTimeDataList.get(j);
+                    if (Long.parseLong(piBoxCom.com) == realHisCfgDevice.plc_id) {
+                        List<PiBoxComAddr> addrList = piBoxCom.addr_list;
+                        for (int k = 0; k < addrList.size(); k++) {
+                            PiBoxComAddr piBoxComAddr = addrList.get(k);
+                            if (Long.parseLong(piBoxComAddr.addr_id) == realHisCfgDevice.id) {
+                                data.put("state", piBoxComAddr.state);
+                                data.put("value", piBoxComAddr.value);
+                            }
                         }
                     }
                 }
             }
             arr.add(data);
-        }*/
+        }
         json.put("list", arr);
         return new Output(json);
     }
@@ -141,9 +141,7 @@ public class BusinessDataAction {
         }
         /** 管理者账号 **/
         if (client.userInfo.getUserType() == 1) {
-            realHisCfgFilter.addr_type = -1;
-            realHisCfgFilter.data_type = 0;
-            realHisCfgFilter.his_cycle = -1;
+            realHisCfgFilter.data_type = 1;
             realHisCfgFilter.account_id = client.userId;
             realHisCfgDataPage = realHisCfgDataApi.getRealHisCfgDataPage(realHisCfgFilter, bParams, param.pageIndex, param.pageSize);
         }
@@ -151,15 +149,13 @@ public class BusinessDataAction {
         else if (client.userInfo.getUserType() == 2) {
             ViewAccountRoleFilter viewAccountRoleFilter = new ViewAccountRoleFilter();
             viewAccountRoleFilter.view_id = client.userId;
-            viewAccountRoleFilter.cfg_type = 1;
-            viewAccountRoleFilter.role_type = -1;
-            viewAccountRoleFilter.data_type = 0;
+            viewAccountRoleFilter.data_type = 1;
             realHisCfgDataPage = realHisCfgDataApi.getRealHisCfgDataPage(viewAccountRoleFilter, bParams, param.pageIndex, param.pageSize);
         }
         List<Map<String, Object>> realHisCfgDataList = realHisCfgDataPage.getList();
         JSONObject json = new JSONObject();
         JSONArray arr = new JSONArray();
-        /*if (realHisCfgDataList == null || realHisCfgDataList.size() < 1) {
+        if (realHisCfgDataList == null || realHisCfgDataList.size() < 1) {
             return new Output(json);
         }
         for(Map<String, Object> row : realHisCfgDataList){
@@ -168,15 +164,15 @@ public class BusinessDataAction {
             data.put("number", row.get("number"));
             data.put("monitorTime", row.get("monitorTime"));
             arr.add(data);
-        }*/
+        }
         //假数据，后面要删除
-        for(int p=1;p<5;p++){
+        /*for(int p=1;p<5;p++){
             JSONObject data = new JSONObject();
             data.put("monitorName", "监控点"+p);
             data.put("number", 56);
             data.put("monitorTime", System.currentTimeMillis());
             arr.add(data);
-        }
+        }*/
 
         json.put("list", arr);
         return new Output(json);
@@ -215,7 +211,7 @@ public class BusinessDataAction {
 
         JSONObject json = new JSONObject();
         JSONArray arr = new JSONArray();
-        /*List<AlarmCfgDataAlarmCfg> alarmCfgDataList = alarmCfgDataPage.getList();
+        List<AlarmCfgDataAlarmCfg> alarmCfgDataList = alarmCfgDataPage.getList();
         if(null != alarmCfgDataList){
             for(AlarmCfgDataAlarmCfg alarmCfg : alarmCfgDataList){
                 JSONObject data = new JSONObject();
@@ -226,17 +222,16 @@ public class BusinessDataAction {
                 arr.add(data);
             }
             json.put("list", arr);
-        }*/
+        }
         //假数据，后面要删除
-        for(int p=1;p<5;p++){
+        /*for(int p=1;p<5;p++){
             JSONObject data = new JSONObject();
             data.put("monitorName", "监控点"+p);
             data.put("state", 1);
             data.put("number", 48);
             data.put("monitorTime", System.currentTimeMillis());
             arr.add(data);
-        }
-        json.put("list", arr);
+        }*/
 
         return new Output(json);
     }
@@ -262,8 +257,12 @@ public class BusinessDataAction {
     @RequestMapping("data/group")
     @WebApi(forceAuth = true, master = true)
     public Output getGroupData(@Valid BusinessDataParam param) {
+        if(0 == param.boxId){
+            throw new BusinessException(ErrorCodeOption.DeviceId_Is_Unknown.key,
+                    ErrorCodeOption.DeviceId_Is_Unknown.value);
+        }
         Client client = AppContext.getSession().client;
-        List<AccountDir> accountDirList = accountDirApi.getAccountDirList(client.userId, param.type);
+        List<AccountDir> accountDirList = accountDirApi.getAccountDirList(client.userId, param.type, param.boxId);
         JSONArray arr = new JSONArray();
         if(null != accountDirList){
             for(AccountDir ad : accountDirList){
@@ -317,7 +316,7 @@ public class BusinessDataAction {
         List<Map<String, Object>> realHisCfgDataList = realHisCfgDataPage.getList();
         JSONObject json = new JSONObject();
         JSONArray arr = new JSONArray();
-        /*if (realHisCfgDataList == null || realHisCfgDataList.size() < 1) {
+        if (realHisCfgDataList == null || realHisCfgDataList.size() < 1) {
             return new Output(json);
         }
         for(Map<String, Object> row : realHisCfgDataList){
@@ -325,14 +324,14 @@ public class BusinessDataAction {
             data.put("monitorId", row.get("monitorId"));
             data.put("monitorTime", row.get("monitorTime"));
             arr.add(data);
-        }*/
+        }
         //假数据，后面要删除
-        for(int p=1;p<5;p++){
+        /*for(int p=1;p<5;p++){
             JSONObject data = new JSONObject();
             data.put("monitorId", p);
             data.put("monitorName", "监控点"+p);
             arr.add(data);
-        }
+        }*/
 
         json.put("list", arr);
         return new Output(json);

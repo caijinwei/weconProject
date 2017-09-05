@@ -169,7 +169,7 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 
 	@Override
 	public Page<Map<String, Object>> getRealHisCfgDataPage(RealHisCfgFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize) {
-		String fromStr = "from real_his_cfg_data rd, real_his_cfg r, device d, plc_info p";
+		String fromStr = "from real_his_cfg_data rd, real_his_cfg r, device d, plc_info p ";
 		StringBuffer condition = new StringBuffer();
 		List<Object> params = new ArrayList<Object>();
 
@@ -177,17 +177,9 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 			condition.append(" and r.account_id = ? ");
 			params.add(filter.account_id);
 		}
-		if (filter.addr_type > -1) {
-			condition.append(" and r.addr_type = ? ");
-			params.add(filter.addr_type);
-		}
 		if (filter.data_type > -1) {
 			condition.append(" and r.data_type = ? ");
 			params.add(filter.data_type);
-		}
-		if (filter.his_cycle > -1) {
-			condition.append(" and r.his_cycle = ? ");
-			params.add(filter.his_cycle);
 		}
 		// 操作时间起
 		if (!CommonUtils.isNullOrEmpty(bParams.get("monitorBeginTime"))) {
@@ -211,16 +203,16 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 			params.add(boxId);
 		}
 		if(null != groupId){
-			fromStr += ", account_dir_rel f";
-			condition.append(" and r.id=f.ref_id and f.acc_dir_id = ?");
+			fromStr += ", account_dir_rel adr";
+			condition.append(" and adr.ref_id=r.id and adr.acc_dir_id = ?");
 			params.add(groupId);
 		}
 		if(null != monitorId){
 			condition.append(" and r.id = ?");
 			params.add(monitorId);
 		}
-		String sqlCount = "select count(0) "+fromStr+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and rd.real_his_cfg_id=r.id";
-		String sql = "select r.id, r.name, rd.value, rd.monitor_time"
+		String sqlCount = "select count(distinct r.id) "+fromStr+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and rd.real_his_cfg_id=r.id";
+		String sql = "select distinct r.id, r.name, rd.value, rd.monitor_time"
 				+ "  "+fromStr+ "  where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and rd.real_his_cfg_id=r.id";
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
@@ -243,10 +235,7 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 			condition.append(" and v.view_id = ? ");
 			params.add(filter.view_id);
 		}
-		if (filter.role_type > -1) {
-			condition.append(" and v.role_type = ? ");
-			params.add(filter.role_type);
-		}
+
 		if (filter.data_type > -1) {
 			condition.append(" and r.data_type = ? ");
 			params.add(filter.data_type);
@@ -270,16 +259,16 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 		Object groupId = bParams.get("groupId");
 		Object monitorId = bParams.get("monitorId");
 		if(null != groupId){
-			fromStr += ", account_dir_rel f";
-			condition.append(" and r.id=f.ref_id and f.acc_dir_id = ?");
+			fromStr += ", account_dir_rel adr";
+			condition.append(" and r.id=adr.ref_id and adr.acc_dir_id = ?");
 			params.add(groupId);
 		}
 		if(null != monitorId){
 			condition.append(" and r.id = ?");
 			params.add(monitorId);
 		}
-		String sqlCount = "select count(0) "+fromStr+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and rd.real_his_cfg_id=r.id";
-		String sql = "select r.id, r.name, rd.value, rd.monitor_time"
+		String sqlCount = "select count(distinct r.id) "+fromStr+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and rd.real_his_cfg_id=r.id";
+		String sql = "select distinct r.id, r.name, rd.value, rd.monitor_time"
 				+ "  "+fromStr+ "  where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and rd.real_his_cfg_id=r.id";
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);

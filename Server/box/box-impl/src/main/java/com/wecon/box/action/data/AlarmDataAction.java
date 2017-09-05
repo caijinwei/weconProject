@@ -26,6 +26,7 @@ import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.filter.AlarmCfgDataFilter;
 import com.wecon.box.filter.AlarmTriggerFilter;
 import com.wecon.box.param.AlarmCfgParam;
+import com.wecon.box.param.AlarmDataParam;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
@@ -54,73 +55,48 @@ public class AlarmDataAction {
 	private ViewAccountRoleApi viewAccountRoleApi;
 
 	@WebApi(forceAuth = true, master = true)
-	@Description("获取当前报警")
-	@RequestMapping(value = "/getNowAlarmData")
-	public Output getNowAlarmData(@RequestParam("device_id") String device_id,
-			@RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
+	@Description("获取当前/历史报警")
+	@RequestMapping(value = "/getNowHisAlarmData")
+	public Output getNowHisAlarmData(@Valid AlarmDataParam alarmDataParam) {
 		Client client = AppContext.getSession().client;
 
 		Page<AlarmCfgDataAlarmCfg> alarmCfgDataAlarmCfgList = null;
 		AlarmCfgDataFilter filter = new AlarmCfgDataFilter();
-		filter.account_id = client.userId;
-		if (!CommonUtils.isNullOrEmpty(device_id)) {
-			filter.device_id = Long.parseLong(device_id);
+		if (!CommonUtils.isNullOrEmpty(alarmDataParam.alarm_cfg_id)) {
+			filter.alarm_cfg_id = Long.parseLong(alarmDataParam.alarm_cfg_id);
+		}
+		if (!CommonUtils.isNullOrEmpty(alarmDataParam.name)) {
+			filter.name = alarmDataParam.name;
+		}
+		if (!CommonUtils.isNullOrEmpty(alarmDataParam.device_id)) {
+			filter.device_id = Long.parseLong(alarmDataParam.device_id);
+		}
+		if (!CommonUtils.isNullOrEmpty(alarmDataParam.start_date)) {
+			filter.start_date = alarmDataParam.start_date;
+		}
+
+		if (!CommonUtils.isNullOrEmpty(alarmDataParam.end_date)) {
+			filter.end_date = alarmDataParam.end_date;
 		}
 
 		filter.state = 1;
 
+		filter.account_id = client.userId;
+
 		if (client.userInfo.getUserType() == 1) {
 			/** 管理 **/
 
-			alarmCfgDataAlarmCfgList = alarmCfgDataApi.getRealHisCfgDataList(filter, pageIndex, pageSize);
+			alarmCfgDataAlarmCfgList = alarmCfgDataApi.getRealHisCfgDataList(filter, alarmDataParam.pageIndex,
+					alarmDataParam.pageSize);
 
 		} else if (client.userInfo.getUserType() == 2) {
 			/** 视图 **/
-			alarmCfgDataAlarmCfgList = alarmCfgDataApi.getViewRealHisCfgDataList(filter, pageIndex, pageSize);
+			alarmCfgDataAlarmCfgList = alarmCfgDataApi.getViewRealHisCfgDataList(filter, alarmDataParam.pageIndex,
+					alarmDataParam.pageSize);
 
 		}
 		JSONObject json = new JSONObject();
 		json.put("type", client.userInfo.getUserType());
-		json.put("alarmData", alarmCfgDataAlarmCfgList);
-		return new Output(json);
-
-	}
-
-	@WebApi(forceAuth = true, master = true)
-	@Description("获取历史报警")
-	@RequestMapping(value = "/getHisAlarmData")
-	public Output getHisAlarmData(@RequestParam("device_id") String device_id,
-			@RequestParam("alarm_cfg_id") String alarm_cfg_id, @RequestParam("name") String name,
-			@RequestParam("start_date") String start_date, @RequestParam("end_date") String end_date,
-			@RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
-		Client client = AppContext.getSession().client;
-
-		Page<AlarmCfgDataAlarmCfg> alarmCfgDataAlarmCfgList = null;
-		AlarmCfgDataFilter filter = new AlarmCfgDataFilter();
-		if (!CommonUtils.isNullOrEmpty(alarm_cfg_id)) {
-			filter.alarm_cfg_id = Long.parseLong(alarm_cfg_id);
-		}
-		filter.name = name;
-		filter.state = 1;
-		filter.start_date = start_date;
-		filter.end_date = end_date;
-		filter.account_id = client.userId;
-		if (!CommonUtils.isNullOrEmpty(device_id)) {
-			filter.device_id = Long.parseLong(device_id);
-		}
-
-		if (client.userInfo.getUserType() == 1) {
-			/** 管理 **/
-
-			alarmCfgDataAlarmCfgList = alarmCfgDataApi.getRealHisCfgDataList(filter, pageIndex, pageSize);
-
-		} else if (client.userInfo.getUserType() == 2) {
-			/** 视图 **/
-			alarmCfgDataAlarmCfgList = alarmCfgDataApi.getViewRealHisCfgDataList(filter, pageIndex, pageSize);
-
-		}
-
-		JSONObject json = new JSONObject();
 		json.put("alarmHisData", alarmCfgDataAlarmCfgList);
 		return new Output(json);
 
