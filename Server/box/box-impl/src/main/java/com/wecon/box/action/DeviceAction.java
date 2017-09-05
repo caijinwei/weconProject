@@ -99,7 +99,7 @@ public class DeviceAction {
             throw new BusinessException(ErrorCodeOption.Device_NotFound.key, ErrorCodeOption.Device_NotFound.value);
         }
         long device_id = device.device_id;
-		/*
+        /*
          * 该设备没有被别的用户绑定过
 		 */
         if (devBindUserApi.findByDevId(device_id) != 0) {
@@ -217,35 +217,30 @@ public class DeviceAction {
     @Label("超级管理员查看所有device盒子")
     @WebApi(forceAuth = true, master = true, authority = {"0"})
     @RequestMapping(value = "showAllDeviceDir")
-    public Output showAllDeviceDir(@RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize, @RequestParam("accountId") String accountId, @RequestParam("bind_state") Integer bind_state,@RequestParam("machine_code")String machine_code) {
-        Page<DeviceDir> page =null;
+    public Output showAllDeviceDir(@RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize, @RequestParam("accountId") String accountId, @RequestParam("bind_state") Integer bind_state, @RequestParam("machine_code") String machine_code) {
+        Page<DeviceDir> page = null;
         JSONObject data = new JSONObject();
-        if (bind_state!=-1) {
+        if (!machine_code.equals("-1")) {
+            ArrayList<DeviceDir> list = new ArrayList<DeviceDir>();
+            list.add(deviceApi.getDeviceDir(machine_code));
+            if (list.size() <= 0) {
+                page = new Page<DeviceDir>(1, 5, 0);
+            } else {
+                page = new Page<DeviceDir>(1, 5, 1);
+            }
+            page.setList(list);
+        } else if (bind_state != -1) {
             if (bind_state == 1) {
                 page = deviceApi.getDeviceByBound(pageNum, pageSize);
             } else {
-                page = page = deviceApi.getDeviceByUnbound(machine_code,pageNum, pageSize);
+                page = page = deviceApi.getDeviceByUnbound(machine_code, pageNum, pageSize);
             }
-        }else if(!machine_code.equals("-1"))
-        {
-            ArrayList<DeviceDir> list=new ArrayList<DeviceDir>();
-            list.add(deviceApi.getDeviceDir(machine_code));
-            System.out.println(deviceApi.getDevice(machine_code));
-            if(list.size()<=0)
-            {
-                page=new Page<DeviceDir>(1,5,0);
-            }else {
-                page=new Page<DeviceDir>(1,5,1);
-            }
-            page.setList(list);
-        }
-        else{
-            page=deviceApi.showAllDeviceDir(accountId, pageNum, pageSize);
+        } else {
+            page = deviceApi.showAllDeviceDir(accountId, pageNum, pageSize);
         }
         data.put("page", page);
         return new Output(data);
     }
-
 
 
     @Label("修改盒子别名和备注,地图")

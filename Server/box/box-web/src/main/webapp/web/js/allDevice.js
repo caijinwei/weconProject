@@ -70,6 +70,4 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             alert("ajax error");
         });
     }
-
-
 });
