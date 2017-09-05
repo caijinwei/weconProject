@@ -90,7 +90,7 @@
 						<tbody>
 							<tr ng-repeat="x in actDatas">
 								<td>{{x.id}}</td>
-								<td>{{x.re_state==0?"超时":"在线"}}</td>
+								<td>{{x.re_state==null?"超时":x.re_state==0?"超时":"在线"}}</td>
 								<td><a href="#" id="act_name_{{x.id}}"
 									ng-click="editable_name(x);mc_change();">{{x.ref_alais==''?x.name:x.ref_alais}}</a></td>
 								<td><a href="#" id="act_value_{{x.id}}"

@@ -680,7 +680,6 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.update_date = rs.getTimestamp("update_date");
 			model.upd_time = TimeUtil.getYYYYMMDDHHMMSSDate(model.update_date);
 			model.machine_code = rs.getString("machine_code");
-			// model.ref_alais = rs.getString("ref_alais");
 			model.rid = rs.getString("rid");
 			return model;
 		}

@@ -303,7 +303,9 @@ public class BoxNotifyTaskJob implements Job {
                     break;
                 case ACT_UPDATE_REAL_HISTORY_CONFIG : //更新实时和历史监控点配置
                     List<Map> updRealHisCfgList = fbData.get("upd_real_his_cfg_list");
+
                     realHisCfgApi.batchUpdateState(getFeedbackUpdArgs(updRealHisCfgList, "addr_id"));
+
                     break;
                 case ACT_UPDATE_ALARM_DATA_CONFIG : //更新报警数据配置
                     List<Map> updAlarmCfgList = fbData.get("upd_alarm_cfg_list");
@@ -311,6 +313,7 @@ public class BoxNotifyTaskJob implements Job {
                     break;
                 case ACT_DELETE_MONITOR_CONFIG : //删除监控点配置
                     List<Map> delCfgList = fbData.get("del_cfg_list");
+
                     List<Integer> alarmCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", 2);
                     List<Integer> realCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", 0);
                     List<Integer> hisCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", 1);
@@ -331,6 +334,9 @@ public class BoxNotifyTaskJob implements Job {
                     alarmCfgDataApi.batchDeleteByPlcId(ids);
                     realHisCfgDataApi.batchDeleteByPlcId(ids);
                     break;
+                /*case ACT_DELETE_PLC_CONFIG : //删除监控点配置
+                    List<Map> delComList = fbData.get("del_com_list");
+                    break;*/
             }
         }catch (NumberFormatException e){
             e.printStackTrace();
