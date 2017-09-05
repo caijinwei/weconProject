@@ -228,9 +228,9 @@ public class DeviceAction {
             }
         }else if(!machine_code.equals("-1"))
         {
-            page=new Page<DeviceDir>(1,1,1);
             ArrayList<DeviceDir> list=new ArrayList<DeviceDir>();
             list.add(deviceApi.getDeviceDir(machine_code));
+            System.out.println(deviceApi.getDevice(machine_code));
             if(list.size()<=0)
             {
                 page=new Page<DeviceDir>(1,5,0);

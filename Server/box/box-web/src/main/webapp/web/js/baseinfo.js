@@ -25,9 +25,11 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $scope.infoData = data.device;
                 $scope.accounttype = data.userType;
                 var map = data.device.map;
-                var maps = map.split(",");
-                $scope.map_a = maps[0];
-                $scope.map_o = maps[1];
+                if (map != "" || map != null) {
+                    var maps = map.split(",");
+                    $scope.map_a = maps[0];
+                    $scope.map_o = maps[1];
+                }
                 $scope.$apply();
             }
             else {
@@ -200,7 +202,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             state: "1",
             driver: $('#driver').val()
         };
-        var selectport=$("#port").val();
+        var selectport = $("#port").val();
         if (params.device_id == "" || params.type == "" || params.driver == "" || params.box_stat_no == "" || params.plc_stat_no == "" || params.port == "" || params.retry_times == ""
             || params.wait_timeout == "" || params.rev_timeout == "" || params.com_stepinterval == "" || params.com_iodelaytime == "" || params.retry_timeout == "") {
             alert("配置参数填未填写");
@@ -383,8 +385,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     $scope.chgPiboxInFoName = function (device_id) {
         var piBoxName = $('#PIBoxName').val();
         var remark = $("#remark").val();
-        if(isNaN($scope.map_a)||isNaN($scope.map_o))
-        {
+        if (isNaN($scope.map_a) || isNaN($scope.map_o)) {
             alert("地图坐标格式错误");
             return;
         }

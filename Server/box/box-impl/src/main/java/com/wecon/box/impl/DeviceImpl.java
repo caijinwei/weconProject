@@ -144,10 +144,14 @@ public class DeviceImpl implements DeviceApi {
                 "device a  " +
                 "LEFT JOIN dev_bind_user b ON a.device_id = b.device_id  " +
                 "LEFT JOIN account c ON b.account_id=c.account_id   " +
-                " where a.machine_code=?  LIMIT 1  ";
+                " where a.machine_code=?   ";
         Object[] args = new Object[]{machine_code};
-        jdbcTemplate.query(sql, args, new DefaultDeviceDirRowMapper());
-        return null;
+       List<DeviceDir> list= jdbcTemplate.query(sql, args, new DefaultDeviceDirRowMapper());
+        if(list.size()<=0)
+        {
+            return null;
+        }
+        return list.get(0);
     }
 
     @Override
