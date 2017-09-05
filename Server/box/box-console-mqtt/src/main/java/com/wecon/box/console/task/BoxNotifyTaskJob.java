@@ -303,7 +303,11 @@ public class BoxNotifyTaskJob implements Job {
                     break;
                 case ACT_UPDATE_REAL_HISTORY_CONFIG : //更新实时和历史监控点配置
                     List<Map> updRealHisCfgList = fbData.get("upd_real_his_cfg_list");
+<<<<<<< Updated upstream
                     realHisCfgApi.batchUpdateState(getFeedbackUpdArgs(updRealHisCfgList, "addr_id"));
+=======
+                    realHisCfgApi.batchUpdateState(getFeedbackArgs(updRealHisCfgList, "addr_id"));
+>>>>>>> Stashed changes
                     break;
                 case ACT_UPDATE_ALARM_DATA_CONFIG : //更新报警数据配置
                     List<Map> updAlarmCfgList = fbData.get("upd_alarm_cfg_list");
@@ -311,6 +315,7 @@ public class BoxNotifyTaskJob implements Job {
                     break;
                 case ACT_DELETE_MONITOR_CONFIG : //删除监控点配置
                     List<Map> delCfgList = fbData.get("del_cfg_list");
+<<<<<<< Updated upstream
                     List<Integer> alarmCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", 2);
                     List<Integer> realCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", 0);
                     List<Integer> hisCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", 1);
@@ -330,6 +335,11 @@ public class BoxNotifyTaskJob implements Job {
                     realHisCfgApi.batchDeleteByPlcId(ids);
                     alarmCfgDataApi.batchDeleteByPlcId(ids);
                     realHisCfgDataApi.batchDeleteByPlcId(ids);
+=======
+                    break;
+                case ACT_DELETE_PLC_CONFIG : //删除监控点配置
+                    List<Map> delComList = fbData.get("del_com_list");
+>>>>>>> Stashed changes
                     break;
             }
         }catch (NumberFormatException e){
@@ -393,7 +403,11 @@ public class BoxNotifyTaskJob implements Job {
         try {
             mqttClient = new MqttClient(MqttConfigContext.mqttConfig.getHost(), clientId, new MemoryPersistence());
             mqttClient.connect(mqttConnectOptions);
+<<<<<<< Updated upstream
             logger.info("mqtt connect success!");
+=======
+            logger.debug("mqtt connect success!");
+>>>>>>> Stashed changes
         }catch (MqttException e){
             e.printStackTrace();
             logger.error("mqtt connect fail!");

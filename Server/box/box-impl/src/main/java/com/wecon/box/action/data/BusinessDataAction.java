@@ -257,6 +257,7 @@ public class BusinessDataAction {
         // 获取实时数据配置信息
         RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
         List<RealHisCfgDevice> realHisCfgDeviceList = null;
+        /** 管理者账号 **/
         if (client.userInfo.getUserType() == 1) {
             /** 管理 **/
             realHisCfgFilter.addr_type = -1;

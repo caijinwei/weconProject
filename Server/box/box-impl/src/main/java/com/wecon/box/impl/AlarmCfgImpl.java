@@ -168,8 +168,8 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 				new DefaultAlarmCfgExtendRowMapper());
 		List<AlarmTrigger> alarmCfgTriggerLst = jdbcTemplate.query(triSql, state,
 				new DefaultAlarmTriggerRowMapper());
-		if (null != alarmCfgExtendLst && null != alarmCfgTriggerLst) {
-			for (AlarmCfgExtend ae : alarmCfgExtendLst) {
+		if(null != alarmCfgExtendLst && null != alarmCfgTriggerLst){
+			for(AlarmCfgExtend ae : alarmCfgExtendLst){
 				List<AlarmTrigger> conditionList = new ArrayList<AlarmTrigger>();
 				for (AlarmTrigger at : alarmCfgTriggerLst) {
 					if (ae.alarmcfg_id == at.alarmcfg_id) {

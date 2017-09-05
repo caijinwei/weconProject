@@ -30,10 +30,17 @@ public class StartTimeTask {
 					// 实时监控是否连接上mqtt代理服务器
 					Scheduler scheduler = QuartzManage.getScheduler();
 					Trigger trigger = TimeTriggerUtil.getTrigger(MQTT_JOB, "2", 5);
+<<<<<<< Updated upstream
 					QuartzManage.createJob(scheduler, trigger, MQTT_JOB, null, null, MonitorTaskJob.class);
 
 					//Trigger trigger2 = TimeTriggerUtil.getTrigger(BOX_NOTIFY_JOB, "1", 20);
 					//QuartzManage.createJob(scheduler, trigger2, BOX_NOTIFY_JOB, null, null, BoxNotifyTaskJob.class);
+=======
+					Trigger trigger2 = TimeTriggerUtil.getTrigger(BOX_NOTIFY_JOB, "1", 20);
+					//QuartzManage.createJob(scheduler, trigger, MQTT_JOB, null, null, MonitorTaskJob.class);
+					QuartzManage.createJob(scheduler, trigger2, BOX_NOTIFY_JOB, null, null, BoxNotifyTaskJob.class);
+					
+>>>>>>> Stashed changes
 				} catch (Exception e) {
 					e.printStackTrace();
 					logger.error("启动定时任务失败，原因是：" + e.getMessage(), e);
