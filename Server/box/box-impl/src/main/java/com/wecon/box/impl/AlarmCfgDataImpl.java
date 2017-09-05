@@ -254,7 +254,8 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 	@Override
 	public Page<AlarmCfgDataAlarmCfg> getViewAlarmCfgDataPage(AlarmCfgDataFilter filter, Map<String, Object> bParams,
 			int pageIndex, int pageSize) {
-		String fromStr = "from view_account_role var,alarm_cfg ac,alarm_trigger atr ,alarm_cfg_data  acd";
+		String fromStr = " from view_account_role var, alarm_cfg ac,alarm_cfg_data acd ";
+		String whereStr = " where  ac.alarmcfg_id=var.cfg_id and ac.alarmcfg_id=acd.alarm_cfg_id and ac.bind_state=1 and var.cfg_type=2 ";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
 		if (filter.account_id > 0) {
@@ -272,25 +273,22 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 			condition.append(" and date_format(acd.monitor_time,'%Y-%m-%d %H:%i') >= ");
 			condition.append(" date_format(str_to_date(?,'%Y-%m-%d %H:%i'),'%Y-%m-%d %H:%i') ");
 			params.add(CommonUtils.trim(filter.start_date));
-
 		}
 		// 操作时间止
 		if (!CommonUtils.isNullOrEmpty(filter.end_date)) {
 			condition.append(" and date_format(acd.monitor_time,'%Y-%m-%d %H:%i') <= ");
 			condition.append(" date_format(str_to_date(?,'%Y-%m-%d %H:%i'),'%Y-%m-%d %H:%i') ");
 			params.add(CommonUtils.trim(filter.end_date));
+		}
 
+		Object boxId = bParams.get("boxId");
+		if (null != boxId) {
+			condition.append(" and ac.device_id = ? ");
+			params.add(boxId);
 		}
-		Object groupId = bParams.get("groupId");
-		if (null != groupId) {
-			fromStr += ", account_dir_rel f";
-			condition.append(" and ac.alarmcfg_id=f.ref_id and f.acc_dir_id = ?");
-			params.add(groupId);
-		}
-		String sqlCount = "select count(0) " + fromStr
-				+ " where 1=1 and ac.alarmcfg_id=var.cfg_id and ac.alarmcfg_id=atr.alarmcfg_id and ac.alarmcfg_id=acd.alarm_cfg_id and var.cfg_type=2 ";
-		String sql = " select " + SEL_COL + ",ac.name,ac.text " + fromStr
-				+ " where 1=1 and ac.alarmcfg_id=var.cfg_id and ac.alarmcfg_id=atr.alarmcfg_id and ac.alarmcfg_id=acd.alarm_cfg_id and var.cfg_type=2 ";
+
+		String sqlCount = "select count(0) " + fromStr + whereStr;
+		String sql = " select " + SEL_COL + ",ac.name, ac.text " + fromStr + whereStr;
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<AlarmCfgDataAlarmCfg> page = new Page<AlarmCfgDataAlarmCfg>(pageIndex, pageSize, totalRecord);
@@ -305,7 +303,8 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 	@Override
 	public Page<AlarmCfgDataAlarmCfg> getAdminAlarmCfgDataPage(AlarmCfgDataFilter filter, Map<String, Object> bParams,
 			int pageIndex, int pageSize) {
-		String fromStr = "from alarm_cfg ac ,alarm_cfg_data acd,alarm_trigger atr";
+		String fromStr = " from alarm_cfg ac, alarm_cfg_data acd ";
+		String whereStr = " where ac.alarmcfg_id=acd.alarm_cfg_id and ac.bind_state=1 ";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
 		if (filter.account_id > 0) {
@@ -331,22 +330,15 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 			condition.append(" date_format(str_to_date(?,'%Y-%m-%d %H:%i'),'%Y-%m-%d %H:%i') ");
 			params.add(CommonUtils.trim(filter.end_date));
 		}
+
 		Object boxId = bParams.get("boxId");
-		Object groupId = bParams.get("groupId");
 		if (null != boxId) {
-			fromStr += ",device d, plc_info p";
-			condition.append(" and d.device_id=p.device_id and p.plc_id=ac.plc_id and d.device_id = ? ");
+			condition.append(" and ac.device_id = ? ");
 			params.add(boxId);
 		}
-		if (null != groupId) {
-			fromStr += ", account_dir_rel f";
-			condition.append(" and ac.alarmcfg_id=f.ref_id and f.acc_dir_id = ?");
-			params.add(groupId);
-		}
-		String sqlCount = "select count(0) " + fromStr
-				+ " where 1=1 and  ac.alarmcfg_id=atr.alarmcfg_id and  ac.alarmcfg_id=acd.alarm_cfg_id";
-		String sql = " select " + SEL_COL + ",ac.name,ac.text " + fromStr
-				+ " where 1=1 and  ac.alarmcfg_id=atr.alarmcfg_id and  ac.alarmcfg_id=acd.alarm_cfg_id ";
+
+		String sqlCount = "select count(0) " + fromStr + whereStr;
+		String sql = " select " + SEL_COL + ",ac.name,ac.text " + fromStr + whereStr;
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<AlarmCfgDataAlarmCfg> page = new Page<AlarmCfgDataAlarmCfg>(pageIndex, pageSize, totalRecord);

@@ -169,7 +169,8 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 
 	@Override
 	public Page<Map<String, Object>> getRealHisCfgDataPage(RealHisCfgFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize) {
-		String fromStr = "from real_his_cfg_data rd, real_his_cfg r, device d, plc_info p ";
+		String fromStr = "from real_his_cfg_data rd, real_his_cfg r";
+		String whereStr = " where rd.real_his_cfg_id=r.id ";
 		StringBuffer condition = new StringBuffer();
 		List<Object> params = new ArrayList<Object>();
 
@@ -196,24 +197,17 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 		}
 
 		Object boxId = bParams.get("boxId");
-		Object groupId = bParams.get("groupId");
 		Object monitorId = bParams.get("monitorId");
 		if(null != boxId){
-			condition.append(" and d.device_id = ? ");
+			condition.append(" and r.device_id = ? ");
 			params.add(boxId);
 		}
-		if(null != groupId){
-			fromStr += ", account_dir_rel adr";
-			condition.append(" and adr.ref_id=r.id and adr.acc_dir_id = ?");
-			params.add(groupId);
-		}
 		if(null != monitorId){
-			condition.append(" and r.id = ?");
+			condition.append(" and rd.real_his_cfg_id = ?");
 			params.add(monitorId);
 		}
-		String sqlCount = "select count(distinct r.id) "+fromStr+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and rd.real_his_cfg_id=r.id";
-		String sql = "select distinct r.id, r.name, rd.value, rd.monitor_time"
-				+ "  "+fromStr+ "  where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and rd.real_his_cfg_id=r.id";
+		String sqlCount = "select count(distinct r.id) " + fromStr + whereStr;
+		String sql = "select distinct r.id, r.name, rd.value, rd.monitor_time" + "  "+fromStr + whereStr;
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<Map<String, Object>> page = new Page<Map<String, Object>>(pageIndex, pageSize, totalRecord);
@@ -227,7 +221,8 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 
 	@Override
 	public Page<Map<String, Object>> getRealHisCfgDataPage(ViewAccountRoleFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize) {
-		String fromStr = "from real_his_cfg_data rd, real_his_cfg r ,device d, plc_info p, view_account_role v";
+		String fromStr = " from real_his_cfg_data rd, real_his_cfg r, view_account_role v ";
+		String whereStr = " where v.cfg_id=r.id and v.cfg_type=1 and rd.real_his_cfg_id=r.id ";
 		StringBuffer condition = new StringBuffer();
 		List<Object> params = new ArrayList<Object>();
 
@@ -256,20 +251,18 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 
 		}
 
-		Object groupId = bParams.get("groupId");
+		Object boxId = bParams.get("boxId");
 		Object monitorId = bParams.get("monitorId");
-		if(null != groupId){
-			fromStr += ", account_dir_rel adr";
-			condition.append(" and r.id=adr.ref_id and adr.acc_dir_id = ?");
-			params.add(groupId);
+		if(null != boxId){
+			condition.append(" and r.device_id = ? ");
+			params.add(boxId);
 		}
 		if(null != monitorId){
-			condition.append(" and r.id = ?");
+			condition.append(" and rd.real_his_cfg_id = ?");
 			params.add(monitorId);
 		}
-		String sqlCount = "select count(distinct r.id) "+fromStr+ " where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and rd.real_his_cfg_id=r.id";
-		String sql = "select distinct r.id, r.name, rd.value, rd.monitor_time"
-				+ "  "+fromStr+ "  where 1=1 and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and rd.real_his_cfg_id=r.id";
+		String sqlCount = "select count(distinct r.id) " + fromStr + whereStr;
+		String sql = "select distinct r.id, r.name, rd.value, rd.monitor_time" + fromStr+ whereStr;
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<Map<String, Object>> page = new Page<Map<String, Object>>(pageIndex, pageSize, totalRecord);

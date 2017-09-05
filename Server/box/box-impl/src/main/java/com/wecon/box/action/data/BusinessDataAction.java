@@ -8,6 +8,7 @@ import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.filter.AlarmCfgDataFilter;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
+import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.BusinessException;
@@ -76,16 +77,6 @@ public class BusinessDataAction {
         JSONObject json = new JSONObject();
         JSONArray arr = new JSONArray();
 
-        //假数据，后面要删除
-        /*for(int p=1;p<5;p++){
-            JSONObject data = new JSONObject();
-            data.put("id", p);
-            data.put("state", 1);
-            data.put("monitorName", "监控点"+p);
-            data.put("number", 60);
-            arr.add(data);
-        }*/
-
         if (realHisCfgDeviceList == null || realHisCfgDeviceList.size() < 1) {
             return new Output(json);
         }
@@ -100,6 +91,7 @@ public class BusinessDataAction {
             data.put("id", realHisCfgDevice.id);
             data.put("state", realHisCfgDevice.state);
             data.put("monitorName", realHisCfgDevice.name);
+            data.put("value", 0);
             if(null != actTimeDataList){
                 for (int j = 0; j < actTimeDataList.size(); j++) {
                     PiBoxCom piBoxCom = actTimeDataList.get(j);
@@ -133,11 +125,8 @@ public class BusinessDataAction {
         RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
         Page<Map<String, Object>> realHisCfgDataPage = null;
         Map<String, Object> bParams = new HashMap<String, Object>();
-        if(param.boxId != 0){
+        if(param.boxId != 0 && param.boxId != -100 && param.boxId != -200){
             bParams.put("boxId", param.boxId);
-        }
-        if(param.groupId != 0){
-            bParams.put("groupId", param.groupId);
         }
         /** 管理者账号 **/
         if (client.userInfo.getUserType() == 1) {
@@ -165,14 +154,6 @@ public class BusinessDataAction {
             data.put("monitorTime", row.get("monitorTime"));
             arr.add(data);
         }
-        //假数据，后面要删除
-        /*for(int p=1;p<5;p++){
-            JSONObject data = new JSONObject();
-            data.put("monitorName", "监控点"+p);
-            data.put("number", 56);
-            data.put("monitorTime", System.currentTimeMillis());
-            arr.add(data);
-        }*/
 
         json.put("list", arr);
         return new Output(json);
@@ -189,16 +170,13 @@ public class BusinessDataAction {
         Client client = AppContext.getSession().client;
         Page<AlarmCfgDataAlarmCfg> alarmCfgDataPage = null;
         AlarmCfgDataFilter filter = new AlarmCfgDataFilter();
-        filter.state = -1;
+        filter.state = 1;
         filter.start_date = param.monitorBeginTime;
         filter.end_date = param.monitorEndTime;
         filter.account_id = client.userId;
         Map<String, Object> bParams = new HashMap<String, Object>();
-        if(param.boxId != 0){
+        if(param.boxId != 0 && param.boxId != -100 && param.boxId != -200){
             bParams.put("boxId", param.boxId);
-        }
-        if(param.groupId != 0){
-            bParams.put("groupId", param.groupId);
         }
         /** 管理者账号 **/
         if (client.userInfo.getUserType() == 1) {
@@ -223,15 +201,6 @@ public class BusinessDataAction {
             }
             json.put("list", arr);
         }
-        //假数据，后面要删除
-        /*for(int p=1;p<5;p++){
-            JSONObject data = new JSONObject();
-            data.put("monitorName", "监控点"+p);
-            data.put("state", 1);
-            data.put("number", 48);
-            data.put("monitorTime", System.currentTimeMillis());
-            arr.add(data);
-        }*/
 
         return new Output(json);
     }
@@ -285,53 +254,45 @@ public class BusinessDataAction {
     @WebApi(forceAuth = true, master = true)
     public Output getMonitorData(@Valid BusinessDataParam param) {
         Client client = AppContext.getSession().client;
+        // 获取实时数据配置信息
         RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
-        Page<Map<String, Object>> realHisCfgDataPage = null;
-        Map<String, Object> bParams = new HashMap<String, Object>();
-        if(param.boxId != 0){
-            bParams.put("boxId", param.boxId);
-        }
-        if(param.groupId != 0){
-            bParams.put("groupId", param.groupId);
-        }
-        param.pageIndex = 1;
-        param.pageSize = Integer.MAX_VALUE;
-        /** 管理者账号 **/
+        List<RealHisCfgDevice> realHisCfgDeviceList = null;
         if (client.userInfo.getUserType() == 1) {
+            /** 管理 **/
             realHisCfgFilter.addr_type = -1;
-            realHisCfgFilter.data_type = 0;
+            realHisCfgFilter.data_type = 1;
             realHisCfgFilter.his_cycle = -1;
+            realHisCfgFilter.state =-1;
             realHisCfgFilter.account_id = client.userId;
-            realHisCfgDataPage = realHisCfgDataApi.getRealHisCfgDataPage(realHisCfgFilter, bParams, param.pageIndex, param.pageSize);
-        }
-        /** 视图账号 **/
-        else if (client.userInfo.getUserType() == 2) {
+            realHisCfgFilter.dirId = -1;
+            if (param.boxId != 0 && param.boxId != -100 && param.boxId != -200) {
+                realHisCfgFilter.device_id = param.boxId;
+            }
+            realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(realHisCfgFilter);
+        } else if (client.userInfo.getUserType() == 2) {
+            /** 视图 **/
+            // 通过视图获取配置信息
             ViewAccountRoleFilter viewAccountRoleFilter = new ViewAccountRoleFilter();
             viewAccountRoleFilter.view_id = client.userId;
             viewAccountRoleFilter.cfg_type = 1;
+            viewAccountRoleFilter.data_type = 1;
             viewAccountRoleFilter.role_type = -1;
-            viewAccountRoleFilter.data_type = 0;
-            realHisCfgDataPage = realHisCfgDataApi.getRealHisCfgDataPage(viewAccountRoleFilter, bParams, param.pageIndex, param.pageSize);
+            viewAccountRoleFilter.state = -1;
+            viewAccountRoleFilter.dirId = -1;
+            realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(viewAccountRoleFilter);
+
         }
-        List<Map<String, Object>> realHisCfgDataList = realHisCfgDataPage.getList();
         JSONObject json = new JSONObject();
         JSONArray arr = new JSONArray();
-        if (realHisCfgDataList == null || realHisCfgDataList.size() < 1) {
+        if (realHisCfgDeviceList == null || realHisCfgDeviceList.size() < 1) {
             return new Output(json);
         }
-        for(Map<String, Object> row : realHisCfgDataList){
+        for(RealHisCfgDevice row : realHisCfgDeviceList){
             JSONObject data = new JSONObject();
-            data.put("monitorId", row.get("monitorId"));
-            data.put("monitorTime", row.get("monitorTime"));
+            data.put("monitorId", row.id);
+            data.put("monitorName", row.name);
             arr.add(data);
         }
-        //假数据，后面要删除
-        /*for(int p=1;p<5;p++){
-            JSONObject data = new JSONObject();
-            data.put("monitorId", p);
-            data.put("monitorName", "监控点"+p);
-            arr.add(data);
-        }*/
 
         json.put("list", arr);
         return new Output(json);
