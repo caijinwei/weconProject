@@ -44,12 +44,13 @@ import com.wecon.common.util.CommonUtils;
  */
 public class MonitorTask extends Thread {
 	public static MqttClient client;
-    private final String clientId = "WECON_REVEIVE";
+	private final String clientId = "WECON_REVEIVE_A";
 	private String serverTopic = "pibox/cts/#";
 	private final int BASE_DATA = 1000;
 	private final int REAL_DATA = 1001;
 	private final int HISTORY_DATA = 1002;
 	private final int ALARM_DATA = 1003;
+	private final int WILL_DATA = 1004;
 
 	private static final Logger logger = LogManager.getLogger(MonitorTask.class);
 	private static int sleepTime = 1000 * 30;
@@ -160,11 +161,11 @@ public class MonitorTask extends Thread {
 				return;
 			}
 			Integer act = jsonObject.getInteger("act");
+			DeviceApi deviceApi = SpringContextHolder.getBean(DeviceApi.class);
 			switch (act) {
 			// 基础数据
 			case BASE_DATA:
 				System.out.println("基础数据接收");
-				DeviceApi deviceApi = SpringContextHolder.getBean(DeviceApi.class);
 				// 获取基础上报数据
 				JSONObject jsonBase = jsonObject.getJSONObject("data");
 				Device olddevice = deviceApi.getDevice(machineCode);
@@ -432,6 +433,13 @@ public class MonitorTask extends Thread {
 				}
 
 				break;
+			case WILL_DATA:
+				System.out.println("盒子离线发的遗嘱消息");
+				Device device = deviceApi.getDevice(machineCode);
+				if (device != null) {
+					device.state = 0;// 设置为离线
+					deviceApi.updateDevice(device);
+				}
 
 			default:
 				break;
