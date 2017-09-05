@@ -331,12 +331,10 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
 	* */
 	public void deleteViewAccountRoleByCfgId(final List<Integer> cfgIds,final Integer type)
 	{
-		System.out.println("这边-----------执行次数");
 		String sql="DELETE FROM view_account_role WHERE cfg_id=? AND cfg_type=?";
 		for(int i=0;i<cfgIds.size();i++)
 		{
 			Object[] args=new Object[]{cfgIds.get(i),type};
-			System.out.println("这边-----------执行次数");
 			jdbcTemplate.update(sql,args);
 		}
 	}

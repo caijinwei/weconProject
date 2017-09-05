@@ -33,6 +33,13 @@
                     </select>
                 </div>
             </div>
+            <div class="col-xs-4 col-sm-4 col-md-4 form-group">
+                <label class="col-sm-4 control-label" for="machine_code">机器码</label>
+
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="machine_code" placeholder="机器码">
+                </div>
+            </div>
             <!--<div class="col-xs-4 col-sm-4 col-md-4 form-group">-->
                 <!--<label class="col-sm-4 control-label" for="alias">用户名/手机号/邮箱</label>-->
 
@@ -71,6 +78,7 @@
                     <th>设备状态</th>
                     <th>所属用户</th>
                     <th>所属用户ID</th>
+                    <td>密码</td>
                     <th>设备创建时间</th>
                 </tr>
                 </thead>
@@ -81,11 +89,12 @@
                     <td>{{x.machine_code}}</td>
                     <td>{{x.name}}</td>
                     <td>{{x.dev_model}}</td>
-                    <td>{{x.state=='1'?'绑定':'未绑定'}}</td>
+                    <td>{{x.state=='1'?'在线':'离线'}}</td>
                     <td>{{x.username}}</td>
                     <td>
                         {{x.accountId}}
                     </td>
+                    <td>{{x.password}}</td>
                     <td>{{x.create_date|date:'yyyy-MM-dd HH:mm:ss'}}</td>
                 </tr>
                 </tbody>

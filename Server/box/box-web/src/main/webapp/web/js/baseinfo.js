@@ -24,6 +24,10 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             if (code == 200) {
                 $scope.infoData = data.device;
                 $scope.accounttype = data.userType;
+                var map = data.device.map;
+                var maps = map.split(",");
+                $scope.map_a = maps[0];
+                $scope.map_o = maps[1];
                 $scope.$apply();
             }
             else {
@@ -94,7 +98,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         T.common.ajax.request("WeconBox", "plcInfoAction/findPlcInfoById", params, function (data, code, msg) {
             if (code == 200) {
                 $scope.plcInfoById = data.plcInfo;
-                $scope.selectedPort=   $scope.plcInfoById.port;
+                $scope.selectedPort = $scope.plcInfoById.port;
                 $("#port").val($scope.plcInfoById.port);
                 if ($scope.selectedPort == "USB") {
                     $scope.temPtype = $scope.usbDeviceMapListByPtype;
@@ -116,8 +120,8 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                  * 修改Ptype
                  * */
                 $scope.selectedPtype = $scope.temType[temType][0].ptype;
-                var TemPtype=$scope.selectedPtype;
-                $scope.pType=$scope.temPtype[TemPtype];
+                var TemPtype = $scope.selectedPtype;
+                $scope.pType = $scope.temPtype[TemPtype];
                 $scope.$apply();
 
                 if ($scope.plcInfoById.port == 'Ethernet') {
@@ -153,7 +157,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $('#box_stat_no').val($scope.plcInfoById.box_stat_no);
                 $('#plc_stat_no').val($scope.plcInfoById.plc_stat_no);
                 $('#retry_times').val($scope.plcInfoById.retry_times);
-                $scope.selectedType=temType;
+                $scope.selectedType = temType;
                 $scope.$apply();
             }
             else {
@@ -196,13 +200,13 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             state: "1",
             driver: $('#driver').val()
         };
-
+        var selectport=$("#port").val();
         if (params.device_id == "" || params.type == "" || params.driver == "" || params.box_stat_no == "" || params.plc_stat_no == "" || params.port == "" || params.retry_times == ""
             || params.wait_timeout == "" || params.rev_timeout == "" || params.com_stepinterval == "" || params.com_iodelaytime == "" || params.retry_timeout == "") {
             alert("配置参数填未填写");
             return;
         }
-        if ($scope.selectedPort == 'Ethernet') {
+        if (selectport == 'Ethernet') {
             if (params.net_port == "" || params.net_type == "" || params.net_isbroadcast == "" || params.net_broadcastaddr == "" || params.net_ipaddr == "") {
                 alert("配置参数填未填写");
                 return;
@@ -216,7 +220,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             params.stop_bit = "0";
             params.data_length = "0";
             params.check_bit = "0";
-        } else if ($scope.selectedPort == 'COM1' || $scope.selectedPort == 'COM2') {
+        } else if (selectport == 'COM1' || selectport == 'COM2') {
             params.net_port = "0";
             params.net_type = "0";
             params.net_isbroadcast = "0";
@@ -379,10 +383,17 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     $scope.chgPiboxInFoName = function (device_id) {
         var piBoxName = $('#PIBoxName').val();
         var remark = $("#remark").val();
+        if(isNaN($scope.map_a)||isNaN($scope.map_o))
+        {
+            alert("地图坐标格式错误");
+            return;
+        }
+        var map = $scope.map_a + "," + $scope.map_o;
         var params = {
             deviceId: device_id,
             piBoxName: piBoxName,
-            remark: remark
+            remark: remark,
+            map: map
         }
         T.common.ajax.request("WeconBox", "baseInfoAction/chgPiboxInFoName", params, function (data, code, msg) {
             if (code == 200) {

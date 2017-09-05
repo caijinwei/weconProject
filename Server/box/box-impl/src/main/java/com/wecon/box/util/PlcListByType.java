@@ -123,10 +123,7 @@ public class PlcListByType {
                 }
             }
         }
-        for(PlcInfo p:allType)
-        {
-            System.out.println(p.type);
-        }
+
         return allType;
     }
 
