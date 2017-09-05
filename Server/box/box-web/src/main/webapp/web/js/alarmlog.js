@@ -83,13 +83,13 @@ appModule
 						T.common.ajax
 								.request(
 										"WeconBox",
-										"alarmDataAction/getNowAlarmData",
+										"alarmDataAction/getNowHisAlarmData",
 										params,
 										function(data, code, msg) {
 											if (code == 200) {
-												$scope.alarmDatas = data.alarmData.list;
+												$scope.alarmHisDatas = data.alarmHisData.list;
 												$scope.accounttype = data.type;
-												$scope.paginationConf_current.totalItems = data.alarmData.totalRecord;
+												$scope.paginationConf_current.totalItems = data.alarmHisData.totalRecord;
 												$scope.$apply();
 
 												$("#loadingModal")
@@ -125,11 +125,12 @@ appModule
 						T.common.ajax
 								.request(
 										"WeconBox",
-										"alarmDataAction/getHisAlarmData",
+										"alarmDataAction/getNowHisAlarmData",
 										params,
 										function(data, code, msg) {
 											if (code == 200) {
 												$scope.alarmHisDatas = data.alarmHisData.list;
+												$scope.accounttype = data.type;
 												$scope.paginationConf_history.totalItems = data.alarmHisData.totalRecord;
 												$scope.$apply();
 												$("#loadingModal")
