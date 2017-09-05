@@ -6,6 +6,8 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     $scope.onInit = function () {
         T.common.user.checkAuth();
 
+        $("[data-toggle='tooltip']").tooltip();
+
         T.common.ajax.request('WeconBox', "user/userinfo", new Object(),
             function (data, code, msg) {
                 if (code == 200) {
@@ -209,4 +211,13 @@ function drop(ev) {
     var $scope = angular.element(appElement).scope();
     $scope.dragToUpdateDir($('#' + data).parent().attr("sid"), $('#' + data)
         .attr("id"), fromDirId, $('#' + data).attr("id"));
+}
+
+/**
+ * 重新加载分组
+ */
+function reloadBoxList(){
+    var appElement = document.querySelector('[ng-controller=infoController]');
+    var $scope = angular.element(appElement).scope();
+    $scope.searchbox();
 }

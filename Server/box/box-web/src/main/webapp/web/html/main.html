@@ -154,7 +154,7 @@
 							href="datamonitor.html?device_id={{y.deviceId}}&device_name={{y.deviceName}}"
 							id="{{y.deviceId}}" draggable="true" ondragstart="drag(event)"
 							ng-click="selectbox(y.deviceId)" class="list-group-item"
-							target="content_frame" ng-repeat="y in x.deviceList">{{y.deviceName}}</a>
+							target="content_frame" ng-repeat="y in x.deviceList"><i class="fa  fa-circle" ng-class="{true:'onlineIcon',false:'offlineIcon'}[y.deviceState==1]" data-toggle="tooltip" title="{{y.deviceState==1?'在线':'离线'}}"></i>{{y.deviceName}}</a>
 					</ul></li>
 
 			</ul>

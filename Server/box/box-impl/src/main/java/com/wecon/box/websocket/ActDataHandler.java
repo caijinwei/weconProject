@@ -31,7 +31,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
      * @throws Exception
      */
     @Override
-    @WebApi(forceAuth = false, master = true)
+    @WebApi(forceAuth = true, master = true)
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String msg = message.getPayload();
         logger.debug("Server received message: " + msg);
@@ -51,7 +51,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
      * @throws Exception
      */
     @Override
-    @WebApi(forceAuth = false, master = true)
+    @WebApi(forceAuth = true, master = true)
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         logger.debug("连接成功");
         session.sendMessage(new TextMessage("连接成功"));
@@ -68,16 +68,12 @@ public class ActDataHandler extends AbstractWebSocketHandler {
             this.timer = timer;
         }
 
-        @Override
-        @WebApi(forceAuth = false, master = true)
         public void run() {
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String msgtime = "3秒报时：" + df.format(new Date());
             try {
                 if (session == null || !session.isOpen()) {
-                    System.out.println("timer is closed");
                     this.timer.cancel();
-                    System.out.println("you can not see me");
                 }
                 System.out.println(msgtime);
                 session.sendMessage(new TextMessage(msgtime));

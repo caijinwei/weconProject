@@ -328,3 +328,12 @@ input[type="submit"] {
 .x-ng-cloak {
 	display: none !important;
 }
+
+.onlineIcon{
+	margin-right: 10px;
+	color: #4cae4c;
+}
+.offlineIcon{
+	margin-right: 10px;
+	color: red;
+}
