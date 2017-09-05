@@ -42,6 +42,9 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     /*
      * 盒子与账户解除关联
      * */
+    $scope.dedede = function () {
+        alert(111);
+    }
     $scope.deletePIBoxBtn = function (device_id) {
         var parmas =
         {
@@ -51,7 +54,8 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             if (code == 200) {
                 $("#deletePIBox").modal('hide');
                 alert("解除绑定成功！")
-                //$scope.showBaseInfo();
+                window.parent.reloadBoxList();
+
                 $scope.$apply();
             }
             else {
@@ -385,11 +389,13 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     $scope.chgPiboxInFoName = function (device_id) {
         var piBoxName = $('#PIBoxName').val();
         var remark = $("#remark").val();
-        if (isNaN($scope.map_a) || isNaN($scope.map_o)) {
+        var map_a=$("#map_a").val();
+        var map_o=$("#map_o").val();
+        if (isNaN(map_a) || isNaN(map_o)) {
             alert("地图坐标格式错误");
             return;
         }
-        var map = $scope.map_a + "," + $scope.map_o;
+        var map = $("#map_a").val() + "," + $("#map_a").val();
         var params = {
             deviceId: device_id,
             piBoxName: piBoxName,
@@ -411,19 +417,26 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     /*
      * 解绑plc
      * */
+    $scope.deletePlc = function (plc_id) {
+        $scope.deletePlc_id = "";
+        $scope.deletePlc_id = plc_id;
+    }
     $scope.unbundledPlc = function (plc_id) {
         var params = {plc_id: plc_id}
         T.common.ajax.request("WeconBox", "plcInfoAction/unbundledPlc", params, function (data, code, msg) {
             if (code == 200) {
+                $("#deletePlc").modal("hide");
                 $scope.showPlcList();
                 $scope.$apply();
             }
             else {
+                $("#deletePlc").modal("hide");
                 alert(code + "-" + msg);
             }
         }, function () {
             alert("ajax error");
         });
+
     }
     /*
      * 进行输入框IP地址验证

@@ -56,7 +56,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      */
     $scope.boundBox = function () {
         if ($("#acc_dir_id").val() == "" || $("#machine_code").val() == ""
-            || $("#dev_password").val() == "") {
+            || $("#dev_password").val() == ""|| $("#dev_name").val()=="") {
             alert("必填参数没有填写完整");
             return;
         }
