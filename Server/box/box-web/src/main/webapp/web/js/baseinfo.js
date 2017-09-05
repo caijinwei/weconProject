@@ -53,10 +53,11 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         T.common.ajax.request("WeconBox", "baseInfoAction/deletePIBox", parmas, function (data, code, msg) {
             if (code == 200) {
                 $("#deletePIBox").modal('hide');
-                alert("解除绑定成功！")
-                window.parent.reloadBoxList();
-
-                $scope.$apply();
+                alert("解除绑定成功！");
+                if (self != top) {
+                    window.parent.reloadBoxList();
+                }
+                window.location.href = "overview.html";
             }
             else {
                 alert(code + "-" + msg);
@@ -389,8 +390,8 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     $scope.chgPiboxInFoName = function (device_id) {
         var piBoxName = $('#PIBoxName').val();
         var remark = $("#remark").val();
-        var map_a=$("#map_a").val();
-        var map_o=$("#map_o").val();
+        var map_a = $("#map_a").val();
+        var map_o = $("#map_o").val();
         if (isNaN(map_a) || isNaN(map_o)) {
             alert("地图坐标格式错误");
             return;
