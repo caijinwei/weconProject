@@ -1,6 +1,10 @@
 package com.wecon.box.action.data;
 
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +22,7 @@ import com.wecon.box.api.ViewAccountRoleApi;
 import com.wecon.box.entity.AccountDir;
 import com.wecon.box.entity.AccountDirRel;
 import com.wecon.box.entity.AlarmCfg;
+import com.wecon.box.entity.AlarmCfgData;
 import com.wecon.box.entity.AlarmCfgDataAlarmCfg;
 import com.wecon.box.entity.AlarmCfgTrigger;
 import com.wecon.box.entity.AlarmTrigger;
@@ -78,8 +83,9 @@ public class AlarmDataAction {
 		if (!CommonUtils.isNullOrEmpty(alarmDataParam.end_date)) {
 			filter.end_date = alarmDataParam.end_date;
 		}
-
-		filter.state = 1;
+		if (!CommonUtils.isNullOrEmpty(alarmDataParam.state)) {
+			filter.state = Integer.parseInt(alarmDataParam.state);
+		}
 
 		filter.account_id = client.userId;
 
@@ -402,6 +408,27 @@ public class AlarmDataAction {
 		AlarmCfg alarmCfg = alarmCfgApi.getAlarmcfg(Long.parseLong(alarmcfg_id));
 		alarmCfg.state = 3;// 删除配置状态
 		alarmCfgApi.upAlarmCfg(alarmCfg);
+
+		return new Output();
+
+	}
+
+	@Description("确认报警数据")
+	@RequestMapping(value = "/confirmData")
+	public Output confirmData(@RequestParam("alarm_cfg_id") String alarm_cfg_id,
+			@RequestParam("monitor_time") String monitor_time) {
+		if (!CommonUtils.isNullOrEmpty(alarm_cfg_id) && !CommonUtils.isNullOrEmpty(monitor_time)) {
+			Date dt=new Date(Long.parseLong(monitor_time));
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
+			String monitortime=sdf.format(dt);
+			AlarmCfgData alarmCfgData = alarmCfgDataApi.getAlarmCfgData(Long.parseLong(alarm_cfg_id),
+					Timestamp.valueOf(monitortime));
+			if (alarmCfgData != null) {
+				alarmCfgData.state = 2;// 已确认状态
+				alarmCfgDataApi.updateAlarmCfgData(alarmCfgData);
+			}
+
+		}
 
 		return new Output();
 

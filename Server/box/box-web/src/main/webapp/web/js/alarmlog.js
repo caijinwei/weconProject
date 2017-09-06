@@ -76,6 +76,7 @@ appModule
 							pageIndex = 1;
 						var params = {
 							device_id : $scope.deviceid,
+							state:1,
 							pageIndex : pageIndex,
 							pageSize : pageSize
 						};
@@ -87,7 +88,7 @@ appModule
 										params,
 										function(data, code, msg) {
 											if (code == 200) {
-												$scope.alarmHisDatas = data.alarmHisData.list;
+												$scope.alarmcurrents = data.alarmHisData.list;
 												$scope.accounttype = data.type;
 												$scope.paginationConf_current.totalItems = data.alarmHisData.totalRecord;
 												$scope.$apply();
@@ -114,6 +115,7 @@ appModule
 							pageIndex = 1;
 						var params = {
 							alarm_cfg_id : $("#alarmcfgid").val(),
+							state:2,
 							name : $("#alarmcfgname").val(),
 							start_date : $("#startdateid").val(),
 							end_date : $("#enddateid").val(),
@@ -891,6 +893,32 @@ appModule
 											alert("ajax error");
 										});
 
+					}
+				$scope.confirmData=function(model){
+						var params = {
+								alarm_cfg_id : model.alarm_cfg_id,
+								monitor_time:model.monitor_time
+							};
+
+							T.common.ajax
+									.request(
+											"WeconBox",
+											"alarmDataAction/confirmData",
+											params,
+											function(data, code, msg) {
+												if (code == 200) {
+													$scope.alarm_submit($scope.paginationConf_current.currentPage,$scope.paginationConf_current.itemsPerPage);
+													alert("报警数据已确认！");
+
+												} else {
+
+													alert(code + "-" + msg);
+												}
+											}, function() {
+												alert("ajax error");
+											});
+	
+						
 					}
 
 				})

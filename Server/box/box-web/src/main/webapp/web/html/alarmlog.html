@@ -64,17 +64,19 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr style="color: red" ng-repeat="x in alarmHisDatas">
+							<tr style="color: red" ng-repeat="x in alarmcurrents">
 								<td>{{x.alarm_cfg_id}}</td>
 								<td>{{x.name}}</td>
 								<td>{{x.text}}</td>
-								<td>{{x.state==0?"确认":"未确认"}}</td>
+								<td>{{x.state==2?"确认":"未确认"}}</td>
 								<td>{{x.value}}</td>
 								<td>{{x.monitor_time|date:'yyyy-MM-dd HH:mm:ss'}}</td>
-								<td><a href="#" title="详情"><span
-										class="glyphicon glyphicon-info-sign"></span></a> <a href="#"
-									title="确认"><span class="glyphicon glyphicon-ok"
-										style="margin-left: 5px;"></span></a></td>
+								<td>
+									<!-- <a href="#" title="详情"><span
+										class="glyphicon glyphicon-info-sign"></span></a> --> <a
+									href="#" title="确认" ng-click="confirmData(x)"><span class="glyphicon glyphicon-ok"
+										style="margin-left: 5px;"></span></a>
+								</td>
 							</tr>
 						</tbody>
 					</table>
@@ -153,7 +155,7 @@
 								<td>{{x.alarm_cfg_id}}</td>
 								<td>{{x.name}}</td>
 								<td>{{x.text}}</td>
-								<td>{{x.state==0?"确认":"未确认"}}</td>
+								<td>{{x.state==2?"确认":"未确认"}}</td>
 								<td>{{x.value}}</td>
 								<td>{{x.monitor_time|date:'yyyy-MM-dd HH:mm:ss'}}</td>
 							</tr>

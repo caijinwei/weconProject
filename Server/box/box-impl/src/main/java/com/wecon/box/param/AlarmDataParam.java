@@ -13,6 +13,8 @@ public class AlarmDataParam {
 	public String device_id;
 	@Label("alarm_cfg_id")
 	public String alarm_cfg_id;
+	@Label("状态")
+	public String state;
 	@Label("名称")
 	public String name;
 	@Label("开始时间")
@@ -30,6 +32,10 @@ public class AlarmDataParam {
 
 	public void setAlarm_cfg_id(String alarm_cfg_id) {
 		this.alarm_cfg_id = alarm_cfg_id;
+	}
+
+	public void setState(String state) {
+		this.state = state;
 	}
 
 	public void setName(String name) {
