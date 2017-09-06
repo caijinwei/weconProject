@@ -262,8 +262,7 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
 		String[] sqls = new String[ids.length];
 		for (int i = 0; i < ids.length; i++) {
 			sqls[i] = "INSERT into view_account_role  (view_id,cfg_type,cfg_id,role_type,create_date,update_date) VALUES("
-					+ viewId + "," + cgf_type + "," + ids[i] + ",0,NOW(),NOW());";
-			System.out.println("执行的sql语句是:" + sqls[i]);
+					+ viewId + "," + cgf_type + "," + ids[i]+" , " +rights[i]+ ",current_timestamp(),current_timestamp())";
 			jdbcTemplate.update(sqls[i]);
 		}
 
@@ -321,7 +320,7 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.wecon.box.api.ViewAccountRoleApi#deletePoint(java.lang.Integer,
 	 * java.lang.Integer)
 	 */

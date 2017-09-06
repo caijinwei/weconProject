@@ -40,18 +40,22 @@ appModule.controller("listController", function ($scope, $http, $compile) {
      * */
     $scope.showAllDeviceDir = function (accountId, pageNum, pageSize) {
         var bind_state = $("#bind_state").val();
-        var machine_code=$("#machine_code").val();
+        var machine_code = $("#machine_code").val();
+        var state = $("#state").val();
         if (pageNum <= 0) {
             pageNum = 1;
         }
-        if(machine_code=="")
-        {
-            machine_code=-1;
+        if (machine_code == "") {
+            machine_code = -1;
+        }
+        if (state == "") {
+            state = -1;
         }
         var params =
         {
             machine_code: machine_code,
             bind_state: bind_state,
+            state: state,
             accountId: accountId,
             pageNum: pageNum,
             pageSize: pageSize

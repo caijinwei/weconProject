@@ -218,7 +218,7 @@ public class DeviceAction {
     @Label("超级管理员查看所有device盒子")
     @WebApi(forceAuth = true, master = true, authority = {"0"})
     @RequestMapping(value = "showAllDeviceDir")
-    public Output showAllDeviceDir(@RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize, @RequestParam("accountId") String accountId, @RequestParam("bind_state") Integer bind_state, @RequestParam("machine_code") String machine_code) {
+    public Output showAllDeviceDir(@RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize, @RequestParam("accountId") String accountId, @RequestParam("bind_state") Integer bind_state, @RequestParam("machine_code") String machine_code, @RequestParam("state") Integer state) {
         Page<DeviceDir> page = null;
         JSONObject data = new JSONObject();
         if (!machine_code.equals("-1")) {
@@ -232,12 +232,17 @@ public class DeviceAction {
             page.setList(list);
         } else if (bind_state != -1) {
             if (bind_state == 1) {
-                page = deviceApi.getDeviceByBound(pageNum, pageSize);
+                //绑定盒子有选择
+                if (state != -1) {
+                    page = deviceApi.getDeviceByBound(state, pageNum, pageSize);
+                } else {
+                    page = deviceApi.getDeviceByBound(state, pageNum, pageSize);
+                }
             } else {
-                page = page = deviceApi.getDeviceByUnbound(machine_code, pageNum, pageSize);
+                page = page = deviceApi.getDeviceByUnbound(state, pageNum, pageSize);
             }
         } else {
-            page = deviceApi.showAllDeviceDir(accountId, pageNum, pageSize);
+            page = deviceApi.showAllDeviceDir(accountId,state,pageNum, pageSize);
         }
         data.put("page", page);
         return new Output(data);

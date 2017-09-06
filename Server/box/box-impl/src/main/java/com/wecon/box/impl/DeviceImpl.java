@@ -146,9 +146,8 @@ public class DeviceImpl implements DeviceApi {
                 "LEFT JOIN account c ON b.account_id=c.account_id   " +
                 " where a.machine_code=?   ";
         Object[] args = new Object[]{machine_code};
-       List<DeviceDir> list= jdbcTemplate.query(sql, args, new DefaultDeviceDirRowMapper());
-        if(list.size()<=0)
-        {
+        List<DeviceDir> list = jdbcTemplate.query(sql, args, new DefaultDeviceDirRowMapper());
+        if (list.size() <= 0) {
             return null;
         }
         return list.get(0);
@@ -392,18 +391,27 @@ public class DeviceImpl implements DeviceApi {
         return ret;
     }
 
-    public Page<DeviceDir> showAllDeviceDir(String accountId, int pageNum, int pageSize) {
+    public Page<DeviceDir> showAllDeviceDir(String accountId, Integer state, int pageNum, int pageSize) {
         StringBuffer condition = new StringBuffer("");
+        Object[] args = null;
+        Object[] argsCount = null;
         if ((!accountId.equals("")) && (accountId != null)) {
-            condition.append(" WHERE c.account_id =" + accountId);
+            condition.append(" WHERE c.account_id =?  ");
+            argsCount = new Object[]{accountId};
+        } else if (!state.equals("") && state != -1 && CommonUtils.isNotNull(state)) {
+            condition.append("WHERE a.state=? ");
+            argsCount = new Object[]{state};
+        } else {
+            argsCount = new Object[]{};
         }
+
         String sqlCount = "SELECT  " +
                 "  count(1)  " +
                 "FROM  " +
                 "device a  " +
                 "LEFT JOIN dev_bind_user b ON a.device_id = b.device_id  " +
                 "LEFT JOIN account c ON b.account_id=c.account_id " + condition;
-        Integer count = jdbcTemplate.queryForObject(sqlCount, Integer.class);
+        Integer count = jdbcTemplate.queryForObject(sqlCount, argsCount, Integer.class);
         Page<DeviceDir> page = new Page<DeviceDir>(pageNum, pageSize, count);
         String sql = "SELECT  " +
                 "a.device_id,a.`name`,a.machine_code,a.`password`,a.dev_model,a.state,a.remark,a.create_date,c.username,c.account_id  " +
@@ -413,7 +421,14 @@ public class DeviceImpl implements DeviceApi {
                 "LEFT JOIN account c ON b.account_id=c.account_id   " +
                 condition +
                 " order by a.device_id desc  LIMIT ?,?  ";
-        Object[] args = new Object[]{page.getStartIndex(), page.getPageSize()};
+        if ((!accountId.equals("")) && (accountId != null)) {
+            args = new Object[]{accountId, page.getStartIndex(), page.getPageSize()};
+        } else if (!state.equals("") && state != -1 && CommonUtils.isNotNull(state)) {
+            args = new Object[]{state, page.getStartIndex(), page.getPageSize()};
+        } else {
+            args = new Object[]{page.getStartIndex(), page.getPageSize()};
+        }
+
         List<DeviceDir> list = jdbcTemplate.query(sql, args, new RowMapper<DeviceDir>() {
             @Override
             public DeviceDir mapRow(ResultSet resultSet, int i) throws SQLException {
@@ -436,35 +451,48 @@ public class DeviceImpl implements DeviceApi {
     }
 
     @Override
-    public Page<DeviceDir> getDeviceByBound(Integer pageNum, Integer pageSize) {
-        String sqlCount = "SELECT count(1) FROM device a INNER JOIN dev_bind_user b ON a.device_id = b.device_id";
-        Integer count = jdbcTemplate.queryForObject(sqlCount, Integer.class);
-        Page<DeviceDir> page = new Page<DeviceDir>(pageNum, pageSize, count);
+    public Page<DeviceDir> getDeviceByBound(Integer state, Integer pageNum, Integer pageSize) {
+        StringBuffer condition = new StringBuffer("");
+        Page<DeviceDir> page = null;
+        Object[] args = null;
+        Object[] argCount = null;
+        if (state != -1 && null != state) {
+            condition.append(" where a.state=?  ");
+            argCount = new Object[]{state};
+        }
+        String sqlCount = "SELECT count(1) FROM device a INNER JOIN dev_bind_user b ON a.device_id = b.device_id " + condition;
+        Integer count = jdbcTemplate.queryForObject(sqlCount, argCount, Integer.class);
+        if (state != -1 && null != state) {
+            page = new Page<DeviceDir>(pageNum, pageSize, count);
+            args = new Object[]{state, page.getStartIndex(), page.getPageSize()};
+        } else {
+            page = new Page<DeviceDir>(pageNum, pageSize, count);
+            args = new Object[]{page.getStartIndex(), page.getPageSize()};
+        }
         if (count <= 0) {
             page.setList(new ArrayList<DeviceDir>());
             return page;
         }
-        String sql = "SELECT a.device_id,a.`name`,a.machine_code,a.`password`,a.dev_model,a.state,a.remark,a.create_date,c.username,c.account_id  FROM device a INNER JOIN dev_bind_user b ON a.device_id = b.device_id  LEFT JOIN account c ON b.account_id=c.account_id  order by a.device_id desc  LIMIT ?,?";
-        Object[] args = new Object[]{page.getStartIndex(), page.getPageSize()};
+        String sql = "SELECT a.device_id,a.`name`,a.machine_code,a.`password`,a.dev_model,a.state,a.remark,a.create_date,c.username,c.account_id  FROM device a INNER JOIN dev_bind_user b ON a.device_id = b.device_id  LEFT JOIN account c ON b.account_id=c.account_id  " + condition + "  order by a.device_id desc  LIMIT ?,?";
         page.setList(jdbcTemplate.query(sql, args, new DefaultDeviceDirRowMapper()));
         return page;
     }
 
     @Override
-    public Page<DeviceDir> getDeviceByUnbound(String machineCode, Integer pageNum, Integer pageSize) {
+    public Page<DeviceDir> getDeviceByUnbound(Integer state, Integer pageNum, Integer pageSize) {
         StringBuffer condition = new StringBuffer("");
-        Object[] args=null;
-        Integer count=null;
+        Object[] args = null;
+        Integer count = null;
         Page<DeviceDir> page = null;
-        if (CommonUtils.isNotNull(machineCode) && !machineCode.equals("-1")) {
-            condition.append("and a.machine_code=? ");
-            String sqlCount = "SELECT count(1) FROM device a where a.device_id not IN(SELECT device_id FROM dev_bind_user where 1=1) " + condition;
-            Object[] argsCount = new Object[]{machineCode};
+        if (CommonUtils.isNotNull(state) && state!=-1) {
+            condition.append("and a.state=? ");
+            String sqlCount = "SELECT count(1) FROM device a  WHERE not EXISTS(SELECT device_id FROM dev_bind_user b where b.device_id=a.device_id) " + condition;
+            Object[] argsCount = new Object[]{state};
             count = jdbcTemplate.queryForObject(sqlCount, argsCount, Integer.class);
             page = new Page<DeviceDir>(pageNum, pageSize, count);
-            args = new Object[]{page.getStartIndex(), page.getPageSize(), machineCode};
+            args = new Object[]{state, page.getStartIndex(), page.getPageSize()};
         } else {
-            String sqlCount = "SELECT count(1) FROM device a where a.device_id not IN(SELECT device_id FROM dev_bind_user where 1=1) " + condition;
+            String sqlCount = "SELECT count(1) FROM device a  WHERE not EXISTS(SELECT device_id FROM dev_bind_user b where b.device_id=a.device_id) " + condition;
             Object[] argsCount = new Object[]{};
             count = jdbcTemplate.queryForObject(sqlCount, argsCount, Integer.class);
             page = new Page<DeviceDir>(pageNum, pageSize, count);
@@ -474,7 +502,7 @@ public class DeviceImpl implements DeviceApi {
             page.setList(new ArrayList<DeviceDir>());
             return page;
         }
-        String sql = "SELECT a.device_id,a.`name`,a.machine_code,a.`password`,a.dev_model,a.state,a.remark,a.create_date  FROM device a  where a.device_id not IN(SELECT device_id FROM dev_bind_user b where 1=1)  " + condition + "  order by a.device_id desc  LIMIT ?,?";
+        String sql = "SELECT a.device_id,a.`name`,a.machine_code,a.`password`,a.dev_model,a.state,a.remark,a.create_date  FROM device a  where NOT EXISTS(SELECT device_id FROM dev_bind_user b  WHERE b.device_id=a.device_id)  " + condition + "  order by a.device_id desc  LIMIT ?,?";
         page.setList(jdbcTemplate.query(sql, args, new RowMapper<DeviceDir>() {
             @Override
             public DeviceDir mapRow(ResultSet resultSet, int i) throws SQLException {

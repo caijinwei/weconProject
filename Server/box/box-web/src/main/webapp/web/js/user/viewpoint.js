@@ -88,14 +88,9 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             function () {
                 chk_value.push($(this).val());
                 var tem = "right_" + $(this).val();
-                rightOption.push($("#myiframe").contents().find("input[name=" + tem + "]").val());
+                rightOption.push($("#myiframe").contents().find("input[name=" + tem + "]:checked").attr("value"));
             }
         );
-        //$('input[name="cbid"]:checked').each(function () {
-        //    chk_value.push($(this).val());
-        //    var tem = "right_" + $(this).val();
-        //    rightOption.push($("input[name=" + tem + "]:checked").val());
-        //});
         var ids = chk_value.join(",");
         var rights = rightOption.join(",");
         if (chk_value.length == 0) {

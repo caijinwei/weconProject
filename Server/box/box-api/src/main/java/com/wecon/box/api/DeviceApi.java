@@ -89,6 +89,7 @@ public interface DeviceApi {
     * */
     public boolean unbindDevice(final Integer accountId, final Integer deviceId);
 
+
     /**
      * 获取管理员下的所有分组及对应设备
      * @param acc_id
@@ -99,7 +100,7 @@ public interface DeviceApi {
     /*
     *超级管理员展示数据
     * */
-    public Page<DeviceDir> showAllDeviceDir(String accountId,int pageNum,int pageSize);
+    public Page<DeviceDir> showAllDeviceDir(String accountId,Integer state,int pageNum,int pageSize);
 
     /*
     * 更新设备名称和说明
@@ -108,12 +109,11 @@ public interface DeviceApi {
 
 
     /*
+    *@params state
     *@params bound_state
     * 根据绑定状态展示所有device
     * */
-    public Page<DeviceDir> getDeviceByBound(Integer pageNum, Integer pageSize);
+    public Page<DeviceDir> getDeviceByBound(Integer state, Integer pageNum, Integer pageSize);
 
-    //public Page<DeviceDir> getDeviceByUnbound(Integer pageNum,Integer pageSize);
-
-    public Page<DeviceDir> getDeviceByUnbound(String machineCode, Integer pageNum, Integer pageSize);
+    public Page<DeviceDir> getDeviceByUnbound(Integer state, Integer pageNum, Integer pageSize);
 }
