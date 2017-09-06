@@ -44,7 +44,7 @@ import com.wecon.common.util.CommonUtils;
  */
 public class MonitorTask extends Thread {
 	public static MqttClient client;
-	private final String clientId = "WECON_REVEIVE_A";
+	private final String clientId = "WECON_REVEIVE_DATA";
 	private String serverTopic = "pibox/cts/#";
 	private final int BASE_DATA = 1000;
 	private final int REAL_DATA = 1001;
@@ -435,10 +435,17 @@ public class MonitorTask extends Thread {
 				break;
 			case WILL_DATA:
 				System.out.println("盒子离线发的遗嘱消息");
-				Device device = deviceApi.getDevice(machineCode);
-				if (device != null) {
-					device.state = 0;// 设置为离线
-					deviceApi.updateDevice(device);
+				JSONObject jsonData = jsonObject.getJSONObject("data");
+				if (!CommonUtils.isNullOrEmpty(jsonData.getString("machine_code"))) {
+					if (machineCode.equals(jsonData.getString("machine_code"))) {
+						Device device = deviceApi.getDevice(machineCode);
+						if (device != null) {
+							device.state = 0;// 设置为离线
+							deviceApi.updateDevice(device);
+						}
+
+					}
+
 				}
 
 			default:
