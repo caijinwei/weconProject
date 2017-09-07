@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.wecon.box.entity.AlarmCfgData;
 import com.wecon.box.entity.AlarmCfgDataAlarmCfg;
 import com.wecon.box.entity.Page;
+import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.filter.AlarmCfgDataFilter;
 
 /**
@@ -23,6 +24,13 @@ public interface AlarmCfgDataApi {
 	 * @return
 	 */
 	public void saveAlarmCfgData(List<AlarmCfgData> listmodel);
+	/**
+	 * 更新报警数据
+	 * 
+	 * @param alarmCfgData
+	 * @return
+	 */
+	public boolean updateAlarmCfgData(AlarmCfgData alarmCfgData);
 
 	/**
 	 * 根据filter取列表报警数据

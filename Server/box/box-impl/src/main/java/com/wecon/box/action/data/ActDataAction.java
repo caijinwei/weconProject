@@ -17,12 +17,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.AccountDirApi;
 import com.wecon.box.api.AccountDirRelApi;
+import com.wecon.box.api.DeviceApi;
 import com.wecon.box.api.PlcInfoApi;
 import com.wecon.box.api.RealHisCfgApi;
 import com.wecon.box.api.RedisPiBoxApi;
 import com.wecon.box.api.ViewAccountRoleApi;
 import com.wecon.box.entity.AccountDir;
 import com.wecon.box.entity.AccountDirRel;
+import com.wecon.box.entity.Device;
 import com.wecon.box.entity.Page;
 import com.wecon.box.entity.PiBoxCom;
 import com.wecon.box.entity.PiBoxComAddr;
@@ -69,6 +71,8 @@ public class ActDataAction {
 	private PlcInfoApi plcInfoApi;
 	@Autowired
 	private ViewAccountRoleApi viewAccountRoleApi;
+	@Autowired
+	private DeviceApi deviceApi;
 
 	/**
 	 * 通过机器码获取对应的实时数据组
@@ -235,39 +239,49 @@ public class ActDataAction {
 	@WebApi(forceAuth = true, master = true)
 	@Description("mosquito消息的推送测试")
 	@RequestMapping(value = "/putMess")
-	public Output putMQTTMess(@RequestParam("machine_code") String machine_code, @RequestParam("com") String com,
-			@RequestParam("value") String value, @RequestParam("addr_id") String addr_id) throws MqttException {
+	public Output putMQTTMess(@RequestParam("value") String value, @RequestParam("addr_id") String addr_id)
+			throws MqttException {
 		ServerMqtt server = new ServerMqtt();
 		server.message = new MqttMessage();
 		server.message.setQos(1);
 		server.message.setRetained(true);
+		if (!CommonUtils.isNullOrEmpty(addr_id)) {
+			RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(addr_id));
+			if (realHisCfg != null) {
+				Device device = deviceApi.getDevice(realHisCfg.device_id);
+				if (device != null) {
+					PiBoxComAddr addr1 = new PiBoxComAddr();
+					addr1.addr_id = addr_id;
+					addr1.value = value;
+					List<PiBoxCom> operate_data_list = new ArrayList<PiBoxCom>();
+					PiBoxCom piBoxCom = new PiBoxCom();
+					List<PiBoxComAddr> piBoxComAddrs = new ArrayList<PiBoxComAddr>();
+					piBoxCom.com = String.valueOf(realHisCfg.plc_id);
+					piBoxComAddrs.add(addr1);
+					piBoxCom.addr_list = piBoxComAddrs;
+					operate_data_list.add(piBoxCom);
 
-		PiBoxComAddr addr1 = new PiBoxComAddr();
-		addr1.addr_id = addr_id;
-		addr1.value = value;
-		List<PiBoxCom> operate_data_list = new ArrayList<PiBoxCom>();
-		PiBoxCom piBoxCom = new PiBoxCom();
-		List<PiBoxComAddr> piBoxComAddrs = new ArrayList<PiBoxComAddr>();
-		piBoxCom.com = com;
-		piBoxComAddrs.add(addr1);
-		piBoxCom.addr_list = piBoxComAddrs;
-		operate_data_list.add(piBoxCom);
+					JSONObject jsonObject = new JSONObject();
+					jsonObject.put("act", 2000);
+					jsonObject.put("machine_code", device.machine_code);
+					JSONObject oplistObject = new JSONObject();
+					oplistObject.put("operate_data_list", operate_data_list);
+					jsonObject.put("data", oplistObject);
+					jsonObject.put("feedback", 0);
+					String message = jsonObject.toJSONString();
+					System.out.println(message);
+					server.message.setPayload((message).getBytes());
+					server.topic11 = server.client.getTopic("pibox/stc/" + device.machine_code);
 
-		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("act", 2000);
-		jsonObject.put("machine_code", machine_code);
-		JSONObject oplistObject = new JSONObject();
-		oplistObject.put("operate_data_list", operate_data_list);
-		jsonObject.put("data", oplistObject);
-		jsonObject.put("feedback", 0);
-		String message = jsonObject.toJSONString();
-		System.out.println(message);
-		server.message.setPayload((message).getBytes());
-		server.topic11 = server.client.getTopic("pibox/stc/" + machine_code);
+					server.publish(server.topic11, server.message);
+					System.out.println(server.message.isRetained() + "------ratained状态");
+					server.client.disconnect();
 
-		server.publish(server.topic11, server.message);
-		System.out.println(server.message.isRetained() + "------ratained状态");
-		server.client.disconnect();
+				}
+			}
+
+		}
+
 		return new Output();
 	}
 
@@ -504,10 +518,10 @@ public class ActDataAction {
 						attr.put("range", range);
 						arr.add(attr);
 					}
-					if(arr.size()>0){
+					if (arr.size() > 0) {
 						data.put("addrRid", arr);
 					}
-					
+
 					allarr.add(data);
 				}
 				if (null != plcs.get("byteaddr")) {
@@ -525,7 +539,7 @@ public class ActDataAction {
 						attr.put("range", range);
 						arr.add(attr);
 					}
-					if(arr.size()>0){
+					if (arr.size() > 0) {
 						data.put("addrRid", arr);
 					}
 					allarr.add(data);
@@ -546,7 +560,7 @@ public class ActDataAction {
 						attr.put("range", range);
 						arr.add(attr);
 					}
-					if(arr.size()>0){
+					if (arr.size() > 0) {
 						data.put("addrRid", arr);
 					}
 					allarr.add(data);
@@ -567,7 +581,7 @@ public class ActDataAction {
 						attr.put("range", range);
 						arr.add(attr);
 					}
-					if(arr.size()>0){
+					if (arr.size() > 0) {
 						data.put("addrRid", arr);
 					}
 					allarr.add(data);

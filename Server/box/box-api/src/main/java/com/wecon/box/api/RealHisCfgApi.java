@@ -103,6 +103,13 @@ public interface RealHisCfgApi {
 	 Page<RealHisCfgDevice> getRealHisCfgDevicePage(ViewAccountRoleFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize);
 
 	/**
+	 * 获取单个实时数据详情
+	 * @param id
+	 * @return
+     */
+	RealHisCfgDevice getRealHisCfgDevice(long id);
+
+	/**
 	 * 根据状态获取历史（实时）数据配置信息列表
 	 * @param state
 	 * @return

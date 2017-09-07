@@ -51,6 +51,15 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 	}
 
 	@Override
+	public boolean updateAlarmCfgData(AlarmCfgData alarmCfgData) {
+		String sql = "update alarm_cfg_data SET `value`=?,create_date=?,state=? where alarm_cfg_id=? and monitor_time=?";
+		jdbcTemplate.update(sql, new Object[] { alarmCfgData.value, alarmCfgData.create_date, alarmCfgData.state,
+				alarmCfgData.alarm_cfg_id, alarmCfgData.monitor_time });
+
+		return true;
+	}
+
+	@Override
 	public List<AlarmCfgDataAlarmCfg> getAlarmCfgData(AlarmCfgDataFilter filter) {
 
 		String sql = " select " + SEL_COL + ",ac.name,ac.text "
@@ -108,10 +117,11 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 		}
 
 		StringBuilder idSb = new StringBuilder();
-		for(int id : ids){
+		for (int id : ids) {
 			idSb.append(",").append(id);
 		}
-		String sql = "delete from alarm_cfg_data where alarm_cfg_id in(select alarmcfg_id from alarm_cfg where plc_id in("+idSb.substring(1)+"))";
+		String sql = "delete from alarm_cfg_data where alarm_cfg_id in(select alarmcfg_id from alarm_cfg where plc_id in("
+				+ idSb.substring(1) + "))";
 		jdbcTemplate.update(sql);
 
 		return true;
@@ -124,10 +134,10 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 		}
 
 		StringBuilder idSb = new StringBuilder();
-		for(int id : ids){
+		for (int id : ids) {
 			idSb.append(",").append(id);
 		}
-		String sql = "delete from alarm_cfg_data where alarm_cfg_id in("+idSb.substring(1)+")";
+		String sql = "delete from alarm_cfg_data where alarm_cfg_id in(" + idSb.substring(1) + ")";
 		jdbcTemplate.update(sql);
 
 		return true;

@@ -529,6 +529,31 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	}
 
 	@Override
+	public RealHisCfgDevice getRealHisCfgDevice(long id) {
+		String sql = "select " + SEL_COL + ",d.machine_code from real_his_cfg r ,device d"
+				+ " where  r.device_id=d.device_id and r.id = ?";
+		List<RealHisCfgDevice> list = jdbcTemplate.query(sql, new Object[]{id}, new RowMapper<RealHisCfgDevice>() {
+			@Override
+			public RealHisCfgDevice mapRow(ResultSet rs, int i) throws SQLException {
+				RealHisCfgDevice model = new RealHisCfgDevice();
+				model.id = rs.getLong("id");
+				model.plc_id = rs.getLong("plc_id");
+				model.name = rs.getString("name");
+				model.data_type = rs.getInt("data_type");
+				model.state = rs.getInt("state");
+				model.create_date = rs.getTimestamp("create_date");
+				model.update_date = rs.getTimestamp("update_date");
+				model.machine_code = rs.getString("machine_code");
+				return model;
+			}
+		});
+		if(null != list && list.size() > 0){
+			return list.get(0);
+		}
+		return null;
+	}
+
+	@Override
 	public List<RealHisCfgExtend> getRealHisCfgListByState(Object... state) {
 		String sql = "select " + SEL_COL
 				+ ",d.machine_code from real_his_cfg r ,device d, plc_info p where d.device_id=p.device_id and p.plc_id=r.plc_id";

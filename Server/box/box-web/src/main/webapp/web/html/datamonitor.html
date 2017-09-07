@@ -94,7 +94,9 @@
 								<td><a href="#" id="act_name_{{x.id}}"
 									ng-click="editable_name(x);mc_change();">{{x.ref_alais==''?x.name:x.ref_alais}}</a></td>
 								<td><a href="#" id="act_value_{{x.id}}"
-									ng-click="editable_value(x);mc_change();">{{x.re_value}}</a></td>
+									ng-click="editable_value(x);mc_change();"
+									ng-if="(accounttype==1)||(accounttype==2&&x.role_type==3)">{{x.re_value}}</a><span
+									ng-if="accounttype==2&&x.role_type!=3">{{x.re_value}}</span></td>
 								<td>{{x.state==0?"已同步盒子":x.state==1?"新增":x.state==2?"已变更":x.state==3?"已删除":x.state}}</td>
 								<td>{{x.describe}}</td>
 								<td><a href="#" title="编辑" data-toggle="modal"
@@ -102,8 +104,7 @@
 									ng-if="accounttype==1&& deviceid>0" ng-click="editmonitor(x);">
 										<span class="glyphicon glyphicon-edit"></span> 编辑
 								</a> <a href="#" title="复制" data-toggle="modal"
-									data-target="#copyDataGroup" ng-cloak
-									ng-if="accounttype==1&& deviceid<0"
+									data-target="#copyDataGroup" ng-cloak ng-if="deviceid<0"
 									ng-click="mc_change();copymonitor(x);"> <span
 										class="glyphicon glyphicon-file"></span> 复制
 								</a> <a href="#" title="移动分组" data-toggle="modal"

@@ -429,9 +429,10 @@ appModule
 					}
 					$scope.editable_value = function(model) {
 						// 判断视图账号是否有写权限
-						if ($scope.accounttype == 2 && model.role_type != 3) {
-							return;
-						}
+						/*
+						 * if ($scope.accounttype == 2 && model.role_type != 3) {
+						 * return; }
+						 */
 						$act_value = $('#act_value_' + model.id);
 						$act_value.editable({
 							type : "text",
@@ -483,8 +484,6 @@ appModule
 					// 下发数据到盒子
 					$scope.putMess = function(model, value) {
 						var params = {
-							machine_code : model.machine_code,
-							com : model.plc_id,
 							value : value,
 							addr_id : model.id
 

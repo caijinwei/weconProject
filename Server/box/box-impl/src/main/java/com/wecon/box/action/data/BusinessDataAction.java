@@ -91,7 +91,7 @@ public class BusinessDataAction {
             data.put("id", realHisCfgDevice.id);
             data.put("state", realHisCfgDevice.state);
             data.put("monitorName", realHisCfgDevice.name);
-            data.put("value", 0);
+            data.put("number", 0);
             if(null != actTimeDataList){
                 for (int j = 0; j < actTimeDataList.size(); j++) {
                     PiBoxCom piBoxCom = actTimeDataList.get(j);
@@ -101,7 +101,7 @@ public class BusinessDataAction {
                             PiBoxComAddr piBoxComAddr = addrList.get(k);
                             if (Long.parseLong(piBoxComAddr.addr_id) == realHisCfgDevice.id) {
                                 data.put("state", piBoxComAddr.state);
-                                data.put("value", piBoxComAddr.value);
+                                data.put("number", piBoxComAddr.value);
                             }
                         }
                     }
@@ -299,6 +299,48 @@ public class BusinessDataAction {
         }
 
         json.put("list", arr);
+        return new Output(json);
+    }
+
+    /**
+     * 获取实时数据详情
+     * @return
+     */
+    @RequestMapping("data/realdetail")
+    @WebApi(forceAuth = true, master = true)
+    public Output getRealDetail(BusinessDataParam param) {
+        JSONObject json = new JSONObject();
+        RealHisCfgDevice realHisCfgDevice = realHisCfgApi.getRealHisCfgDevice(param.monitorId);
+        if(null != realHisCfgDevice){
+            String device_machine = realHisCfgDevice.machine_code;
+            // 通过机器码去redis中获取数据
+            RedisPiBoxActData redisPiBoxActData = redisPiBoxApi.getRedisPiBoxActData(device_machine);
+            List<PiBoxCom> actTimeDataList = null == redisPiBoxActData ? null : redisPiBoxActData.act_time_data_list;
+            JSONObject data = new JSONObject();
+            data.put("monitorName", realHisCfgDevice.name);
+            data.put("dataType", realHisCfgDevice.data_type);
+            data.put("machine_code", realHisCfgDevice.machine_code);
+            data.put("com", realHisCfgDevice.plc_id);
+            data.put("addr_id", realHisCfgDevice.id);
+            data.put("number", 0);
+            if(null != actTimeDataList){
+                for (int j = 0; j < actTimeDataList.size(); j++) {
+                    PiBoxCom piBoxCom = actTimeDataList.get(j);
+                    if (Long.parseLong(piBoxCom.com) == realHisCfgDevice.plc_id) {
+                        List<PiBoxComAddr> addrList = piBoxCom.addr_list;
+                        for (int k = 0; k < addrList.size(); k++) {
+                            PiBoxComAddr piBoxComAddr = addrList.get(k);
+                            if (Long.parseLong(piBoxComAddr.addr_id) == realHisCfgDevice.id) {
+                                data.put("state", piBoxComAddr.state);
+                                data.put("number", piBoxComAddr.value);
+                            }
+                        }
+                    }
+                }
+            }
+            json.put("detail", data);
+        }
+
         return new Output(json);
     }
 }
