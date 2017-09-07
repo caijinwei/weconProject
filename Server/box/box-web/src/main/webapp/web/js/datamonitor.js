@@ -440,11 +440,16 @@ appModule
 							pk : 1,
 							url : '',
 							disabled : false,
-							emptytext : "默认值0",
+							emptytext : "0",
 							mode : "inline",
 							validate : function(value) {
 								if (!$.trim(value)) {
 									return '不能为空';
+								}
+								var reg = /^[+]?\d+(\.\d+)?$/;
+								if(!reg.test(value)){
+									
+									return '格式错误';
 								}
 								$scope.putMess(model, value);
 							}
@@ -492,7 +497,13 @@ appModule
 								"actDataAction/putMess", params, function(data,
 										code, msg) {
 									if (code == 200) {
-										alert("数据下发盒子成功！");
+										$scope.resultData = data.resultData;
+										if ($scope.resultData == 0) {
+											alert("数据下发失败，请检查盒子是否在线！");
+										} else {
+											alert("数据下发盒子成功！");
+										}
+
 									} else {
 
 										alert(code + "-" + msg);
