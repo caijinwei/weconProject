@@ -36,9 +36,12 @@ import com.wecon.box.entity.plcdom.AddrDom;
 import com.wecon.box.entity.plcdom.Plc;
 import com.wecon.box.entity.plcdom.Res;
 import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.box.enums.OpTypeOption;
+import com.wecon.box.enums.ResTypeOption;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.box.param.RealHisCfgParam;
+import com.wecon.box.util.DbLogUtil;
 import com.wecon.box.util.OptionUtil;
 import com.wecon.box.util.PlcTypeParser;
 import com.wecon.box.util.PlcTypeQuerier;
@@ -73,6 +76,8 @@ public class ActDataAction {
 	private ViewAccountRoleApi viewAccountRoleApi;
 	@Autowired
 	private DeviceApi deviceApi;
+	@Autowired
+	protected DbLogUtil dbLogUtil;
 
 	/**
 	 * 通过机器码获取对应的实时数据组
@@ -325,7 +330,7 @@ public class ActDataAction {
 	 * @return
 	 */
 	@WebApi(forceAuth = true, master = true)
-	@Description("复制监控点到其他组")
+	@Description("移动监控点到其他组")
 	@RequestMapping(value = "/moveMonitor")
 	public Output moveMonitor(@RequestParam("monitorid") String monitorid,
 			@RequestParam("to_acc_dir_id") String to_acc_dir_id,
@@ -381,6 +386,13 @@ public class ActDataAction {
 			RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(monitorid));
 			realHisCfg.state = 3;// 删除配置状态
 			realHisCfgApi.updateRealHisCfg(realHisCfg);
+			if (realHisCfg.data_type == 0) {// 删除实时数据配置日志
+				dbLogUtil.addOperateLog(OpTypeOption.DelAct, ResTypeOption.Act, realHisCfg.id, realHisCfg);
+
+			} else {
+				// 删除历史数据配置日志
+				dbLogUtil.addOperateLog(OpTypeOption.DelHis, ResTypeOption.His, realHisCfg.id, realHisCfg);
+			}
 
 		}
 
@@ -604,8 +616,10 @@ public class ActDataAction {
 		JSONObject json = new JSONObject();
 		long account_id = AppContext.getSession().client.userId;
 		if (realHisCfgParam != null) {
+			RealHisCfg oldrealHisCfg = null;
 			RealHisCfg realHisCfg = null;
 			if (realHisCfgParam.id > 0) {
+				oldrealHisCfg = realHisCfgApi.getRealHisCfg(realHisCfgParam.id);
 				realHisCfg = realHisCfgApi.getRealHisCfg(realHisCfgParam.id);
 				realHisCfg.account_id = account_id;
 				realHisCfg.addr = realHisCfgParam.addr;
@@ -636,7 +650,16 @@ public class ActDataAction {
 				realHisCfg.state = 2;// 更新配置
 
 				boolean issuccess = realHisCfgApi.updateRealHisCfg(realHisCfg);
+
 				if (issuccess) {
+					if (realHisCfg.data_type == 0) {// 实时数据配置
+						dbLogUtil.updOperateLog(OpTypeOption.UpdAct, ResTypeOption.Act, realHisCfg.id, oldrealHisCfg,
+								realHisCfg);
+					} else {
+						dbLogUtil.updOperateLog(OpTypeOption.UpdHis, ResTypeOption.His, realHisCfg.id, oldrealHisCfg,
+								realHisCfg);
+					}
+
 					if (realHisCfgParam.data_type == 0) {
 						AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(realHisCfgParam.group_id,
 								realHisCfg.id);
@@ -687,6 +710,13 @@ public class ActDataAction {
 				}
 				long id = realHisCfgApi.saveRealHisCfg(realHisCfg);
 				if (id > 0) {
+					if (realHisCfg.data_type == 0) {// 实时数据配置
+						dbLogUtil.addOperateLog(OpTypeOption.AddAct, ResTypeOption.Act, realHisCfg.id, realHisCfg);
+					} else {
+						// 历史数据配置
+						dbLogUtil.addOperateLog(OpTypeOption.AddHis, ResTypeOption.His, realHisCfg.id, realHisCfg);
+					}
+
 					if (realHisCfgParam.data_type == 0) {
 						realHisCfg = realHisCfgApi.getRealHisCfg(id);
 						AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(realHisCfgParam.group_id,

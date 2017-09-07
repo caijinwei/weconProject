@@ -28,10 +28,13 @@ import com.wecon.box.entity.AlarmCfgTrigger;
 import com.wecon.box.entity.AlarmTrigger;
 import com.wecon.box.entity.Page;
 import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.box.enums.OpTypeOption;
+import com.wecon.box.enums.ResTypeOption;
 import com.wecon.box.filter.AlarmCfgDataFilter;
 import com.wecon.box.filter.AlarmTriggerFilter;
 import com.wecon.box.param.AlarmCfgParam;
 import com.wecon.box.param.AlarmDataParam;
+import com.wecon.box.util.DbLogUtil;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
@@ -58,6 +61,8 @@ public class AlarmDataAction {
 	private AlarmTriggerApi alarmTriggerApi;
 	@Autowired
 	private ViewAccountRoleApi viewAccountRoleApi;
+	@Autowired
+	protected DbLogUtil dbLogUtil;
 
 	@WebApi(forceAuth = true, master = true)
 	@Description("获取当前/历史报警")
@@ -287,8 +292,10 @@ public class AlarmDataAction {
 	public Output addUpdataAlarmMonitor(@Valid AlarmCfgParam alarmCfgParam) {
 		long account_id = AppContext.getSession().client.userId;
 		if (alarmCfgParam != null) {
+			AlarmCfg oldalarmCfg = null;
 			AlarmCfg alarmCfg = null;
 			if (alarmCfgParam.alarmcfg_id > 0) {
+				oldalarmCfg = alarmCfgApi.getAlarmcfg(alarmCfgParam.alarmcfg_id);
 				alarmCfg = alarmCfgApi.getAlarmcfg(alarmCfgParam.alarmcfg_id);
 				if (alarmCfg != null) {
 					alarmCfg.account_id = account_id;
@@ -306,6 +313,8 @@ public class AlarmDataAction {
 					alarmCfg.data_limit = alarmCfgParam.rang;
 					boolean issuccess = alarmCfgApi.upAlarmCfg(alarmCfg);
 					if (issuccess) {
+						dbLogUtil.updOperateLog(OpTypeOption.UpdAlarm, ResTypeOption.Alarm, alarmCfg.alarmcfg_id, oldalarmCfg,
+								alarmCfg);
 						// 获取分组信息
 						if (alarmCfgParam.group_id > 0) {
 							AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(-1,
@@ -362,6 +371,7 @@ public class AlarmDataAction {
 				alarmCfg.data_limit = alarmCfgParam.rang;
 				long id = alarmCfgApi.saveAlarmCfg(alarmCfg);
 				if (id > 0) {
+					dbLogUtil.addOperateLog(OpTypeOption.AddAlarm, ResTypeOption.Alarm, alarmCfg.alarmcfg_id, alarmCfg);
 					// 添加到分组下
 					AlarmCfg alarm = alarmCfgApi.getAlarmcfg(id);
 					AccountDirRel accountDirRel = new AccountDirRel();
@@ -408,6 +418,7 @@ public class AlarmDataAction {
 		AlarmCfg alarmCfg = alarmCfgApi.getAlarmcfg(Long.parseLong(alarmcfg_id));
 		alarmCfg.state = 3;// 删除配置状态
 		alarmCfgApi.upAlarmCfg(alarmCfg);
+		dbLogUtil.addOperateLog(OpTypeOption.DelAlarm, ResTypeOption.Alarm, alarmCfg.alarmcfg_id, alarmCfg);
 
 		return new Output();
 
@@ -426,6 +437,7 @@ public class AlarmDataAction {
 			if (alarmCfgData != null) {
 				alarmCfgData.state = 2;// 已确认状态
 				alarmCfgDataApi.updateAlarmCfgData(alarmCfgData);
+				
 			}
 
 		}
