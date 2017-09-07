@@ -1,7 +1,6 @@
 package com.wecon.box.action.data;
 
 import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -437,6 +436,7 @@ public class AlarmDataAction {
 			if (alarmCfgData != null) {
 				alarmCfgData.state = 2;// 已确认状态
 				alarmCfgDataApi.updateAlarmCfgData(alarmCfgData);
+				dbLogUtil.addOperateLog(OpTypeOption.ConFirmAlarmData, ResTypeOption.Alarm, alarmCfgData.alarm_cfg_id, alarmCfgData);
 				
 			}
 
