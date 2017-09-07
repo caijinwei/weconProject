@@ -280,6 +280,9 @@ public class PlcInfoSettingAction {
             throw new BusinessException(ErrorCodeOption.Is_Not_Params_DeviceID.key, ErrorCodeOption.Is_Not_Params_DeviceID.value);
         }
         plcInfoApi.unBundledPlc(plcId);
+        // <editor - fold desc = "操作日志" >
+        dbLogUtil.addOperateLog(OpTypeOption.DelPlc,ResTypeOption.Plc,plcId,plcInfoApi.findPlcInfoByPlcId(plcId));
+        //</editor-fold>
         return new Output();
     }
 

@@ -28,8 +28,8 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             }
         }
         /*
-        * 初始化 展示视图账户实时历史监控点
-        * */
+         * 初始化 展示视图账户实时历史监控点
+         * */
         $scope.showAlreadPoint(type, viewid);
     }
     $scope.paginationConf = {
@@ -57,6 +57,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
         T.common.ajax.request("WeconBox", "Viewpoint/showReal", params, function (data, code, msg) {
             if (code == 200) {
                 $scope.realpointDatas = data.page.list;
+                console.log("获取的list的值是:",data.page.list);
                 $scope.conf.totalItems = data.page.totalRecord;
 
                 $scope.$apply();
@@ -88,7 +89,11 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             function () {
                 chk_value.push($(this).val());
                 var tem = "right_" + $(this).val();
-                rightOption.push($("#myiframe").contents().find("input[name=" + tem + "]:checked").attr("value"));
+                var right = $("#myiframe").contents().find("input[name=" + tem + "]:checked").val();
+                if (right != ""&&right!=undefined) {
+                    rightOption.push(right);
+                }
+
             }
         );
         var ids = chk_value.join(",");
@@ -104,7 +109,6 @@ appModule.controller("listController", function ($scope, $http, $compile) {
                 $("#showRestOpint").modal("hide");
                 alert("添加成功");
                 var type = T.common.util.getParameter("type").toString();
-                console.log("类型:", typeof type);
                 $scope.showAlreadPoint(type.toString(), viewid.toString());
                 //$scope.getRestList( $scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
             }
