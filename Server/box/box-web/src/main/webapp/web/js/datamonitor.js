@@ -446,11 +446,11 @@ appModule
 								if (!$.trim(value)) {
 									return '不能为空';
 								}
-								var reg = /^[+]?\d+(\.\d+)?$/;
+								/*var reg = /^[+]?\d+(\.\d+)?$/;
 								if(!reg.test(value)){
 									
 									return '格式错误';
-								}
+								}*/
 								$scope.putMess(model, value);
 							}
 						});
