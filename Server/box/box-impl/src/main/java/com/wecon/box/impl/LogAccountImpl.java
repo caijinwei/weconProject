@@ -151,7 +151,6 @@ public class LogAccountImpl implements LogAccountApi {
             log.client_ip = rs.getString("client_ip");
             log.client_platform = rs.getInt("client_platform");
             log.url = rs.getString("url");
-
             log.res_type_name = log.res_type.getKey();
             log.op_type_name = log.op_type.getKey();
 
