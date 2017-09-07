@@ -72,7 +72,7 @@ public class MonitorTask extends Thread {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void connect() {
 		try {
@@ -434,8 +434,8 @@ public class MonitorTask extends Thread {
 
 				break;
 			case WILL_DATA:
-				System.out.println("盒子离线发的遗嘱消息");
 				JSONObject jsonData = jsonObject.getJSONObject("data");
+				logger.info("盒子离线发的遗嘱消息,machine_code:" + jsonData.getString("machine_code"));
 				if (!CommonUtils.isNullOrEmpty(jsonData.getString("machine_code"))) {
 					if (machineCode.equals(jsonData.getString("machine_code"))) {
 						Device device = deviceApi.getDevice(machineCode);
