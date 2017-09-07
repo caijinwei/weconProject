@@ -5,7 +5,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.*;
 import com.wecon.box.entity.*;
 import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.box.enums.OpTypeOption;
+import com.wecon.box.enums.ResTypeOption;
 import com.wecon.box.filter.DeviceDir;
+import com.wecon.box.util.DbLogUtil;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
@@ -30,6 +33,9 @@ import java.util.List;
 public class DeviceAction {
     @Autowired
     DeviceApi deviceApi;
+
+    @Autowired
+    protected DbLogUtil dbLogUtil;
 
     @Autowired
     AccountApi accountApi;
@@ -79,12 +85,16 @@ public class DeviceAction {
     public Output deletePIBox(@RequestParam("device_id") Integer device_id) {
         long accountId = AppContext.getSession().client.userId;
         deviceApi.unbindDevice((int) accountId, device_id);
+        //<editor-fold desc="操作日志">
+        dbLogUtil.addOperateLog(OpTypeOption.UnBindDevice, ResTypeOption.Device,device_id, deviceApi.getDevice(device_id));
+        //</editor-fold>
         return new Output();
     }
 
     /*
      * 测试 没有用户登入等验证 直接先传入user_id
      */
+    @Label("绑定盒子")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping(value = "/boundBox")
     public Output boundBox(@RequestParam("machine_code") String machine_code, @RequestParam("password") String password,
@@ -114,8 +124,7 @@ public class DeviceAction {
         Device modelUpdName = deviceApi.getDevice(device_id);
         modelUpdName.name = name;
         deviceApi.updateDevice(modelUpdName);
-        
-        
+
         /*
         * 更新实时历史监控点迁移
         * */
@@ -137,6 +146,9 @@ public class DeviceAction {
         * 更新监控点分组迁移
         * */
         accountDirApi.updateAccountBydeviceAndType(AppContext.getSession().client.userId, device_id);
+        //<editor-fold desc="操作日志">
+        dbLogUtil.addOperateLog(OpTypeOption.BindDevice, ResTypeOption.Device,device_id,deviceApi.getDevice(device_id));
+        //</editor-fold>
         return new Output();
     }
 
@@ -204,7 +216,7 @@ public class DeviceAction {
     @Label("用户拖拽，更新用户分组")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping(value = "dragToUpdateDir")
-    public Output dragToUpdateDir(@RequestParam("target_acc_dir_id") Integer targetAccDirId, @RequestParam("target_ref_id") Integer targetRefId, @RequestParam("from_acc_dir_id") Integer fromAccDirId, @RequestParam("from_ref_id") Integer fromRefId) {
+    public Output dragToUpdateDir(@RequestParam("target_acc_dir_id") long targetAccDirId, @RequestParam("target_ref_id") long targetRefId, @RequestParam("from_acc_dir_id") long fromAccDirId, @RequestParam("from_ref_id") long fromRefId) {
         AccountDirRel newAccDirRel = new AccountDirRel();
         newAccDirRel.acc_dir_id = targetAccDirId;
         newAccDirRel.ref_id = targetRefId;
@@ -212,6 +224,11 @@ public class DeviceAction {
         oldAccDirRel.acc_dir_id = fromAccDirId;
         oldAccDirRel.ref_id = fromRefId;
         accountDirRelApi.updateAccountDirRel(newAccDirRel, oldAccDirRel);
+        //<editor-fold desc="操作日志">
+        AccountDir fromAccDir=accountDirApi.getAccountDir(fromAccDirId);
+        long device_id=fromAccDir.device_id;
+        dbLogUtil.updOperateLog(OpTypeOption.DragDeviceDir, ResTypeOption.Device,device_id,fromAccDir,accountDirApi.getAccountDir(targetAccDirId));
+        //</editor-fold>
         return new Output();
     }
 
@@ -254,6 +271,7 @@ public class DeviceAction {
     @RequestMapping("chgPiboxInFoName")
     public Output chgPiboxInFoName(@RequestParam("deviceId") Integer deviceId, @RequestParam("piBoxName") String piBoxName, @RequestParam("remark") String remark, @RequestParam("map") String map) {
         Device device = deviceApi.getDevice(deviceId);
+        Device oldDevice=device;
         if (null == deviceId || null == device) {
             throw new BusinessException(ErrorCodeOption.Device_NotFound.key, ErrorCodeOption.Device_NotFound.value);
         }
@@ -267,6 +285,9 @@ public class DeviceAction {
             device.map = map;
         }
         deviceApi.updateDevice(device);
+        //<editor-fold desc="操作日志">
+        dbLogUtil.updOperateLog(OpTypeOption.UpdateDeviceInfo, ResTypeOption.Device,deviceId,oldDevice,device);
+        //</editor-fold>
         return new Output();
     }
 }

@@ -9,7 +9,8 @@ public enum ResTypeOption implements EnumVal {
     Unknown("未定义", 0),
     Account("帐号", 100),
     Dir("分组", 200),
-    Device("盒子", 300);
+    Device("盒子", 300),
+    Plc("通讯口",500);
 
     private String key;
 

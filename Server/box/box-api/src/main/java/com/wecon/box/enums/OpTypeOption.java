@@ -26,12 +26,15 @@ public enum OpTypeOption implements EnumVal {
 
     //盒子操作
     BindDevice("绑定盒子",300),
-    UnBindDevice("解除绑定盒子",301);
+    UnBindDevice("解除绑定盒子",301),
+    DragDeviceDir("盒子分组修改",302),
+    UpdateDeviceInfo("修改盒子基本信息",303),
 
     //权限操作
 
     //通讯口操作
-
+    AddPlc("添加通讯口",501),
+    UpdatePlc("更新通讯口配置",502);
     //实时监控点操作
 
     //历史监控点操作

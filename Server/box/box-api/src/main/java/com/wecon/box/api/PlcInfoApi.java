@@ -93,7 +93,7 @@ public interface PlcInfoApi {
     * 展示单个plc
     * @Params plc_id
     * */
-    public PlcInfo findPlcInfoByPlcId(Integer plcId);
+    public PlcInfo findPlcInfoByPlcId(long plcId);
 
 
 }

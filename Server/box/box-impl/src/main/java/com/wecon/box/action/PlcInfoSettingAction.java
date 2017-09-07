@@ -5,8 +5,11 @@ import com.wecon.box.api.DevBindUserApi;
 import com.wecon.box.api.PlcInfoApi;
 import com.wecon.box.entity.PlcInfo;
 import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.box.enums.OpTypeOption;
+import com.wecon.box.enums.ResTypeOption;
 import com.wecon.box.param.PlcInfoData;
 import com.wecon.box.param.PlcInfoSettingParam;
+import com.wecon.box.util.DbLogUtil;
 import com.wecon.box.util.PlcListByType;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
@@ -14,7 +17,6 @@ import com.wecon.restful.core.BusinessException;
 import com.wecon.restful.core.Output;
 import com.wecon.restful.doc.Label;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Description;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,46 +40,50 @@ public class PlcInfoSettingAction {
     DevBindUserApi devBindUserApi;
     @Autowired
     PlcListByType plcListByType;
+    @Autowired
+    DbLogUtil dbLogUtil;
 
-    @Description("新增plc配置")
-    @RequestMapping(value = "/addPlcInfo")
-    @WebApi(forceAuth = true, master = true, authority = {"1"})
-    public Output comPortSetting(@Valid PlcInfoSettingParam param) {
-        long account_id = AppContext.getSession().client.userId;
-        if (devBindUserApi.isRecord((int) param.device_id, account_id) == false) {
-            throw new BusinessException(ErrorCodeOption.PiBoxDevice_IsNot_Found.key, ErrorCodeOption.PiBoxDevice_IsNot_Found.value);
-        }
-        PlcInfo plcInfo = new PlcInfo();
-        plcInfo.type = param.type;
-        plcInfo.port = param.port;
-        plcInfo.state = param.state;
-        plcInfo.baudrate = param.baudrate;
-        plcInfo.box_stat_no = param.box_stat_no;
-        plcInfo.check_bit = param.check_bit;
-        plcInfo.com_iodelaytime = param.com_iodelaytime;
-        plcInfo.com_stepinterval = param.com_stepinterval;
-        plcInfo.comtype = param.comtype;
-        plcInfo.stop_bit = param.stop_bit;
-        plcInfo.data_length = param.data_length;
-        plcInfo.rev_timeout = param.rev_timeout;
-        plcInfo.com_stepinterval = param.com_stepinterval;
-        plcInfo.device_id = param.device_id;
-        plcInfo.net_broadcastaddr = param.net_broadcastaddr;
-        plcInfo.net_ipaddr = param.net_ipaddr;
-        plcInfo.net_isbroadcast = param.net_isbroadcast;
-        plcInfo.net_port = param.net_port;
-        plcInfo.net_type = param.net_type;
-        plcInfo.driver = param.driver;
-        if (!plcInfo.port.equals("Ethernet")) {
-            if (plcInfoApi.isExistPort(plcInfo.device_id, plcInfo.port)) {
-                throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
-            }
-        }
-        System.out.println("---------------------------" + plcInfo.stop_bit);
-        plcInfoApi.savePlcInfo(plcInfo);
-        return new Output();
-    }
-
+//    @Description("新增plc配置")
+//    @RequestMapping(value = "/addPlcInfo")
+//    @WebApi(forceAuth = true, master = true, authority = {"1"})
+//    public Output comPortSetting(@Valid PlcInfoSettingParam param) {
+//        long account_id = AppContext.getSession().client.userId;
+//        if (devBindUserApi.isRecord((int) param.device_id, account_id) == false) {
+//            throw new BusinessException(ErrorCodeOption.PiBoxDevice_IsNot_Found.key, ErrorCodeOption.PiBoxDevice_IsNot_Found.value);
+//        }
+//        PlcInfo plcInfo = new PlcInfo();
+//        plcInfo.type = param.type;
+//        plcInfo.port = param.port;
+//        plcInfo.state = param.state;
+//        plcInfo.baudrate = param.baudrate;
+//        plcInfo.box_stat_no = param.box_stat_no;
+//        plcInfo.check_bit = param.check_bit;
+//        plcInfo.com_iodelaytime = param.com_iodelaytime;
+//        plcInfo.com_stepinterval = param.com_stepinterval;
+//        plcInfo.comtype = param.comtype;
+//        plcInfo.stop_bit = param.stop_bit;
+//        plcInfo.data_length = param.data_length;
+//        plcInfo.rev_timeout = param.rev_timeout;
+//        plcInfo.com_stepinterval = param.com_stepinterval;
+//        plcInfo.device_id = param.device_id;
+//        plcInfo.net_broadcastaddr = param.net_broadcastaddr;
+//        plcInfo.net_ipaddr = param.net_ipaddr;
+//        plcInfo.net_isbroadcast = param.net_isbroadcast;
+//        plcInfo.net_port = param.net_port;
+//        plcInfo.net_type = param.net_type;
+//        plcInfo.driver = param.driver;
+//        if (!plcInfo.port.equals("Ethernet")) {
+//            if (plcInfoApi.isExistPort(plcInfo.device_id, plcInfo.port)) {
+//                throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
+//            }
+//        }
+//        plcInfoApi.savePlcInfo(plcInfo);
+//        //<editor-fold desc="操作日志">
+//        dbLogUtil.addOperateLog(OpTypeOption.AddPlc, ResTypeOption.Plc, , dir);
+//        //</editor-fold>
+//        return new Output();
+//    }
+//
 
     @Label("展示该盒子下全部通讯口")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
@@ -114,45 +120,44 @@ public class PlcInfoSettingAction {
         return new Output(data);
     }
 
-    @Label("更新通讯口配置")
-    @WebApi(forceAuth = true, master = true, authority = {"1"})
-    @RequestMapping("updataPlcInfo")
-    public Output update(@Valid PlcInfoSettingParam param) {
-        long account_id = AppContext.getSession().client.userId;
-
-        PlcInfo plcInfo = new PlcInfo();
-        plcInfo.plc_id = param.plc_id;
-        plcInfo.type = param.type;
-        plcInfo.port = param.port;
-
-        plcInfo.state = param.state;
-        System.out.println("------------------------------------------------------------------------------state" + plcInfo.state);
-        plcInfo.baudrate = param.baudrate;
-        plcInfo.box_stat_no = param.box_stat_no;
-        plcInfo.check_bit = param.check_bit;
-        plcInfo.com_iodelaytime = param.com_iodelaytime;
-        plcInfo.com_stepinterval = param.com_stepinterval;
-        plcInfo.comtype = param.comtype;
-        plcInfo.data_length = param.data_length;
-        plcInfo.rev_timeout = param.rev_timeout;
-        plcInfo.com_stepinterval = param.com_stepinterval;
-        plcInfo.device_id = param.device_id;
-        plcInfo.net_broadcastaddr = param.net_broadcastaddr;
-        plcInfo.net_ipaddr = param.net_ipaddr;
-        plcInfo.net_isbroadcast = param.net_isbroadcast;
-        plcInfo.net_port = param.net_port;
-        plcInfo.net_type = param.net_type;
-        plcInfo.driver = param.driver;
-        if (!plcInfo.port.equals(plcInfoApi.findPlcInfoByPlcId((int) plcInfo.plc_id).port)) {
-            if (!plcInfo.port.equals("Ethernet")) {
-                if (plcInfoApi.isExistPort(plcInfo.device_id, plcInfo.port)) {
-                    throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
-                }
-            }
-        }
-        plcInfoApi.updatePlcInfo(plcInfo);
-        return new Output();
-    }
+//    @Label("更新通讯口配置")
+//    @WebApi(forceAuth = true, master = true, authority = {"1"})
+//    @RequestMapping("updataPlcInfo")
+//    public Output update(@Valid PlcInfoSettingParam param) {
+//        long account_id = AppContext.getSession().client.userId;
+//
+//        PlcInfo plcInfo = new PlcInfo();
+//        plcInfo.plc_id = param.plc_id;
+//        plcInfo.type = param.type;
+//        plcInfo.port = param.port;
+//
+//        plcInfo.state = param.state;
+//        plcInfo.baudrate = param.baudrate;
+//        plcInfo.box_stat_no = param.box_stat_no;
+//        plcInfo.check_bit = param.check_bit;
+//        plcInfo.com_iodelaytime = param.com_iodelaytime;
+//        plcInfo.com_stepinterval = param.com_stepinterval;
+//        plcInfo.comtype = param.comtype;
+//        plcInfo.data_length = param.data_length;
+//        plcInfo.rev_timeout = param.rev_timeout;
+//        plcInfo.com_stepinterval = param.com_stepinterval;
+//        plcInfo.device_id = param.device_id;
+//        plcInfo.net_broadcastaddr = param.net_broadcastaddr;
+//        plcInfo.net_ipaddr = param.net_ipaddr;
+//        plcInfo.net_isbroadcast = param.net_isbroadcast;
+//        plcInfo.net_port = param.net_port;
+//        plcInfo.net_type = param.net_type;
+//        plcInfo.driver = param.driver;
+//        if (!plcInfo.port.equals(plcInfoApi.findPlcInfoByPlcId((int) plcInfo.plc_id).port)) {
+//            if (!plcInfo.port.equals("Ethernet")) {
+//                if (plcInfoApi.isExistPort(plcInfo.device_id, plcInfo.port)) {
+//                    throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
+//                }
+//            }
+//        }
+//        plcInfoApi.updatePlcInfo(plcInfo);
+//        return new Output();
+//    }
 
     @Label("更新通讯口配置")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
@@ -203,10 +208,17 @@ public class PlcInfoSettingAction {
         }
         if (plcInfo.plc_id > 0) {
             plcInfo.state = 2;
+            PlcInfo oldPlc=plcInfoApi.findPlcInfoByPlcId(plcInfo.plc_id);
             plcInfoApi.updatePlcInfo(plcInfo);
+            // <editor - fold desc = "操作日志" >
+            dbLogUtil.updOperateLog(OpTypeOption.UpdatePlc,ResTypeOption.Plc,oldPlc.plc_id,plcInfo,oldPlc);
+            //</editor-fold>
         } else {
             plcInfo.state = 1;
-            plcInfoApi.savePlcInfo(plcInfo);
+            long newPlcInfoId=plcInfoApi.savePlcInfo(plcInfo);
+            // <editor - fold desc = "操作日志" >
+            dbLogUtil.addOperateLog(OpTypeOption.UpdatePlc,ResTypeOption.Plc,newPlcInfoId,plcInfo);
+            //</editor-fold>
         }
         return new Output();
     }

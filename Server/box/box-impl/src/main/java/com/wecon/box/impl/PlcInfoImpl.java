@@ -4,18 +4,22 @@ import com.wecon.box.api.PlcInfoApi;
 import com.wecon.box.entity.PlcExtend;
 import com.wecon.box.entity.PlcInfo;
 import com.wecon.box.enums.ErrorCodeOption;
-import com.wecon.restful.core.BusinessException;
 import com.wecon.common.util.TimeUtil;
+import com.wecon.restful.core.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -38,9 +42,8 @@ public class PlcInfoImpl implements PlcInfoApi {
     通讯口配置
     * */
     @Override
-    public long savePlcInfo(PlcInfo model) {
+    public long savePlcInfo(final PlcInfo model) {
 
-        System.out.println("通讯口配置获取到的model值是" + model);
         /*
         * INSERT INTO plc_info (device_id,type,driver,box_stat_no,plc_stat_no,port,comtype,baudrate,stop_bit,
             data_length,check_bit,retry_times,wait_timeout,rev_timeout,com_stepinterval,com_iodelaytime,retry_timeout,net_port,net_type,net_isbroadcast,net_broadcastaddr
@@ -48,16 +51,46 @@ public class PlcInfoImpl implements PlcInfoApi {
             "1","1","1",NOW(),NOW());
 */
 
-        String sql = "INSERT INTO plc_info (device_id,type,driver,box_stat_no,plc_stat_no,port,comtype,baudrate,stop_bit,\n" +
-                "data_length,check_bit,retry_times,wait_timeout,rev_timeout,com_stepinterval,com_iodelaytime,retry_timeout,net_port,net_type,net_isbroadcast,net_broadcastaddr\n" +
-                ",net_ipaddr,state,create_date,update_date) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())";
+//
+//        Object args[] = {model.device_id, model.type, model.driver, model.box_stat_no, model.plc_stat_no, model.port, model.comtype, model.baudrate, model.stop_bit, model.data_length, model.check_bit,
+//                model.retry_times, model.wait_timeout, model.rev_timeout, model.com_stepinterval, model.com_iodelaytime, model.rev_timeout, model.net_port, model.net_type, model.net_isbroadcast, model.net_broadcastaddr,
+//                model.net_ipaddr, model.state};
+        KeyHolder key = new GeneratedKeyHolder();
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                String sql = "INSERT INTO plc_info (device_id,type,driver,box_stat_no,plc_stat_no,port,comtype,baudrate,stop_bit, " +
+                        "data_length,check_bit,retry_times,wait_timeout,rev_timeout,com_stepinterval,com_iodelaytime,retry_timeout,net_port,net_type,net_isbroadcast,net_broadcastaddr  " +
+                        ",net_ipaddr,state,create_date,update_date) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP(),CURRENT_TIMESTAMP())";
+                PreparedStatement  preState=con.prepareStatement(sql);
+                preState.setLong(1,model.device_id);
+                preState.setString(2, model.type);
+                preState.setString(3, model.driver);
+                preState.setInt(4, model.box_stat_no);
+                preState.setInt(5, model.plc_stat_no);
+                preState.setString(6,model.port);
+                preState.setInt(7,model.comtype);
+                preState.setString(8,model.baudrate);
+                preState.setInt(9,model.stop_bit);
+                preState.setInt(10,model.data_length);
+                preState.setString(11,model.check_bit);
 
-        Object args[] = {model.device_id, model.type, model.driver, model.box_stat_no, model.plc_stat_no, model.port, model.comtype, model.baudrate, model.stop_bit, model.data_length, model.check_bit,
-                model.retry_times, model.wait_timeout, model.rev_timeout, model.com_stepinterval, model.com_iodelaytime, model.rev_timeout, model.net_port, model.net_type, model.net_isbroadcast, model.net_broadcastaddr,
-                model.net_ipaddr, model.state};
-        System.out.println("--------------------------"+args.toString());
-        return jdbcTemplate.update(sql, args);
-
+                preState.setInt(12,model.retry_times);
+                preState.setInt(13,model.wait_timeout);
+                preState.setInt(14,model.rev_timeout);
+                preState.setInt(15,model.com_stepinterval);
+                preState.setInt(16,model.com_iodelaytime);
+                preState.setInt(17,model.retry_timeout);
+                preState.setInt(18,model.net_port);
+                preState.setInt(19,model.net_type);
+                preState.setInt(20,model.net_isbroadcast);
+                preState.setInt(21,model.net_broadcastaddr);
+                preState.setString(22,model.net_ipaddr);
+                preState.setInt(23,model.state);
+                return preState;
+            }
+        },key);
+       return key.getKey().longValue();
     }
 
     /*
@@ -123,7 +156,7 @@ public class PlcInfoImpl implements PlcInfoApi {
         return null;
     }
     @Override
-    public PlcInfo findPlcInfoByPlcId(Integer plcId) {
+    public PlcInfo findPlcInfoByPlcId(long plcId) {
         String sql="select "+SEL_COL+"  FROM plc_info where plc_id=?";
         PlcInfo info=jdbcTemplate.queryForObject(sql,new Object[]{plcId},new DefaultPlcInfoRowMapper());
         return info;
