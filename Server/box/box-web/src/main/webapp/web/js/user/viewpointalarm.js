@@ -20,7 +20,6 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             onChange: function () {
                 if (this.currentPage != 0) {
                     $scope.showViewAlarmpoint(viewid, this.currentPage, this.itemsPerPage);
-
                 }
             }
         }

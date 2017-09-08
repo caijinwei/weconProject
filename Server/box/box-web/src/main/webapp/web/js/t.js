@@ -88,6 +88,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     var sock;
     $scope.ws_connect = function () {
         console.log(1);
+
         sock = new SockJS(T.common.requestUrl['WeconBox'] + 'actdata-websocket/');
         sock.onopen = function () {
             $scope.ws_log('>>>open');
@@ -120,30 +121,32 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     var ws;
     $scope.ws_connect2 = function () {
         if ("WebSocket" in window) {
-            alert("WebSocket is supported by your Browser!");
+
+            ws = new WebSocket(T.common.requestUrl['WeconBoxWs'] + 'actdata-websocket/websocket?' + T.common.websocket.getParams());
+            ws.onopen = function () {
+                $scope.ws_log('>>>open');
+            };
+            ws.onmessage = function (evt) {
+                $scope.ws_log('server message ->' + evt.data);
+                console.log(evt);
+            };
+            ws.onclose = function (evt) {
+                $scope.ws_log('>>>close' + " ");
+                console.log(evt);
+            };
+            ws.onerror = function (evt) {
+                $scope.ws_log('>>>error' + " " + evt.data);
+                console.log(evt);
+            };
+        } else {
+            alert("WebSocket isn't supported by your Browser!");
         }
-        ws = new WebSocket("ws://localhost:8080/wecon-box/api/" + 'actdata-websocket/');
-        ws.onopen = function () {
-            $scope.ws_log('>>>open');
-        };
-        ws.onmessage = function (evt) {
-            $scope.ws_log('server message ->' + evt.data);
-        };
-        ws.onclose = function (evt) {
-            $scope.ws_log('>>>close' + " " + evt.data);
-            console.log(evt);
-        };
-        ws.onerror = function (evt) {
-            $scope.ws_log('>>>error' + " " + evt.data);
-            console.log(evt);
-        };
     }
     $scope.ws_send2 = function () {
         ws.send($("#wsMsg").val());
         $scope.ws_log('client message ->' + $("#wsMsg").val());
     }
     $scope.ws_close2 = function () {
-        s
         ws.close();
     }
 })

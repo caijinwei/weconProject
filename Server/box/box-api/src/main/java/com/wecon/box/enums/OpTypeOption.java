@@ -32,7 +32,7 @@ public enum OpTypeOption implements EnumVal {
 
     //权限操作
     AddViewRole("添加视图帐号权限", 400),
-    UpdViewRole("更新视图帐号权限", 401),
+    UpdViewRole("修改视图监控点权限", 401),
     DelViewRole("删除视图帐号权限", 402),
 
     //通讯口操作

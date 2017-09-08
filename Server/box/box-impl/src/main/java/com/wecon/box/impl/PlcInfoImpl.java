@@ -19,10 +19,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 
 /**
@@ -62,7 +59,7 @@ public class PlcInfoImpl implements PlcInfoApi {
                 String sql = "INSERT INTO plc_info (device_id,type,driver,box_stat_no,plc_stat_no,port,comtype,baudrate,stop_bit, " +
                         "data_length,check_bit,retry_times,wait_timeout,rev_timeout,com_stepinterval,com_iodelaytime,retry_timeout,net_port,net_type,net_isbroadcast,net_broadcastaddr  " +
                         ",net_ipaddr,state,create_date,update_date) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP(),CURRENT_TIMESTAMP())";
-                PreparedStatement  preState=con.prepareStatement(sql);
+                PreparedStatement  preState=con.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
                 preState.setLong(1,model.device_id);
                 preState.setString(2, model.type);
                 preState.setString(3, model.driver);
