@@ -167,8 +167,8 @@ public class AlarmDataAction {
 			json.put("listalrmCfgTrigger", listalrmCfgTrigger);
 			return new Output(json);
 		}
-		listalrmCfgTrigger = alarmCfgApi.getRealHisCfgDataList(account_id, Long.parseLong(group_id),
-				Long.parseLong(device_id), pageIndex, pageSize);
+		listalrmCfgTrigger = alarmCfgApi.getAlarmCfgDataList(account_id, Long.parseLong(group_id),
+				Long.parseLong(device_id),1, pageIndex, pageSize);
 		if (listalrmCfgTrigger.getList().size() > 0) {
 			for (int i = 0; i < listalrmCfgTrigger.getList().size(); i++) {
 				AlarmCfgTrigger alarmCfgTrigger = listalrmCfgTrigger.getList().get(i);

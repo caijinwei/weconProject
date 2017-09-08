@@ -32,7 +32,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
         var bind_state = $("#bind_state").val();
 
         if (bind_state != "") {
-            $scope.showAllDeviceDir("", $scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+            $scope.showAllDeviceDir(accountId, $scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
         }
     }
     /*

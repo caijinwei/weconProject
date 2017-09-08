@@ -150,6 +150,7 @@ public class ActDataAction {
 			realHisCfgFilter.data_type = 0;
 			realHisCfgFilter.his_cycle = -1;
 			realHisCfgFilter.state = -1;
+			realHisCfgFilter.bind_state=1;
 
 			realHisCfgFilter.account_id = client.userId;
 
@@ -425,6 +426,7 @@ public class ActDataAction {
 			realHisCfgFilter.data_type = 0;
 			realHisCfgFilter.his_cycle = -1;
 			realHisCfgFilter.state = -1;
+			realHisCfgFilter.bind_state=1;
 
 			realHisCfgFilter.account_id = client.userId;
 			if (!CommonUtils.isNullOrEmpty(device_id)) {

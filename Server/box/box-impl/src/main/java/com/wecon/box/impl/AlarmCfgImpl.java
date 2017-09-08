@@ -74,7 +74,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Page<AlarmCfgTrigger> getRealHisCfgDataList(long account_id, long groupId, long device_id, int pageIndex,
+	public Page<AlarmCfgTrigger> getAlarmCfgDataList(long account_id, long groupId, long device_id,long bind_state, int pageIndex,
 			int pageSize) {
 		String sqlCount = "select count(0) from `alarm_cfg` ac,`account_dir` ad,`account_dir_rel` adr where 1=1 and ac.`alarmcfg_id`=adr.`ref_id` and ad.`id`=adr.`acc_dir_id` and ad.`type`=3 and ac.`account_id`=ad.`account_id` AND  ac.`device_id`=ad.`device_id` ";
 
@@ -93,6 +93,10 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 		if (groupId > 0) {
 			condition.append(" and ad.`id`=? ");
 			params.add(groupId);
+		}
+		if (bind_state > -1) {
+			condition.append(" and ac.bind_state=? ");
+			params.add(bind_state);
 		}
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
@@ -120,8 +124,9 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 				model.dirName = rs.getString("dirname");
 				model.alais = rs.getString("ref_alais");
 				model.rid = rs.getString("rid");
-				model.data_limit = rs.getString("data_limit");
 				model.plc_id = rs.getLong("plc_id");
+				model.data_limit=rs.getString("data_limit");
+				model.bind_state = rs.getInt("bind_state");
 				model.condition_type = rs.getInt("condition_type");
 				model.create_date = rs.getTimestamp("create_date");
 				model.update_date = rs.getTimestamp("update_date");
@@ -133,6 +138,62 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 		page.setList(list);
 		return page;
 
+	}
+	@SuppressWarnings("unchecked")
+	@Override
+	public Page<AlarmCfgTrigger> getAlarmList(long device_id, long bind_state, int pageIndex, int pageSize) {
+		String sqlCount = "select count(0) from alarm_cfg where 1=1 ";
+
+		String sql = " select "+ SEL_COL +" from alarm_cfg where 1=1 ";
+
+		StringBuffer condition = new StringBuffer("");
+		List<Object> params = new ArrayList<Object>();
+		
+		if (device_id > 0) {
+			condition.append(" and device_id=? ");
+			params.add(device_id);
+	
+		}
+		if (bind_state > -1) {
+			condition.append(" and bind_state=? ");
+			params.add(bind_state);
+		}
+		sqlCount += condition;
+		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
+		Page<AlarmCfgTrigger> page = new Page<AlarmCfgTrigger>(pageIndex, pageSize, totalRecord);
+		String sort = " order by  alarmcfg_id desc";
+		sql += condition + sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
+
+		@SuppressWarnings("rawtypes")
+		List<AlarmCfgTrigger> list = jdbcTemplate.query(sql, params.toArray(), new RowMapper() {
+
+			@Override
+			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				AlarmCfgTrigger model = new AlarmCfgTrigger();
+				model.alarmcfg_id = rs.getLong("alarmcfg_id");
+				model.data_id = rs.getLong("data_id");
+				model.account_id = rs.getLong("account_id");
+				model.device_id = rs.getLong("device_id");
+				model.name = rs.getString("name");
+				model.addr = rs.getString("addr");
+				model.addr_type = rs.getInt("addr_type");
+				model.text = rs.getString("text");
+				model.state = rs.getInt("state");
+				model.rid = rs.getString("rid");
+				model.plc_id = rs.getLong("plc_id");
+				model.data_limit=rs.getString("data_limit");
+				model.bind_state = rs.getInt("bind_state");
+				model.condition_type = rs.getInt("condition_type");
+				model.create_date = rs.getTimestamp("create_date");
+				model.update_date = rs.getTimestamp("update_date");
+
+				return model;
+			}
+
+		});
+		page.setList(list);
+		return page;
 	}
 
 	@Override
@@ -276,6 +337,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			model.addr_type = rs.getInt("addr_type");
 			model.text = rs.getString("text");
 			model.state = rs.getInt("state");
+			model.data_limit=rs.getString("data_limit");
 			model.condition_type = rs.getInt("condition_type");
 			model.create_date = rs.getTimestamp("create_date");
 			model.update_date = rs.getTimestamp("update_date");
@@ -360,4 +422,6 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 		}
 		return true;
 	}
+
+	
 }
