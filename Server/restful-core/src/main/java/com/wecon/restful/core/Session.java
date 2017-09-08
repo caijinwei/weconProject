@@ -21,6 +21,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.restful.authotiry.RightsHelper;
 import com.wecon.restful.test.TestBase;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.http.server.ServletServerHttpResponse;
 
 /**
  * 请求会话
@@ -97,6 +101,56 @@ public class Session {
                 client.reqid = System.currentTimeMillis() + "";
             }
             request.setAttribute("reqid", this.client.reqid);
+        }
+    }
+
+    /**
+     * 为websocket做验证
+     *
+     * @param serverHttpRequest
+     * @param serverHttpResponse
+     * @throws IOException
+     */
+    public Session(ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse) throws IOException {
+        ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) serverHttpRequest;
+        this.request = servletRequest.getServletRequest();
+        ServletServerHttpResponse servletResponse = (ServletServerHttpResponse) serverHttpResponse;
+        this.response = servletResponse.getServletResponse();
+
+        fillParamWs();
+        client = new Client();
+        client.init(this);
+
+        String customSignKeyName = Config.getCustomSignKeyNameFrom() == null ? null : this.getString(Config.getCustomSignKeyNameFrom());
+        this.authWs(client, Config.getSignKeyV1(customSignKeyName));
+
+    }
+
+    private void fillParamWs() {
+        params.putAll(request.getParameterMap());
+    }
+
+    private void authWs(Client client, String key) throws IOException {
+        //强制websocket必须要登陆状态才能使用
+        if (client.userId <= 0) {
+            logger.debug("session timeout");
+            throw new IllegalArgumentException("session timeout");
+//            throw new SessionInvalidException("session timeout");
+        }
+        // 延长session时间
+        else {
+            SessionManager.expireSid(client.sid, 3600 * 12);// * 24 * 30
+        }
+
+        try {
+            String serverSign = this.sign(key, this.params);
+            String clientSign = client.sign;
+            if (!serverSign.equals(clientSign)) {
+                logger.debug("sign error");
+                throw new SignErrorException("sign error");
+            }
+        } catch (Throwable e) {
+            throw e;
         }
     }
 
