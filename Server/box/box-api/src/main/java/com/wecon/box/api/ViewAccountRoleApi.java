@@ -113,4 +113,8 @@ public interface ViewAccountRoleApi {
 	* 解绑盒子  删除盒子下的视图
 	* */
 	public void deleteViewAccountRoleByCfgId(final List<Integer> cfgIds,final Integer type);
+	/*
+	* 根据视图账户ID  监控点ID  监控点类型 获取ViewAccountRoleView
+	* */
+	public ViewAccountRole findViewAccountRoleById(long accId,Integer cfgType);
 }
