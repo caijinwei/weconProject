@@ -222,6 +222,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             } else {
                 $selecedView.hide();
             }
+            return;
         }
         $scope.manager_id = manager_id;
         var params = {
@@ -231,7 +232,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             if (code == 200) {
                 var viewAccountList = [];
                 var accountRels = data.list;
-                var allUser = $scope.pushlist;
+                var allUser = data.allList;
                 $.each(accountRels, function (name, value) {
                     //console.log(value.view_id);
                     $.each(allUser, function () {

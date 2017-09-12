@@ -334,11 +334,17 @@ public class AccountImpl implements AccountApi {
     }
 
     @Override
-    public void updatePwd(long accountId,String pwd) {
-        String sql="UPDATE account a SET a.`password`=?,a.secret_key=?,a.update_date=CURRENT_TIMESTAMP() WHERE account_id=? ";
+    public void updatePwd(long accountId, String pwd) {
+        String sql = "UPDATE account a SET a.`password`=?,a.secret_key=?,a.update_date=CURRENT_TIMESTAMP() WHERE account_id=? ";
         String secret_key = DigestUtils.md5Hex(UUID.randomUUID().toString());
-        String newPwd = DigestUtils.md5Hex(pwd+secret_key);
-        jdbcTemplate.update(sql,new Object[]{newPwd,secret_key,accountId});
+        String newPwd = DigestUtils.md5Hex(pwd + secret_key);
+        jdbcTemplate.update(sql, new Object[]{newPwd, secret_key, accountId});
+    }
+
+    @Override
+    public List<Account> getAllAccounts() {
+        String sql = "SELECT "+SEL_COL+" FROM account where 1=1";
+        return jdbcTemplate.query(sql, new DefaultAccountRowMapper());
     }
 
     public static final class DefaultAccountRowMapper implements RowMapper<Account> {

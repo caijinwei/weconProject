@@ -478,5 +478,43 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         });
     };
 
+    //--------------------------------------------------------------------debugInfo上报调试信息-------------------------------------------------------------------------------------------------------------------------------
+    var ws;
+    $scope.ws_connect = function () {
+        if ("WebSocket" in window) {
+            ws = new WebSocket(T.common.requestUrl['WeconBoxWs'] + '/debugInfo-websocket/websocket/pibox/cts/'+$scope.infoData.machine_code+'/logs' + T.common.websocket.getParams());
+            ws.onopen = function () {
+                $scope.ws_log('>>>open');
+            };
+            ws.onmessage = function (evt) {
+                $scope.ws_log('server message ->' + evt.data);
+                console.log(evt);
+            };
+            ws.onclose = function (evt) {
+                $scope.ws_log('>>>close' + " ");
+                console.log(evt);
+            };
+            ws.onerror = function (evt) {
+                $scope.ws_log('>>>error' + " " + evt.data);
+                console.log(evt);
+            };
+        } else {
+            alert("WebSocket isn't supported by your Browser!");
+        }
+    }
+    $scope.ws_send = function () {
+        ws.send($("#wsMsg").val());
+        $scope.ws_log('client message ->' + $("#wsMsg").val());
+    }
+    $scope.ws_close = function () {
+        ws.close();
+    }
+    $scope.ws_log = function (data) {
+        $('#wsLog').prepend('<p>' + data + '</p>');
+    }
+    $scope.ws_clear = function () {
+        $("#wsLog").empty();
+        $scope.ws_log("Clear :)");
+    }
 });
 

@@ -24,7 +24,7 @@
     <ul class="nav nav-tabs" role="tablist" id="baseConfigTab">
         <li class="active"><a href="#base-info" data-toggle="tab">基本信息</a></li>
         <li><a href="#com-port" data-toggle="tab" ng-click="initPlcSetting()">通讯口配置</a></li>
-        <!--<li><a href="#entry-statistic" data-toggle="tab">条目统计</a></li>-->
+        <li><a href="#debugInfo" data-toggle="tab" >调试信息</a></li>
     </ul>
     <div class="tab-content">
         <div class="tab-pane active" id="base-info">
@@ -493,6 +493,39 @@
                 </div>
             </div>
         </div>
+        <!------------------------------------------------------------------------------------------------调试信息接收------------------------------------------------------------------------------------------------------------------------------>
+        <div class="tab-pane" id="debugInfo">
+            <div class="row form-group">
+                <label class="col-xs-2 col-sm-2 col-md-2 control-label">发送消息</label>
+
+                <div class="col-xs-9 col-sm-9 col-md-9">
+                    <input type="text" class="form-control" id="wsMsg" placeholder="发送消息">
+                </div>
+            </div>
+            <div class="row form-group">
+                <label class="col-xs-2 col-sm-2 col-md-2 control-label">使用H5 Websocket</label>
+
+                <div class="col-xs-9 col-sm-9 col-md-9">
+                    <button type="button" class="btn btn-primary" ng-click="ws_connect();">连接</button>
+                    <button type="button" class="btn btn-primary" ng-click="ws_send();">发送消息</button>
+                    <button type="button" class="btn btn-primary" ng-click="ws_close();">关闭</button>
+                </div>
+            </div>
+
+            <div class="row form-group">
+                <label class="col-xs-2 col-sm-2 col-md-2 control-label"></label>
+                <div class="col-xs-9 col-sm-9 col-md-9">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <span class="label label-info">日志</span>
+                            <span class="label label-danger"><a id="clear" ng-click="ws_clear();">Clear</a></span>
+                        </div>
+                        <div class="panel-body" id="wsLog"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 <script src="../lib/jquery/jquery-3.2.1.min.js"></script>
