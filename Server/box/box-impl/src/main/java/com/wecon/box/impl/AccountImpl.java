@@ -174,7 +174,7 @@ public class AccountImpl implements AccountApi {
             throw new BusinessException(ErrorCodeOption.AccountNotExisted.key, ErrorCodeOption.AccountNotExisted.value);
         }
         String pwd = DigestUtils.md5Hex(oldpwd + model.secret_key);
-        if (!pwd.equals(model.password)) {
+        if (oldpwd != "" && !pwd.equals(model.password)) {
             throw new BusinessException(ErrorCodeOption.OldPwdError.key, ErrorCodeOption.OldPwdError.value);
         }
         pwd = DigestUtils.md5Hex(newpwd + model.secret_key);
@@ -334,11 +334,11 @@ public class AccountImpl implements AccountApi {
     }
 
     @Override
-    public void updatePwd(long accountId,String pwd) {
-        String sql="UPDATE account a SET a.`password`=?,a.secret_key=?,a.update_date=CURRENT_TIMESTAMP() WHERE account_id=? ";
+    public void updatePwd(long accountId, String pwd) {
+        String sql = "UPDATE account a SET a.`password`=?,a.secret_key=?,a.update_date=CURRENT_TIMESTAMP() WHERE account_id=? ";
         String secret_key = DigestUtils.md5Hex(UUID.randomUUID().toString());
-        String newPwd = DigestUtils.md5Hex(pwd+secret_key);
-        jdbcTemplate.update(sql,new Object[]{newPwd,secret_key,accountId});
+        String newPwd = DigestUtils.md5Hex(pwd + secret_key);
+        jdbcTemplate.update(sql, new Object[]{newPwd, secret_key, accountId});
     }
 
     public static final class DefaultAccountRowMapper implements RowMapper<Account> {

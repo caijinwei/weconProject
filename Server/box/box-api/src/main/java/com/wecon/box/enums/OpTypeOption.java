@@ -19,6 +19,7 @@ public enum OpTypeOption implements EnumVal {
     AddViewUser("新增视图帐号", 108),
     UpdViewUser("修改视图帐号", 109),
     SetUserState("修改账户状态",110),
+    FindPwd("找回密码", 111),
 
     //分组操作
     AddDir("新增分组", 200),

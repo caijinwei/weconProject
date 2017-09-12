@@ -121,7 +121,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     var ws;
     $scope.ws_connect2 = function () {
         if ("WebSocket" in window) {
-
             ws = new WebSocket(T.common.requestUrl['WeconBoxWs'] + 'actdata-websocket/websocket?' + T.common.websocket.getParams());
             ws.onopen = function () {
                 $scope.ws_log('>>>open');
