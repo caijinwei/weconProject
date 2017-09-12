@@ -3,13 +3,12 @@ package com.wecon.box.action.user;
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.entity.Account;
 import com.wecon.box.entity.Page;
-import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
 import com.wecon.box.filter.AccountFilter;
+import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
-import com.wecon.restful.core.BusinessException;
 import com.wecon.restful.core.Output;
 import com.wecon.restful.doc.Label;
 import org.hibernate.validator.constraints.Length;
@@ -78,6 +77,31 @@ public class ViewUserAction extends UserBaseAction {
         data.put("page", page);
         return new Output(data);
     }
+
+
+    @Label("超管用户修改用户密码或状态")
+    @RequestMapping("user/chgInfo")
+    @WebApi(forceAuth = true, master = true, authority = {"0"})
+    public Output chgAccountInfo(@RequestParam("account_id") long accountId, @RequestParam("state") Integer state, @RequestParam("password") String password) {
+        Account oldAcc = accountApi.getAccount(accountId);
+        Account newAcc = accountApi.getAccount(accountId);
+        if (CommonUtils.isNotNull(password)&&!password.equals("")) {
+            newAcc.password = password;
+            accountApi.updatePwd(accountId, password);
+            //<editor-fold desc="操作日志">
+            dbLogUtil.updOperateLog(OpTypeOption.ChgPwd, ResTypeOption.Account, accountId, oldAcc, newAcc);
+            //</editor-fold>
+        } else if (state != null) {
+            newAcc.state = state;
+            accountApi.updateAccountState(newAcc);
+            //<editor-fold desc="操作日志">
+            dbLogUtil.updOperateLog(OpTypeOption.SetUserState, ResTypeOption.Account, accountId, oldAcc, newAcc);
+            //</editor-fold>
+        }
+        return new Output();
+    }
+
+
 }
 
 class ViewUserCreateParam {

@@ -18,6 +18,7 @@ public enum OpTypeOption implements EnumVal {
     ChgPhone("修改手机号码", 107),
     AddViewUser("新增视图帐号", 108),
     UpdViewUser("修改视图帐号", 109),
+    SetUserState("修改账户状态",110),
 
     //分组操作
     AddDir("新增分组", 200),

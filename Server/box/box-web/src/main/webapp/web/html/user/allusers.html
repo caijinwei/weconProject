@@ -71,26 +71,105 @@
                 <th>用户名</th>
                 <th>手机号</th>
                 <th>邮箱号</th>
+                <td>账户密码</td>
                 <th>帐号类型</th>
                 <th>启用状态</th>
                 <th>创建时间</th>
             </tr>
             </thead>
-            <tbody>
-            <tr ng-repeat="x in pushlist" change-color>
+            <tbody ng-repeat="x in pushlist">
+            <tr change-color>
                 <td>{{x.account_id}}</td>
                 <td>{{x.username}}</td>
                 <td>{{x.phonenum}}</td>
                 <td>{{x.email}}</td>
-                <td>{{x.type==1?'管理者帐号':(x.type==2?'视图帐号':((x.type==0?'超管帐号':x.type)))}}</td>
-                <td>
+                <td ng-click="chgPwd(x.account_id,x.username)">{{x.password}}</td>
+                <td ng-click="getAccountRelationByManagerAccId(x.account_id,x.type)">
+                    {{x.type==1?'管理者帐号':(x.type==2?'视图帐号':((x.type==0?'超管帐号':x.type)))}}
+                </td>
+                <td ng-click="chgState(x.account_id,x.username,x.state)">
                     <div class="{{x.state?'glyphicon glyphicon-ok':'glyphicon glyphicon-remove'}}"></div>
                 </td>
                 <td>{{x.create_date|date:'yyyy-MM-dd HH:mm:ss'}}</td>
             </tr>
+
+            <!-- 视图账户-->
+            <div class="viewShow" >
+                <tr name="manager_{{x.account_id}}" ng-if="manager_id==x.account_id" style="color: #5bc0de" ng-repeat="y in viewAccountList"
+                    change-color>
+                    <td>{{y.account_id}}</td>
+                    <td>{{y.username}}</td>
+                    <td>{{y.phonenum}}</td>
+                    <td>{{y.email}}</td>
+                    <td ng-click="chgPwd(x.account_id,x.username)">{{x.password}}</td>
+                    <td ng-click="getAccountRelationByManagerAccId(x.account_id,x.type)">
+                        {{y.type==1?'管理者帐号':(y.type==2?'视图帐号':((y.type==0?'超管帐号':y.type)))}}
+                    </td>
+                    <td ng-click="chgState(y.account_id,y.username,y.state)">
+                        <div class="{{y.state?'glyphicon glyphicon-ok':'glyphicon glyphicon-remove'}}"></div>
+                    </td>
+                    <td>{{y.create_date|date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                </tr>
+            </div>
             </tbody>
         </table>
         <tm-pagination conf="paginationConf"></tm-pagination>
+    </div>
+
+    <!-- 弹出修改密码窗口 -->
+    <div class="modal fade" id="newWinModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">重置用户:{{selecetedUsername}}密码</h4>
+                </div>
+
+                <div class="modal-body" style="word-wrap: break-word;">
+                    <div class="row">
+                        <div class="col-md-1">新密码</div>
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" id="newPwdInput" placeholder="请输入新密码">
+                        </div>
+                        <div class="col-md-1"><span style="color: red">*</span></div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="chgPwdSubmit()">确定
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--弹出修改用户状态窗口-->
+    <div class="modal" tabindex="-1" id="chgAccountState"
+         data-backdrop="false">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                    <h4 class="modal-title">用户账户修改启用状态</h4>
+                </div>
+                <div class="modal-body">
+                    <span>确定将用户:{{selecetedUsername}}设置为 {{selecetedState==0?'启用':'禁止登入'}}</span>
+                </div>
+                <input id="stateInput" hidden value="{{selecetedState==0?'1':'0'}}">
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info"
+                            ng-click="chgStateSubmit()">确定
+                    </button>
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">取消
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
 

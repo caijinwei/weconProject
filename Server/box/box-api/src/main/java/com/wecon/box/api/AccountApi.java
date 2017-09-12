@@ -130,4 +130,10 @@ public interface AccountApi {
      * @return
      */
     boolean addViewAccount(long managerId, Account viewAccount);
+    /*
+    * 更新账户信息
+    * @param accountId
+    * @param pwd
+    * */
+    void updatePwd(long accountId,String pwd);
 }

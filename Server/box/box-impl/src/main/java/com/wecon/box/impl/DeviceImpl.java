@@ -414,11 +414,12 @@ public class DeviceImpl implements DeviceApi {
         Integer count = jdbcTemplate.queryForObject(sqlCount, argsCount, Integer.class);
         Page<DeviceDir> page = new Page<DeviceDir>(pageNum, pageSize, count);
         String sql = "SELECT  " +
-                "a.device_id,a.`name`,a.machine_code,a.`password`,a.dev_model,a.state,a.remark,a.create_date,c.username,c.account_id  " +
+                "a.device_id,a.`name`,a.machine_code,a.`password`,a.dev_model,a.state,a.remark,a.create_date,c.username,c.account_id,d.f_id,d.f_name,d.f_ver " +
                 "FROM  " +
                 "device a  " +
                 "LEFT JOIN dev_bind_user b ON a.device_id = b.device_id  " +
                 "LEFT JOIN account c ON b.account_id=c.account_id   " +
+                "LEFT JOIN dev_firm d ON a.device_id=d.device_id  "+
                 condition +
                 " order by a.device_id desc  LIMIT ?,?  ";
         if ((!accountId.equals("")) && (accountId != null)) {
@@ -443,6 +444,9 @@ public class DeviceImpl implements DeviceApi {
                 model.state = resultSet.getInt("state");
                 model.accountId = resultSet.getLong("account_id");
                 model.username = resultSet.getString("username");
+                model.fId=resultSet.getLong("f_id");
+                model.fName=resultSet.getString("f_name");
+                model.fVer=resultSet.getString("f_ver");
                 return model;
             }
         });

@@ -136,4 +136,121 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             location = "viewpointalarm.html?type=2&viewid=" + model.account_id + "&name=" + model.username;
         }
     }
-})
+    /*
+     * 修改账户密码
+     * */
+    $scope.chgPwd = function (id, name) {
+        $("#newWinModal").modal('show');
+        $("#newPwdInput").val("");
+        $scope.selectedAccountId = id;
+        $scope.selecetedUsername = name;
+    }
+    /*
+     * 修改用户信息密码
+     * */
+    $scope.chgPwdSubmit = function () {
+        var newPwdInput = $("#newPwdInput").val();
+        if (newPwdInput == undefined || newPwdInput == "") {
+            return;
+        }
+        newPwdInput = T.common.util.md5(newPwdInput);
+        var params = {
+            account_id: $scope.selectedAccountId,
+            password: newPwdInput,
+            state: ""
+        }
+        T.common.ajax.request("WeconBox", "user/chgInfo", params, function (data, code, msg) {
+            if (code == 200) {
+                $scope.getList($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+                $("#newWinModal").modal("hide");
+                alert("设置成功");
+            }
+            else {
+                alert(msg);
+                $("#loadingModal").modal("hide");
+            }
+        }, function () {
+            alert("ajax error");
+        });
+    }
+    /*
+     * 修改用户启用状态
+     * */
+    $scope.chgState = function (id, name, state) {
+        $("#chgAccountState").modal('show');
+        $scope.selectedAccountId = id;
+        $scope.selecetedUsername = name;
+        $scope.selecetedState = state;
+    }
+    $scope.chgStateSubmit = function () {
+        var state = $("#stateInput").val();
+        if (state == undefined || state == "") {
+            alert("修改状态失败");
+            return;
+        }
+        var params = {
+            account_id: $scope.selectedAccountId,
+            state: state,
+            password: ""
+        }
+        T.common.ajax.request("WeconBox", "user/chgInfo", params, function (data, code, msg) {
+            if (code == 200) {
+                $scope.getList($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+                $("#chgAccountState").modal("hide");
+                alert("设置成功");
+            }
+            else {
+                alert(msg);
+                $("#chgAccountState").modal("hide");
+            }
+        }, function () {
+            alert("ajax error");
+        });
+    }
+    /*
+     * 点击管理员账户 展示该账户下的所有视图账户
+     * */
+    $scope.getAccountRelationByManagerAccId = function (manager_id, type) {
+        if (type != '1') {
+            return;
+        }
+        if (manager_id == $scope.manager_id) {
+            var selecetedName = "manager_" + manager_id;
+            var $selecedView= $("tr[name=" + selecetedName + "]");
+            if ($selecedView.is(":hidden")) {
+                $selecedView.show();
+            } else {
+                $selecedView.hide();
+            }
+        }
+        $scope.manager_id = manager_id;
+        var params = {
+            manager_id: manager_id
+        }
+        T.common.ajax.request("WeconBox", "user/getViewIdsByManagerId", params, function (data, code, msg) {
+            if (code == 200) {
+                var viewAccountList = [];
+                var accountRels = data.list;
+                var allUser = $scope.pushlist;
+                $.each(accountRels, function (name, value) {
+                    //console.log(value.view_id);
+                    $.each(allUser, function () {
+                        if (this.account_id == value.view_id) {
+                            viewAccountList.push(this);
+                        }
+                    });
+                });
+                $scope.manager_id = manager_id;
+                $scope.viewAccountList = viewAccountList;
+                $("#viewShow" + manager_id).show();
+                $scope.$apply();
+            }
+            else {
+                alert(msg);
+                $("#chgAccountState").modal("hide");
+            }
+        }, function () {
+            alert("ajax error");
+        });
+    };
+});
