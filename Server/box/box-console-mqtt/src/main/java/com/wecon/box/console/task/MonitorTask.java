@@ -160,6 +160,11 @@ public class MonitorTask extends Thread {
 				System.out.println("act为空！");
 				return;
 			}
+			if (CommonUtils.isNullOrEmpty(jsonObject.getInteger("feedback"))) {
+				logger.info("feedback为空！");
+				System.out.println("feedback为空！");
+				return;
+			}
 			Integer act = jsonObject.getInteger("act");
 			DeviceApi deviceApi = SpringContextHolder.getBean(DeviceApi.class);
 			switch (act) {
@@ -222,22 +227,10 @@ public class MonitorTask extends Thread {
 						}
 					}
 				}
-				// 反馈成功信息
-				MqttMessage baseboxmessage = new MqttMessage();
-				JSONObject basejson = new JSONObject();
-				basejson.put("act", "1");
-				basejson.put("feedback_act", BASE_DATA);
-				basejson.put("machine_code", jsonObject.getString("machine_code"));
-				basejson.put("code", "1");
-				basejson.put("msg", "success");
-				baseboxmessage.setPayload(basejson.toString().getBytes());
-				baseboxmessage.setQos(2);
-				baseboxmessage.setRetained(true);
-				// 需要反馈盒子的主题
-				String baseboxtopic = "pibox/stc/" + jsonObject.getString("machine_code");
-				MqttTopic basemqtttopic = client.getTopic(baseboxtopic);
-				PublishTask basepublish = new PublishTask(basemqtttopic, baseboxmessage);
-				basepublish.start();
+				if (jsonObject.getInteger("feedback") == 1) {
+					SendMessage(machineCode, BASE_DATA);
+				}
+
 				break;
 			// 实时数据
 			case REAL_DATA:
@@ -287,6 +280,9 @@ public class MonitorTask extends Thread {
 					newModel.machine_code = jsonObject.getString("machine_code");
 					redisPiBoxApi.saveRedisPiBoxActData(newModel);
 					System.out.println("redis add success");
+				}
+				if (jsonObject.getInteger("feedback") == 1) {
+					SendMessage(machineCode, REAL_DATA);
 				}
 
 				break;
@@ -352,6 +348,9 @@ public class MonitorTask extends Thread {
 					}
 
 				}
+				if (jsonObject.getInteger("feedback") == 1) {
+					SendMessage(machineCode, HISTORY_DATA);
+				}
 
 				break;
 			// 报警数据
@@ -406,23 +405,10 @@ public class MonitorTask extends Thread {
 							// 批量保存报警数据成功
 							alarmCfgDataApi.saveAlarmCfgData(listInsertAlarmCfgData);
 							System.out.println("alarmCfgData add success !");
-							// 反馈成功消息给盒子
-							MqttMessage boxmessage = new MqttMessage();
-							JSONObject json = new JSONObject();
-							json.put("act", "1");
-							json.put("feedback_act", ALARM_DATA);
-							json.put("machine_code", jsonObject.getString("machine_code"));
-							json.put("code", "1");
-							json.put("msg", "success");
-							System.out.println("报警反馈==" + json.toJSONString());
-							boxmessage.setPayload(json.toString().getBytes());
-							boxmessage.setQos(2);
-							boxmessage.setRetained(true);
-							// 需要反馈盒子的主题
-							String boxtopic = "pibox/stc/" + jsonObject.getString("machine_code");
-							MqttTopic mqtttopic = client.getTopic(boxtopic);
-							PublishTask publish = new PublishTask(mqtttopic, boxmessage);
-							publish.start();
+							if (jsonObject.getInteger("feedback") == 1) {
+								SendMessage(machineCode, ALARM_DATA);
+							}
+
 						} catch (Exception e) {
 							logger.info("报警数据批量保存失败");
 							System.out.println("报警数据批量保存失败");
@@ -458,6 +444,26 @@ public class MonitorTask extends Thread {
 			}
 
 		}
+
+	}
+
+	public void SendMessage(String machineCode, int code) {
+		// 反馈成功信息
+		MqttMessage message = new MqttMessage();
+		JSONObject json = new JSONObject();
+		json.put("act", "1");
+		json.put("feedback_act", code);
+		json.put("machine_code", machineCode);
+		json.put("code", "1");
+		json.put("msg", "success");
+		message.setPayload(json.toString().getBytes());
+		message.setQos(2);
+		message.setRetained(true);
+		// 需要反馈盒子的主题
+		String topic = "pibox/stc/" + machineCode;
+		MqttTopic mqtttopic = client.getTopic(topic);
+		PublishTask publish = new PublishTask(mqtttopic, message);
+		publish.start();
 
 	}
 }

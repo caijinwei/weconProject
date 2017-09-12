@@ -48,7 +48,7 @@ public class HisDataAction {
 
 		Client client = AppContext.getSession().client;
 		JSONObject json = new JSONObject();
-		// 获取实时数据配置信息
+		// 获取历史数据配置信息
 		RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
 		List<RealHisCfgDevice> realHisCfgDeviceList = null;
 		if (client.userInfo.getUserType() == 1) {
@@ -136,6 +136,7 @@ public class HisDataAction {
 			realHisCfgFilter.data_type = 1;
 			realHisCfgFilter.his_cycle = -1;
 			realHisCfgFilter.state = -1;
+			realHisCfgFilter.bind_state=1;
 
 			realHisCfgFilter.account_id = client.userId;
 			if (!CommonUtils.isNullOrEmpty(device_id)) {

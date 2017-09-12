@@ -18,7 +18,6 @@ import java.util.TimerTask;
 /**
  * Created by zengzhipeng on 2017/8/22.
  */
-@RestController
 public class ActDataHandler extends AbstractWebSocketHandler {
     private static final Logger logger = LogManager.getLogger(ActDataHandler.class.getName());
     private Timer timer;
@@ -31,12 +30,14 @@ public class ActDataHandler extends AbstractWebSocketHandler {
      * @throws Exception
      */
     @Override
-    @WebApi(forceAuth = true, master = true)
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String msg = message.getPayload();
         logger.debug("Server received message: " + msg);
         session.sendMessage(new TextMessage("Server received message: " + msg));
         if (msg.equals("time")) {
+            if (this.timer != null) {
+                this.timer.cancel();
+            }
             timer = new Timer(true);
             long delay = 0;
             OrderTimeTask orderTimeTask = new OrderTimeTask(session, msg, timer);
@@ -51,7 +52,6 @@ public class ActDataHandler extends AbstractWebSocketHandler {
      * @throws Exception
      */
     @Override
-    @WebApi(forceAuth = true, master = true)
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         logger.debug("连接成功");
         session.sendMessage(new TextMessage("连接成功"));
@@ -96,6 +96,6 @@ public class ActDataHandler extends AbstractWebSocketHandler {
             this.timer.cancel();
             logger.debug("timer cancel");
         }
-        System.out.println("关闭连接");
+        logger.debug("关闭连接");
     }
 }

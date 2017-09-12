@@ -16,6 +16,7 @@ public class RealHisCfgFilter {
 	public int his_cycle;// 历史数据采集周期
 	public int data_type;// 0：实时数据 1：历史数据
 	public int state;// 状态:1-启用; 0-未启用
+	public int bind_state;// 1.绑定状态 0.解绑状态'
 	public long device_id;
 	public String rid;// 寄存器类型
 	public long dirId;// 分组id

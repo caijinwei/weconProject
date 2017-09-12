@@ -85,8 +85,12 @@
         </property>
     </bean>
 
-    <websocket:handlers>
+    <websocket:handlers allowed-origins="*">
         <websocket:mapping handler="actDataHandler" path="/actdata-websocket" />
+        <websocket:handshake-interceptors>
+            <bean class="com.wecon.restful.core.WsHandShakeInterceptor"/>
+        </websocket:handshake-interceptors>
+
         <websocket:sockjs />
     </websocket:handlers>
     <bean id="actDataHandler"

@@ -53,7 +53,9 @@ public enum OpTypeOption implements EnumVal {
     //报警监控点
     AddAlarm("新增报警数据配置", 800),
     UpdAlarm("修改报警数据配置", 801),
-    DelAlarm("删除报警数据配置", 802);
+    DelAlarm("删除报警数据配置", 802),
+    ConFirmAlarmData("确认报警数据", 803);
+	
 
     private String key;
 

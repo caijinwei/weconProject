@@ -150,6 +150,7 @@ public class ActDataAction {
 			realHisCfgFilter.data_type = 0;
 			realHisCfgFilter.his_cycle = -1;
 			realHisCfgFilter.state = -1;
+			realHisCfgFilter.bind_state=1;
 
 			realHisCfgFilter.account_id = client.userId;
 
@@ -246,6 +247,7 @@ public class ActDataAction {
 	@RequestMapping(value = "/putMess")
 	public Output putMQTTMess(@RequestParam("value") String value, @RequestParam("addr_id") String addr_id)
 			throws MqttException {
+		JSONObject json = new JSONObject();
 		ServerMqtt server = new ServerMqtt();
 		server.message = new MqttMessage();
 		server.message.setQos(1);
@@ -254,6 +256,10 @@ public class ActDataAction {
 			RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(addr_id));
 			if (realHisCfg != null) {
 				Device device = deviceApi.getDevice(realHisCfg.device_id);
+				if(device.state==0){//盒子离线，不进行下发
+					json.put("resultData", 0);
+					return new Output(json);
+				}
 				if (device != null) {
 					PiBoxComAddr addr1 = new PiBoxComAddr();
 					addr1.addr_id = addr_id;
@@ -286,8 +292,8 @@ public class ActDataAction {
 			}
 
 		}
-
-		return new Output();
+		json.put("resultData", 1);
+		return new Output(json);
 	}
 
 	/**
@@ -420,6 +426,7 @@ public class ActDataAction {
 			realHisCfgFilter.data_type = 0;
 			realHisCfgFilter.his_cycle = -1;
 			realHisCfgFilter.state = -1;
+			realHisCfgFilter.bind_state=1;
 
 			realHisCfgFilter.account_id = client.userId;
 			if (!CommonUtils.isNullOrEmpty(device_id)) {

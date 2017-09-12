@@ -190,9 +190,9 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	 */
 	@Override
 	public Page<RealHisCfgDevice> getRealHisCfg(RealHisCfgFilter filter, int pageIndex, int pageSize) {
-		String sqlCount = "select count(0) from  device d,real_his_cfg r where 1=1 and d.`device_id`=r.device_id and r.bind_state=1 ";
+		String sqlCount = "select count(0) from  device d,real_his_cfg r where 1=1 and d.`device_id`=r.device_id ";
 		String sql = "select " + SEL_COL + ",d.machine_code"
-				+ " from  device d,real_his_cfg r where 1=1 and d.`device_id`=r.device_id and r.bind_state=1 ";
+				+ " from  device d,real_his_cfg r where 1=1 and d.`device_id`=r.device_id";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
 		if (filter.id > 0) {
@@ -244,6 +244,10 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		if (filter.his_cycle > -1) {
 			condition.append(" and r.his_cycle = ? ");
 			params.add(filter.his_cycle);
+		}
+		if (filter.bind_state > -1) {
+			condition.append(" and r.bind_state = ? ");
+			params.add(filter.bind_state);
 		}
 		if (filter.data_type > -1) {
 			condition.append(" and r.data_type = ? ");
@@ -327,9 +331,9 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 	@Override
 	public Page<RealHisCfgDevice> getRealHisCfgList(RealHisCfgFilter filter, int pageIndex, int pageSize) {
-		String sqlCount = "select count(0) from account_dir ad,account_dir_rel adr ,real_his_cfg  r,plc_info pli,device d where 1=1 and  ad.`id`=adr.`acc_dir_id` and pli.`plc_id`=r.`plc_id` and pli.`device_id`=d.`device_id` and r.`id`=adr.`ref_id` and ad.`account_id`=r.`account_id`and r.bind_state=1";
+		String sqlCount = "select count(0) from account_dir ad,account_dir_rel adr ,real_his_cfg  r,plc_info pli,device d where 1=1 and  ad.`id`=adr.`acc_dir_id` and pli.`plc_id`=r.`plc_id` and pli.`device_id`=d.`device_id` and r.`id`=adr.`ref_id` and ad.`account_id`=r.`account_id`";
 		String sql = "select " + SEL_COL + ",d.machine_code,adr.ref_alais"
-				+ " from account_dir ad,account_dir_rel adr ,real_his_cfg  r,plc_info pli,device d where 1=1 and  ad.`id`=adr.`acc_dir_id` and pli.`plc_id`=r.`plc_id` and pli.`device_id`=d.`device_id` and r.`id`=adr.`ref_id` and ad.`account_id`=r.`account_id`and r.bind_state=1";
+				+ " from account_dir ad,account_dir_rel adr ,real_his_cfg  r,plc_info pli,device d where 1=1 and  ad.`id`=adr.`acc_dir_id` and pli.`plc_id`=r.`plc_id` and pli.`device_id`=d.`device_id` and r.`id`=adr.`ref_id` and ad.`account_id`=r.`account_id`";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
 		if (filter.id > 0) {
@@ -394,6 +398,11 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			condition.append(" and r.state = ? ");
 			params.add(filter.state);
 
+		}
+		if (filter.bind_state > -1) {
+			condition.append(" and r.bind_state = ? ");
+			params.add(filter.bind_state);
+			
 		}
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
@@ -810,5 +819,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		return true;
 
 	}
+
+	
 
 }

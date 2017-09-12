@@ -1,7 +1,6 @@
 package com.wecon.box.action.data;
 
 import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -168,8 +167,8 @@ public class AlarmDataAction {
 			json.put("listalrmCfgTrigger", listalrmCfgTrigger);
 			return new Output(json);
 		}
-		listalrmCfgTrigger = alarmCfgApi.getRealHisCfgDataList(account_id, Long.parseLong(group_id),
-				Long.parseLong(device_id), pageIndex, pageSize);
+		listalrmCfgTrigger = alarmCfgApi.getAlarmCfgDataList(account_id, Long.parseLong(group_id),
+				Long.parseLong(device_id),1, pageIndex, pageSize);
 		if (listalrmCfgTrigger.getList().size() > 0) {
 			for (int i = 0; i < listalrmCfgTrigger.getList().size(); i++) {
 				AlarmCfgTrigger alarmCfgTrigger = listalrmCfgTrigger.getList().get(i);
@@ -437,6 +436,7 @@ public class AlarmDataAction {
 			if (alarmCfgData != null) {
 				alarmCfgData.state = 2;// 已确认状态
 				alarmCfgDataApi.updateAlarmCfgData(alarmCfgData);
+				dbLogUtil.addOperateLog(OpTypeOption.ConFirmAlarmData, ResTypeOption.Alarm, alarmCfgData.alarm_cfg_id, alarmCfgData);
 				
 			}
 
