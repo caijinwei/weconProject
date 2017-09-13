@@ -394,5 +394,4 @@ class BusinessDataParam {
     public void setType(int type) {
         this.type = type;
     }
-
 }
