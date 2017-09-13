@@ -433,7 +433,7 @@ public class RedisManager {
      * @param jedisPubSub
      * @param channel
      */
-    public static void subscribe(String group, JedisPubSub jedisPubSub, String channel) {
+    public static void subscribe(String group, JedisPubSub jedisPubSub, String[] channel) {
         Jedis jedis = null;
         try {
             jedis = getJedis(group);
