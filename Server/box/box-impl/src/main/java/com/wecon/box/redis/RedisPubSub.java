@@ -21,6 +21,7 @@ public class RedisPubSub {
     public RedisPubSub(String host){
         jedisPool = new JedisPool(new JedisPoolConfig(), host);
     }
+
     public RedisPubSub(String host, int port){
         jedisPool = new JedisPool(new JedisPoolConfig(), host, port);
     }

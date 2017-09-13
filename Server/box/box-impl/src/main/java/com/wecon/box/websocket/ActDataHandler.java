@@ -6,9 +6,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.wecon.box.api.RealHisCfgApi;
 import com.wecon.box.api.RedisPiBoxApi;
+import com.wecon.box.constant.ConstKey;
 import com.wecon.box.entity.*;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
+import com.wecon.common.redis.RedisManager;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.Client;
@@ -19,10 +21,12 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
+import redis.clients.jedis.JedisPubSub;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by zengzhipeng on 2017/8/22.
@@ -32,8 +36,16 @@ public class ActDataHandler extends AbstractWebSocketHandler {
     private RedisPiBoxApi redisPiBoxApi;
     @Autowired
     private RealHisCfgApi realHisCfgApi;
+
+    private String params;
+
+    private Set<String> machineCodeSet;
+
+    private WebSocketSession session;
+
+    private SubscribeListener subscribeListener;
+
     private static final Logger logger = LogManager.getLogger(ActDataHandler.class.getName());
-    private Timer timer;
 
     /**
      * 收到消息
@@ -44,13 +56,61 @@ public class ActDataHandler extends AbstractWebSocketHandler {
      */
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        String msg = message.getPayload();
-        logger.debug("Server received message: " + msg);
-        if(CommonUtils.isNullOrEmpty(msg)){
+        this.session = session;
+        this.params = message.getPayload();
+        logger.debug("Server received message: " + params);
+        if(CommonUtils.isNullOrEmpty(params)){
             return;
         }
+        //推送消息给移动端
+
+        logger.debug("WebSocket push begin");
+        session.sendMessage(new TextMessage(getStringRealData()));
+        logger.debug("WebSocket push end");
+
+        //订阅redis消息
+        if(null != machineCodeSet && null == subscribeListener){
+            subscribeRealData();
+        }
+    }
+
+    /**
+     * 订阅redis消息
+     */
+    private void subscribeRealData(){
+        subscribeListener = new SubscribeListener();
+        ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+        cachedThreadPool.execute(new Runnable() {
+            public void run() {
+                logger.debug("Redis begin subscribe realData");
+                String[] machineCodeArray = new String[machineCodeSet.size()];
+                int i = 0;
+                for(String machineCode : machineCodeSet){
+                    machineCodeArray[i++] = machineCode;
+                }
+                RedisManager.subscribe(ConstKey.REDIS_GROUP_NAME, subscribeListener, machineCodeArray);
+            }
+        });
+    }
+
+    class SubscribeListener extends JedisPubSub{
+        @Override
+        public void onMessage(String channel, String message) {
+            logger.debug("Subscribe callback，channel："+channel +"message:"+message);
+            if(!CommonUtils.isNullOrEmpty(message)){
+                try {
+                    session.sendMessage(new TextMessage(getStringRealData()));
+                }catch (IOException e){
+                    e.printStackTrace();
+                    logger.debug("Subscribe callback error，"+e.getMessage());
+                }
+            }
+        }
+    }
+
+    private String getStringRealData(){
         try {
-            Map<String, Object> bParams = JSON.parseObject(msg, new TypeReference<Map<String, Object>>(){});
+            Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>(){});
             Client client = AppContext.getSession().client;
             RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
             Page<RealHisCfgDevice> realHisCfgDevicePage = null;
@@ -81,12 +141,13 @@ public class ActDataHandler extends AbstractWebSocketHandler {
             JSONArray arr = new JSONArray();
 
             if (realHisCfgDeviceList == null || realHisCfgDeviceList.size() < 1) {
-                session.sendMessage(new TextMessage(json.toJSONString()));
-                return;
+                return null;
             }
+            machineCodeSet = new HashSet<>();
             for (int i = 0; i < realHisCfgDeviceList.size(); i++) {
                 RealHisCfgDevice realHisCfgDevice = realHisCfgDeviceList.get(i);
                 String device_machine = realHisCfgDevice.machine_code;
+                machineCodeSet.add(device_machine);
                 // 通过机器码去redis中获取数据
                 RedisPiBoxActData redisPiBoxActData = redisPiBoxApi.getRedisPiBoxActData(device_machine);
                 List<PiBoxCom> actTimeDataList = null == redisPiBoxActData ? null : redisPiBoxActData.act_time_data_list;
@@ -114,9 +175,12 @@ public class ActDataHandler extends AbstractWebSocketHandler {
                 arr.add(data);
             }
             json.put("list", arr);
-            session.sendMessage(new TextMessage(json.toJSONString()));
+            logger.debug("Websocket push msg: " + json.toJSONString());
+            return json.toJSONString();
         }catch (Exception e){
-            session.sendMessage(new TextMessage("服务器错误"));
+            logger.debug("Server error，"+e.getMessage());
+            e.printStackTrace();
+            return "服务器错误";
         }
     }
 
@@ -129,33 +193,6 @@ public class ActDataHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         logger.debug("连接成功");
-        //session.sendMessage(new TextMessage("连接成功"));
-    }
-
-    class OrderTimeTask extends TimerTask {
-        private WebSocketSession session;
-        private String msg;
-        private Timer timer;
-
-        public OrderTimeTask(WebSocketSession session, String msg, Timer timer) {
-            this.session = session;
-            this.msg = msg;
-            this.timer = timer;
-        }
-
-        public void run() {
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String msgtime = "3秒报时：" + df.format(new Date());
-            try {
-                if (session == null || !session.isOpen()) {
-                    this.timer.cancel();
-                }
-                System.out.println(msgtime);
-                session.sendMessage(new TextMessage(msgtime));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     /**
@@ -167,10 +204,9 @@ public class ActDataHandler extends AbstractWebSocketHandler {
      */
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        if (this.timer != null) {
-            this.timer.cancel();
-            logger.debug("timer cancel");
-        }
         logger.debug("关闭连接");
+        //取消订阅
+        subscribeListener.unsubscribe();
+        logger.debug("Redis取消订阅成功");
     }
 }
