@@ -58,7 +58,6 @@ public class ActDataHandler extends AbstractWebSocketHandler {
      */
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        this.session = session;
         this.params = message.getPayload();
         logger.debug("Server received message: " + params);
         if (CommonUtils.isNullOrEmpty(params)) {
@@ -114,9 +113,6 @@ public class ActDataHandler extends AbstractWebSocketHandler {
         try {
             Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {
             });
-            if (client == null) {
-                client = AppContext.getSession().client;
-            }
             RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
             Page<RealHisCfgDevice> realHisCfgDevicePage = null;
             int pageIndex = 1;
@@ -198,6 +194,10 @@ public class ActDataHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         logger.debug("连接成功");
+        this.session = session;
+        if (client == null) {
+            client = AppContext.getSession().client;
+        }
     }
 
     /**
