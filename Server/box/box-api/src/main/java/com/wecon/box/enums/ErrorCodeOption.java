@@ -50,6 +50,7 @@ public enum ErrorCodeOption {
     Delete_AccDevice_Rel_False("设备解绑失败",300017),
     DeviceId_Is_Unknown("盒子设备ID非法",300018),
     DebugInfo_PramaIsNotFount_MachineCode("关闭调试不成功缺失参数机器码",300019),
+    GetDevFirm_PramaIsUnFormate_MachineCode("获取设备固件信息失败",300020),
 
 
     Get_Groupid_Error("获取数组ID错误",50001),

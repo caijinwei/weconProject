@@ -23,7 +23,7 @@ public class DebugInfoCallback implements MqttCallback{
 
     }
     public void messageArrived(String s, MqttMessage message) throws Exception {
-        sendWSMassage(session,new String(message.getPayload()));
+        sendWSMassage(session,new String(message.getPayload(),"UTF-8"));
     }
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
     }

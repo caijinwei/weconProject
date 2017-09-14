@@ -85,7 +85,7 @@ public class DebugInfoHandler extends AbstractWebSocketHandler {
         * 发送关闭连接
         * */
         if (CommonUtils.isNotNull(machine_code)) {
-            mqttSend(machine_code, 2);
+            mqttSend(machine_code, 0);
 
         } else {
             throw new BusinessException(ErrorCodeOption.DebugInfo_PramaIsNotFount_MachineCode.key, ErrorCodeOption.DebugInfo_PramaIsNotFount_MachineCode.value);
@@ -102,7 +102,7 @@ public class DebugInfoHandler extends AbstractWebSocketHandler {
 
         ServerMqtt server = new ServerMqtt();
         server.message = new MqttMessage();
-        server.message.setQos(1);
+        server.message.setQos(0);
         server.message.setRetained(true);
 
         Map data = new HashMap<String, String>();

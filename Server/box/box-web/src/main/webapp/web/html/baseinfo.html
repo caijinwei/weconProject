@@ -25,6 +25,7 @@
         <li class="active"><a href="#base-info" data-toggle="tab">基本信息</a></li>
         <li><a href="#com-port" data-toggle="tab" ng-click="initPlcSetting()">通讯口配置</a></li>
         <li><a href="#debugInfo" data-toggle="tab">调试信息</a></li>
+        <li><a href="#dev_firm" data-toggle="tab" ng-click="dev_firmShow(infoData.state)">固件信息</a></li>
     </ul>
     <div class="tab-content">
         <div class="tab-pane active" id="base-info">
@@ -458,6 +459,7 @@
                 </div>
             </div>
         </div>
+
         <div class="tab-pane" id="entry-statistic">
             <div class="container-fluid" style="margin-top: 10px;">
                 <div class="row" style="margin-top: 20px;">
@@ -497,13 +499,14 @@
         <div class="tab-pane" id="debugInfo">
 
             <div style="margin-top: 35px">
-                <button class="btn btn-primary"
-                        style="text-decoration: none" ng-click="openGetDeviceDebugInfo(infoData.machine_code);">
-                    <span class="fa fa-indent"></span> 开启获取调试
+                <button class="btn btn-info"
+                        style="text-decoration: none"
+                        ng-click="openGetDeviceDebugInfo(infoData.machine_code,infoData.state);">
+                    开启获取调试
                 </button>
-                <button class="btn btn-primary"
-                        style="text-decoration: none" ng-click="ws_close();">
-                    <span class="fa fa-indent"></span> 关闭获取调试
+                <button class="btn btn-danger"
+                        style="text-decoration: none" ng-click="ws_close(infoData.state);">
+                    关闭获取调试
                 </button>
             </div>
             <!--<div class="row form-group">-->
@@ -535,6 +538,41 @@
 
         </div>
 
+        <!------------------------------------------------------------------------------------------------固件信息------------------------------------------------------------------------------------------------------->
+        <div class="tab-pane" id="dev_firm">
+            <!-- 基本信息展示-->
+            <div class="container-fluid" style="margin-top: 12px;font-size: 15px;">
+                <div class="row" style="margin-top: 30px;">
+                    <span class="col-md-1">固件ID</span>
+                    <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.f_id}}</span>
+                </div>
+                <div class="row" style="margin-top: 30px;">
+                    <span class="col-md-1">固件名称</span>
+                    <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.f_name}}</span>
+                </div>
+                <div class="row" style="margin-top: 30px;">
+                    <span class="col-md-1">固件版本</span>
+                    <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.f_ver}}</span>
+                </div>
+                <div class="row" style="margin-top: 30px;">
+                    <span class="col-md-1">更新时间</span>
+                    <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.create_date|date:'yyyy-MM-dd HH:mm:ss'}}</span>
+                </div>
+                <div class="row" style="margin-top: 30px;">
+                    <span class="col-md-1">创建时间</span>
+                    <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.create_date|date:'yyyy-MM-dd HH:mm:ss'}}</span>
+                </div>
+
+                <div class="row" style="margin-top: 30px;">
+                    <span class="col-md-1">操作</span>
+                    <!--<div class="btn-group" style="margin-left: 10px;">-->
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="">
+                        查看固件更新
+                    </button>
+
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <script src="../lib/jquery/jquery-3.2.1.min.js"></script>
