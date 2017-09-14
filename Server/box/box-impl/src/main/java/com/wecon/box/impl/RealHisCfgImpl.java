@@ -472,11 +472,11 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 		Object boxId = bParams.get("boxId");
 		Object groupId = bParams.get("groupId");
-		if (null != boxId) {
+		if (null != boxId && !"0".equals(boxId.toString())) {
 			condition.append(" and ad.device_id = ? ");
 			params.add(boxId);
 		}
-		if (null != groupId) {
+		if (null != groupId && !"0".equals(groupId.toString())) {
 			condition.append(" and adr.acc_dir_id = ?");
 			params.add(groupId);
 		}
@@ -514,11 +514,11 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 		Object groupId = bParams.get("groupId");
 		Object boxId = bParams.get("boxId");
-		if (null != groupId) {
+		if (null != groupId  && !"0".equals(groupId.toString())) {
 			condition.append(" and adr.acc_dir_id = ?");
 			params.add(groupId);
 		}
-		if (null != boxId) {
+		if (null != boxId  && !"0".equals(boxId.toString())) {
 			condition.append(" and ad.device_id = ? ");
 			params.add(boxId);
 		}

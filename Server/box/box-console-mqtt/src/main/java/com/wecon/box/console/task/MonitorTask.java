@@ -27,6 +27,7 @@ import com.wecon.box.api.RedisPiBoxApi;
 import com.wecon.box.console.config.ConnectOptions;
 import com.wecon.box.console.util.MqttConfigContext;
 import com.wecon.box.console.util.SpringContextHolder;
+import com.wecon.box.constant.ConstKey;
 import com.wecon.box.entity.AlarmCfgData;
 import com.wecon.box.entity.DevFirm;
 import com.wecon.box.entity.Device;
@@ -37,6 +38,7 @@ import com.wecon.box.entity.PiBoxHisComAddr;
 import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.entity.RealHisCfgData;
 import com.wecon.box.entity.RedisPiBoxActData;
+import com.wecon.common.redis.RedisManager;
 import com.wecon.common.util.CommonUtils;
 
 /**
@@ -241,6 +243,7 @@ public class MonitorTask extends Thread {
 				RedisPiBoxActData newModel = JSON.parseObject(jsonObject.getString("data"),
 						new TypeReference<RedisPiBoxActData>() {
 						});
+				
 				if (redisModel != null && redisModel.act_time_data_list != null && newModel != null
 						&& newModel.act_time_data_list != null) {
 					redisModel.time = newModel.time;
@@ -281,6 +284,8 @@ public class MonitorTask extends Thread {
 					redisPiBoxApi.saveRedisPiBoxActData(newModel);
 					System.out.println("redis add success");
 				}
+				//发布消息
+				RedisManager.publish(ConstKey.REDIS_GROUP_NAME, machineCode, machineCode);
 				if (jsonObject.getInteger("feedback") == 1) {
 					SendMessage(machineCode, REAL_DATA);
 				}
