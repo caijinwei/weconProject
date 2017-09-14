@@ -24,7 +24,8 @@
     <ul class="nav nav-tabs" role="tablist" id="baseConfigTab">
         <li class="active"><a href="#base-info" data-toggle="tab">基本信息</a></li>
         <li><a href="#com-port" data-toggle="tab" ng-click="initPlcSetting()">通讯口配置</a></li>
-        <!--<li><a href="#entry-statistic" data-toggle="tab">条目统计</a></li>-->
+        <li><a href="#debugInfo" data-toggle="tab">调试信息</a></li>
+        <li><a href="#dev_firm" data-toggle="tab" ng-click="dev_firmShow(infoData.state)">固件信息</a></li>
     </ul>
     <div class="tab-content">
         <div class="tab-pane active" id="base-info">
@@ -33,7 +34,7 @@
                 <div class="row" style="margin-top: 20px;">
                     <span class="col-md-1">PIBox名称</span>
 
-                    <div class="col-md-4" >
+                    <div class="col-md-4">
                         <div class="form-group" style="display: inline-block;font-weight: bold;">
                             <input type="text" class="form-control"
                                    id="PIBoxName" name="PIBoxName"
@@ -458,6 +459,7 @@
                 </div>
             </div>
         </div>
+
         <div class="tab-pane" id="entry-statistic">
             <div class="container-fluid" style="margin-top: 10px;">
                 <div class="row" style="margin-top: 20px;">
@@ -490,6 +492,84 @@
                 <div class="row" style="margin-top:20px;">
                     <span class="col-md-1">说明</span>
                     <span>12/100 分别表示 已经使用条目数/可以使用总条目数，相同条目不重复统计。</span>
+                </div>
+            </div>
+        </div>
+        <!------------------------------------------------------------------------------------------------调试信息接收------------------------------------------------------------------------------------------------------------------------------>
+        <div class="tab-pane" id="debugInfo">
+
+            <div style="margin-top: 35px">
+                <button class="btn btn-info"
+                        style="text-decoration: none"
+                        ng-click="openGetDeviceDebugInfo(infoData.machine_code,infoData.state);">
+                    开启获取调试
+                </button>
+                <button class="btn btn-danger"
+                        style="text-decoration: none" ng-click="ws_close(infoData.state);">
+                    关闭获取调试
+                </button>
+            </div>
+            <!--<div class="row form-group">-->
+            <!--<label class="col-xs-2 col-sm-2 col-md-2 control-label"></label>-->
+
+            <!--<div class="col-xs-9 col-sm-9 col-md-9">-->
+            <!--<div class="panel panel-info">-->
+            <!--<div class="panel-heading">-->
+            <!--<span class="label label-info">日志</span>-->
+            <!--<span class="label label-danger"><a id="clear" ng-click="ws_clear();">Clear</a></span>-->
+            <!--</div>-->
+            <!--<div class="panel-body">-->
+            <!--<textarea class="form-control"  id="wsLog" rows="3"></textarea>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+
+
+            <div class="panel panel-success" id="mqtt-log-containor">
+                <div class="panel-heading">
+                    <span class="label label-info">日志</span>
+                    <!--<h3 class="panel-title" style="display:inline">日志</h3>-->
+                    <!--<a id="clear">Clear</a>-->
+                    <span class="label label-danger"><a id="clear" ng-click="ws_clear()">Clear</a></span>
+                </div>
+                <div class="panel-body" style="overflow: scroll" id="wsLog"></div>
+            </div>
+
+        </div>
+
+        <!------------------------------------------------------------------------------------------------固件信息------------------------------------------------------------------------------------------------------->
+        <div class="tab-pane" id="dev_firm">
+            <!-- 基本信息展示-->
+            <div class="container-fluid" style="margin-top: 12px;font-size: 15px;">
+                <div class="row" style="margin-top: 30px;">
+                    <span class="col-md-1">固件ID</span>
+                    <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.f_id}}</span>
+                </div>
+                <div class="row" style="margin-top: 30px;">
+                    <span class="col-md-1">固件名称</span>
+                    <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.f_name}}</span>
+                </div>
+                <div class="row" style="margin-top: 30px;">
+                    <span class="col-md-1">固件版本</span>
+                    <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.f_ver}}</span>
+                </div>
+                <div class="row" style="margin-top: 30px;">
+                    <span class="col-md-1">更新时间</span>
+                    <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.create_date|date:'yyyy-MM-dd HH:mm:ss'}}</span>
+                </div>
+                <div class="row" style="margin-top: 30px;">
+                    <span class="col-md-1">创建时间</span>
+                    <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.create_date|date:'yyyy-MM-dd HH:mm:ss'}}</span>
+                </div>
+
+                <div class="row" style="margin-top: 30px;">
+                    <span class="col-md-1">操作</span>
+                    <!--<div class="btn-group" style="margin-left: 10px;">-->
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="">
+                        查看固件更新
+                    </button>
+
                 </div>
             </div>
         </div>

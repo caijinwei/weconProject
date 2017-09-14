@@ -341,6 +341,12 @@ public class AccountImpl implements AccountApi {
         jdbcTemplate.update(sql, new Object[]{newPwd, secret_key, accountId});
     }
 
+    @Override
+    public List<Account> getAllAccounts() {
+        String sql = "SELECT "+SEL_COL+" FROM account where 1=1";
+        return jdbcTemplate.query(sql, new DefaultAccountRowMapper());
+    }
+
     public static final class DefaultAccountRowMapper implements RowMapper<Account> {
         @Override
         public Account mapRow(ResultSet rs, int i) throws SQLException {

@@ -60,6 +60,9 @@ public class UserInfoAction extends UserBaseAction {
     public Output getViewIdsByManagerId(@RequestParam("manager_id") long managerId) {
         List<AccountRelation> list=accountRelationApi.getAccountRelationByManagerAccId(managerId);
         JSONObject data=new JSONObject();
+
+        List<Account> allList=accountApi.getAllAccounts();
+        data.put("allList",allList);
         data.put("list",list);
         return new Output(data);
     }

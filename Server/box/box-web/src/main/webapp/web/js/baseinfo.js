@@ -478,5 +478,84 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         });
     };
 
+    //--------------------------------------------------------------------debugInfo上报调试信息-------------------------------------------------------------------------------------------------------------------------------
+    var ws;
+
+    $scope.ws_send = function (msg) {
+        ws.send(msg);
+    }
+    $scope.ws_close = function (state) {
+        if(state!=1){
+            alert("盒子已经离线");
+            return;
+        }
+        ws.close();
+        ws="";
+    }
+    $scope.ws_log = function (data) {
+        $('#wsLog').prepend('<p>' + data + '</p>');
+    }
+    $scope.ws_clear = function () {
+        $("#wsLog").empty();
+        $scope.ws_log("Clear :)");
+    }
+    $scope.ws_connect = function (machine_code) {
+        if ("WebSocket" in window) {
+            ws = new WebSocket(T.common.requestUrl['WeconBoxWs'] + 'debugInfo-websocket/websocket?' + T.common.websocket.getParams());
+            ws.onopen = function () {
+                $scope.ws_send(machine_code);
+            };
+            ws.onmessage = function (evt) {
+                $scope.ws_log(evt.data);
+            };
+            ws.onclose = function (evt) {
+                $scope.ws_log('>>>关闭获取调试' + " ");
+                console.log(evt);
+            };
+            ws.onerror = function (evt) {
+                $scope.ws_log('>>>error' + " " + evt.data);
+                console.log(evt);
+            };
+        } else {
+            alert("WebSocket isn't supported by your Browser!");
+        }
+    }
+    $scope.openGetDeviceDebugInfo=function(machine_code,state){
+        if(state!=1){
+            alert("盒子已经离线");
+            return;
+        }
+        if(ws==""||ws==undefined){
+            $scope.ws_connect(machine_code);
+        }
+    };
+
+    //--------------------------------------------------------------------------固件信息------------------------------------------------------------------------------------------------------------
+
+    $scope.dev_firmShow=function(state){
+        if(state!=1){
+            alert("盒子已经离线");
+            return;
+        };
+        var device_id = T.common.util.getParameter("device_id");
+        var params={
+            device_id:device_id
+        }
+        T.common.ajax.request("WeconBox", "dirFirmAction/getDirFirmInfoByDevId", params, function (data, code, msg) {
+            if (code == 200) {
+                $scope.devFirmInfo=data.devFirmInfo
+                console.log("获得到的固件信息",data.devFirmInfo);
+                $scope.$apply();
+            }
+            else {
+                $("#deletePlc").modal("hide");
+                alert(code + "-" + msg);
+            }
+        }, function () {
+            alert("ajax error");
+        });
+
+    }
+
 });
 
