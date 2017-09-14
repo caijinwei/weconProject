@@ -87,7 +87,7 @@
 
     <websocket:handlers allowed-origins="*">
         <websocket:mapping handler="actDataHandler" path="/actdata-websocket"/>
-        <websocket:mapping path="/debugInfo-websocket" handler="debugInfoHandler" />
+        <websocket:mapping path="/debugInfo-websocket/" handler="debugInfoHandler" />
         <websocket:handshake-interceptors>
             <bean class="com.wecon.restful.core.WsHandShakeInterceptor"/>
         </websocket:handshake-interceptors>

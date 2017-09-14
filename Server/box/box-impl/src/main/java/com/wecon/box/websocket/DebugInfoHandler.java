@@ -1,26 +1,40 @@
 package com.wecon.box.websocket;
 
+import com.alibaba.fastjson.JSONObject;
+import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.box.util.ClientMQTT;
+import com.wecon.box.util.DebugInfoCallback;
+import com.wecon.box.util.ServerMqtt;
+import com.wecon.common.util.CommonUtils;
+import com.wecon.restful.core.BusinessException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by caijinw on 2017/9/12.
  */
-public class DebugInfoHandler  extends AbstractWebSocketHandler {
+@Component
+public class DebugInfoHandler extends AbstractWebSocketHandler {
+
+    String machine_code;
+    ClientMQTT client;
     private static final Logger logger = LogManager.getLogger(DebugInfoHandler.class.getName());
     private Timer timer;
+
     /**
      * 收到消息
+     * 1)下发给mqtt
      *
      * @param session
      * @param message
@@ -28,18 +42,17 @@ public class DebugInfoHandler  extends AbstractWebSocketHandler {
      */
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        String msg = message.getPayload();
-        logger.debug("Server received message: " + msg);
-        session.sendMessage(new TextMessage("Server received message: " + msg));
-        if (msg.equals("time")) {
-            if (this.timer != null) {
-                this.timer.cancel();
-            }
-            timer = new Timer(true);
-            long delay = 0;
-            OrderTimeTask orderTimeTask = new OrderTimeTask(session, msg, timer);
-            timer.schedule(orderTimeTask, delay, 3000);
-        }
+        machine_code = message.getPayload();
+        /*
+        * mqtt 发送
+        * */
+        mqttSend(machine_code, 1);
+        /*
+        * mqtt监听主题
+        * */
+        DebugInfoCallback debugInfoCallback = new DebugInfoCallback(session);
+        client = new ClientMQTT("pibox/cts/" + machine_code+"/logs", debugInfoCallback);
+        client.start();
     }
 
     /**
@@ -54,31 +67,6 @@ public class DebugInfoHandler  extends AbstractWebSocketHandler {
         session.sendMessage(new TextMessage("连接成功"));
     }
 
-    class OrderTimeTask extends TimerTask {
-        private WebSocketSession session;
-        private String msg;
-        private Timer timer;
-
-        public OrderTimeTask(WebSocketSession session, String msg, Timer timer) {
-            this.session = session;
-            this.msg = msg;
-            this.timer = timer;
-        }
-
-        public void run() {
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String msgtime = "3秒报时：" + df.format(new Date());
-            try {
-                if (session == null || !session.isOpen()) {
-                    this.timer.cancel();
-                }
-                System.out.println(msgtime);
-                session.sendMessage(new TextMessage(msgtime));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     /**
      * 关闭连接后
@@ -93,7 +81,47 @@ public class DebugInfoHandler  extends AbstractWebSocketHandler {
             this.timer.cancel();
             logger.debug("timer cancel");
         }
+        /*
+        * 发送关闭连接
+        * */
+        if (CommonUtils.isNotNull(machine_code)) {
+            mqttSend(machine_code, 2);
+
+        } else {
+            throw new BusinessException(ErrorCodeOption.DebugInfo_PramaIsNotFount_MachineCode.key, ErrorCodeOption.DebugInfo_PramaIsNotFount_MachineCode.value);
+        }
+        client.close();
         logger.debug("关闭连接");
+    }
+
+    /*
+    * mqtt发送 数据
+    * */
+    public void mqttSend(String machine_code, Integer opType) throws MqttException {
+
+
+        ServerMqtt server = new ServerMqtt();
+        server.message = new MqttMessage();
+        server.message.setQos(1);
+        server.message.setRetained(true);
+
+        Map data = new HashMap<String, String>();
+        //  1、 上报调试信息   2、关闭上报
+        data.put("op_type", opType);
+
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("act", 2006);
+        jsonObject.put("machine_code", machine_code);
+        jsonObject.put("feedback", 0);
+        jsonObject.put("data", data);
+        String msg = jsonObject.toJSONString();
+
+        server.message.setPayload((msg).getBytes());
+        server.topic11 = server.client.getTopic("pibox/stc/" + machine_code);
+        //mqtt发送成功
+        server.publish(server.topic11, server.message);
+        server.client.disconnect();
     }
 }
 

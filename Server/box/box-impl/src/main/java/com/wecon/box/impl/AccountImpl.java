@@ -174,7 +174,7 @@ public class AccountImpl implements AccountApi {
             throw new BusinessException(ErrorCodeOption.AccountNotExisted.key, ErrorCodeOption.AccountNotExisted.value);
         }
         String pwd = DigestUtils.md5Hex(oldpwd + model.secret_key);
-        if (!pwd.equals(model.password)) {
+        if (oldpwd != "" && !pwd.equals(model.password)) {
             throw new BusinessException(ErrorCodeOption.OldPwdError.key, ErrorCodeOption.OldPwdError.value);
         }
         pwd = DigestUtils.md5Hex(newpwd + model.secret_key);

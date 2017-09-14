@@ -480,18 +480,32 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 
     //--------------------------------------------------------------------debugInfo上报调试信息-------------------------------------------------------------------------------------------------------------------------------
     var ws;
-    $scope.ws_connect = function () {
+
+    $scope.ws_send = function (msg) {
+        ws.send(msg);
+    }
+    $scope.ws_close = function () {
+        ws.close();
+        ws="";
+    }
+    $scope.ws_log = function (data) {
+        $('#wsLog').prepend('<p>' + data + '</p>');
+    }
+    $scope.ws_clear = function () {
+        $("#wsLog").empty();
+        $scope.ws_log("Clear :)");
+    }
+    $scope.ws_connect = function (machine_code) {
         if ("WebSocket" in window) {
-            ws = new WebSocket(T.common.requestUrl['WeconBoxWs'] + '/debugInfo-websocket/websocket/pibox/cts/'+$scope.infoData.machine_code+'/logs' + T.common.websocket.getParams());
+            ws = new WebSocket(T.common.requestUrl['WeconBoxWs'] + 'debugInfo-websocket/websocket?' + T.common.websocket.getParams());
             ws.onopen = function () {
-                $scope.ws_log('>>>open');
+                $scope.ws_send(machine_code);
             };
             ws.onmessage = function (evt) {
-                $scope.ws_log('server message ->' + evt.data);
-                console.log(evt);
+                $scope.ws_log(evt.data);
             };
             ws.onclose = function (evt) {
-                $scope.ws_log('>>>close' + " ");
+                $scope.ws_log('>>>关闭获取调试' + " ");
                 console.log(evt);
             };
             ws.onerror = function (evt) {
@@ -502,19 +516,11 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             alert("WebSocket isn't supported by your Browser!");
         }
     }
-    $scope.ws_send = function () {
-        ws.send($("#wsMsg").val());
-        $scope.ws_log('client message ->' + $("#wsMsg").val());
-    }
-    $scope.ws_close = function () {
-        ws.close();
-    }
-    $scope.ws_log = function (data) {
-        $('#wsLog').prepend('<p>' + data + '</p>');
-    }
-    $scope.ws_clear = function () {
-        $("#wsLog").empty();
-        $scope.ws_log("Clear :)");
-    }
+    $scope.openGetDeviceDebugInfo=function(machine_code){
+        if(ws==""||ws==undefined){
+            $scope.ws_connect(machine_code);
+        }
+    };
+
 });
 

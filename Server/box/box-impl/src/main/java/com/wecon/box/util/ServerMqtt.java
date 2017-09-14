@@ -4,7 +4,7 @@ import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 /**
- * Created by Administrator on 2017/7/27.
+ * Created by caijinw on 2017/7/27.
  */
 public class ServerMqtt {
     //tcp://MQTT安装的服务器地址:MQTT定义的端口号
@@ -16,8 +16,8 @@ public class ServerMqtt {
 
     public MqttClient client;
     public MqttTopic topic11;
-    public String userName = "mosquitto";
-    public String passWord = "";
+    public String userName = "admin";
+    public String passWord = "password";
 
     public MqttMessage message;
 
@@ -40,7 +40,7 @@ public class ServerMqtt {
         options.setUserName(userName);
         options.setPassword(passWord.toCharArray());
         // 设置超时时间
-        options.setConnectionTimeout(10);
+        options.setConnectionTimeout(10000);
         // 设置会话心跳时间
         options.setKeepAliveInterval(20);
         try {
@@ -66,6 +66,9 @@ public class ServerMqtt {
         token.waitForCompletion();
         System.out.println("message is published completely! "
                 + token.isComplete());
+//        System.out.println("内容是    "+message.toString());
+//        System.out.println("主题是    "+topic.toString());
+
     }
 
     /**
@@ -81,7 +84,9 @@ public class ServerMqtt {
         server.message.setPayload("hello,topic11".getBytes());
         server.topic11 = server.client.getTopic("pibox");
         server.publish(server.topic11 , server.message);
-
+        /*
+        * pibox/cts/<machine_code>/logs
+        * */
         server.client.close();
     }
 }

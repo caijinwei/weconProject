@@ -24,6 +24,12 @@ public enum ErrorCodeOption {
     SmsVercodeError("手机验证码有错", 11014),
     AccountEmailExisted("邮箱已经被使用", 11015),
     AccountPhoneExisted("手机号码已经被使用", 11016),
+    PhonenumAndEmailError("手机号码和邮箱格式有错", 11017),
+
+    //文件操作相关
+    UploadFileError("上传文件异常", 12000),
+    UploadFileParamEmpty("上传文件参数为空", 12001),
+    UploadFileExtError("上传文件格式有误", 12002),
 
     PiBoxDevice_IsNot_Found("盒子不存在",300009),
     Account_Permissions_No("账户权限不足，无法新增盒子", 30001),
@@ -43,6 +49,7 @@ public enum ErrorCodeOption {
     PIBox_Bound_PointMove_False("设备绑定失败",300016),
     Delete_AccDevice_Rel_False("设备解绑失败",300017),
     DeviceId_Is_Unknown("盒子设备ID非法",300018),
+    DebugInfo_PramaIsNotFount_MachineCode("关闭调试不成功缺失参数机器码",300019),
 
 
     Get_Groupid_Error("获取数组ID错误",50001),

@@ -43,6 +43,24 @@ public class ChangeAction extends UserBaseAction {
         return new Output();
     }
 
+    @Label("忘记密码根据验证码重新修改密码")
+    @RequestMapping("user/findpwd")
+    @WebApi(forceAuth = false, master = true)
+    public Output findPwd(@Valid FindPwdParam param) {
+        if (!VerifyUtil.isChinaPhone(param.account) && !VerifyUtil.isValidEmail(param.account)) {
+            throw new BusinessException(ErrorCodeOption.PhonenumAndEmailError.key, ErrorCodeOption.PhonenumAndEmailError.value);
+        }
+        //验证码是否有效
+        checkVercode(param.vercode,param.account);
+        Account model = accountApi.getAccount(param.account);
+
+        accountApi.updateAccountPwd(model.account_id, "", param.newpwd);
+        //<editor-fold desc="操作日志">
+        dbLogUtil.addOperateLog(OpTypeOption.FindPwd, ResTypeOption.Account, model.account_id, null);
+        //</editor-fold>
+        return new Output();
+    }
+
     @Label("更换邮箱")
     @RequestMapping("user/chgemail")
     @WebApi(forceAuth = true, master = true)
@@ -80,11 +98,7 @@ public class ChangeAction extends UserBaseAction {
             throw new BusinessException(ErrorCodeOption.PhonenumError.key, ErrorCodeOption.PhonenumError.value);
         }
         //验证码是否有效
-        String redisKey = String.format(ConstKey.REDIS_PHONE_SIGNIN_VERCODE, param.phonenum);
-        String vercode = RedisManager.get(ConstKey.REDIS_GROUP_NAME, redisKey);
-        if (vercode == null || !vercode.equals(param.vercode)) {
-            throw new BusinessException(ErrorCodeOption.SmsVercodeError.key, ErrorCodeOption.SmsVercodeError.value);
-        }
+        checkVercode(param.vercode,param.phonenum);
         Client client = AppContext.getSession().client;
         Account user = accountApi.getAccount(client.userId);
         Account oldUser = accountApi.getAccount(client.userId);
@@ -96,6 +110,22 @@ public class ChangeAction extends UserBaseAction {
         dbLogUtil.updOperateLog(OpTypeOption.ChgPhone, ResTypeOption.Account, user.account_id, oldUser, user);
         //</editor-fold>
         return new Output(data);
+    }
+
+    /**
+     * 验证码是否有效
+     *
+     * @param vercodeparam
+     * @param phonenum
+     * @return
+     */
+    private boolean checkVercode(String vercodeparam, String phonenum) {
+        String redisKey = String.format(ConstKey.REDIS_PHONE_SIGNIN_VERCODE, phonenum);
+        String vercode = RedisManager.get(ConstKey.REDIS_GROUP_NAME, redisKey);
+        if (vercode == null || !vercode.equals(vercodeparam)) {
+            throw new BusinessException(ErrorCodeOption.SmsVercodeError.key, ErrorCodeOption.SmsVercodeError.value);
+        }
+        return true;
     }
 }
 
@@ -112,6 +142,34 @@ class ChgPwdParam {
 
     public void setOldpwd(String oldpwd) {
         this.oldpwd = oldpwd;
+    }
+
+    public void setNewpwd(String newpwd) {
+        this.newpwd = newpwd;
+    }
+}
+
+class FindPwdParam {
+    @Label("手机码、邮箱")
+    @NotNull
+    public String account;
+
+    @Label("验证码")
+    @NotNull
+    @Length(max = 6, min = 6)
+    public String vercode;
+
+    @Label("新密码md5")
+    @NotNull
+    @Length(max = 32, min = 32)
+    public String newpwd;
+
+    public void setAccount(String account) {
+        this.account = account;
+    }
+
+    public void setVercode(String vercode) {
+        this.vercode = vercode;
     }
 
     public void setNewpwd(String newpwd) {

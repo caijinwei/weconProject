@@ -6,6 +6,7 @@ import com.wecon.box.entity.Account;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
+import com.wecon.box.util.EmailUtil;
 import com.wecon.box.util.SmsUtil;
 import com.wecon.box.util.VerifyUtil;
 import com.wecon.common.redis.RedisManager;
@@ -30,15 +31,15 @@ import javax.validation.constraints.NotNull;
 @RestController
 public class SignupPhoneAction extends UserBaseAction {
     /**
-     * 发送验证码
+     * 发送验证码 -- 将邮箱的验证码也整合到此接口 20170911
      *
      * @return
      */
     @RequestMapping("user/sendvercode")
     @WebApi(forceAuth = false, master = true)
     public Output sendVercode(@RequestParam("phonenum") String phonenum) throws Exception {
-        if (!VerifyUtil.isChinaPhone(phonenum)) {
-            throw new BusinessException(ErrorCodeOption.PhonenumError.key, ErrorCodeOption.PhonenumError.value);
+        if (!VerifyUtil.isChinaPhone(phonenum) && !VerifyUtil.isValidEmail(phonenum)) {
+            throw new BusinessException(ErrorCodeOption.PhonenumAndEmailError.key, ErrorCodeOption.PhonenumAndEmailError.value);
         }
         //生成短信验证码
         int vercode = (int) ((Math.random() * 9 + 1) * 100000);
@@ -48,7 +49,12 @@ public class SignupPhoneAction extends UserBaseAction {
         if (vercodeRedis == null) {
             //保存到redis
             RedisManager.set(ConstKey.REDIS_GROUP_NAME, redisKey, String.valueOf(vercode), 60);
-            SmsUtil.sendSMS(phonenum, String.valueOf(vercode));
+            if (VerifyUtil.isChinaPhone(phonenum)) {
+                SmsUtil.sendSMS(phonenum, String.valueOf(vercode));
+            } else if (VerifyUtil.isValidEmail(phonenum)) {
+                //发送到邮箱
+                EmailUtil.send(phonenum, "pibox - 验证码", String.valueOf(vercode));
+            }
         }
 
         return new Output();

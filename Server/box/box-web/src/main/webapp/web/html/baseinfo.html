@@ -24,7 +24,7 @@
     <ul class="nav nav-tabs" role="tablist" id="baseConfigTab">
         <li class="active"><a href="#base-info" data-toggle="tab">基本信息</a></li>
         <li><a href="#com-port" data-toggle="tab" ng-click="initPlcSetting()">通讯口配置</a></li>
-        <li><a href="#debugInfo" data-toggle="tab" >调试信息</a></li>
+        <li><a href="#debugInfo" data-toggle="tab">调试信息</a></li>
     </ul>
     <div class="tab-content">
         <div class="tab-pane active" id="base-info">
@@ -33,7 +33,7 @@
                 <div class="row" style="margin-top: 20px;">
                     <span class="col-md-1">PIBox名称</span>
 
-                    <div class="col-md-4" >
+                    <div class="col-md-4">
                         <div class="form-group" style="display: inline-block;font-weight: bold;">
                             <input type="text" class="form-control"
                                    id="PIBoxName" name="PIBoxName"
@@ -495,35 +495,44 @@
         </div>
         <!------------------------------------------------------------------------------------------------调试信息接收------------------------------------------------------------------------------------------------------------------------------>
         <div class="tab-pane" id="debugInfo">
-            <div class="row form-group">
-                <label class="col-xs-2 col-sm-2 col-md-2 control-label">发送消息</label>
 
-                <div class="col-xs-9 col-sm-9 col-md-9">
-                    <input type="text" class="form-control" id="wsMsg" placeholder="发送消息">
-                </div>
+            <div style="margin-top: 35px">
+                <button class="btn btn-primary"
+                        style="text-decoration: none" ng-click="openGetDeviceDebugInfo(infoData.machine_code);">
+                    <span class="fa fa-indent"></span> 开启获取调试
+                </button>
+                <button class="btn btn-primary"
+                        style="text-decoration: none" ng-click="ws_close();">
+                    <span class="fa fa-indent"></span> 关闭获取调试
+                </button>
             </div>
-            <div class="row form-group">
-                <label class="col-xs-2 col-sm-2 col-md-2 control-label">使用H5 Websocket</label>
+            <!--<div class="row form-group">-->
+            <!--<label class="col-xs-2 col-sm-2 col-md-2 control-label"></label>-->
 
-                <div class="col-xs-9 col-sm-9 col-md-9">
-                    <button type="button" class="btn btn-primary" ng-click="ws_connect();">连接</button>
-                    <button type="button" class="btn btn-primary" ng-click="ws_send();">发送消息</button>
-                    <button type="button" class="btn btn-primary" ng-click="ws_close();">关闭</button>
+            <!--<div class="col-xs-9 col-sm-9 col-md-9">-->
+            <!--<div class="panel panel-info">-->
+            <!--<div class="panel-heading">-->
+            <!--<span class="label label-info">日志</span>-->
+            <!--<span class="label label-danger"><a id="clear" ng-click="ws_clear();">Clear</a></span>-->
+            <!--</div>-->
+            <!--<div class="panel-body">-->
+            <!--<textarea class="form-control"  id="wsLog" rows="3"></textarea>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+
+
+            <div class="panel panel-success" id="mqtt-log-containor">
+                <div class="panel-heading">
+                    <span class="label label-info">日志</span>
+                    <!--<h3 class="panel-title" style="display:inline">日志</h3>-->
+                    <!--<a id="clear">Clear</a>-->
+                    <span class="label label-danger"><a id="clear" ng-click="ws_clear()">Clear</a></span>
                 </div>
+                <div class="panel-body" style="overflow: scroll" id="wsLog"></div>
             </div>
 
-            <div class="row form-group">
-                <label class="col-xs-2 col-sm-2 col-md-2 control-label"></label>
-                <div class="col-xs-9 col-sm-9 col-md-9">
-                    <div class="panel panel-info">
-                        <div class="panel-heading">
-                            <span class="label label-info">日志</span>
-                            <span class="label label-danger"><a id="clear" ng-click="ws_clear();">Clear</a></span>
-                        </div>
-                        <div class="panel-body" id="wsLog"></div>
-                    </div>
-                </div>
-            </div>
         </div>
 
     </div>
