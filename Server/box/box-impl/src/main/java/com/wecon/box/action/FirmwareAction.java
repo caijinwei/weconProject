@@ -43,12 +43,12 @@ public class FirmwareAction {
             Firmware modelOld = firmwareApi.getFirmware(input.firmware_id);
             firmwareApi.updateFirmware(model);
             //<editor-fold desc="操作日志">
-            dbLogUtil.updOperateLog(OpTypeOption.AddFirm, ResTypeOption.Firm, model.firmware_id, modelOld, model);
+            dbLogUtil.updOperateLog(OpTypeOption.UpdFirm, ResTypeOption.Firm, model.firmware_id, modelOld, model);
             //</editor-fold>
         } else {
             firmwareApi.addFirmware(model);
             //<editor-fold desc="操作日志">
-            dbLogUtil.addOperateLog(OpTypeOption.UpdFirm, ResTypeOption.Firm, model.firmware_id, model);
+            dbLogUtil.addOperateLog(OpTypeOption.AddFirm, ResTypeOption.Firm, model.firmware_id, model);
             //</editor-fold>
         }
         JSONObject data = new JSONObject();
