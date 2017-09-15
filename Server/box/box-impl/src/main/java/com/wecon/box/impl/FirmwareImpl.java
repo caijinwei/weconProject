@@ -5,6 +5,7 @@ import com.wecon.box.constant.ConstKey;
 import com.wecon.box.entity.Account;
 import com.wecon.box.entity.Firmware;
 import com.wecon.box.entity.FirmwareDetail;
+import com.wecon.box.entity.Page;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.util.BoxWebConfigContext;
 import com.wecon.common.redis.RedisManager;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import javax.sql.rowset.serial.SerialBlob;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,7 +36,7 @@ public class FirmwareImpl implements FirmwareApi {
 
     @Override
     public FirmwareDetail getFirmwareDetail(long firmware_id) {
-        String sql = getFirmwareDetailSql() + "WHERE a.firmware_id=?";
+        String sql = getFirmwareDetailSql() + " WHERE a.firmware_id=?";
         List<FirmwareDetail> list = jdbcTemplate.query(sql,
                 new Object[]{firmware_id},
                 new DefaultFirmwareDetailRowMapper());
@@ -42,6 +44,36 @@ public class FirmwareImpl implements FirmwareApi {
             return list.get(0);
         }
         return null;
+    }
+
+    @Override
+    public Page<FirmwareDetail> getFirmwareDetailList(String dev_model, String firm_info, int pageIndex, int pageSize) {
+        String sqlCount = "SELECT count(1) " +
+                "FROM firmware a " +
+                "INNER JOIN file_storage b on b.file_id=a.file_id ";
+        String sql = getFirmwareDetailSql();
+        String condition = " WHERE 1=1 ";
+        List<Object> params = new ArrayList<Object>();
+        if (!CommonUtils.isNullOrEmpty(dev_model)) {
+            condition += " AND a.dev_model = ?";
+            params.add(dev_model);
+        }
+        if (!CommonUtils.isNullOrEmpty(firm_info)) {
+            condition += " AND a.firm_info = ?";
+            params.add(firm_info);
+        }
+        sqlCount += condition;
+        int totalRecord = jdbcTemplate.queryForObject(sqlCount,
+                params.toArray(),
+                Integer.class);
+        Page<FirmwareDetail> page = new Page<FirmwareDetail>(pageIndex, pageSize, totalRecord);
+        String sort = " order by a.firmware_id desc";
+        sql += condition + sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
+        List<FirmwareDetail> list = jdbcTemplate.query(sql,
+                params.toArray(),
+                new DefaultFirmwareDetailRowMapper());
+        page.setList(list);
+        return page;
     }
 
     @Override

@@ -3,6 +3,8 @@ package com.wecon.box.action;
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.FirmwareApi;
 import com.wecon.box.entity.Firmware;
+import com.wecon.box.entity.FirmwareDetail;
+import com.wecon.box.entity.Page;
 import com.wecon.box.param.FirmwareParam;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.BusinessException;
@@ -26,7 +28,7 @@ public class FirmwareAction {
 
     @Description("保存固件")
     @RequestMapping(value = "/savefirmware")
-    @WebApi(forceAuth = false, master = true, authority = {"0"})
+    @WebApi(forceAuth = true, master = true, authority = {"0"})
     public Output saveFirmware(@Valid FirmwareParam input) {
         Firmware model = paramConvertFirmware(input);
 
@@ -42,11 +44,21 @@ public class FirmwareAction {
 
     @Description("获取固件详情")
     @RequestMapping(value = "/getfirmware")
-    @WebApi(forceAuth = false, master = true, authority = {"0"})
+    @WebApi(forceAuth = true, master = true, authority = {"0"})
     public Output getFirmware(@RequestParam("id") Long id) {
         Firmware model = firmwareApi.getFirmwareDetail(id);
         JSONObject data = new JSONObject();
         data.put("firmware", model);
+        return new Output(data);
+    }
+
+    @Description("获取固件列表")
+    @RequestMapping(value = "/getfirmwarelist")
+    @WebApi(forceAuth = true, master = true, authority = {"0"})
+    public Output getFirmwareList(@RequestParam("dev_model") String dev_model, @RequestParam("firm_info") String firm_info, @RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
+        Page<FirmwareDetail> page = firmwareApi.getFirmwareDetailList(dev_model, firm_info, pageIndex, pageSize);
+        JSONObject data = new JSONObject();
+        data.put("page", page);
         return new Output(data);
     }
 

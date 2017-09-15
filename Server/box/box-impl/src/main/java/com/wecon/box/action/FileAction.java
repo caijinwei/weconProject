@@ -75,12 +75,32 @@ public class FileAction {
         model.file_data = IOUtils.toByteArray(partFile.getInputStream());
         model.file_md5 = DigestUtils.md5Hex(model.file_data);
         model.file_size = Long.valueOf(model.file_data.length);
+        //获取版本信息
+        File tempFile = File.createTempFile(model.file_name, "");
+        FileOutputStream fos = new FileOutputStream(tempFile);
+        fos.write(model.file_data);
+        fos.close();
+        FileInputStream fis = new FileInputStream(tempFile);
+        fis.getChannel().position(fis.getChannel().size() - 256);
+        byte[] a = new byte[256];
+        fis.read(a);
+        fis.close();
+        String verStr = new String(a);
+        try {
+            String[] strs1 = verStr.split("VER:");
+            String[] strs2 = strs1[1].split(" ");
+            verStr = strs2[0];
+        } catch (Exception e) {
+            throw new BusinessException(ErrorCodeOption.FileGetVerError.key, ErrorCodeOption.FileGetVerError.value);
+        }
         fileStorageApi.addFileStorage(model);
         JSONObject dataOut = new JSONObject();
         dataOut.put("file_id", model.file_id);
         dataOut.put("file_name", model.file_name);
         dataOut.put("file_md5", model.file_md5);
         dataOut.put("file_size", model.file_size);
+        dataOut.put("version_code", verStr);
+        dataOut.put("version_name", model.file_name.substring(0, model.file_name.lastIndexOf(".") - 1));
         String token = UUID.randomUUID().toString().replace("-", "");
         String redisKey = String.format(ConstKey.REDIS_FILE_DOWNLOAD_TOKEN, model.file_id);
         RedisManager.set(ConstKey.REDIS_GROUP_NAME, redisKey, token, ConstKey.FILEDOWNLOAD_EXPIRE_TIME);//保存一小时
@@ -90,13 +110,6 @@ public class FileAction {
         logger.debug("上传成功");
         return new Output(dataOut);
     }
-
-    /*@Description("下载文件接口")
-    @RequestMapping(value = "/filedownload")
-    @WebApi(forceAuth = false, master = true)
-    public Output fileDownloadAction(@RequestParam("id") Long id, @RequestParam("t") String token) throws IOException, ServletException {
-        return new Output();
-    }*/
 
     @Description("下载文件接口")
     @RequestMapping(value = "/filedownload", method = RequestMethod.GET)

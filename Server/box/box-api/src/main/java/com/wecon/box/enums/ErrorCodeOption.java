@@ -31,6 +31,7 @@ public enum ErrorCodeOption {
     UploadFileParamEmpty("上传文件参数为空", 12001),
     UploadFileExtError("上传文件格式有误", 12002),
     DownloadFileParamError("下载文件参数异常", 12003),
+    FileGetVerError("文件解析版本有错", 12004),
 
     //检查更新相关（固件，驱动升级）
     FirmwareExisted("此版本固件已经存在", 13000),
