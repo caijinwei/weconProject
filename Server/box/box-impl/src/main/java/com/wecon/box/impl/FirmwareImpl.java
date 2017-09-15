@@ -2,7 +2,6 @@ package com.wecon.box.impl;
 
 import com.wecon.box.api.FirmwareApi;
 import com.wecon.box.constant.ConstKey;
-import com.wecon.box.entity.Account;
 import com.wecon.box.entity.Firmware;
 import com.wecon.box.entity.FirmwareDetail;
 import com.wecon.box.entity.Page;
@@ -33,6 +32,18 @@ import java.util.UUID;
 public class FirmwareImpl implements FirmwareApi {
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Override
+    public Firmware getFirmware(long firmware_id) {
+        String sql = getFirmwareSql() + " WHERE firmware_id=?";
+        List<Firmware> list = jdbcTemplate.query(sql,
+                new Object[]{firmware_id},
+                new DefaultFirmwareRowMapper());
+        if (!list.isEmpty()) {
+            return list.get(0);
+        }
+        return null;
+    }
 
     @Override
     public FirmwareDetail getFirmwareDetail(long firmware_id) {
@@ -159,11 +170,35 @@ public class FirmwareImpl implements FirmwareApi {
         }
     }
 
+    public static final class DefaultFirmwareRowMapper implements RowMapper<Firmware> {
+        @Override
+        public Firmware mapRow(ResultSet rs, int i) throws SQLException {
+            Firmware model = new Firmware();
+            model.firmware_id = rs.getLong("firmware_id");
+            model.version_code = rs.getString("version_code");
+            model.version_name = rs.getString("version_name");
+            model.dev_model = rs.getString("dev_model");
+            model.description = rs.getString("description");
+            model.file_id = rs.getLong("file_id");
+            model.firm_info = rs.getString("firm_info");
+            model.create_date = rs.getTimestamp("create_date");
+            model.update_date = rs.getTimestamp("update_date");
+
+            return model;
+        }
+    }
+
     private String getFirmwareDetailSql() {
         String sql = "SELECT a.firmware_id,a.`description`,a.dev_model,a.file_id,a.firm_info,a.version_code,a.version_name,a.create_date,a.update_date, " +
                 "b.file_name,b.file_md5,b.file_size,b.file_type " +
                 "FROM firmware a " +
                 "INNER JOIN file_storage b on b.file_id=a.file_id ";
+        return sql;
+    }
+
+    private String getFirmwareSql() {
+        String sql = "SELECT firmware_id,`description`,dev_model,file_id,firm_info,version_code,version_name,create_date,update_date " +
+                "FROM firmware " ;
         return sql;
     }
 }

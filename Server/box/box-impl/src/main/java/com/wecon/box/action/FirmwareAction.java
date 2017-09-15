@@ -5,7 +5,11 @@ import com.wecon.box.api.FirmwareApi;
 import com.wecon.box.entity.Firmware;
 import com.wecon.box.entity.FirmwareDetail;
 import com.wecon.box.entity.Page;
+import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.box.enums.OpTypeOption;
+import com.wecon.box.enums.ResTypeOption;
 import com.wecon.box.param.FirmwareParam;
+import com.wecon.box.util.DbLogUtil;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.BusinessException;
 import com.wecon.restful.core.Output;
@@ -26,16 +30,26 @@ public class FirmwareAction {
     @Autowired
     private FirmwareApi firmwareApi;
 
+    @Autowired
+    protected DbLogUtil dbLogUtil;
+
     @Description("保存固件")
     @RequestMapping(value = "/savefirmware")
     @WebApi(forceAuth = true, master = true, authority = {"0"})
     public Output saveFirmware(@Valid FirmwareParam input) {
         Firmware model = paramConvertFirmware(input);
 
-        if (model.firmware_id > 0) {
+        if (input.firmware_id > 0) {
+            Firmware modelOld = firmwareApi.getFirmware(input.firmware_id);
             firmwareApi.updateFirmware(model);
+            //<editor-fold desc="操作日志">
+            dbLogUtil.updOperateLog(OpTypeOption.AddFirm, ResTypeOption.Firm, model.firmware_id, modelOld, model);
+            //</editor-fold>
         } else {
             firmwareApi.addFirmware(model);
+            //<editor-fold desc="操作日志">
+            dbLogUtil.addOperateLog(OpTypeOption.UpdFirm, ResTypeOption.Firm, model.firmware_id, model);
+            //</editor-fold>
         }
         JSONObject data = new JSONObject();
         data.put("id", model.firmware_id);
@@ -64,7 +78,12 @@ public class FirmwareAction {
 
     private Firmware paramConvertFirmware(FirmwareParam input) {
         Firmware model = new Firmware();
-        model.firmware_id = input.firmware_id;
+        if (input.firmware_id > 0) {
+            model = firmwareApi.getFirmware(input.firmware_id);
+            if (model == null) {
+                throw new BusinessException(ErrorCodeOption.FirmwareNotExist.key, ErrorCodeOption.FirmwareNotExist.value);
+            }
+        }
         model.file_id = input.file_id;
         model.version_name = input.version_name;
         model.version_code = input.version_code;
