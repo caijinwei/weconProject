@@ -29,6 +29,7 @@
     <!--boxweb配置 -->
     <bean id="boxWebConfig" class="com.wecon.box.config.BoxWebConfig">
         <property name="emailActiveUrl" value="${emailActiveUrl}"/>
+        <property name="fileDownloadUrl" value="${fileDownloadUrl}" />
     </bean>
     <bean id="boxWebContext" class="com.wecon.box.util.BoxWebConfigContext">
         <property name="boxWebConfig" ref="boxWebConfig"/>

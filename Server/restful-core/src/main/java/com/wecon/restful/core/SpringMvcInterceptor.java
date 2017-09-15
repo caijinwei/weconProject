@@ -48,6 +48,10 @@ public class SpringMvcInterceptor implements HandlerInterceptor
 			logger.debug("websocket request");
 			return true;
 		}
+		if(baseUrl.contains("/filedownload")){
+			logger.debug("file download request");
+			return true;
+		}
 
 		// 初始化会话上下文
 		Session session = new Session(request, response);

@@ -45,6 +45,8 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 
     private SubscribeListener subscribeListener;
 
+    private Client client;
+
     private static final Logger logger = LogManager.getLogger(ActDataHandler.class.getName());
 
     /**
@@ -56,10 +58,9 @@ public class ActDataHandler extends AbstractWebSocketHandler {
      */
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        this.session = session;
         this.params = message.getPayload();
         logger.debug("Server received message: " + params);
-        if(CommonUtils.isNullOrEmpty(params)){
+        if (CommonUtils.isNullOrEmpty(params)) {
             return;
         }
         //推送消息给移动端
@@ -69,7 +70,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
         logger.debug("WebSocket push end");
 
         //订阅redis消息
-        if(null != machineCodeSet && null == subscribeListener){
+        if (null != machineCodeSet && null == subscribeListener) {
             subscribeRealData();
         }
     }
@@ -77,7 +78,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
     /**
      * 订阅redis消息
      */
-    private void subscribeRealData(){
+    private void subscribeRealData() {
         subscribeListener = new SubscribeListener();
         ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
         cachedThreadPool.execute(new Runnable() {
@@ -85,7 +86,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
                 logger.debug("Redis begin subscribe realData");
                 String[] machineCodeArray = new String[machineCodeSet.size()];
                 int i = 0;
-                for(String machineCode : machineCodeSet){
+                for (String machineCode : machineCodeSet) {
                     machineCodeArray[i++] = machineCode;
                 }
                 RedisManager.subscribe(ConstKey.REDIS_GROUP_NAME, subscribeListener, machineCodeArray);
@@ -93,33 +94,33 @@ public class ActDataHandler extends AbstractWebSocketHandler {
         });
     }
 
-    class SubscribeListener extends JedisPubSub{
+    class SubscribeListener extends JedisPubSub {
         @Override
         public void onMessage(String channel, String message) {
-            logger.debug("Subscribe callback，channel："+channel +"message:"+message);
-            if(!CommonUtils.isNullOrEmpty(message)){
+            logger.debug("Subscribe callback，channel：" + channel + "message:" + message);
+            if (!CommonUtils.isNullOrEmpty(message)) {
                 try {
                     session.sendMessage(new TextMessage(getStringRealData()));
-                }catch (IOException e){
+                } catch (IOException e) {
                     e.printStackTrace();
-                    logger.debug("Subscribe callback error，"+e.getMessage());
+                    logger.debug("Subscribe callback error，" + e.getMessage());
                 }
             }
         }
     }
 
-    private String getStringRealData(){
+    private String getStringRealData() {
         try {
-            Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>(){});
-            Client client = AppContext.getSession().client;
+            Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {
+            });
             RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
             Page<RealHisCfgDevice> realHisCfgDevicePage = null;
             int pageIndex = 1;
             int pageSize = Integer.MAX_VALUE;
-            if(null != bParams.get("pageIndex")){
+            if (null != bParams.get("pageIndex")) {
                 pageIndex = Integer.parseInt(bParams.get("pageIndex").toString());
             }
-            if(null != bParams.get("pageSize")){
+            if (null != bParams.get("pageSize")) {
                 pageSize = Integer.parseInt(bParams.get("pageSize").toString());
             }
 
@@ -157,7 +158,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
                 data.put("state", realHisCfgDevice.state);
                 data.put("monitorName", realHisCfgDevice.name);
                 data.put("number", 0);
-                if(null != actTimeDataList){
+                if (null != actTimeDataList) {
                     for (int j = 0; j < actTimeDataList.size(); j++) {
                         PiBoxCom piBoxCom = actTimeDataList.get(j);
                         if (Long.parseLong(piBoxCom.com) == realHisCfgDevice.plc_id) {
@@ -177,8 +178,8 @@ public class ActDataHandler extends AbstractWebSocketHandler {
             json.put("list", arr);
             logger.debug("Websocket push msg: " + json.toJSONString());
             return json.toJSONString();
-        }catch (Exception e){
-            logger.debug("Server error，"+e.getMessage());
+        } catch (Exception e) {
+            logger.debug("Server error，" + e.getMessage());
             e.printStackTrace();
             return "服务器错误";
         }
@@ -193,6 +194,10 @@ public class ActDataHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         logger.debug("连接成功");
+        this.session = session;
+        if (client == null) {
+            client = AppContext.getSession().client;
+        }
     }
 
     /**
