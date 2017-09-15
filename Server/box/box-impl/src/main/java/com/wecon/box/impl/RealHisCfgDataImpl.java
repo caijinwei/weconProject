@@ -93,13 +93,13 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 	}
 
 	@Override
-	public boolean batchDeleteByPlcId(List<Integer> ids) {
+	public boolean batchDeleteByPlcId(List<Long> ids) {
 		if (null == ids || ids.size() == 0) {
 			return false;
 		}
 
 		StringBuilder idSb = new StringBuilder();
-		for(int id : ids){
+		for(long id : ids){
 			idSb.append(",").append(id);
 		}
 		String sql = "delete from real_his_cfg_data where real_his_cfg_id in(select id from real_his_cfg where plc_id in("+idSb.substring(1)+"))";

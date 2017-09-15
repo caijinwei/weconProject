@@ -56,14 +56,14 @@ public interface AlarmCfgApi {
 	 * @param updList
 	 * @return
 	 */
-	boolean batchUpdateState(final List<int[]> updList);
+	boolean batchUpdateState(final List<String[]> updList);
 
 	/**
 	 * 批量删除报警配置根据plc_id
 	 * @param ids
 	 * @return
      */
-	boolean batchDeleteByPlcId(final List<Integer> ids);
+	boolean batchDeleteByPlcId(final List<Long> ids);
 
 	/**
 	 * 批量删除报警配置根据alaramcfg_id

@@ -52,7 +52,7 @@ public interface RealHisCfgDataApi {
 	 * @param ids
 	 * @return
      */
-	boolean batchDeleteByPlcId(List<Integer> ids);
+	boolean batchDeleteByPlcId(List<Long> ids);
 
 	/**
 	 * 批量删除实时历史配置数据根据real_his_cfg_id

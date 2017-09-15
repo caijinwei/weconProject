@@ -258,11 +258,11 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 	}
 
 	@Override
-	public boolean batchUpdateState(final List<int[]> updList) {
+	public boolean batchUpdateState(final List<String[]> updList) {
 		if (null == updList || updList.size() == 0) {
 			return false;
 		}
-		String sql = "update alarm_cfg set state = ? where alarmcfg_id = ?";
+		String sql = "update alarm_cfg set state = ? where alarmcfg_id = ? and date_format(update_date,'%Y-%m-%d %H:%i:%s') = ?";
 		jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
 			public int getBatchSize() {
 				return updList.size();
@@ -270,22 +270,27 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			}
 
 			public void setValues(PreparedStatement ps, int i) throws SQLException {
-				int[] arg = updList.get(i);
-				ps.setInt(1, arg[0]);
-				ps.setInt(2, arg[1]);
+				try {
+					String[] arg = updList.get(i);
+					ps.setInt(1, Integer.parseInt(arg[0]));
+					ps.setInt(2, Integer.parseInt(arg[1]));
+					ps.setString(3, arg[2]);
+				}catch (Exception e){
+					e.printStackTrace();
+				}
 			}
 		});
 		return true;
 	}
 
 	@Override
-	public boolean batchDeleteByPlcId(final List<Integer> ids) {
+	public boolean batchDeleteByPlcId(final List<Long> ids) {
 		if (null == ids || ids.size() == 0) {
 			return false;
 		}
 
 		StringBuilder idSb = new StringBuilder();
-		for (int id : ids) {
+		for (long id : ids) {
 			idSb.append(",").append(id);
 		}
 		String sql = "delete from alarm_cfg where plc_id in(" + idSb.substring(1) + ")";

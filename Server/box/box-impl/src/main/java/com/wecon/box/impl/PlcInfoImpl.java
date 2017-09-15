@@ -20,6 +20,7 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -179,38 +180,81 @@ public class PlcInfoImpl implements PlcInfoApi {
     }
 
     @Override
-    public boolean batchUpdateState(final List<int[]> updList){
+    public boolean batchUpdateState(final List<String[]> updList){
         if(null == updList || updList.size() == 0){
             return false;
         }
-        String sql = "update plc_info set state = ? where plc_id = ?";
+        String sql = "update plc_info set state = ? where plc_id = ? and date_format(update_date,'%Y-%m-%d %H:%i:%s') = ?";
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             public int getBatchSize() {
                 return updList.size();
                 //这个方法设定更新记录数，通常List里面存放的都是我们要更新的，所以返回list.size();
             }
             public void setValues(PreparedStatement ps, int i)throws SQLException {
-                int[] arg = updList.get(i);
-                ps.setInt(1, arg[0]);
-                ps.setInt(2, arg[1]);
+                try {
+                    String[] arg = updList.get(i);
+                    ps.setInt(1, Integer.parseInt(arg[0]));
+                    ps.setInt(2, Integer.parseInt(arg[1]));
+                    ps.setString(3, arg[2]);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
             }
         });
         return true;
     }
 
     @Override
-    public boolean batchDeletePlc(final List<Integer> ids){
+    public boolean batchDeletePlc(final List<Long> ids){
         if(null == ids || ids.size() == 0){
             return false;
         }
         StringBuilder idSb = new StringBuilder();
-        for(int id : ids){
+        for(long id : ids){
             idSb.append(",").append(id);
         }
         String sql = "delete from plc_info where plc_id in("+idSb.substring(1)+")";
         jdbcTemplate.update(sql);
 
         return true;
+    }
+
+    @Override
+    public List<Long> getDeleteIdsByUpdTime(List<String[]> delArgList){
+        if(null == delArgList || delArgList.size() == 0){
+            return null;
+        }
+
+        StringBuilder idSb = new StringBuilder();
+        for(String[] args : delArgList){
+            idSb.append(",").append(args[0]);
+        }
+        List<PlcExtend> plcInfoList = jdbcTemplate.query("select plc_id, update_date from plc_info where plc_id in("+idSb.substring(1)+")", new RowMapper() {
+            @Override
+            public Object mapRow(ResultSet resultSet, int i) throws SQLException {
+                PlcExtend model = new PlcExtend();
+                model.plc_id = resultSet.getLong("plc_id");
+                model.upd_time = TimeUtil.getYYYYMMDDHHMMSSDate(model.update_date);
+                return model;
+            }
+        });
+
+        if(null != plcInfoList){
+            List<Long> plcIds = new ArrayList<>();
+            for(String[] args : delArgList){
+                for(PlcExtend plcExtend : plcInfoList){
+                    if(Integer.parseInt(args[0]) == plcExtend.plc_id
+                            && args[1].equals(plcExtend.upd_time)){
+                        plcIds.add(plcExtend.plc_id);
+                        break;
+                    }
+                }
+            }
+
+            return plcIds;
+        }
+
+        return null;
     }
 
 
