@@ -5,7 +5,10 @@ import com.wecon.box.api.FileStorageApi;
 import com.wecon.box.constant.ConstKey;
 import com.wecon.box.entity.FileStorage;
 import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.box.enums.OpTypeOption;
+import com.wecon.box.enums.ResTypeOption;
 import com.wecon.box.util.BoxWebConfigContext;
+import com.wecon.box.util.DbLogUtil;
 import com.wecon.common.redis.RedisManager;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
@@ -53,6 +56,9 @@ public class FileAction {
 
     @Autowired
     FileStorageApi fileStorageApi;
+
+    @Autowired
+    protected DbLogUtil dbLogUtil;
 
     @Description("上传文件接口")
     @RequestMapping(value = "/fileupload")
@@ -107,6 +113,9 @@ public class FileAction {
         String url = BoxWebConfigContext.boxWebConfig.getFileDownloadUrl() + "?id=" + model.file_id + "&t=" + token;
         dataOut.put("file_url", url);
 
+        //<editor-fold desc="操作日志">
+        dbLogUtil.addOperateLog(OpTypeOption.AddFile, ResTypeOption.File, model.file_id, dataOut);
+        //</editor-fold>
         logger.debug("上传成功");
         return new Output(dataOut);
     }

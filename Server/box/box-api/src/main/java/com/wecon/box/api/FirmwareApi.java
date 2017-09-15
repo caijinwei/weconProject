@@ -14,6 +14,14 @@ import java.util.List;
 public interface FirmwareApi {
 
     /**
+     * 获取固件
+     *
+     * @param firmware_id
+     * @return
+     */
+    Firmware getFirmware(long firmware_id);
+
+    /**
      * 获取详情
      *
      * @param firmware_id
