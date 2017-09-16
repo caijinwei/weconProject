@@ -307,15 +307,15 @@ public class BoxNotifyTask extends Thread {
                     break;
                 case ACT_DELETE_MONITOR_CONFIG : //删除监控点配置
                     List<Map> delCfgList = fbData.get("del_cfg_list");
-                    /*List<Integer> alarmCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_ALARM);
-                    List<Integer> realCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_REAL);
-                    List<Integer> hisCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_HISTORY);
+                    List<Long> alarmCfgIds = alarmCfgApi.getDeleteIdsByUpdTime(getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_ALARM));
+                    List<Long> realCfgIds = realHisCfgApi.getDeleteIdsByUpdTime(getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_REAL));
+                    List<Long> hisCfgIds = realHisCfgApi.getDeleteIdsByUpdTime(getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_HISTORY));
                     realCfgIds.addAll(hisCfgIds);
                     //删除监控点配置、数据
                     realHisCfgApi.batchDeleteById(realCfgIds);
                     realHisCfgDataApi.batchDeleteById(realCfgIds);
                     alarmCfgApi.batchDeleteById(alarmCfgIds);
-                    alarmCfgDataApi.batchDeleteById(alarmCfgIds);*/
+                    alarmCfgDataApi.batchDeleteById(alarmCfgIds);
                     break;
                 case ACT_DELETE_PLC_CONFIG : //删除通讯口配置
                     List<Map> delComList = fbData.get("del_com_list");

@@ -68,7 +68,7 @@ public interface AlarmCfgDataApi {
 	 * @param ids
 	 * @return
      */
-	boolean batchDeleteById(final List<Integer> ids);
+	boolean batchDeleteById(final List<Long> ids);
 
 	/**
 	 * 分页查询报警数据

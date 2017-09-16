@@ -135,7 +135,14 @@ public interface RealHisCfgApi {
 	 * @param ids
 	 * @return
      */
-	boolean batchDeleteById(final List<Integer> ids);
+	boolean batchDeleteById(final List<Long> ids);
+
+	/**
+	 * 根据update_date查找需要删除的id列表
+	 * @param delArgList
+	 * @return
+	 */
+	List<Long> getDeleteIdsByUpdTime(List<String[]> delArgList);
 
 	/*
 	* 查找id根据device_id

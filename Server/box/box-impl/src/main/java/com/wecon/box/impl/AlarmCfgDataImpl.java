@@ -128,13 +128,13 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 	}
 
 	@Override
-	public boolean batchDeleteById(final List<Integer> ids) {
+	public boolean batchDeleteById(final List<Long> ids) {
 		if (null == ids || ids.size() == 0) {
 			return false;
 		}
 
 		StringBuilder idSb = new StringBuilder();
-		for (int id : ids) {
+		for (long id : ids) {
 			idSb.append(",").append(id);
 		}
 		String sql = "delete from alarm_cfg_data where alarm_cfg_id in(" + idSb.substring(1) + ")";
