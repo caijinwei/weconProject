@@ -3,6 +3,7 @@ package com.wecon.box.websocket;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.wecon.box.api.DeviceApi;
 import com.wecon.box.api.RealHisCfgApi;
 import com.wecon.box.api.RedisPiBoxApi;
 import com.wecon.box.constant.ConstKey;
@@ -34,6 +35,8 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	private RedisPiBoxApi redisPiBoxApi;
 	@Autowired
 	private RealHisCfgApi realHisCfgApi;
+	@Autowired
+	private DeviceApi deviceApi;
 
 	private String params;
 
@@ -180,6 +183,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 					}
 					String device_machine = realHisCfgDevice.machine_code;
 					machineCodeSet.add(device_machine);
+					Device device = deviceApi.getDevice(device_machine);
 					// 通过机器码去redis中获取数据
 					RedisPiBoxActData redisPiBoxActData = redisPiBoxApi.getRedisPiBoxActData(device_machine);
 					if (redisPiBoxActData != null) {
@@ -194,7 +198,12 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 									PiBoxComAddr piBoxComAddr = addr_list.get(x);
 
 									if (realHisCfgDevice.id == Long.parseLong(piBoxComAddr.addr_id)) {
-										realHisCfgDevice.re_state = piBoxComAddr.state;
+										if(device.state==0){
+											realHisCfgDevice.re_state = "0";
+										}else{
+											realHisCfgDevice.re_state= piBoxComAddr.state;
+										}
+										
 										realHisCfgDevice.re_value = piBoxComAddr.value;
 
 									}

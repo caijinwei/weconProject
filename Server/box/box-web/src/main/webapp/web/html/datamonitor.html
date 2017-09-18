@@ -89,9 +89,11 @@
 						<tbody>
 							<tr ng-repeat="x in actDatas">
 								<td>{{x.id}}</td>
-								<td>{{x.re_state==null?"超时":x.re_state==0?"超时":"在线"}}</td>
+								<td>{{x.re_state==null?"超时":x.re_state==0?"离线":x.re_state==1?"在线":"超时"}}</td>
 								<td><a href="#" id="act_name_{{x.id}}"
-									ng-click="editable_name(x);">{{x.ref_alais==''?x.name:x.ref_alais}}</a></td>
+									ng-if="(accounttype==1&&deviceid<0)||(accounttype==2)"
+									ng-click="editable_name(x);">{{x.ref_alais==''?x.name:x.ref_alais}}</a><span
+									ng-if="(accounttype==1&&deviceid>0)">{{x.ref_alais==''?x.name:x.ref_alais}}</span></td>
 								<td><a href="#" id="act_value_{{x.id}}"
 									ng-click="editable_value(x);"
 									ng-if="(accounttype==1)||(accounttype==2&&x.role_type==3)">{{x.re_value}}</a><span
@@ -182,11 +184,12 @@
 										</div>
 										<div class="row col-md-11 col-md-offset-1"
 											style="margin: 10px 0;" id="child_registeraddr">
-											<span class="col-md-3">寄存器地址(子编号)</span><input id="child_addrid"
-												type="text" class="col-md-3"
+											<span class="col-md-3">寄存器地址(子编号)</span><input
+												id="child_addrid" type="text" class="col-md-3"
 												style="height: 30px; padding-left: 5px;" /> <span
 												class="col-md-6" style="font-weight: bold;">子编号:<span
-												id="child_rangid"></span><span>(</span><span id="child_scaleid"></span><span>)</span></span>
+												id="child_rangid"></span><span>(</span><span
+												id="child_scaleid"></span><span>)</span></span>
 
 										</div>
 
