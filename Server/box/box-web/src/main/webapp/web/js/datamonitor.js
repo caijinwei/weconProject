@@ -19,13 +19,13 @@ appModule
 							totalItems : $scope.count,
 							pagesLength : 15,
 							perPageOptions : [ 5, 10, 20, 50, 100 ],
-							rememberPerPage : 'perPageItems',
-							onChange : function() {
+							rememberPerPage : 'perPageItems'
+							/*onChange : function() {
 								if (this.currentPage != 0) {
 									$scope.ws_send(this.currentPage,
 											this.itemsPerPage, actgroupId);
 								}
-							}
+							}*/
 						}
 
 						// 打开模态框
