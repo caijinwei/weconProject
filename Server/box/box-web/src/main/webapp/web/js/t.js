@@ -84,7 +84,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             alert("ajax error");
         });
     }
-
     var sock;
     $scope.ws_connect = function () {
         console.log(1);

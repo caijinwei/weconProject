@@ -79,7 +79,7 @@ public class BoxNotifyTask extends Thread {
             List<PlcExtend> plcExtendLst = plcInfoApi.getPlcExtendListByState(Constant.State.STATE_UPDATE_CONFIG, Constant.State.STATE_NEW_CONFIG);
             logger.info("updatePlcCfgHandle，获取更新条数："+(null==plcExtendLst?"0":plcExtendLst.size()));
             if(null != plcExtendLst){
-                Map<String, List<Map>> groupPlcExtends = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(plcExtendLst));
+                Map<String, List<Map>> groupPlcExtends = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(plcExtendLst), PlcExtend.UPDATE_PLC_FIELD_FILTER);
                 if(null != groupPlcExtends){
                     for(Map.Entry<String, List<Map>> entry : groupPlcExtends.entrySet()){
                         BaseMsgResp<Map<String, List<Map>>> baseMsgResp = new BaseMsgResp<Map<String, List<Map>>>();
@@ -111,7 +111,7 @@ public class BoxNotifyTask extends Thread {
             List<RealHisCfgExtend> realHisCfgList = realHisCfgApi.getRealHisCfgListByState(Constant.State.STATE_UPDATE_CONFIG, Constant.State.STATE_NEW_CONFIG);
             logger.info("updateRealHisCfgHandle，获取更新条数："+(null==realHisCfgList?"0":realHisCfgList.size()));
             if(null != realHisCfgList){
-                Map<String, List<Map>> groupRealHisCfg = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(realHisCfgList));
+                Map<String, List<Map>> groupRealHisCfg = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(realHisCfgList), RealHisCfgExtend.UPDATE_REAL_HIS_FIELD_FILTER);
                 if(null != groupRealHisCfg){
                     for(Map.Entry<String, List<Map>> entry : groupRealHisCfg.entrySet()){
                         BaseMsgResp<Map<String, List<BaseCfgCom<Map>>>> baseMsgResp = new BaseMsgResp<Map<String, List<BaseCfgCom<Map>>>>();
@@ -150,7 +150,7 @@ public class BoxNotifyTask extends Thread {
             List<AlarmCfgExtend> alarmCfgExtendList = alarmCfgApi.getAlarmCfgExtendListByState(Constant.State.STATE_UPDATE_CONFIG, Constant.State.STATE_NEW_CONFIG);
             logger.info("updateAlarmCfgHandle，获取更新条数："+(null==alarmCfgExtendList?"0":alarmCfgExtendList.size()));
             if(null != alarmCfgExtendList){
-                Map<String, List<Map>> groupAlarmCfg = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(alarmCfgExtendList));
+                Map<String, List<Map>> groupAlarmCfg = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(alarmCfgExtendList), AlarmCfgExtend.UPDATE_ALARM_FIELD_FILTER);
                 if(null != groupAlarmCfg){
                     for(Map.Entry<String, List<Map>> entry : groupAlarmCfg.entrySet()){
                         BaseMsgResp<Map<String, List<BaseCfgCom<Map>>>> baseMsgResp = new BaseMsgResp<Map<String, List<BaseCfgCom<Map>>>>();
@@ -307,9 +307,9 @@ public class BoxNotifyTask extends Thread {
                     break;
                 case ACT_DELETE_MONITOR_CONFIG : //删除监控点配置
                     List<Map> delCfgList = fbData.get("del_cfg_list");
-                    List<Integer> alarmCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_ALARM);
-                    List<Integer> realCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_REAL);
-                    List<Integer> hisCfgIds = getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_HISTORY);
+                    List<Long> alarmCfgIds = alarmCfgApi.getDeleteIdsByUpdTime(getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_ALARM));
+                    List<Long> realCfgIds = realHisCfgApi.getDeleteIdsByUpdTime(getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_REAL));
+                    List<Long> hisCfgIds = realHisCfgApi.getDeleteIdsByUpdTime(getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_HISTORY));
                     realCfgIds.addAll(hisCfgIds);
                     //删除监控点配置、数据
                     realHisCfgApi.batchDeleteById(realCfgIds);
@@ -319,13 +319,13 @@ public class BoxNotifyTask extends Thread {
                     break;
                 case ACT_DELETE_PLC_CONFIG : //删除通讯口配置
                     List<Map> delComList = fbData.get("del_com_list");
-                    List<Integer> ids = getFeedbackDelArgs(delComList, "com", 5);
+                    List<Long> plcIds = plcInfoApi.getDeleteIdsByUpdTime(getFeedbackDelArgs(delComList, "com", 5));
                     //删除通讯口数据，实时历史报警配置、数据
-                    plcInfoApi.batchDeletePlc(ids);
-                    alarmCfgApi.batchDeleteByPlcId(ids);
-                    realHisCfgApi.batchDeleteByPlcId(ids);
-                    alarmCfgDataApi.batchDeleteByPlcId(ids);
-                    realHisCfgDataApi.batchDeleteByPlcId(ids);
+                    plcInfoApi.batchDeletePlc(plcIds);
+                    alarmCfgApi.batchDeleteByPlcId(plcIds);
+                    realHisCfgApi.batchDeleteByPlcId(plcIds);
+                    alarmCfgDataApi.batchDeleteByPlcId(plcIds);
+                    realHisCfgDataApi.batchDeleteByPlcId(plcIds);
                     break;
             }
         }catch (NumberFormatException e){
@@ -337,14 +337,14 @@ public class BoxNotifyTask extends Thread {
         }
     }
 
-    private List<int[]> getFeedbackUpdArgs(List<Map> updCfgList, String idKey){
+    private List<String[]> getFeedbackUpdArgs(List<Map> updCfgList, String idKey){
         if(null != updCfgList){
-            List<int[]> updArgList = new ArrayList<int[]>();
+            List<String[]> updArgList = new ArrayList<String[]>();
             for(Map m : updCfgList){
                 try {
                     if(UPD_STATE_SUCCESS == Integer.parseInt(m.get("upd_state").toString())){
-                        updArgList.add(new int[]{Constant.State.STATE_SYNCED_BOX,
-                                Integer.parseInt(m.get(idKey).toString())});
+                        updArgList.add(new String[]{Constant.State.STATE_SYNCED_BOX+"",
+                                m.get(idKey).toString(), m.get("upd_time").toString()});
                     }
                 }catch (Exception e){
                     e.printStackTrace();
@@ -355,20 +355,21 @@ public class BoxNotifyTask extends Thread {
         return null;
     }
 
-    private List<Integer> getFeedbackDelArgs(List<Map> delCfgList, String idKey, int delType){
+    private List<String[]> getFeedbackDelArgs(List<Map> delCfgList, String idKey, int delType){
         if(null != delCfgList){
-            List<Integer> delArgList = new ArrayList<Integer>();
+            List<String[]> delArgList = new ArrayList<String[]>();
             for(Map m : delCfgList){
                 try {
                     if(UPD_STATE_SUCCESS == Integer.parseInt(m.get("upd_state").toString())){
                         Object delTypeOj = m.get("del_type");
-                        int id = Integer.parseInt(m.get(idKey).toString());
+                        String id = m.get(idKey).toString();
+                        String updTime = m.get("upd_time").toString();
                         if(null != delTypeOj){
                             if(Integer.parseInt(delTypeOj.toString()) == delType){
-                                delArgList.add(id);
+                                delArgList.add(new String[]{id, updTime});
                             }
                         }else{
-                            delArgList.add(id);
+                            delArgList.add(new String[]{id, updTime});
                         }
                     }
                 }catch (Exception e){

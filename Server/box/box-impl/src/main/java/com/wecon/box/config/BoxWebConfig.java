@@ -10,11 +10,24 @@ public class BoxWebConfig {
      */
     private String emailActiveUrl;
 
+    /**
+     * 下载文件接口url
+     */
+    private String fileDownloadUrl;
+
     public String getEmailActiveUrl() {
         return emailActiveUrl;
     }
 
     public void setEmailActiveUrl(String emailActiveUrl) {
         this.emailActiveUrl = emailActiveUrl;
+    }
+
+    public String getFileDownloadUrl() {
+        return fileDownloadUrl;
+    }
+
+    public void setFileDownloadUrl(String fileDownloadUrl) {
+        this.fileDownloadUrl = fileDownloadUrl;
     }
 }

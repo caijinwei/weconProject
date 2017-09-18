@@ -121,21 +121,28 @@ public interface RealHisCfgApi {
 	 * @param updList
 	 * @return
 	 */
-	boolean batchUpdateState(final List<int[]> updList);
+	boolean batchUpdateState(final List<String[]> updList);
 
 	/**
 	 * 批量删除实时历史配置根据plc_id
 	 * @param ids
 	 * @return
      */
-	boolean batchDeleteByPlcId(final List<Integer> ids);
+	boolean batchDeleteByPlcId(final List<Long> ids);
 
 	/**
 	 * 批量删除实时历史配置根据id
 	 * @param ids
 	 * @return
      */
-	boolean batchDeleteById(final List<Integer> ids);
+	boolean batchDeleteById(final List<Long> ids);
+
+	/**
+	 * 根据update_date查找需要删除的id列表
+	 * @param delArgList
+	 * @return
+	 */
+	List<Long> getDeleteIdsByUpdTime(List<String[]> delArgList);
 
 	/*
 	* 查找id根据device_id

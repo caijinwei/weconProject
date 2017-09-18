@@ -70,14 +70,21 @@ public interface PlcInfoApi {
 	 * @param updList
 	 * @return
      */
-	boolean batchUpdateState(final List<int[]> updList);
+	boolean batchUpdateState(final List<String[]> updList);
 
 	/**
 	 * 批量删除Plc
 	 * @param ids
 	 * @return
      */
-	boolean batchDeletePlc(final List<Integer> ids);
+	boolean batchDeletePlc(final List<Long> ids);
+
+	/**
+	 * 根据update_date查找需要删除的id列表
+	 * @param delArgList
+	 * @return
+     */
+	List<Long> getDeleteIdsByUpdTime(List<String[]> delArgList);
 
 	/*
 	* 通讯协议是否已经存在

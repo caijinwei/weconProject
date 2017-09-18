@@ -20,6 +20,11 @@ public class ConstKey {
     public final static int SESSION_EXPIRE_TIME = 3600 * 12;
 
     /**
+     * 文件下载默认过期时间 单位秒
+     */
+    public final static int FILEDOWNLOAD_EXPIRE_TIME = 3600;
+
+    /**
      * 保存激活邮件的token的key,由帐号Id组成，值为随机生成的token,有设置过期时间
      */
     public final static String REDIS_EMAIL_SIGNUP_TOKEN = "pibox:emailsignuptoken:%s";
@@ -33,4 +38,9 @@ public class ConstKey {
      * 保存手机验证码的key,由手机号组成，值为随机生成的六位数,有设置过期时间
      */
     public final static String REDIS_PHONE_SIGNIN_VERCODE = "pibox:phonesignupvercode:%s";
+
+    /**
+     * 保存文件下载的token的key,由文件Id组成，值为随机生成的token,有设置过期时间
+     */
+    public final static String REDIS_FILE_DOWNLOAD_TOKEN = "pibox:filedownloadtoken:%s";
 }

@@ -52,14 +52,14 @@ public interface RealHisCfgDataApi {
 	 * @param ids
 	 * @return
      */
-	boolean batchDeleteByPlcId(List<Integer> ids);
+	boolean batchDeleteByPlcId(List<Long> ids);
 
 	/**
 	 * 批量删除实时历史配置数据根据real_his_cfg_id
 	 * @param ids
 	 * @return
      */
-	boolean batchDeleteById(final List<Integer> ids);
+	boolean batchDeleteById(final List<Long> ids);
 
 	/**
 	 * 获取某条历史（实时）数据的分页列表

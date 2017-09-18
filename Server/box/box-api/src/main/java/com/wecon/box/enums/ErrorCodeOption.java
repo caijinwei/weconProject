@@ -30,6 +30,12 @@ public enum ErrorCodeOption {
     UploadFileError("上传文件异常", 12000),
     UploadFileParamEmpty("上传文件参数为空", 12001),
     UploadFileExtError("上传文件格式有误", 12002),
+    DownloadFileParamError("下载文件参数异常", 12003),
+    FileGetVerError("文件解析版本有错", 12004),
+
+    //检查更新相关（固件，驱动升级）
+    FirmwareExisted("此版本固件已经存在", 13000),
+    FirmwareNotExist("操作的固件不存在", 13001),
 
     PiBoxDevice_IsNot_Found("盒子不存在",300009),
     Account_Permissions_No("账户权限不足，无法新增盒子", 30001),
@@ -49,6 +55,8 @@ public enum ErrorCodeOption {
     PIBox_Bound_PointMove_False("设备绑定失败",300016),
     Delete_AccDevice_Rel_False("设备解绑失败",300017),
     DeviceId_Is_Unknown("盒子设备ID非法",300018),
+    DebugInfo_PramaIsNotFount_MachineCode("关闭调试不成功缺失参数机器码",300019),
+    GetDevFirm_PramaIsUnFormate_MachineCode("获取设备固件信息失败",300020),
 
 
     Get_Groupid_Error("获取数组ID错误",50001),

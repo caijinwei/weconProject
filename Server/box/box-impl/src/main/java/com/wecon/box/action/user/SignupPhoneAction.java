@@ -48,7 +48,7 @@ public class SignupPhoneAction extends UserBaseAction {
         String vercodeRedis = RedisManager.get(ConstKey.REDIS_GROUP_NAME, redisKey);
         if (vercodeRedis == null) {
             //保存到redis
-            RedisManager.set(ConstKey.REDIS_GROUP_NAME, redisKey, String.valueOf(vercode), 60);
+            RedisManager.set(ConstKey.REDIS_GROUP_NAME, redisKey, String.valueOf(vercode), 60 * 3);//验证码保存3分钟
             if (VerifyUtil.isChinaPhone(phonenum)) {
                 SmsUtil.sendSMS(phonenum, String.valueOf(vercode));
             } else if (VerifyUtil.isValidEmail(phonenum)) {

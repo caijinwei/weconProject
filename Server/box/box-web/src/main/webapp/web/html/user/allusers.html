@@ -71,10 +71,10 @@
                 <th>用户名</th>
                 <th>手机号</th>
                 <th>邮箱号</th>
-                <td>账户密码</td>
                 <th>帐号类型</th>
                 <th>启用状态</th>
                 <th>创建时间</th>
+                <th>操作</th>
             </tr>
             </thead>
             <tbody ng-repeat="x in pushlist">
@@ -83,7 +83,6 @@
                 <td>{{x.username}}</td>
                 <td>{{x.phonenum}}</td>
                 <td>{{x.email}}</td>
-                <td ng-click="chgPwd(x.account_id,x.username)">{{x.password}}</td>
                 <td ng-click="getAccountRelationByManagerAccId(x.account_id,x.type)">
                     {{x.type==1?'管理者帐号':(x.type==2?'视图帐号':((x.type==0?'超管帐号':x.type)))}}
                 </td>
@@ -91,11 +90,17 @@
                     <div class="{{x.state?'glyphicon glyphicon-ok':'glyphicon glyphicon-remove'}}"></div>
                 </td>
                 <td>{{x.create_date|date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                <td>
+                    <button  type="button" class="btn btn-info"
+                            ng-click="chgPwd(x.account_id,x.username)">修改密码
+                    </button>
+                </td>
             </tr>
 
             <!-- 视图账户-->
-            <div class="viewShow" >
-                <tr name="manager_{{x.account_id}}" ng-if="manager_id==x.account_id" style="color: #5bc0de" ng-repeat="y in viewAccountList"
+            <div class="viewShow">
+                <tr name="manager_{{x.account_id}}" ng-if="manager_id==x.account_id" style="color: #5bc0de"
+                    ng-repeat="y in viewAccountList"
                     change-color>
                     <td>{{y.account_id}}</td>
                     <td>{{y.username}}</td>

@@ -5,6 +5,8 @@ import com.wecon.box.entity.Page;
 import com.wecon.box.filter.AccountFilter;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * Created by zengzhipeng on 2017/7/31.
  */
@@ -136,4 +138,8 @@ public interface AccountApi {
     * @param pwd
     * */
     void updatePwd(long accountId,String pwd);
+    /*
+    * 获取全部的account
+    * */
+    List<Account> getAllAccounts();
 }

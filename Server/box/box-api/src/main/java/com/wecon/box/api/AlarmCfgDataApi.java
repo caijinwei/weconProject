@@ -61,14 +61,14 @@ public interface AlarmCfgDataApi {
 	 * @param ids
 	 * @return
      */
-	boolean batchDeleteByPlcId(List<Integer> ids);
+	boolean batchDeleteByPlcId(List<Long> ids);
 
 	/**
 	 * 批量删除报警配置数据根据alarm_cfg_id
 	 * @param ids
 	 * @return
      */
-	boolean batchDeleteById(final List<Integer> ids);
+	boolean batchDeleteById(final List<Long> ids);
 
 	/**
 	 * 分页查询报警数据
