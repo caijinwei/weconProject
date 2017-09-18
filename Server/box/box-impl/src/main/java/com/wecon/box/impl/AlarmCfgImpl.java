@@ -8,6 +8,8 @@ import com.wecon.box.entity.AlarmTrigger;
 import com.wecon.box.entity.Page;
 import com.wecon.common.util.TimeUtil;
 
+import com.wecon.common.util.CommonUtils;
+import com.wecon.common.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -232,6 +234,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 				new DefaultAlarmCfgExtendRowMapper());
 		List<AlarmTrigger> alarmCfgTriggerLst = jdbcTemplate.query(triSql, state,
 				new DefaultAlarmTriggerRowMapper());
+
 		if(null != alarmCfgExtendLst && null != alarmCfgTriggerLst){
 			for(AlarmCfgExtend ae : alarmCfgExtendLst){
 				List<AlarmTrigger> conditionList = new ArrayList<AlarmTrigger>();

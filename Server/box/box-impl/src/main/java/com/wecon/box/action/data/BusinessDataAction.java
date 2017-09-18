@@ -262,6 +262,15 @@ public class BusinessDataAction {
         // 获取实时数据配置信息
         RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
         List<RealHisCfgDevice> realHisCfgDeviceList = null;
+        Map<String, Object> bParams = new HashMap<String, Object>();
+        if(param.boxId != 0){
+            bParams.put("boxId", param.boxId);
+        }
+        if(param.groupId != 0){
+            bParams.put("groupId", param.groupId);
+        }
+        param.pageIndex = 1;
+        param.pageSize = Integer.MAX_VALUE;
         /** 管理者账号 **/
         if (client.userInfo.getUserType() == 1) {
             /** 管理 **/
