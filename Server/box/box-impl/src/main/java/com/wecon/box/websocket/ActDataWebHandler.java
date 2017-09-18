@@ -46,6 +46,8 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 
 	private SubscribeListener subscribeListener;
 
+	private Client client;
+
 	private static final Logger logger = LogManager.getLogger(ActDataHandler.class.getName());
 
 	/**
@@ -113,7 +115,6 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 		try {
 			Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {
 			});
-			Client client = AppContext.getSession().client;
 			JSONObject json = new JSONObject();
 			/** 获取实时数据配置信息 **/
 			RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
@@ -156,9 +157,10 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 						Integer.parseInt(bParams.get("pageIndex").toString()),
 						Integer.parseInt(bParams.get("pageSize").toString()));
 			}
-			machineCodeSet = new HashSet<>();
+
 			// 如果该账号下无实时数据配置文件直接返回空
 			if (realHisCfgDeviceList != null && realHisCfgDeviceList.getList().size() > 0) {
+				machineCodeSet = new HashSet<>();
 				for (int i = 0; i < realHisCfgDeviceList.getList().size(); i++) {
 					RealHisCfgDevice realHisCfgDevice = realHisCfgDeviceList.getList().get(i);
 					if (realHisCfgDevice.digit_count != null) {
@@ -235,6 +237,9 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		logger.debug("连接成功");
+		if (client == null) {
+			client = AppContext.getSession().client;
+		}
 	}
 
 	/**
@@ -249,6 +254,8 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 		logger.debug("关闭连接");
 		// 取消订阅
 		subscribeListener.unsubscribe();
+		subscribeListener = null;
+		machineCodeSet = null;
 		logger.debug("Redis取消订阅成功");
 	}
 }
