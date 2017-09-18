@@ -30,7 +30,7 @@ import java.util.Map;
 public class RealHisCfgImpl implements RealHisCfgApi {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	private final String SEL_COL = "r.id,r.data_id,r.account_id,r.plc_id,r.name,r.addr,r.addr_type,r.describe,r.digit_count,r.data_limit,r.his_cycle,r.data_type,r.state,r.create_date,r.update_date,r.bind_state,r.device_id,r.rid";
+	private final String SEL_COL = "r.id,r.data_id,r.account_id,r.plc_id,r.name,r.addr,r.addr_type,r.describe,r.digit_count,r.data_limit,r.his_cycle,r.data_type,r.state,r.create_date,r.update_date,r.bind_state,r.device_id,r.rid,r.digit_binary";
 
 	@Override
 	public long saveRealHisCfg(final RealHisCfg model) {
@@ -39,7 +39,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
 				PreparedStatement preState = con.prepareStatement(
-						"insert into real_his_cfg(data_id,account_id,plc_id,`name`,addr,addr_type,`describe`,digit_count,data_limit,his_cycle,data_type,state,create_date,update_date,bind_state,device_id,rid)values(?,?,?,?,?,?,?,?,?,?,?,?,current_timestamp(),current_timestamp(),1,?,?);",
+						"insert into real_his_cfg(data_id,account_id,plc_id,`name`,addr,addr_type,`describe`,digit_count,data_limit,his_cycle,data_type,state,create_date,update_date,bind_state,device_id,rid,digit_binary)values(?,?,?,?,?,?,?,?,?,?,?,?,current_timestamp(),current_timestamp(),1,?,?,?);",
 						Statement.RETURN_GENERATED_KEYS);
 				preState.setLong(1, model.data_id);
 				preState.setLong(2, model.account_id);
@@ -55,6 +55,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 				preState.setInt(12, model.state);
 				preState.setLong(13, model.device_id);
 				preState.setString(14, model.rid);
+				preState.setString(15, model.digit_binary);
 				return preState;
 			}
 		}, key);
@@ -64,11 +65,11 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 	@Override
 	public boolean updateRealHisCfg(RealHisCfg model) {
-		String sql = "update real_his_cfg SET data_id=?,account_id=?,plc_id=?,`name`=?,addr=?,addr_type=?,`describe`=?,digit_count=?,data_limit=?,his_cycle=?,data_type=?,state=?,update_date=current_timestamp(),bind_state=?,device_id=?,rid=? where id=?";
+		String sql = "update real_his_cfg SET data_id=?,account_id=?,plc_id=?,`name`=?,addr=?,addr_type=?,`describe`=?,digit_count=?,data_limit=?,his_cycle=?,data_type=?,state=?,update_date=current_timestamp(),bind_state=?,device_id=?,rid=?,digit_binary=? where id=?";
 		jdbcTemplate.update(sql,
 				new Object[] { model.data_id, model.account_id, model.plc_id, model.name, model.addr, model.addr_type,
 						model.describe, model.digit_count, model.data_limit, model.his_cycle, model.data_type,
-						model.state, model.bind_state, model.device_id, model.rid, model.id });
+						model.state, model.bind_state, model.device_id, model.rid,model.digit_binary, model.id });
 
 		return true;
 	}
@@ -646,6 +647,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.addr_type = rs.getInt("addr_type");
 			model.describe = rs.getString("describe");
 			model.digit_count = rs.getString("digit_count");
+			model.digit_binary = rs.getString("digit_binary");
 			model.data_limit = rs.getString("data_limit");
 			model.his_cycle = rs.getInt("his_cycle");
 			model.data_type = rs.getInt("data_type");
@@ -676,6 +678,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.describe = rs.getString("describe");
 			model.digit_count = rs.getString("digit_count");
 			model.data_limit = rs.getString("data_limit");
+			model.digit_binary = rs.getString("digit_binary");
 			model.his_cycle = rs.getInt("his_cycle");
 			model.data_type = rs.getInt("data_type");
 			model.state = rs.getInt("state");
@@ -733,6 +736,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.addr_type = rs.getInt("addr_type");
 			model.describe = rs.getString("describe");
 			model.digit_count = rs.getString("digit_count");
+			model.digit_binary = rs.getString("digit_binary");
 			model.data_limit = rs.getString("data_limit");
 			model.his_cycle = rs.getInt("his_cycle");
 			model.data_type = rs.getInt("data_type");
@@ -765,6 +769,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.describe = rs.getString("describe");
 			model.digit_count = rs.getString("digit_count");
 			model.data_limit = rs.getString("data_limit");
+			model.digit_binary = rs.getString("digit_binary");
 			model.his_cycle = rs.getInt("his_cycle");
 			model.data_type = rs.getInt("data_type");
 			model.state = rs.getInt("state");

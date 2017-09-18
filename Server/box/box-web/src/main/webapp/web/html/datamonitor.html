@@ -38,16 +38,15 @@
 			<li ng-repeat="x in dir_list"
 				ng-class="{active:x.id==dir_list[0].id && type==0 }"><a
 				href="#data-item-1" data-toggle="tab" id="actgroupId"
-				ng-click="mc_change();act_submit(paginationConf.currentPage,paginationConf.itemsPerPage,x.id);">{{x.name}}</a>
+				ng-click="ws_send(paginationConf.currentPage,paginationConf.itemsPerPage,x.id);">{{x.name}}</a>
 			</li>
 
 
-			<li><a href="#group-setting" data-toggle="tab"
-				ng-click="mc_change();"> <span class="glyphicon glyphicon-cog"></span>
-					分组设置
+			<li><a href="#group-setting" data-toggle="tab"> <span
+					class="glyphicon glyphicon-cog"></span> 分组设置
 			</a></li>
 			<!-- <li><a href="#global-setting" data-toggle="tab"
-				ng-click="mc_change();"> <span class="glyphicon glyphicon-globe"></span>
+				ng-click=""> <span class="glyphicon glyphicon-globe"></span>
 					全局设置
 			</a></li> -->
 		</ul>
@@ -92,9 +91,9 @@
 								<td>{{x.id}}</td>
 								<td>{{x.re_state==null?"超时":x.re_state==0?"超时":"在线"}}</td>
 								<td><a href="#" id="act_name_{{x.id}}"
-									ng-click="editable_name(x);mc_change();">{{x.ref_alais==''?x.name:x.ref_alais}}</a></td>
+									ng-click="editable_name(x);">{{x.ref_alais==''?x.name:x.ref_alais}}</a></td>
 								<td><a href="#" id="act_value_{{x.id}}"
-									ng-click="editable_value(x);mc_change();"
+									ng-click="editable_value(x);"
 									ng-if="(accounttype==1)||(accounttype==2&&x.role_type==3)">{{x.re_value}}</a><span
 									ng-if="accounttype==2&&x.role_type!=3">{{x.re_value}}</span></td>
 								<td>{{x.state==0?"已同步盒子":x.state==1?"新增":x.state==2?"已变更":x.state==3?"已删除":x.state}}</td>
@@ -105,21 +104,19 @@
 										<span class="glyphicon glyphicon-edit"></span> 编辑
 								</a> <a href="#" title="复制" data-toggle="modal"
 									data-target="#copyDataGroup" ng-cloak ng-if="deviceid<0"
-									ng-click="mc_change();copymonitor(x);"> <span
+									ng-click="copymonitor(x);"> <span
 										class="glyphicon glyphicon-file"></span> 复制
 								</a> <a href="#" title="移动分组" data-toggle="modal"
-									data-target="#moveDataGroup"
-									ng-click="mc_change();movemonitor(x);"> <span
+									data-target="#moveDataGroup" ng-click="movemonitor(x);"> <span
 										class="glyphicon glyphicon-resize-horizontal"></span> 移动
 								</a> <a href="#" title="移除" data-toggle="modal" ng-cloak
 									ng-if="accounttype==1&& deviceid<0" data-target="#deletePoint"
-									ng-click="mc_change();remonitor(x);"> <span
+									ng-click="remonitor(x);"> <span
 										class="glyphicon glyphicon-trash"></span> 移除
 								</a> <a href="#" title="删除" data-toggle="modal"
 									data-target="#deletePoint" ng-cloak
-									ng-if="accounttype==1&& deviceid>0"
-									ng-click="mc_change();delmonitor(x);"> <span
-										class="glyphicon glyphicon-trash"></span> 删除
+									ng-if="accounttype==1&& deviceid>0" ng-click="delmonitor(x);">
+										<span class="glyphicon glyphicon-trash"></span> 删除
 								</a></td>
 							</tr>
 						</tbody>
@@ -151,56 +148,61 @@
 												<option ng-repeat="x in infoDatas" value="{{x.plcId}}">{{$index+1}}-{{x.port}}</option>
 											</select>
 										</div>
-										<div class="row col-md-11 col-md-offset-1"
-											style="margin: 10px 0;">
-											<span class="col-md-3">数据格式</span> <select id="datatypeid"
-												class="col-md-9" style="height: 30px;">
-												<option ng-repeat="x in dataTypes" value="{{x.value}}">{{x.text}}</option>
-											</select>
-										</div>
+
 										<div class="row col-md-11 col-md-offset-1"
 											style="margin: 10px 0;">
 											<span class="col-md-3">地址类型</span> <select class="col-md-3"
 												id="addrtypeid" style="height: 30px;">
 												<option ng-repeat="x in allAddrs" value="{{x.addrkey}}">{{x.addrkey==0?"位地址":x.addrkey==1?"字节地址":x.addrkey==2?"字地址":"双字"}}</option>
 
-											</select> <span class="col-md-3">寄存器地址</span> <select id="registerid"
+											</select> <span class="col-md-3">寄存器类型</span> <select id="registerid"
 												class="col-md-3" style="height: 30px;">
 												<option ng-repeat="x in addrvalues" value="{{x.addrvalue}}">{{x.addrvalue}}</option>
 
 											</select>
 										</div>
 
-										<div id="datadigits" class="row col-md-11 col-md-offset-1"
-											style="margin: 10px 0; display: none;">
-											<div id="div-integer">
-												<span class="col-md-3">整数位数</span> <select
-													id="integerdigits" class="col-md-3" style="height: 30px;"
-													onchange="getData()">
 
-												</select>
-											</div>
-											<div id="div-decimal">
-												<span class="col-md-3">小数位数</span> <select
-													id="decimaldigits" class="col-md-3" style="height: 30px;"
-													onchange="calcuSystem()">
-
-												</select>
-											</div>
-										</div>
-										<div class="row col-md-11 col-md-offset-1"
+										<!-- <div class="row col-md-11 col-md-offset-1"
 											style="margin: 10px 0;">
 											<div id="data-range">
-												<span class="col-md-3">数据范围</span> <input type="text"
+												<span class="col-md-3">地址范围</span> <input type="text"
 													class="col-md-9" style="height: 30px; padding-left: 5px;"
 													id="rangid" disabled />
 											</div>
+										</div> -->
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;" id="registeraddr">
+											<span class="col-md-3">寄存器地址(主编号)</span><input id="addrid"
+												type="text" class="col-md-3"
+												style="height: 30px; padding-left: 5px;" /> <span
+												class="col-md-6" style="font-weight: bold;">主编号:<span
+												id="rangid"></span><span>(</span><span id="scaleid"></span><span>)</span></span>
+
 										</div>
 										<div class="row col-md-11 col-md-offset-1"
-											style="margin: 10px 0;">
-											<span class="col-md-3">地址</span><input id="addrid"
-												type="text" class="col-md-9"
-												style="height: 30px; padding-left: 5px;" />
+											style="margin: 10px 0;" id="child_registeraddr">
+											<span class="col-md-3">寄存器地址(子编号)</span><input id="child_addrid"
+												type="text" class="col-md-3"
+												style="height: 30px; padding-left: 5px;" /> <span
+												class="col-md-6" style="font-weight: bold;">子编号:<span
+												id="child_rangid"></span><span>(</span><span id="child_scaleid"></span><span>)</span></span>
+
+										</div>
+
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;" id="divdatatypeid">
+											<span class="col-md-3">数据格式</span> <select id="datatypeid"
+												class="col-md-9" style="height: 30px;">
+												<option ng-repeat="x in dataTypes" value="{{x.value}}">{{x.text}}</option>
+											</select>
+										</div>
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;" id="datadigitid">
+											<span class="col-md-3">整数位数</span> <input type="text"
+												class="col-md-3" style="height: 30px;" id="dataid" /> <span
+												class="col-md-3">小数位数</span><input type="text"
+												class="col-md-3" style="height: 30px;" id="decid" />
 										</div>
 										<div class="row col-md-11 col-md-offset-1"
 											style="margin: 10px 0;">

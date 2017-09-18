@@ -437,6 +437,7 @@ public class RedisManager {
         Jedis jedis = null;
         try {
             jedis = getJedis(group);
+            
             jedis.subscribe(jedisPubSub, channel);
         } finally {
             returnJedis(jedis);

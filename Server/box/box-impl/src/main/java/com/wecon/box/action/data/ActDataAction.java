@@ -150,7 +150,7 @@ public class ActDataAction {
 			realHisCfgFilter.data_type = 0;
 			realHisCfgFilter.his_cycle = -1;
 			realHisCfgFilter.state = -1;
-			realHisCfgFilter.bind_state=1;
+			realHisCfgFilter.bind_state = 1;
 
 			realHisCfgFilter.account_id = client.userId;
 
@@ -180,7 +180,13 @@ public class ActDataAction {
 		if (realHisCfgDeviceList != null && realHisCfgDeviceList.getList().size() > 0) {
 			for (int i = 0; i < realHisCfgDeviceList.getList().size(); i++) {
 				RealHisCfgDevice realHisCfgDevice = realHisCfgDeviceList.getList().get(i);
-
+				String[] numdecs = realHisCfgDevice.digit_count.split(",");
+				System.out.println("ss=" + numdecs);
+				if (numdecs != null && numdecs.length > 0) {
+					System.out.println(numdecs[0]);
+					realHisCfgDevice.num = numdecs[0];
+					realHisCfgDevice.dec = numdecs[1];
+				}
 				String device_machine = realHisCfgDevice.machine_code;
 				// 通过机器码去redis中获取数据
 				RedisPiBoxActData redisPiBoxActData = redisPiBoxApi.getRedisPiBoxActData(device_machine);
@@ -256,10 +262,11 @@ public class ActDataAction {
 			RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(addr_id));
 			if (realHisCfg != null) {
 				Device device = deviceApi.getDevice(realHisCfg.device_id);
-				if(device.state==0){//盒子离线，不进行下发
+				if (device.state == 0) {// 盒子离线，不进行下发
 					json.put("resultData", 0);
 					return new Output(json);
 				}
+
 				if (device != null) {
 					PiBoxComAddr addr1 = new PiBoxComAddr();
 					addr1.addr_id = addr_id;
@@ -283,9 +290,33 @@ public class ActDataAction {
 					System.out.println(message);
 					server.message.setPayload((message).getBytes());
 					server.topic11 = server.client.getTopic("pibox/stc/" + device.machine_code);
-
 					server.publish(server.topic11, server.message);
-					System.out.println(server.message.isRetained() + "------ratained状态");
+					// 通过机器码去redis中获取数据
+					RedisPiBoxActData redisPiBoxActData = redisPiBoxApi.getRedisPiBoxActData(device.machine_code);
+					if (redisPiBoxActData != null) {
+						List<PiBoxCom> act_time_data_list = redisPiBoxActData.act_time_data_list;
+						for (int j = 0; j < act_time_data_list.size(); j++) {
+							PiBoxCom Com = act_time_data_list.get(j);
+
+							if (realHisCfg.plc_id == Long.parseLong(Com.com)) {
+
+								List<PiBoxComAddr> addr_list = Com.addr_list;
+								for (int x = 0; x < addr_list.size(); x++) {
+									PiBoxComAddr piBoxComAddr = addr_list.get(x);
+
+									if (realHisCfg.id == Long.parseLong(piBoxComAddr.addr_id)) {
+										dbLogUtil.updOperateLog(OpTypeOption.WriteAct, ResTypeOption.Write,
+												realHisCfg.id, piBoxComAddr.value, value);
+
+									}
+
+								}
+
+							}
+
+						}
+					}
+
 					server.client.disconnect();
 
 				}
@@ -426,7 +457,7 @@ public class ActDataAction {
 			realHisCfgFilter.data_type = 0;
 			realHisCfgFilter.his_cycle = -1;
 			realHisCfgFilter.state = -1;
-			realHisCfgFilter.bind_state=1;
+			realHisCfgFilter.bind_state = 1;
 
 			realHisCfgFilter.account_id = client.userId;
 			if (!CommonUtils.isNullOrEmpty(device_id)) {
@@ -533,8 +564,37 @@ public class ActDataAction {
 						Map<String, String> attris = ResList.get(i).getAttributes();
 						String value = attris.get("Rid");
 						String range = attris.get("MRange");
+						String mJinzhi = attris.get("MJinzhi");// 整数位进制 d-十进制//
+																// o-八进制 h-十六进制
+						if ("d".equals(mJinzhi.toLowerCase())) {
+							mJinzhi = "十进制";
+						} else if ("o".equals(mJinzhi.toLowerCase())) {
+							mJinzhi = "八进制";
+						} else if ("h".equals(mJinzhi.toLowerCase())) {
+							mJinzhi = "十六进制";
+						}
+						String bitCount = attris.get("BitCount");
 						attr.put("addrvalue", value);
 						attr.put("range", range);
+						attr.put("mJinzhi", mJinzhi);
+						if (0 != Integer.parseInt(bitCount)) {// 有小数位数
+							String bJinzhi = attris
+									.get("BJinzhi");/**
+													 * 整数位进制 d-十进制 o-八进制 h-十六进制
+													 **/
+							if ("d".equals(bJinzhi.toLowerCase())) {
+								bJinzhi = "十进制";
+							} else if ("o".equals(bJinzhi.toLowerCase())) {
+								bJinzhi = "八进制";
+							} else if ("h".equals(bJinzhi.toLowerCase())) {
+								bJinzhi = "十六进制";
+							}
+							String bRange = attris.get("BRange");
+							attr.put("bitCount", bitCount);
+							attr.put("bJinzhi", bJinzhi);
+							attr.put("bRange", bRange);
+
+						}
 						arr.add(attr);
 					}
 					if (arr.size() > 0) {
@@ -554,8 +614,18 @@ public class ActDataAction {
 						Map<String, String> attris = ResList.get(i).getAttributes();
 						String value = attris.get("Rid");
 						String range = attris.get("Range");
+						String Jinzhi = attris.get("Jinzhi");// 整数位进制 d-十进制//
+																// o-八进制 h-十六进制
+						if ("d".equals(Jinzhi.toLowerCase())) {
+							Jinzhi = "十进制";
+						} else if ("o".equals(Jinzhi.toLowerCase())) {
+							Jinzhi = "八进制";
+						} else if ("h".equals(Jinzhi.toLowerCase())) {
+							Jinzhi = "十六进制";
+						}
 						attr.put("addrvalue", value);
 						attr.put("range", range);
+						attr.put("mJinzhi", Jinzhi);
 						arr.add(attr);
 					}
 					if (arr.size() > 0) {
@@ -575,8 +645,18 @@ public class ActDataAction {
 						Map<String, String> attris = ResList.get(i).getAttributes();
 						String value = attris.get("Rid");
 						String range = attris.get("Range");
+						String Jinzhi = attris.get("Jinzhi");// 整数位进制 d-十进制//
+																// o-八进制 h-十六进制
+						if ("d".equals(Jinzhi.toLowerCase())) {
+							Jinzhi = "十进制";
+						} else if ("o".equals(Jinzhi.toLowerCase())) {
+							Jinzhi = "八进制";
+						} else if ("h".equals(Jinzhi.toLowerCase())) {
+							Jinzhi = "十六进制";
+						}
 						attr.put("addrvalue", value);
 						attr.put("range", range);
+						attr.put("mJinzhi", Jinzhi);
 						arr.add(attr);
 					}
 					if (arr.size() > 0) {
@@ -596,8 +676,18 @@ public class ActDataAction {
 						Map<String, String> attris = ResList.get(i).getAttributes();
 						String value = attris.get("Rid");
 						String range = attris.get("Range");
+						String Jinzhi = attris.get("Jinzhi");// 整数位进制 d-十进制//
+																// o-八进制 h-十六进制
+						if ("d".equals(Jinzhi.toLowerCase())) {
+							Jinzhi = "十进制";
+						} else if ("o".equals(Jinzhi.toLowerCase())) {
+							Jinzhi = "八进制";
+						} else if ("h".equals(Jinzhi.toLowerCase())) {
+							Jinzhi = "十六进制";
+						}
 						attr.put("addrvalue", value);
 						attr.put("range", range);
+						attr.put("mJinzhi", Jinzhi);
 						arr.add(attr);
 					}
 					if (arr.size() > 0) {
@@ -637,6 +727,8 @@ public class ActDataAction {
 				realHisCfg.device_id = realHisCfgParam.device_id;
 				realHisCfg.rid = realHisCfgParam.rid;
 				realHisCfg.data_limit = realHisCfgParam.rang;
+				realHisCfg.digit_count = realHisCfgParam.digit_count;
+				realHisCfg.digit_binary = realHisCfgParam.digit_binary;
 				if (!CommonUtils.isNullOrEmpty(realHisCfgParam.describe)) {
 					realHisCfg.describe = realHisCfgParam.describe;
 				}
@@ -697,6 +789,8 @@ public class ActDataAction {
 				realHisCfg.device_id = realHisCfgParam.device_id;
 				realHisCfg.rid = realHisCfgParam.rid;
 				realHisCfg.data_limit = realHisCfgParam.rang;
+				realHisCfg.digit_count = realHisCfgParam.digit_count;
+				realHisCfg.digit_binary = realHisCfgParam.digit_binary;
 				realHisCfg.state = 1;// 0：已同步给盒子1：新增配置2：更新配置3：删除配置，如果同步成功再做物理删除，同时需要删除监控点绑定和权限的分配，和其他相关数据
 				if (!CommonUtils.isNullOrEmpty(realHisCfgParam.describe)) {
 					realHisCfg.describe = realHisCfgParam.describe;

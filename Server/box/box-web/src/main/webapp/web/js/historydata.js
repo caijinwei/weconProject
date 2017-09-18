@@ -283,6 +283,9 @@ appModule
 													$("#describeid").val(
 															minfo.describe);
 
+													$("#dataid").val(
+															minfo.digit_count);
+
 												}
 
 											} else {
@@ -344,11 +347,22 @@ appModule
 																		data.allAddr[0].addrRid[0].range);
 													}
 													$scope.$apply();
+
+													if ($("#addrtypeid").val() == 0) {// 如果是位地址隐藏
+														$('#datadigitid').css(
+																'display',
+																'none');
+													} else {
+														$('#datadigitid').css(
+																'display',
+																'block');
+													}
 													if (mtype == 1) {
 
 														$("#addrtypeid")
 																.val(
 																		minfo.addr_type);
+														
 														angular
 																.forEach(
 																		$scope.allAddrs,
@@ -374,6 +388,18 @@ appModule
 															$("#addrtypeid")
 																	.val(
 																			data.allAddr[0].addrkey);
+															if ($("#addrtypeid")
+																	.val() == 0) {// 如果是位地址隐藏
+																$('#datadigitid')
+																		.css(
+																				'display',
+																				'none');
+															} else {
+																$('#datadigitid')
+																		.css(
+																				'display',
+																				'block');
+															}
 
 															if ($scope.addrvalues != null) {
 																$("#registerid")
@@ -407,6 +433,12 @@ appModule
 					$("#addrtypeid").change(function() {
 
 						$scope.changeaddrtype($("#addrtypeid").val());
+
+						if ($("#addrtypeid").val() == 0) {// 如果是位地址隐藏
+							$('#datadigitid').css('display', 'none');
+						} else {
+							$('#datadigitid').css('display', 'block');
+						}
 
 					});
 					$scope.changeaddrtype = function(value) {
@@ -477,6 +509,7 @@ appModule
 							rid : $("#registerid").val(),
 							rang : $("#rangid").val(),
 							describe : $("#describeid").val(),
+							digit_count : $("#dataid").val(),
 							data_type : "1",
 							his_cycle : $("#hiscycleid").val()
 						};

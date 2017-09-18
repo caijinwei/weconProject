@@ -310,6 +310,7 @@ public class AlarmDataAction {
 					alarmCfg.state = 2;
 					alarmCfg.device_id = alarmCfgParam.device_id;
 					alarmCfg.data_limit = alarmCfgParam.rang;
+					alarmCfg.digit_count = alarmCfgParam.digit_count;
 					boolean issuccess = alarmCfgApi.upAlarmCfg(alarmCfg);
 					if (issuccess) {
 						dbLogUtil.updOperateLog(OpTypeOption.UpdAlarm, ResTypeOption.Alarm, alarmCfg.alarmcfg_id, oldalarmCfg,
@@ -368,6 +369,7 @@ public class AlarmDataAction {
 				alarmCfg.state = 1;
 				alarmCfg.device_id = alarmCfgParam.device_id;
 				alarmCfg.data_limit = alarmCfgParam.rang;
+				alarmCfg.digit_count = alarmCfgParam.digit_count;
 				long id = alarmCfgApi.saveAlarmCfg(alarmCfg);
 				if (id > 0) {
 					dbLogUtil.addOperateLog(OpTypeOption.AddAlarm, ResTypeOption.Alarm, alarmCfg.alarmcfg_id, alarmCfg);

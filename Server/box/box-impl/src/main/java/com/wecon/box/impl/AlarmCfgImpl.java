@@ -29,7 +29,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	private final String SEL_COL = "alarmcfg_id,data_id,account_id,name,addr,addr_type,text,condition_type,state,plc_id,device_id,rid,data_limit,bind_state,create_date,update_date";
+	private final String SEL_COL = "alarmcfg_id,data_id,account_id,name,addr,addr_type,text,condition_type,state,plc_id,device_id,rid,data_limit,digit_count,bind_state,create_date,update_date";
 
 	@Override
 	public long saveAlarmCfg(final AlarmCfg alarmCfg) {
@@ -39,7 +39,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
 				PreparedStatement preState = con.prepareStatement(
-						"insert into alarm_cfg(data_id,account_id,plc_id,`name`,addr,addr_type,text,condition_type,state,device_id,rid,data_limit,bind_state,create_date,update_date)values(?,?,?,?,?,?,?,?,?,?,?,?,1,current_timestamp(),current_timestamp());",
+						"insert into alarm_cfg(data_id,account_id,plc_id,`name`,addr,addr_type,text,condition_type,state,device_id,rid,data_limit,digit_count,bind_state,create_date,update_date)values(?,?,?,?,?,?,?,?,?,?,?,?,?,1,current_timestamp(),current_timestamp());",
 						Statement.RETURN_GENERATED_KEYS);
 				preState.setLong(1, alarmCfg.data_id);
 				preState.setLong(2, alarmCfg.account_id);
@@ -53,6 +53,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 				preState.setLong(10, alarmCfg.device_id);
 				preState.setString(11, alarmCfg.rid);
 				preState.setString(12, alarmCfg.data_limit);
+				preState.setString(13, alarmCfg.digit_count);
 				return preState;
 			}
 		}, key);
@@ -78,7 +79,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			int pageSize) {
 		String sqlCount = "select count(0) from `alarm_cfg` ac,`account_dir` ad,`account_dir_rel` adr where 1=1 and ac.`alarmcfg_id`=adr.`ref_id` and ad.`id`=adr.`acc_dir_id` and ad.`type`=3 and ac.`account_id`=ad.`account_id` AND  ac.`device_id`=ad.`device_id` ";
 
-		String sql = " select ac.alarmcfg_id,ac.data_id,ac.account_id,ac.name,ac.addr,ac.addr_type,ac.text,ac.condition_type,ac.state,ac.device_id,ac.rid,ac.bind_state,ac.plc_id,ac.data_limit,ac.create_date,ac.update_date,adr.`ref_alais`,ad.`name` dirname,ad.`id` from `alarm_cfg` ac,`account_dir` ad,`account_dir_rel` adr where 1=1 and ac.`alarmcfg_id`=adr.`ref_id` and ad.`id`=adr.`acc_dir_id` and ad.`type`=3 and ac.`account_id`=ad.`account_id` and  ac.`device_id`=ad.`device_id`";
+		String sql = " select ac.alarmcfg_id,ac.data_id,ac.account_id,ac.name,ac.addr,ac.addr_type,ac.text,ac.condition_type,ac.state,ac.device_id,ac.rid,ac.bind_state,ac.plc_id,ac.data_limit,ac.digit_count,ac.create_date,ac.update_date,adr.`ref_alais`,ad.`name` dirname,ad.`id` from `alarm_cfg` ac,`account_dir` ad,`account_dir_rel` adr where 1=1 and ac.`alarmcfg_id`=adr.`ref_id` and ad.`id`=adr.`acc_dir_id` and ad.`type`=3 and ac.`account_id`=ad.`account_id` and  ac.`device_id`=ad.`device_id`";
 
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
@@ -126,6 +127,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 				model.rid = rs.getString("rid");
 				model.plc_id = rs.getLong("plc_id");
 				model.data_limit=rs.getString("data_limit");
+				model.digit_count=rs.getString("digit_count");
 				model.bind_state = rs.getInt("bind_state");
 				model.condition_type = rs.getInt("condition_type");
 				model.create_date = rs.getTimestamp("create_date");
@@ -183,6 +185,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 				model.rid = rs.getString("rid");
 				model.plc_id = rs.getLong("plc_id");
 				model.data_limit=rs.getString("data_limit");
+				model.digit_count=rs.getString("digit_count");
 				model.bind_state = rs.getInt("bind_state");
 				model.condition_type = rs.getInt("condition_type");
 				model.create_date = rs.getTimestamp("create_date");
@@ -248,12 +251,12 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 		if (alarmCfg == null) {
 			return false;
 		}
-		String sql = "update alarm_cfg set data_id = ?, account_id=?,name=?,addr=?,addr_type=?,text=?,condition_type=?,state=?,update_date=current_timestamp(),bind_state=?,plc_id=?,device_id=?,rid=? ,data_limit=? where alarmcfg_id = ?";
+		String sql = "update alarm_cfg set data_id = ?, account_id=?,name=?,addr=?,addr_type=?,text=?,condition_type=?,state=?,update_date=current_timestamp(),bind_state=?,plc_id=?,device_id=?,rid=? ,data_limit=?,digit_count=?  where alarmcfg_id = ?";
 
 		jdbcTemplate.update(sql,
 				new Object[] { alarmCfg.data_id, alarmCfg.account_id, alarmCfg.name, alarmCfg.addr, alarmCfg.addr_type,
 						alarmCfg.text, alarmCfg.condition_type, alarmCfg.state, alarmCfg.bind_state, alarmCfg.plc_id,
-						alarmCfg.device_id, alarmCfg.rid, alarmCfg.data_limit, alarmCfg.alarmcfg_id });
+						alarmCfg.device_id, alarmCfg.rid, alarmCfg.data_limit,alarmCfg.digit_count, alarmCfg.alarmcfg_id });
 		return true;
 	}
 
@@ -364,6 +367,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			model.state = rs.getInt("state");
 			model.rid = rs.getString("rid");
 			model.data_limit = rs.getString("data_limit");
+			model.digit_count = rs.getString("digit_count");
 			model.plc_id = rs.getLong("plc_id");
 			model.condition_type = rs.getInt("condition_type");
 			model.create_date = rs.getTimestamp("create_date");

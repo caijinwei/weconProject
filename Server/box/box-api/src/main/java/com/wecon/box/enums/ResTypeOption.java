@@ -14,7 +14,8 @@ public enum ResTypeOption implements EnumVal {
     Plc("通讯口", 500),
     Act("实时数据", 600),
     His("历史数据", 700),
-    Alarm("报警数据", 800);
+    Alarm("报警数据", 800),
+    Write("操作实时数据", 900);
     private String key;
 
     private int value;

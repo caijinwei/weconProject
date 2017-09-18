@@ -35,6 +35,7 @@ public class RealHisCfg {
 	public String describe;//描述
 	public String digit_count;//整数位数，小数位数
 	public String data_limit;//数据范围
+	public String digit_binary;//进制
 	public int his_cycle;//历史数据采集周期
 	public int data_type;//0：实时数据 1：历史数据
 	public int state;//状态:1-启用; 0-未启用

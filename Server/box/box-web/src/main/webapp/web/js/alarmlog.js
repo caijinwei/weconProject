@@ -76,7 +76,7 @@ appModule
 							pageIndex = 1;
 						var params = {
 							device_id : $scope.deviceid,
-							state:1,
+							state : 1,
 							pageIndex : pageIndex,
 							pageSize : pageSize
 						};
@@ -115,7 +115,7 @@ appModule
 							pageIndex = 1;
 						var params = {
 							alarm_cfg_id : $("#alarmcfgid").val(),
-							state:2,
+							state : 2,
 							name : $("#alarmcfgname").val(),
 							start_date : $("#startdateid").val(),
 							end_date : $("#enddateid").val(),
@@ -368,6 +368,10 @@ appModule
 													$('#selectgroup').val(
 															alarmfo.dirId);
 
+													$("#dataid")
+															.val(
+																	alarmfo.digit_count);
+
 												}
 
 											} else {
@@ -454,6 +458,15 @@ appModule
 																		data.allAddr[0].addrRid[0].range);
 													}
 													$scope.$apply();
+													if ($("#addrtypeid").val() == 0) {// 如果是位地址隐藏
+														$('#datadigitid').css(
+																'display',
+																'none');
+													} else {
+														$('#datadigitid').css(
+																'display',
+																'block');
+													}
 													if (mtype == 1) {
 
 														$("#addrtypeid")
@@ -484,6 +497,20 @@ appModule
 															$("#addrtypeid")
 																	.val(
 																			data.allAddr[0].addrkey);
+															if ($("#addrtypeid")
+																	.val() == 0) {// 如果是位地址隐藏
+																$(
+																		'#datadigitid')
+																		.css(
+																				'display',
+																				'none');
+															} else {
+																$(
+																		'#datadigitid')
+																		.css(
+																				'display',
+																				'block');
+															}
 
 															if ($scope.addrvalues != null) {
 																$("#registerid")
@@ -499,6 +526,12 @@ appModule
 														} else {
 															if ($("#addrtypeid")
 																	.val() == 0) {
+
+																$(
+																		'#datadigitid')
+																		.css(
+																				'display',
+																				'none');
 
 																$(
 																		'#firstCondition')
@@ -542,6 +575,12 @@ appModule
 																}
 
 															} else {
+
+																$(
+																		'#datadigitid')
+																		.css(
+																				'display',
+																				'block');
 																$(
 																		'#firstCondition')
 																		.css(
@@ -672,6 +711,11 @@ appModule
 							$('#bitsetting').css('display', 'none');
 							$('#secondCondition').css('display', 'none');
 							$('#selectWith').val(0);
+						}
+						if ($("#addrtypeid").val() == 0) {// 如果是位地址隐藏
+							$('#datadigitid').css('display', 'none');
+						} else {
+							$('#datadigitid').css('display', 'block');
 						}
 
 						$scope.changeaddrtype($("#addrtypeid").val());
@@ -855,6 +899,7 @@ appModule
 							group_id : $("#selectgroup").val(),
 							text : $("#alarmtextid").val(),
 							condition_type : $("#selectWith").val(),
+							digit_count : $("#dataid").val(),
 							rang : $("#rangid").val(),
 							type : alarmtypes,
 							value : alarmvalues
@@ -894,31 +939,33 @@ appModule
 										});
 
 					}
-				$scope.confirmData=function(model){
+					$scope.confirmData = function(model) {
 						var params = {
-								alarm_cfg_id : model.alarm_cfg_id,
-								monitor_time:model.monitor_time
-							};
+							alarm_cfg_id : model.alarm_cfg_id,
+							monitor_time : model.monitor_time
+						};
 
-							T.common.ajax
-									.request(
-											"WeconBox",
-											"alarmDataAction/confirmData",
-											params,
-											function(data, code, msg) {
-												if (code == 200) {
-													$scope.alarm_submit($scope.paginationConf_current.currentPage,$scope.paginationConf_current.itemsPerPage);
-													alert("报警数据已确认！");
+						T.common.ajax
+								.request(
+										"WeconBox",
+										"alarmDataAction/confirmData",
+										params,
+										function(data, code, msg) {
+											if (code == 200) {
+												$scope
+														.alarm_submit(
+																$scope.paginationConf_current.currentPage,
+																$scope.paginationConf_current.itemsPerPage);
+												alert("报警数据已确认！");
 
-												} else {
+											} else {
 
-													alert(code + "-" + msg);
-												}
-											}, function() {
-												alert("ajax error");
-											});
-	
-						
+												alert(code + "-" + msg);
+											}
+										}, function() {
+											alert("ajax error");
+										});
+
 					}
 
 				})

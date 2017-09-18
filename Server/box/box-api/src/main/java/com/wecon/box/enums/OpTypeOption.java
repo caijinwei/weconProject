@@ -45,6 +45,7 @@ public enum OpTypeOption implements EnumVal {
     AddAct("新增实时数据配置", 600),
     UpdAct("修改实时数据配置", 601),
     DelAct("删除实时数据配置", 602),
+    WriteAct("下发数据到盒子", 603),
 
     //历史监控点操作
     AddHis("新增历史数据配置", 700),
