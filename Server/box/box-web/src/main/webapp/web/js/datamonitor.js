@@ -13,20 +13,7 @@ appModule
 						$scope.getDataType();
 						$scope.act_group($scope.deviceid);
 
-						$scope.paginationConf = {
-							currentPage : 1,
-							itemsPerPage : 10,
-							totalItems : $scope.count,
-							pagesLength : 15,
-							perPageOptions : [ 5, 10, 20, 50, 100 ],
-							rememberPerPage : 'perPageItems'
-							/*onChange : function() {
-								if (this.currentPage != 0) {
-									$scope.ws_send(this.currentPage,
-											this.itemsPerPage, actgroupId);
-								}
-							}*/
-						}
+
 
 						// 打开模态框
 						function showAddGroup() {
@@ -122,11 +109,22 @@ appModule
 											+ '/actdataweb-websocket/websocket?'
 											+ T.common.websocket.getParams());
 							ws.onopen = function() {
-
-								$scope.ws_send(
-										$scope.paginationConf.currentPage,
-										$scope.paginationConf.itemsPerPage,
-										fristGroupId);
+								$scope.paginationConf = {
+									currentPage : 1,
+									itemsPerPage : 10,
+									totalItems : $scope.count,
+									pagesLength : 15,
+									perPageOptions : [ 5, 10, 20, 50, 100 ],
+									rememberPerPage : 'perPageItems',
+									onChange : function() {
+										if (this.currentPage != 0) {
+											$scope.ws_send(this.currentPage,
+													this.itemsPerPage, actgroupId);
+										}
+									}
+								}
+								$scope.ws_send($scope.paginationConf.currentPage,
+										$scope.paginationConf.itemsPerPage, actgroupId);
 							};
 							ws.onmessage = function(evt) {
 								$scope.paginationConf.totalItems = JSON
