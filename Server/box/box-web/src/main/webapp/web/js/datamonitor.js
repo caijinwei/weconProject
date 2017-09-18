@@ -13,8 +13,6 @@ appModule
 						$scope.getDataType();
 						$scope.act_group($scope.deviceid);
 
-
-
 						// 打开模态框
 						function showAddGroup() {
 							$('#identifier').modal('show');
@@ -39,6 +37,7 @@ appModule
 												if (data.ActGroup != null
 														&& $scope.type == 0) {
 													var fristGroupId = data.ActGroup[0].id;
+													actgroupId = fristGroupId;
 													$scope
 															.ws_connect(fristGroupId);
 													/*
@@ -119,12 +118,15 @@ appModule
 									onChange : function() {
 										if (this.currentPage != 0) {
 											$scope.ws_send(this.currentPage,
-													this.itemsPerPage, actgroupId);
+													this.itemsPerPage,
+													actgroupId);
 										}
 									}
 								}
-								$scope.ws_send($scope.paginationConf.currentPage,
-										$scope.paginationConf.itemsPerPage, actgroupId);
+								$scope.ws_send(
+										$scope.paginationConf.currentPage,
+										$scope.paginationConf.itemsPerPage,
+										actgroupId);
 							};
 							ws.onmessage = function(evt) {
 								$scope.paginationConf.totalItems = JSON
@@ -602,7 +604,7 @@ appModule
 											if (code == 200) {
 												$scope.infoDatas = data.infoDatas;
 												$scope.$apply();
-
+												$scope.datatype();
 												if (dealtype == 0) {
 
 													$scope.showtype = 0;
@@ -649,7 +651,6 @@ appModule
 																'display',
 																'block');
 													}
-													$scope.datatype();
 
 													$("#dataid").val(minfo.num);
 													$("#decid").val(minfo.dec);
@@ -1129,40 +1130,40 @@ appModule
 						} else if ($("#datatypeid").val() == 401) {
 							$("#dataid").attr("placeholder", "暂时没用");
 							$("#decid").attr("placeholder", "暂时没用");
-							$("#dataid").attr("disabled", true); // 设置为可编辑
-							$("#decid").attr("disabled", true); // 设置为可编辑
+							$("#dataid").attr("disabled", true); // 设置为不可编辑
+							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#dataid").val("");
 							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 402) {
 							$("#dataid").attr("placeholder", "暂时没用");
 							$("#decid").attr("placeholder", "暂时没用");
-							$("#dataid").attr("disabled", true); // 设置为可编辑
-							$("#decid").attr("disabled", true); // 设置为可编辑
+							$("#dataid").attr("disabled", true); // 设置为不可编辑
+							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#dataid").val("");
 							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 403) {
 							$("#dataid").attr("placeholder", "暂时没用");
 							$("#decid").attr("placeholder", "暂时没用");
-							$("#dataid").attr("disabled", true); // 设置为可编辑
-							$("#decid").attr("disabled", true); // 设置为可编辑
+							$("#dataid").attr("disabled", true); // 设置为不可编辑
+							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#dataid").val("");
 							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 404) {
 							$("#dataid").attr("placeholder", "暂时没用");
 							$("#decid").attr("placeholder", "暂时没用");
-							$("#dataid").attr("disabled", true); // 设置为可编辑
-							$("#decid").attr("disabled", true); // 设置为可编辑
+							$("#dataid").attr("disabled", true); // 设置为不可编辑
+							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#dataid").val("");
 							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 405) {
 							$("#dataid").attr("placeholder", "暂时没用");
 							$("#decid").attr("placeholder", "暂时没用");
-							$("#dataid").attr("disabled", true); // 设置为可编辑
-							$("#decid").attr("disabled", true); // 设置为可编辑
+							$("#dataid").attr("disabled", true); // 设置为不可编辑
+							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#dataid").val("");
 							$("#decid").val("");
 
@@ -1177,8 +1178,8 @@ appModule
 						} else if ($("#datatypeid").val() == 1000) {
 							$("#dataid").attr("placeholder", "无整数");
 							$("#decid").attr("placeholder", "无小数");
-							$("#dataid").attr("disabled", true); // 设置为可编辑
-							$("#decid").attr("disabled", true); // 设置为可编辑
+							$("#dataid").attr("disabled", true); // 设置为不可编辑
+							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#dataid").val("");
 							$("#decid").val("");
 						}
@@ -1327,11 +1328,22 @@ appModule
 						}
 						if ($("#addrtypeid").val() != 0) {
 							var regnum = /^0|[1-9]\d*$/;
-							if (!regnum.test($("#dataid").val())
-									|| !regnum.test($("#decid").val())) {
-								alert("整数位数或者小数位数格式错误");
-								return;
+							var datadisabled = $("#dataid").prop("disabled");
+							if (!datadisabled) {
+								if (!regnum.test($("#dataid").val())) {
+									alert("整数位数格式错误");
+									return;
+								}
+
 							}
+							var decdisabled = $("#decid").prop("disabled");
+							if (!decdisabled) {
+								if (!regnum.test($("#dataid").val())) {
+									alert("小数位数格式错误");
+									return;
+								}
+							}
+
 							if ($("#datatypeid").val() == 100) {
 								if ($("#dataid").val().length < 1
 										|| $("#dataid").val().length > 16) {
@@ -1507,15 +1519,17 @@ appModule
 							$("#decid").val("");
 
 						}
-						if($("#dataid").val()!=""||$("#decid").val()!=""){
+						if (!$("#dataid").prop("disabled")) {
 							num = $("#dataid").val();
-							dec = $("#decid").val();
 							digit_counts.push(num);
+						}
+						if (!$("#decid").prop("disabled")) {
+							dec = $("#decid").val();
 							digit_counts.push(dec);
-							var digs = digit_counts.join(",");
 						}
 						var rang_datas = rangs.join(",");
 						var scalie_datas = scalies.join(",");
+						var digs = digit_counts.join(",");
 						var params = {
 							id : mid,
 							plc_id : plcId,
