@@ -2,6 +2,7 @@ package com.wecon.box.action;
 
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.DevBindUserApi;
+import com.wecon.box.api.DriverApi;
 import com.wecon.box.api.PlcInfoApi;
 import com.wecon.box.entity.PlcInfo;
 import com.wecon.box.enums.ErrorCodeOption;
@@ -42,6 +43,8 @@ public class PlcInfoSettingAction {
     PlcListByType plcListByType;
     @Autowired
     DbLogUtil dbLogUtil;
+    @Autowired
+    DriverApi driverApi;
 
 //    @Description("新增plc配置")
 //    @RequestMapping(value = "/addPlcInfo")
@@ -99,6 +102,10 @@ public class PlcInfoSettingAction {
         List<PlcInfo> showAllPlcConf = plcInfoApi.showAllPlcInfoByDeviceId(device_id);
         List<PlcInfoData> infoDatas = new ArrayList<PlcInfoData>();
         for (PlcInfo info : showAllPlcConf) {
+            //过滤掉删除配置的plc
+            if(info.state==3){
+                continue;
+            }
             PlcInfoData plcInfoData = new PlcInfoData();
 //            if (info.comtype == 1) {
 //                plcInfoData.comtype = "RS232";
@@ -205,6 +212,10 @@ public class PlcInfoSettingAction {
                     }
                 }
             }
+        }
+        System.out.println("plcInfoType=======================-------------------"+plcInfo.type);
+        if(driverApi.getDriverBydriver(plcInfo.driver)==null){
+            throw new BusinessException(ErrorCodeOption.Driver_IsNot_Fount.key,ErrorCodeOption.Device_NotFound.value);
         }
         if (plcInfo.plc_id > 0) {
             plcInfo.state = 2;

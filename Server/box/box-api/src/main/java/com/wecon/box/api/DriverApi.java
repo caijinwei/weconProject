@@ -29,6 +29,14 @@ public interface DriverApi {
     boolean saveDriver(Driver model);
 
     /**
+     * 更新驱动，根据id
+     *
+     * @param model
+     * @return
+     */
+    boolean updateDriver(Driver model);
+
+    /**
      * 获取驱动的分页列表
      *
      * @param type
@@ -55,6 +63,14 @@ public interface DriverApi {
      */
     Driver getDriver(String type);
 
+    /*
+    * 获取驱动信息
+    *
+    * @param driver
+    * @return
+    * */
+    Driver getDriverBydriver(String driver);
+
     /**
      * 获取驱动详情
      *
@@ -62,6 +78,7 @@ public interface DriverApi {
      * @return
      */
     DriverDetail getDriverDetail(Long driver_id);
+
 
     /**
      * 删除驱动

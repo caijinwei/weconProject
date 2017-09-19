@@ -8,6 +8,13 @@ appModule
 								.getParameter("device_id");
 						$scope.devicename = T.common.util
 								.getParameter("device_name");
+						//获取用户权限
+						T.common.ajax.request("WeconBox",
+								"user/userinfo", new Object(),function(data, code, msg) {
+									$scope.accounttype = data.type;
+									$scope.$apply();
+									$("body").css("display","block");
+								});
 
 						$scope.commointor_submit();
 
@@ -39,7 +46,7 @@ appModule
 								function(data, code, msg) {
 									if (code == 200) {
 										$scope.commonitors = data.monitors;
-										$scope.accounttype = data.type;
+
 
 										if ($scope.commonitors == "") {
 											$("#searchid").attr("disabled",

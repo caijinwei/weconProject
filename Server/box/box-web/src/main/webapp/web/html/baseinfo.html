@@ -25,13 +25,13 @@
          aria-labelledby="mySmallModalLabel">
         <div class="modal-dialog modal-sm" role="document"
              style="margin-top: 350px; text-align: center">
-            <img src="../image/loading.jpg" />
+            <img src="../image/loading.jpg"/>
         </div>
     </div>
     <ul class="nav nav-tabs" role="tablist" id="baseConfigTab">
         <li class="active"><a href="#base-info" data-toggle="tab">基本信息</a></li>
         <li><a href="#com-port" data-toggle="tab" ng-click="initPlcSetting()">通讯口配置</a></li>
-        <li><a href="#debugInfo" data-toggle="tab">调试信息</a></li>
+        <!--<li><a href="#debugInfo" data-toggle="tab">调试信息</a></li>-->
         <li><a href="#dev_firm" data-toggle="tab" ng-click="dev_firmShow(infoData.state)">固件信息</a></li>
     </ul>
     <div class="tab-content">
@@ -41,17 +41,13 @@
                 <div class="row" style="margin-top: 20px;">
                     <span class="col-md-1">PIBox名称</span>
 
-                    <div class="col-md-4">
+                    <div class="col-md-11">
                         <div class="form-group" style="display: inline-block;font-weight: bold;">
                             <input type="text" class="form-control"
                                    id="PIBoxName" name="PIBoxName"
                                    value="{{infoData.name}}">
                         </div>
                     </div>
-                </div>
-                <div class="row" style="margin-top: 12px;">
-                    <span class="col-md-1">设备ID</span>
-                    <span style="font-weight: bold;margin-left: 20px;">{{infoData.device_id}}</span>
                 </div>
                 <div class="row" style="margin-top: 12px;">
                     <span class="col-md-1">在线状态</span>
@@ -79,15 +75,6 @@
                             </div>
                         </div>
                         </span>
-                </div>
-
-                <div class="row" style="margin-top: 12px;">
-                    <span class="col-md-1">更新时间</span>
-                    <span style="font-weight: bold;margin-left: 20px;">{{infoData.update_date|date:'yyyy-MM-dd HH:mm:ss'}}</span>
-                </div>
-                <div class="row" style="margin-top: 12px;">
-                    <span class="col-md-1">创建时间</span>
-                    <span style="font-weight: bold;margin-left: 20px;">{{infoData.create_date|date:'yyyy-MM-dd HH:mm:ss'}}</span>
                 </div>
 
                 <div class="row" style="margin-top:12px;">
@@ -165,7 +152,6 @@
                         </caption>
                         <thead>
                         <tr>
-                            <th>plcID</th>
                             <th>编号</th>
                             <th>通讯接口</th>
                             <th>串口协议</th>
@@ -178,7 +164,6 @@
 
 
                         <tr ng-repeat="x in infoDatas">
-                            <td>{{x.plcId}}</td>
                             <td>{{$index + 1}}</td>
                             <td>{{x.port}}</td>
                             <td>{{x.comtype==0?'RS232':(x.comtype==1?'RS485':'RS422')}}</td>
@@ -549,10 +534,10 @@
         <div class="tab-pane" id="dev_firm">
             <!-- 基本信息展示-->
             <div class="container-fluid" style="margin-top: 12px;font-size: 15px;">
-                <div class="row" style="margin-top: 30px;">
-                    <span class="col-md-1">固件ID</span>
-                    <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.f_id}}</span>
-                </div>
+                <!--<div class="row" style="margin-top: 30px;">-->
+                <!--<span class="col-md-1">固件ID</span>-->
+                <!--<span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.f_id}}</span>-->
+                <!--</div>-->
                 <div class="row" style="margin-top: 30px;">
                     <span class="col-md-1">版本名称</span>
                     <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.f_name}}</span>
@@ -578,7 +563,45 @@
                     </button>
                 </div>
             </div>
-            <!-- -->
+
+            <div class="panel panel-default">
+                <div class="panel-heading">固件信息</div>
+                <div class="panel-body">
+                    <div class="container-fluid" style="margin-top: 12px;font-size: 15px;">
+                        <!--<div class="row" style="margin-top: 30px;">-->
+                        <!--<span class="col-md-1">固件ID</span>-->
+                        <!--<span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.f_id}}</span>-->
+                        <!--</div>-->
+                        <div class="row" style="margin-top: 30px;">
+                            <span class="col-md-1">版本名称</span>
+                            <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.f_name}}</span>
+                        </div>
+                        <div class="row" style="margin-top: 30px;">
+                            <span class="col-md-1">固件版本</span>
+                            <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.f_ver}}</span>
+                        </div>
+                        <div class="row" style="margin-top: 30px;">
+                            <span class="col-md-1">更新时间</span>
+                            <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.create_date|date:'yyyy-MM-dd HH:mm:ss'}}</span>
+                        </div>
+                        <div class="row" style="margin-top: 30px;">
+                            <span class="col-md-1">创建时间</span>
+                            <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.create_date|date:'yyyy-MM-dd HH:mm:ss'}}</span>
+                        </div>
+
+                        <div class="row" style="margin-top: 30px;">
+                            <span class="col-md-1">操作</span>
+                            <!--<div class="btn-group" style="margin-left: 10px;">-->
+                            <button type="button" class="btn btn-info" data-toggle="modal" ng-click="checkUpdateFir()">
+                                查看固件更新
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!--检查更新modal框 -->
             <div class="modal" tabindex="-1" id="checkUpdateFir"
                  data-backdrop="false">
                 <div class="modal-dialog modal-sm">
@@ -590,7 +613,11 @@
                             <h4 class="modal-title">固件版本更新</h4>
                         </div>
                         <div class="modal-body">
-                            <span id="updateNotice"></span>
+                            <span id="noticeDiv">
+                                <!--<div id="testtest" ng-show="noticeType==1">最新版：{{noticeVersionCode}}</div>-->
+                                <!--<div ng-show="noticeType==0">已经是最新版了，不需要更新！</div>-->
+
+                            </span>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-info"
@@ -603,6 +630,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </div>

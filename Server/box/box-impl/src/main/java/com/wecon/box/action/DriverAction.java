@@ -55,7 +55,49 @@ public class DriverAction {
             driverList.add(tmp);
         }
         driverApi.batchAddDriver(driverList);
+        //<editor-fold desc="操作日志">
+        dbLogUtil.addOperateLog(OpTypeOption.BatchDriver, ResTypeOption.Driver, 0, driverList);
+        //</editor-fold>
         return new Output();
+    }
+
+    @Description("保存驱动(单个)")
+    @RequestMapping(value = "/savedriver1")
+    @WebApi(forceAuth = true, master = true, authority = {"0"})
+    public Output saveDriverOne(@RequestParam("drivers") String drivers) {
+        List<HashMap> list = JSON.parseArray(drivers, HashMap.class);
+
+        Driver model = new Driver();
+        model.driver_id = Long.valueOf(list.get(0).get("driver_id").toString());
+        if (model.driver_id > 0) {
+            model = driverApi.getDriver(model.driver_id);
+            if (model == null) {
+                throw new BusinessException(ErrorCodeOption.DriverNotExist.key, ErrorCodeOption.DriverNotExist.value);
+            }
+        }
+        model.driver = list.get(0).get("driver").toString();
+        model.type = list.get(0).get("type").toString();
+        model.file_md5 = list.get(0).get("file_md5").toString();
+        model.file_id = Long.valueOf(list.get(0).get("file_id").toString());
+        model.description = list.get(0).get("description").toString();
+        if (model.driver_id > 0) {
+            Driver modelOld = driverApi.getDriver(model.driver_id);
+            driverApi.updateDriver(model);
+            //<editor-fold desc="操作日志">
+            dbLogUtil.updOperateLog(OpTypeOption.UpdDriver, ResTypeOption.Driver, model.driver_id, modelOld, model);
+            //</editor-fold>
+        } else {
+            List<Driver> driverList = new ArrayList<>();
+            driverList.add(model);
+            driverApi.batchAddDriver(driverList);
+            //<editor-fold desc="操作日志">
+            dbLogUtil.addOperateLog(OpTypeOption.BatchDriver, ResTypeOption.Driver, model.driver_id, driverList);
+            //</editor-fold>
+        }
+        Driver modelNow = driverApi.getDriver(list.get(0).get("type").toString());
+        JSONObject data = new JSONObject();
+        data.put("id", modelNow.driver_id);
+        return new Output(data);
     }
 
     @Description("获取列表")
@@ -85,7 +127,7 @@ public class DriverAction {
         Driver model = driverApi.getDriver(id);
         driverApi.delDriver(model);
         //<editor-fold desc="操作日志">
-//        dbLogUtil.addOperateLog(OpTypeOption.DelFirm, ResTypeOption.Firm, model.firmware_id, model);
+        dbLogUtil.addOperateLog(OpTypeOption.DelDriver, ResTypeOption.Driver, model.driver_id, model);
         //</editor-fold>
         return new Output();
     }

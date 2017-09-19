@@ -64,7 +64,12 @@ public enum OpTypeOption implements EnumVal {
     //固件管理
     AddFirm("新增固件", 1000),
     UpdFirm("修改固件", 1001),
-    DelFirm("删除固件", 1002);
+    DelFirm("删除固件", 1002),
+
+    //驱动管理
+    BatchDriver("批量新增驱动", 1200),
+    UpdDriver("修改驱动", 1201),
+    DelDriver("删除驱动", 1202);
 	
 
     private String key;
