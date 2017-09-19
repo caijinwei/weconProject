@@ -15,7 +15,11 @@ public class RealHisCfgDevice extends RealHisCfg {
 	public String monitor_time;// 最新时间
 	public String num;// 整数位数
 	public String dec;// 小数位数
-	public String main_addr;//主编号
-	public String child_addr;//子编号
+	public String main_addr;//主编号地址
+	public String child_addr;//子编号地址
+	public String main_limit;//主编号范围
+	public String child_limit;//子编号范围
+	public String main_binary;//主编号进制
+	public String child_binary;//子编号进制
 
 }

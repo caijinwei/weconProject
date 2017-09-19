@@ -57,6 +57,13 @@ public class AlarmCfgParam {
 	public String text;
 	@Label("整数小数位")
 	public String digit_count;
+	@Label("进制")
+	public String digit_binary;
+	
+
+	public void setDigit_binary(String digit_binary) {
+		this.digit_binary = digit_binary;
+	}
 
 	public void setDigit_count(String digit_count) {
 		this.digit_count = digit_count;

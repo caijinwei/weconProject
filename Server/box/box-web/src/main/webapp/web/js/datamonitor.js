@@ -40,12 +40,6 @@ appModule
 													actgroupId = fristGroupId;
 													$scope
 															.ws_connect(fristGroupId);
-													/*
-													 * $scope .act_submit(
-													 * $scope.paginationConf.currentPage,
-													 * $scope.paginationConf.itemsPerPage,
-													 * fristGroupId);
-													 */
 												}
 
 											} else {
@@ -60,43 +54,7 @@ appModule
 					$scope.paginationConf = {
 						totalItems : $scope.count,
 					}
-
-					var t;
 					var actgroupId;
-
-					/**
-					 * 提交接口请求
-					 */
-					/*
-					 * $scope.act_submit = function(pageIndex, pageSize,
-					 * groupId) { actgroupId = groupId; if (pageIndex == 0)
-					 * pageIndex = 1; var params = { device_id :
-					 * $scope.deviceid, acc_dir_id : groupId, pageIndex :
-					 * pageIndex, pageSize : pageSize }; T.common.ajax .request(
-					 * "WeconBox", "actDataAction/getActData", params,
-					 * function(data, code, msg) { if (code == 200) {
-					 * $scope.paginationConf.totalItems =
-					 * data.piBoxActDateMode.totalRecord; $scope.actDatas =
-					 * data.piBoxActDateMode.list; $scope.$apply(); angular
-					 * .forEach( $scope.actDatas, function(data, index, array) {
-					 * 
-					 * console .log("初始化==" + data.id);
-					 * 
-					 * $scope .editable_name(data); $scope
-					 * .editable_value(data); });
-					 * 
-					 * t = setTimeout( function() { $scope .act_submit(
-					 * $scope.paginationConf.currentPage,
-					 * $scope.paginationConf.itemsPerPage, actgroupId) }, 3000); }
-					 * else {
-					 * 
-					 * alert(code + "-" + msg); } }, function() { alert("ajax
-					 * error"); }); }
-					 */
-
-					/*
-					 * $scope.mc_change = function() { clearTimeout(t); }
-					 */
 					/**
 					 * webscoket发送数据
 					 */
@@ -470,6 +428,7 @@ appModule
 								if (!$.trim(value)) {
 									return '不能为空';
 								}
+                                
 								$scope.putMess(model, value);
 							}
 						});
@@ -517,11 +476,17 @@ appModule
 										code, msg) {
 									if (code == 200) {
 										$scope.resultData = data.resultData;
+										
 										if ($scope.resultData == 0) {
+											
 											alert("数据下发失败，请检查盒子是否在线！");
 										} else {
 											alert("数据下发盒子成功！");
 										}
+										$scope.ws_send(
+												$scope.paginationConf.currentPage,
+												$scope.paginationConf.itemsPerPage,
+												actgroupId);
 
 									} else {
 
@@ -604,14 +569,11 @@ appModule
 											if (code == 200) {
 												$scope.infoDatas = data.infoDatas;
 												$scope.$apply();
-												$scope.datatype();
 												if (dealtype == 0) {
-
 													$scope.showtype = 0;
 													$("#datatypeid")
 															.val(
 																	$scope.dataTypes[0].value);
-
 													if (data.infoDatas != "") {
 														$scope
 																.condevice(data.infoDatas[0].plcId);
@@ -621,7 +583,6 @@ appModule
 																"");
 														$("#describeid")
 																.val("");
-
 													}
 												} else {
 													$scope.showtype = 1;
@@ -651,11 +612,10 @@ appModule
 																'display',
 																'block');
 													}
-
 													$("#dataid").val(minfo.num);
 													$("#decid").val(minfo.dec);
-
 												}
+												$scope.datatype();
 
 											} else {
 												alert(code + "-" + msg);
@@ -808,6 +768,12 @@ appModule
 															$("#child_addrid")
 																	.val(
 																			minfo.child_addr);
+															$("#child_rangid")
+																	.html(
+																			minfo.child_limit);
+															$("#child_scaleid")
+																	.html(
+																			minfo.child_binary);
 
 														} else {
 															$(
@@ -892,7 +858,12 @@ appModule
 
 															$("#rangid")
 																	.html(
-																			minfo.data_limit);
+																			minfo.main_limit);
+
+															$("#scaleid")
+																	.html(
+																			minfo.main_binary);
+
 															if ($("#addrtypeid")
 																	.val() == 0) {// 如果是位地址隐藏
 																$(
@@ -937,7 +908,6 @@ appModule
 						if ($("#addrtypeid").val() == 0) {
 							$('#divdatatypeid').css('display', 'none');
 							$('#datadigitid').css('display', 'none');
-
 							$("#dataid").val("");
 							$("#decid").val("");
 						} else {
@@ -1008,6 +978,23 @@ appModule
 							if (value == data.addrvalue) {
 								$("#rangid").html(data.range);
 								$("#scaleid").html(data.mJinzhi);
+								if ($("#addrtypeid").val() == 0) {// 如果是位地址隐藏
+									if (data.bRange != null
+											&& data.bJinzhi != null) {
+										$('#child_registeraddr').css('display',
+												'block');
+										$("#child_rangid").html(data.bRange);
+										$("#child_scaleid").html(data.bJinzhi);
+									} else {
+
+										$('#child_registeraddr').css('display',
+												'none');
+										$("#child_rangid").html("");
+										$("#child_scaleid").html("");
+
+									}
+
+								}
 							}
 						})
 					}
@@ -1024,7 +1011,6 @@ appModule
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#decid").attr("placeholder", "无小数");
-							$("#dataid").val("");
 							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 101) {
@@ -1032,14 +1018,12 @@ appModule
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#decid").attr("placeholder", "无小数");
-							$("#dataid").val("");
 							$("#decid").val("");
 						} else if ($("#datatypeid").val() == 102) {
 							$("#dataid").attr("placeholder", "1~4");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#decid").attr("placeholder", "无小数");
-							$("#dataid").val("");
 							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 103) {
@@ -1047,30 +1031,23 @@ appModule
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~4");
-							$("#dataid").val("");
-							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 104) {
 							$("#dataid").attr("placeholder", "0~5");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~5");
-							$("#dataid").val("");
-							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 105) {
 							$("#dataid").attr("placeholder", "0~5");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~5");
-							$("#dataid").val("");
-							$("#decid").val("");
 						} else if ($("#datatypeid").val() == 200) {
 							$("#dataid").attr("placeholder", "1~32");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#decid").attr("placeholder", "无小数");
-							$("#dataid").val("");
 							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 201) {
@@ -1078,14 +1055,12 @@ appModule
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#decid").attr("placeholder", "无小数");
-							$("#dataid").val("");
 							$("#decid").val("");
 						} else if ($("#datatypeid").val() == 202) {
 							$("#dataid").attr("placeholder", "1~8");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#decid").attr("placeholder", "无小数");
-							$("#dataid").val("");
 							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 203) {
@@ -1093,32 +1068,24 @@ appModule
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~8");
-							$("#dataid").val("");
-							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 204) {
 							$("#dataid").attr("placeholder", "0~10");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~10");
-							$("#dataid").val("");
-							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 205) {
 							$("#dataid").attr("placeholder", "0~10");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~10");
-							$("#dataid").val("");
-							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 206) {
 							$("#dataid").attr("placeholder", "0~7");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~7");
-							$("#dataid").val("");
-							$("#decid").val("");
 						} else if ($("#datatypeid").val() == 400) {
 							$("#dataid").attr("placeholder", "暂时没用");
 							$("#decid").attr("placeholder", "暂时没用");
@@ -1130,40 +1097,40 @@ appModule
 						} else if ($("#datatypeid").val() == 401) {
 							$("#dataid").attr("placeholder", "暂时没用");
 							$("#decid").attr("placeholder", "暂时没用");
-							$("#dataid").attr("disabled", true); // 设置为不可编辑
-							$("#decid").attr("disabled", true); // 设置为不可编辑
+							$("#dataid").attr("disabled", true); // 设置为可编辑
+							$("#decid").attr("disabled", true); // 设置为可编辑
 							$("#dataid").val("");
 							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 402) {
 							$("#dataid").attr("placeholder", "暂时没用");
 							$("#decid").attr("placeholder", "暂时没用");
-							$("#dataid").attr("disabled", true); // 设置为不可编辑
-							$("#decid").attr("disabled", true); // 设置为不可编辑
+							$("#dataid").attr("disabled", true); // 设置为可编辑
+							$("#decid").attr("disabled", true); // 设置为可编辑
 							$("#dataid").val("");
 							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 403) {
 							$("#dataid").attr("placeholder", "暂时没用");
 							$("#decid").attr("placeholder", "暂时没用");
-							$("#dataid").attr("disabled", true); // 设置为不可编辑
-							$("#decid").attr("disabled", true); // 设置为不可编辑
+							$("#dataid").attr("disabled", true); // 设置为可编辑
+							$("#decid").attr("disabled", true); // 设置为可编辑
 							$("#dataid").val("");
 							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 404) {
 							$("#dataid").attr("placeholder", "暂时没用");
 							$("#decid").attr("placeholder", "暂时没用");
-							$("#dataid").attr("disabled", true); // 设置为不可编辑
-							$("#decid").attr("disabled", true); // 设置为不可编辑
+							$("#dataid").attr("disabled", true); // 设置为可编辑
+							$("#decid").attr("disabled", true); // 设置为可编辑
 							$("#dataid").val("");
 							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 405) {
 							$("#dataid").attr("placeholder", "暂时没用");
 							$("#decid").attr("placeholder", "暂时没用");
-							$("#dataid").attr("disabled", true); // 设置为不可编辑
-							$("#decid").attr("disabled", true); // 设置为不可编辑
+							$("#dataid").attr("disabled", true); // 设置为可编辑
+							$("#decid").attr("disabled", true); // 设置为可编辑
 							$("#dataid").val("");
 							$("#decid").val("");
 
@@ -1172,14 +1139,12 @@ appModule
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~15");
-							$("#dataid").val("");
-							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 1000) {
 							$("#dataid").attr("placeholder", "无整数");
 							$("#decid").attr("placeholder", "无小数");
-							$("#dataid").attr("disabled", true); // 设置为不可编辑
-							$("#decid").attr("disabled", true); // 设置为不可编辑
+							$("#dataid").attr("disabled", true); // 设置为可编辑
+							$("#decid").attr("disabled", true); // 设置为可编辑
 							$("#dataid").val("");
 							$("#decid").val("");
 						}
@@ -1212,12 +1177,26 @@ appModule
 						var digit_counts = [];
 						var rangdata, child_rangdata;
 						var rangs = [];
+						var addrdata, child_addrdata;
+						var addrs = [];
 						var scaliedata, child_scaliedata;
 						var scalies = [];
-						if ($("#nameid").val() == ""
-								|| $("#addrid").val() == "") {
+						if ($("#nameid").val() == "") {
 							alert("参数未配置完整！");
-							return;
+						}
+						if ($('#registeraddr').css('display') == 'block') {
+							if ($("#addrid").val() == "") {
+								alert("参数未配置完整！");
+								return;
+							}
+
+						}
+						if ($('#child_registeraddr').css('display') == 'block') {
+							if ($("#child_addrid").val() == "") {
+								alert("参数未配置完整！");
+								return;
+							}
+
 						}
 						var display = $('#registeraddr').css('display');
 						if (display == 'block') {
@@ -1264,8 +1243,10 @@ appModule
 							}
 							scaliedata = $("#scaleid").text();
 							scalies.push(scaliedata);
-							rangdata = $("#addrid").val();
+							rangdata = $("#rangid").text();
 							rangs.push(rangdata);
+							addrdata = $("#addrid").val();
+							addrs.push(addrdata);
 
 						} else {
 							$("#rangid").html("");
@@ -1318,8 +1299,10 @@ appModule
 							}
 							child_scaliedata = $("#child_scaleid").text();
 							scalies.push(child_scaliedata);
-							child_rangdata = $("#child_addrid").val();
+							child_rangdata = $("#child_rangid").text();
 							rangs.push(child_rangdata);
+							child_addrdata = $("#child_addrid").val();
+							addrs.push(child_addrdata);
 						} else {
 
 							$("#child_rangid").html("");
@@ -1505,19 +1488,15 @@ appModule
 									if (totle < 1 || totle > 15) {
 										alert("整数位数+小数位数必须大于1小于15");
 										return;
-
 									}
-
 								}
 
 							}
 						} else {
 							$('#divdatatypeid').css('display', 'none');
 							$('#datadigitid').css('display', 'none');
-
 							$("#dataid").val("");
 							$("#decid").val("");
-
 						}
 						if (!$("#dataid").prop("disabled")) {
 							num = $("#dataid").val();
@@ -1528,6 +1507,7 @@ appModule
 							digit_counts.push(dec);
 						}
 						var rang_datas = rangs.join(",");
+						var addr_datas = addrs.join(",");
 						var scalie_datas = scalies.join(",");
 						var digs = digit_counts.join(",");
 						var params = {
@@ -1537,10 +1517,10 @@ appModule
 							name : $("#nameid").val(),
 							data_id : $("#datatypeid").val(),
 							addr_type : $("#addrtypeid").val(),
-							addr : rang_datas,
+							addr : addr_datas,
 							digit_binary : scalie_datas,
 							rid : $("#registerid").val(),
-							rang : $("#rangid").text(),
+							rang : rang_datas,
 							describe : $("#describeid").val(),
 							digit_count : digs,
 							data_type : "0",
