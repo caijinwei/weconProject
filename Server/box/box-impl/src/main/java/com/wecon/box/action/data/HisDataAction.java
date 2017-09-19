@@ -56,7 +56,7 @@ public class HisDataAction {
 			realHisCfgFilter.addr_type = -1;
 			realHisCfgFilter.data_type = 1;
 			realHisCfgFilter.his_cycle = -1;
-			realHisCfgFilter.state =-1;
+			realHisCfgFilter.state = -1;
 			realHisCfgFilter.account_id = client.userId;
 			realHisCfgFilter.dirId = -1;
 			if (!CommonUtils.isNullOrEmpty(device_id)) {
@@ -96,7 +96,7 @@ public class HisDataAction {
 			@RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
 
 		JSONObject data = new JSONObject();
-		Page<RealHisCfgData> realHisCfgDataList = new Page<RealHisCfgData>(pageIndex,pageSize,0);
+		Page<RealHisCfgData> realHisCfgDataList = new Page<RealHisCfgData>(pageIndex, pageSize, 0);
 
 		RealHisCfgDataFilter realHisCfgDataFilter = new RealHisCfgDataFilter();
 		if (CommonUtils.isNullOrEmpty(real_his_cfg_id)) {
@@ -136,7 +136,7 @@ public class HisDataAction {
 			realHisCfgFilter.data_type = 1;
 			realHisCfgFilter.his_cycle = -1;
 			realHisCfgFilter.state = -1;
-			realHisCfgFilter.bind_state=1;
+			realHisCfgFilter.bind_state = 1;
 
 			realHisCfgFilter.account_id = client.userId;
 			if (!CommonUtils.isNullOrEmpty(device_id)) {
@@ -146,6 +146,52 @@ public class HisDataAction {
 			realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(realHisCfgFilter, pageIndex, pageSize);
 			for (int i = 0; i < realHisCfgDeviceList.getList().size(); i++) {
 				RealHisCfgDevice realHisCfgDevice = realHisCfgDeviceList.getList().get(i);
+				// 整数位 小数位分割
+				if (realHisCfgDevice.digit_count != null) {
+					String[] numdecs = realHisCfgDevice.digit_count.split(",");
+					if (numdecs != null) {
+						if (numdecs.length == 1) {
+							realHisCfgDevice.num = numdecs[0];
+						} else if (numdecs.length == 2) {
+							realHisCfgDevice.num = numdecs[0];
+							realHisCfgDevice.dec = numdecs[1];
+						}
+					}
+				}
+				// 主子编号范围分割
+				if (realHisCfgDevice.data_limit != null) {
+					String[] numdecs = realHisCfgDevice.data_limit.split(",");
+					if (numdecs != null) {
+						if (numdecs.length == 1) {
+							realHisCfgDevice.main_limit = numdecs[0];
+						} else if (numdecs.length == 2) {
+							realHisCfgDevice.main_limit = numdecs[0];
+							realHisCfgDevice.child_limit = numdecs[1];
+						}
+					}
+				}
+				// 主子编号进制分割
+				if (realHisCfgDevice.digit_binary != null) {
+					String[] numdecs = realHisCfgDevice.digit_binary.split(",");
+					if (numdecs != null) {
+						if (numdecs.length == 1) {
+							realHisCfgDevice.main_binary = numdecs[0];
+						} else if (numdecs.length == 2) {
+							realHisCfgDevice.main_binary = numdecs[0];
+							realHisCfgDevice.child_binary = numdecs[1];
+						}
+					}
+				}
+				// 主子地址分割
+				String[] addrs = realHisCfgDevice.addr.split(",");
+				if (addrs != null) {
+					if (addrs.length == 1) {
+						realHisCfgDevice.main_addr = addrs[0];
+					} else if (addrs.length == 2) {
+						realHisCfgDevice.main_addr = addrs[0];
+						realHisCfgDevice.child_addr = addrs[1];
+					}
+				}
 				PlcInfo plcInfo = plcInfoApi.getPlcInfo(realHisCfgDevice.plc_id);
 				if (plcInfo != null) {
 					realHisCfgDevice.condevice = plcInfo.port;

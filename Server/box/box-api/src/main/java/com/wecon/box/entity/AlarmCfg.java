@@ -26,6 +26,7 @@ public class AlarmCfg {
 	public String addr;
 	public String data_limit;
 	public String digit_count;
+	public String digit_binary;
 	public int addr_type;
 	public String text;
 	public int condition_type;

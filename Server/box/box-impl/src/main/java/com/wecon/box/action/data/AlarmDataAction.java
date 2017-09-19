@@ -168,10 +168,56 @@ public class AlarmDataAction {
 			return new Output(json);
 		}
 		listalrmCfgTrigger = alarmCfgApi.getAlarmCfgDataList(account_id, Long.parseLong(group_id),
-				Long.parseLong(device_id),1, pageIndex, pageSize);
+				Long.parseLong(device_id), 1, pageIndex, pageSize);
 		if (listalrmCfgTrigger.getList().size() > 0) {
 			for (int i = 0; i < listalrmCfgTrigger.getList().size(); i++) {
 				AlarmCfgTrigger alarmCfgTrigger = listalrmCfgTrigger.getList().get(i);
+				// 整数位 小数位分割
+				if (alarmCfgTrigger.digit_count != null) {
+					String[] numdecs = alarmCfgTrigger.digit_count.split(",");
+					if (numdecs != null) {
+						if (numdecs.length == 1) {
+							alarmCfgTrigger.num = numdecs[0];
+						} else if (numdecs.length == 2) {
+							alarmCfgTrigger.num = numdecs[0];
+							alarmCfgTrigger.dec = numdecs[1];
+						}
+					}
+				}
+				// 主子编号范围分割
+				if (alarmCfgTrigger.data_limit != null) {
+					String[] numdecs = alarmCfgTrigger.data_limit.split(",");
+					if (numdecs != null) {
+						if (numdecs.length == 1) {
+							alarmCfgTrigger.main_limit = numdecs[0];
+						} else if (numdecs.length == 2) {
+							alarmCfgTrigger.main_limit = numdecs[0];
+							alarmCfgTrigger.child_limit = numdecs[1];
+						}
+					}
+				}
+				// 主子编号进制分割
+				if (alarmCfgTrigger.digit_binary != null) {
+					String[] numdecs = alarmCfgTrigger.digit_binary.split(",");
+					if (numdecs != null) {
+						if (numdecs.length == 1) {
+							alarmCfgTrigger.main_binary = numdecs[0];
+						} else if (numdecs.length == 2) {
+							alarmCfgTrigger.main_binary = numdecs[0];
+							alarmCfgTrigger.child_binary = numdecs[1];
+						}
+					}
+				}
+				// 主子地址分割
+				String[] addrs = alarmCfgTrigger.addr.split(",");
+				if (addrs != null) {
+					if (addrs.length == 1) {
+						alarmCfgTrigger.main_addr = addrs[0];
+					} else if (addrs.length == 2) {
+						alarmCfgTrigger.main_addr = addrs[0];
+						alarmCfgTrigger.child_addr = addrs[1];
+					}
+				}
 				AlarmTriggerFilter filter = new AlarmTriggerFilter();
 				filter.alarmcfg_id = alarmCfgTrigger.alarmcfg_id;
 				filter.type = -1;
@@ -311,10 +357,12 @@ public class AlarmDataAction {
 					alarmCfg.device_id = alarmCfgParam.device_id;
 					alarmCfg.data_limit = alarmCfgParam.rang;
 					alarmCfg.digit_count = alarmCfgParam.digit_count;
+					alarmCfg.digit_binary = alarmCfgParam.digit_binary;
+
 					boolean issuccess = alarmCfgApi.upAlarmCfg(alarmCfg);
 					if (issuccess) {
-						dbLogUtil.updOperateLog(OpTypeOption.UpdAlarm, ResTypeOption.Alarm, alarmCfg.alarmcfg_id, oldalarmCfg,
-								alarmCfg);
+						dbLogUtil.updOperateLog(OpTypeOption.UpdAlarm, ResTypeOption.Alarm, alarmCfg.alarmcfg_id,
+								oldalarmCfg, alarmCfg);
 						// 获取分组信息
 						if (alarmCfgParam.group_id > 0) {
 							AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(-1,
@@ -370,6 +418,7 @@ public class AlarmDataAction {
 				alarmCfg.device_id = alarmCfgParam.device_id;
 				alarmCfg.data_limit = alarmCfgParam.rang;
 				alarmCfg.digit_count = alarmCfgParam.digit_count;
+				alarmCfg.digit_binary = alarmCfgParam.digit_binary;
 				long id = alarmCfgApi.saveAlarmCfg(alarmCfg);
 				if (id > 0) {
 					dbLogUtil.addOperateLog(OpTypeOption.AddAlarm, ResTypeOption.Alarm, alarmCfg.alarmcfg_id, alarmCfg);
@@ -430,16 +479,17 @@ public class AlarmDataAction {
 	public Output confirmData(@RequestParam("alarm_cfg_id") String alarm_cfg_id,
 			@RequestParam("monitor_time") String monitor_time) {
 		if (!CommonUtils.isNullOrEmpty(alarm_cfg_id) && !CommonUtils.isNullOrEmpty(monitor_time)) {
-			Date dt=new Date(Long.parseLong(monitor_time));
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
-			String monitortime=sdf.format(dt);
+			Date dt = new Date(Long.parseLong(monitor_time));
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String monitortime = sdf.format(dt);
 			AlarmCfgData alarmCfgData = alarmCfgDataApi.getAlarmCfgData(Long.parseLong(alarm_cfg_id),
 					Timestamp.valueOf(monitortime));
 			if (alarmCfgData != null) {
 				alarmCfgData.state = 2;// 已确认状态
 				alarmCfgDataApi.updateAlarmCfgData(alarmCfgData);
-				dbLogUtil.addOperateLog(OpTypeOption.ConFirmAlarmData, ResTypeOption.Alarm, alarmCfgData.alarm_cfg_id, alarmCfgData);
-				
+				dbLogUtil.addOperateLog(OpTypeOption.ConFirmAlarmData, ResTypeOption.Alarm, alarmCfgData.alarm_cfg_id,
+						alarmCfgData);
+
 			}
 
 		}

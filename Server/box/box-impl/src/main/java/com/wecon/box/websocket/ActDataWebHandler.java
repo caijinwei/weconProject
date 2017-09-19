@@ -163,6 +163,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 				machineCodeSet = new HashSet<>();
 				for (int i = 0; i < realHisCfgDeviceList.getList().size(); i++) {
 					RealHisCfgDevice realHisCfgDevice = realHisCfgDeviceList.getList().get(i);
+					// 整数位 小数位分割
 					if (realHisCfgDevice.digit_count != null) {
 						String[] numdecs = realHisCfgDevice.digit_count.split(",");
 						if (numdecs != null) {
@@ -174,6 +175,31 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 							}
 						}
 					}
+					// 主子编号范围分割
+					if (realHisCfgDevice.data_limit != null) {
+						String[] numdecs = realHisCfgDevice.data_limit.split(",");
+						if (numdecs != null) {
+							if (numdecs.length == 1) {
+								realHisCfgDevice.main_limit = numdecs[0];
+							} else if (numdecs.length == 2) {
+								realHisCfgDevice.main_limit = numdecs[0];
+								realHisCfgDevice.child_limit = numdecs[1];
+							}
+						}
+					}
+					// 主子编号进制分割
+					if (realHisCfgDevice.digit_binary != null) {
+						String[] numdecs = realHisCfgDevice.digit_binary.split(",");
+						if (numdecs != null) {
+							if (numdecs.length == 1) {
+								realHisCfgDevice.main_binary = numdecs[0];
+							} else if (numdecs.length == 2) {
+								realHisCfgDevice.main_binary = numdecs[0];
+								realHisCfgDevice.child_binary = numdecs[1];
+							}
+						}
+					}
+					// 主子地址分割
 					String[] addrs = realHisCfgDevice.addr.split(",");
 					if (addrs != null) {
 						if (addrs.length == 1) {
@@ -200,12 +226,12 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 									PiBoxComAddr piBoxComAddr = addr_list.get(x);
 
 									if (realHisCfgDevice.id == Long.parseLong(piBoxComAddr.addr_id)) {
-										if(device.state==0){
+										if (device.state == 0) {
 											realHisCfgDevice.re_state = "0";
-										}else{
-											realHisCfgDevice.re_state= piBoxComAddr.state;
+										} else {
+											realHisCfgDevice.re_state = piBoxComAddr.state;
 										}
-										
+
 										realHisCfgDevice.re_value = piBoxComAddr.value;
 
 									}
