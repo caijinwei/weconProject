@@ -247,14 +247,13 @@ appModule
 											if (code == 200) {
 												$scope.infoDatas = data.infoDatas;
 												$scope.$apply();
-												$scope.datatype();
+
 												if (dealtype == 0) {
 													$scope.showtype = 0;
 													$("#datatypeid")
 															.val(
 																	$scope.dataTypes[0].value);
 													mid = -1;
-
 													if (data.infoDatas != "") {
 														$scope
 																.condevice(data.infoDatas[0].plcId);
@@ -279,14 +278,11 @@ appModule
 															minfo.data_id);
 													$("#hiscycleid").val(
 															minfo.his_cycle);
-
-													$("#addrid")
-															.val(minfo.addr);
+													$("#addrid").val(
+															minfo.main_addr);
 													$("#describeid").val(
 															minfo.describe);
 
-													$("#dataid").val(
-															minfo.digit_count);
 													if ($("#addrtypeid").val() == 0) {// 如果是位地址隐藏
 														$('#datadigitid').css(
 																'display',
@@ -299,10 +295,12 @@ appModule
 																'display',
 																'block');
 													}
+
 													$("#dataid").val(minfo.num);
 													$("#decid").val(minfo.dec);
 
 												}
+												$scope.datatype();
 
 											} else {
 												alert(code + "-" + msg);
@@ -454,6 +452,12 @@ appModule
 															$("#child_addrid")
 																	.val(
 																			minfo.child_addr);
+															$("#child_rangid")
+																	.html(
+																			minfo.child_limit);
+															$("#child_scaleid")
+																	.html(
+																			minfo.child_binary);
 
 														} else {
 															$(
@@ -538,7 +542,11 @@ appModule
 
 															$("#rangid")
 																	.html(
-																			minfo.data_limit);
+																			minfo.main_limit);
+
+															$("#scaleid")
+																	.html(
+																			minfo.main_binary);
 															if ($("#addrtypeid")
 																	.val() == 0) {// 如果是位地址隐藏
 																$(
@@ -576,45 +584,6 @@ appModule
 										});
 
 					}
-					/*
-					 * $scope.condevice = function(clickplc) { plcId = clickplc;
-					 * var params = { plc_id : clickplc }; T.common.ajax
-					 * .request( "WeconBox", "actDataAction/getAddrType",
-					 * params, function(data, code, msg) { if (code == 200) {
-					 * $scope.allAddrs = data.allAddr;
-					 * 
-					 * if (data.allAddr != "") {
-					 * 
-					 * $scope.addrvalues = data.allAddr[0].addrRid; if
-					 * (data.allAddr[0].addrRid != null) { $("#rangid") .val(
-					 * data.allAddr[0].addrRid[0].range); } $scope.$apply();
-					 * 
-					 * if ($("#addrtypeid").val() == 0) {// 如果是位地址隐藏
-					 * $('#datadigitid').css( 'display', 'none'); } else {
-					 * $('#datadigitid').css( 'display', 'block'); } if (mtype ==
-					 * 1) {
-					 * 
-					 * $("#addrtypeid") .val( minfo.addr_type);
-					 * 
-					 * angular .forEach( $scope.allAddrs, function( data, index,
-					 * array) { if ($( "#addrtypeid") .val() == data.addrkey) {
-					 * $scope.addrvalues = data.addrRid; $scope .$apply(); } })
-					 * 
-					 * $("#registerid").val( minfo.rid); if ($("#registerid")
-					 * .val() == null) { $("#addrtypeid") .val(
-					 * data.allAddr[0].addrkey); if ($("#addrtypeid") .val() ==
-					 * 0) {// 如果是位地址隐藏 $('#datadigitid') .css( 'display',
-					 * 'none'); } else { $('#datadigitid') .css( 'display',
-					 * 'block'); }
-					 * 
-					 * if ($scope.addrvalues != null) { $("#registerid") .val(
-					 * $scope.addrvalues[0].addrvalue);
-					 * 
-					 * $("#rangid") .val( $scope.addrvalues[0].range); } } else {
-					 * $("#rangid") .val( minfo.data_limit); } } } } else {
-					 * alert(code + "-" + msg); } }, function() { alert("ajax
-					 * error"); }); }
-					 */
 					// 地址类型点击
 					$("#addrtypeid").change(function() {
 
@@ -632,13 +601,6 @@ appModule
 						}
 
 					});
-					/*
-					 * $scope.changeaddrtype = function(value) {
-					 * angular.forEach($scope.allAddrs, function(data, index,
-					 * array) { if (value == data.addrkey) { $scope.addrvalues =
-					 * data.addrRid; $("#rangid").val(data.addrRid[0].range);
-					 * $scope.$apply(); } }) }
-					 */
 					$scope.changeaddrtype = function(value) {
 						angular
 								.forEach(
@@ -700,13 +662,27 @@ appModule
 						angular.forEach($scope.addrvalues, function(data,
 								index, array) {
 							if (value == data.addrvalue) {
-								$("#rangid").val(data.range);
+								$("#rangid").html(data.range);
 								$("#scaleid").html(data.mJinzhi);
+								if ($("#addrtypeid").val() == 0) {// 如果是位地址隐藏
+									if (data.bRange != null
+											&& data.bJinzhi != null) {
+										$('#child_registeraddr').css('display',
+												'block');
+										$("#child_rangid").html(data.bRange);
+										$("#child_scaleid").html(data.bJinzhi);
+									} else {
 
+										$('#child_registeraddr').css('display',
+												'none');
+										$("#child_rangid").html("");
+										$("#child_scaleid").html("");
+
+									}
+
+								}
 							}
-
 						})
-
 					}
 					/**
 					 * 数据格式设置
@@ -721,7 +697,6 @@ appModule
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#decid").attr("placeholder", "无小数");
-							$("#dataid").val("");
 							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 101) {
@@ -729,14 +704,12 @@ appModule
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#decid").attr("placeholder", "无小数");
-							$("#dataid").val("");
 							$("#decid").val("");
 						} else if ($("#datatypeid").val() == 102) {
 							$("#dataid").attr("placeholder", "1~4");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#decid").attr("placeholder", "无小数");
-							$("#dataid").val("");
 							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 103) {
@@ -744,30 +717,23 @@ appModule
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~4");
-							$("#dataid").val("");
-							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 104) {
 							$("#dataid").attr("placeholder", "0~5");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~5");
-							$("#dataid").val("");
-							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 105) {
 							$("#dataid").attr("placeholder", "0~5");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~5");
-							$("#dataid").val("");
-							$("#decid").val("");
 						} else if ($("#datatypeid").val() == 200) {
 							$("#dataid").attr("placeholder", "1~32");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#decid").attr("placeholder", "无小数");
-							$("#dataid").val("");
 							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 201) {
@@ -775,14 +741,12 @@ appModule
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#decid").attr("placeholder", "无小数");
-							$("#dataid").val("");
 							$("#decid").val("");
 						} else if ($("#datatypeid").val() == 202) {
 							$("#dataid").attr("placeholder", "1~8");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#decid").attr("placeholder", "无小数");
-							$("#dataid").val("");
 							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 203) {
@@ -790,32 +754,24 @@ appModule
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~8");
-							$("#dataid").val("");
-							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 204) {
 							$("#dataid").attr("placeholder", "0~10");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~10");
-							$("#dataid").val("");
-							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 205) {
 							$("#dataid").attr("placeholder", "0~10");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~10");
-							$("#dataid").val("");
-							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 206) {
 							$("#dataid").attr("placeholder", "0~7");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~7");
-							$("#dataid").val("");
-							$("#decid").val("");
 						} else if ($("#datatypeid").val() == 400) {
 							$("#dataid").attr("placeholder", "暂时没用");
 							$("#decid").attr("placeholder", "暂时没用");
@@ -869,8 +825,6 @@ appModule
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~15");
-							$("#dataid").val("");
-							$("#decid").val("");
 
 						} else if ($("#datatypeid").val() == 1000) {
 							$("#dataid").attr("placeholder", "无整数");
@@ -906,17 +860,26 @@ appModule
 						var digit_counts = [];
 						var rangdata, child_rangdata;
 						var rangs = [];
+						var addrdata, child_addrdata;
+						var addrs = [];
 						var scaliedata, child_scaliedata;
 						var scalies = [];
-						if ($("#nameid").val() == ""
-								|| $("#addrid").val() == "") {
+						if ($("#nameid").val() == "") {
 							alert("参数未配置完整！");
-							return;
 						}
-						if ($("#hiscycleid").val() == ""
-								|| $("#hiscycleid").val() < 1) {
-							alert("请输入大于0的采集周期");
-							return;
+						if ($('#registeraddr').css('display') == 'block') {
+							if ($("#addrid").val() == "") {
+								alert("参数未配置完整！");
+								return;
+							}
+
+						}
+						if ($('#child_registeraddr').css('display') == 'block') {
+							if ($("#child_addrid").val() == "") {
+								alert("参数未配置完整！");
+								return;
+							}
+
 						}
 						var display = $('#registeraddr').css('display');
 						if (display == 'block') {
@@ -963,8 +926,10 @@ appModule
 							}
 							scaliedata = $("#scaleid").text();
 							scalies.push(scaliedata);
-							rangdata = $("#addrid").val();
+							rangdata = $("#rangid").text();
 							rangs.push(rangdata);
+							addrdata = $("#addrid").val();
+							addrs.push(addrdata);
 
 						} else {
 							$("#rangid").html("");
@@ -1017,8 +982,10 @@ appModule
 							}
 							child_scaliedata = $("#child_scaleid").text();
 							scalies.push(child_scaliedata);
-							child_rangdata = $("#child_addrid").val();
+							child_rangdata = $("#child_rangid").text();
 							rangs.push(child_rangdata);
+							child_addrdata = $("#child_addrid").val();
+							addrs.push(child_addrdata);
 						} else {
 
 							$("#child_rangid").html("");
@@ -1028,25 +995,21 @@ appModule
 						if ($("#addrtypeid").val() != 0) {
 							var regnum = /^0|[1-9]\d*$/;
 							var datadisabled = $("#dataid").prop("disabled");
-							alert(datadisabled);
-							console.log(datadisabled);
-							if (datadisabled == 'false') {
-								alert(datadisabled);
+							if (!datadisabled) {
 								if (!regnum.test($("#dataid").val())) {
 									alert("整数位数格式错误");
 									return;
 								}
 
 							}
-							console.log(datadisabled);
 							var decdisabled = $("#decid").prop("disabled");
-							if (decdisabled == 'false') {
-								alert(decdisabled);
+							if (!decdisabled) {
 								if (!regnum.test($("#dataid").val())) {
 									alert("小数位数格式错误");
 									return;
 								}
 							}
+
 							if ($("#datatypeid").val() == 100) {
 								if ($("#dataid").val().length < 1
 										|| $("#dataid").val().length > 16) {
@@ -1208,29 +1171,28 @@ appModule
 									if (totle < 1 || totle > 15) {
 										alert("整数位数+小数位数必须大于1小于15");
 										return;
-
 									}
-
 								}
 
 							}
 						} else {
 							$('#divdatatypeid').css('display', 'none');
 							$('#datadigitid').css('display', 'none');
-
 							$("#dataid").val("");
 							$("#decid").val("");
-
 						}
-						if ($("#dataid").val() != "" || $("#decid").val() != "") {
+						if (!$("#dataid").prop("disabled")) {
 							num = $("#dataid").val();
-							dec = $("#decid").val();
 							digit_counts.push(num);
+						}
+						if (!$("#decid").prop("disabled")) {
+							dec = $("#decid").val();
 							digit_counts.push(dec);
-							var digs = digit_counts.join(",");
 						}
 						var rang_datas = rangs.join(",");
+						var addr_datas = addrs.join(",");
 						var scalie_datas = scalies.join(",");
+						var digs = digit_counts.join(",");
 						var params = {
 							id : mid,
 							plc_id : plcId,
@@ -1238,10 +1200,10 @@ appModule
 							name : $("#nameid").val(),
 							data_id : $("#datatypeid").val(),
 							addr_type : $("#addrtypeid").val(),
-							addr : rang_datas,
+							addr : addr_datas,
 							digit_binary : scalie_datas,
 							rid : $("#registerid").val(),
-							rang : $("#rangid").val(),
+							rang : rang_datas,
 							describe : $("#describeid").val(),
 							digit_count : digs,
 							data_type : "1",
