@@ -36,6 +36,8 @@ public enum ErrorCodeOption {
     //检查更新相关（固件，驱动升级）
     FirmwareExisted("此版本固件已经存在", 13000),
     FirmwareNotExist("操作的固件不存在", 13001),
+    DriverExisted("此驱动名已经被使用", 13002),
+    DriverNotExist("操作的驱动不存在", 13003),
 
     PiBoxDevice_IsNot_Found("盒子不存在",300009),
     Account_Permissions_No("账户权限不足，无法新增盒子", 30001),

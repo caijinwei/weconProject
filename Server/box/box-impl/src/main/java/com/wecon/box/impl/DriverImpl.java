@@ -60,11 +60,25 @@ public class DriverImpl implements DriverApi {
 
     @Override
     public boolean saveDriver(Driver model) {
-        String sql = "update driver set driver=?,file_id=?,file_md5=?,`description`=?,update_date=current_timestamp() where `type` = ? ";
-        if (jdbcTemplate.update(sql, new Object[]{model.driver, model.file_id, model.file_md5, model.type,model.description}) == 0) {
+        String sql = "update driver set `driver`=?,file_id=?,file_md5=?,`description`=?,update_date=current_timestamp() where `type` = ? ";
+        if (jdbcTemplate.update(sql, new Object[]{model.driver, model.file_id, model.file_md5, model.description, model.type}) == 0) {
             sql = "insert into driver(`driver`,file_id,file_md5,`type`,`description`,create_date,update_date) values (?,?,?,?,?,current_timestamp(),current_timestamp() );";
-            jdbcTemplate.update(sql, new Object[]{model.driver, model.file_id, model.file_md5, model.type,model.description});
+            jdbcTemplate.update(sql, new Object[]{model.driver, model.file_id, model.file_md5, model.type, model.description});
         }
+        return true;
+    }
+
+    @Override
+    public boolean updateDriver(Driver model) {
+        String sql = "select count(1) from driver where driver_id<>? and `type` = ?  ";
+        int ret = jdbcTemplate.queryForObject(sql,
+                new Object[]{model.driver_id, model.type},
+                Integer.class);
+        if (ret > 0) {
+            throw new BusinessException(ErrorCodeOption.DriverExisted.key, ErrorCodeOption.DriverExisted.value);
+        }
+        sql = "update driver set `driver`=?,file_id=?,file_md5=?,`description`=?,`type` = ?,update_date=current_timestamp() where driver_id=?";
+        jdbcTemplate.update(sql, new Object[]{model.driver, model.file_id, model.file_md5, model.description, model.type, model.driver_id});
         return true;
     }
 

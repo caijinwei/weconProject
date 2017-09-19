@@ -29,6 +29,14 @@ public interface DriverApi {
     boolean saveDriver(Driver model);
 
     /**
+     * 更新驱动，根据id
+     *
+     * @param model
+     * @return
+     */
+    boolean updateDriver(Driver model);
+
+    /**
      * 获取驱动的分页列表
      *
      * @param type
