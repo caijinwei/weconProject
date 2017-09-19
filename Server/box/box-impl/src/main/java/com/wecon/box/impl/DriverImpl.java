@@ -4,7 +4,6 @@ import com.wecon.box.api.DriverApi;
 import com.wecon.box.constant.ConstKey;
 import com.wecon.box.entity.Driver;
 import com.wecon.box.entity.DriverDetail;
-import com.wecon.box.entity.FirmwareDetail;
 import com.wecon.box.entity.Page;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.util.BoxWebConfigContext;
@@ -12,12 +11,10 @@ import com.wecon.common.redis.RedisManager;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.core.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -60,7 +57,7 @@ public class DriverImpl implements DriverApi {
 
     @Override
     public boolean saveDriver(Driver model) {
-        String sql = "update driver set `driver`=?,file_id=?,file_md5=?,`description`=?,update_date=current_timestamp() where `type` = ? ";
+        String sql = "update driver set driver=?,file_id=?,file_md5=?,`description`=?,update_date=current_timestamp() where `type` = ? ";
         if (jdbcTemplate.update(sql, new Object[]{model.driver, model.file_id, model.file_md5, model.description, model.type}) == 0) {
             sql = "insert into driver(`driver`,file_id,file_md5,`type`,`description`,create_date,update_date) values (?,?,?,?,?,current_timestamp(),current_timestamp() );";
             jdbcTemplate.update(sql, new Object[]{model.driver, model.file_id, model.file_md5, model.type, model.description});
@@ -133,6 +130,19 @@ public class DriverImpl implements DriverApi {
         }
         return null;
     }
+
+    @Override
+    public Driver getDriverBydriver(String driver) {
+        String sql = "SELECT driver_id,`driver`,file_id,file_md5,`type`,create_date,update_date,`description` from driver  WHERE driver=?";
+        List<Driver> list = jdbcTemplate.query(sql,
+                new Object[]{driver},
+                new DefaultDriverRowMapper());
+        if (!list.isEmpty()) {
+            return list.get(0);
+        }
+        return null;
+    }
+
 
     @Override
     public DriverDetail getDriverDetail(Long driver_id) {

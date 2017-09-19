@@ -167,7 +167,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $("#retry_timeout").val($scope.plcInfoById.retry_timeout);
                 $('#box_stat_no').val($scope.plcInfoById.box_stat_no);
                 $('#plc_stat_no').val($scope.plcInfoById.plc_stat_no);
-                $('#retry_times').val($scope.plcInfoById.retry_times);
+                //$('#retry_times').val($scope.plcInfoById.retry_times);
                 $scope.selectedType = temType;
                 $scope.$apply();
             }
@@ -544,6 +544,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         T.common.ajax.request("WeconBox", "dirFirmAction/getDirFirmInfoByDevId", params, function (data, code, msg) {
             if (code == 200) {
                 $scope.devFirmInfo = data.devFirmInfo;
+                console.log("固件对象",data.devFirmInfo);
                 //固件更新要用到
                 $scope.localVersionCode = data.devFirmInfo.f_ver;
                 $scope.$apply();
@@ -559,7 +560,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     $scope.checkUpdateFir = function () {
         var localVersionCode = $scope.localVersionCode;
         var dev_model = $scope.dev_model;
-        console.log("参数model" + dev_model + "localVersionCode" + localVersionCode);
         if (dev_model == "" || dev_model == undefined || localVersionCode == "" || localVersionCode == undefined) {
             alert("系统错误");
             return;
@@ -572,12 +572,17 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             if (code == 200) {
                 $("#checkUpdateFir").modal("show");
                 if (data.isNewVersion) {
-                    $("#updateNotice").prepend('<p>' + "最新版：" + data.versionCode + '</p>');
+                    //用于展示提示内容
+                    $("#noticeDiv").empty();
+                    $("#noticeDiv").prepend('<div>最新版本:'+data.versionCode+'</div>');
+
+
                     $scope.file_id = data.file_id;
                     $scope.fileData=data.fileData;
-                    console.log(data.fileData);
                 } else {
-                    $("#updateNotice").prepend('<p>' + "已经是最新版了，不需要更新！" + '</p>');
+                    //用于展示提示内容
+                    $("#noticeDiv").empty();
+                    $("#noticeDiv").prepend('<div>已经是最新版了，不需要更新</div>');
                 }
             }
             else {
@@ -600,7 +605,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             file_id:file_id,
             machine_code:machine_code
         }
-        console.log(params);
         if(machine_code==""||machine_code==undefined||versionName==""||versionName==undefined||version_code==""||version_code==undefined||file_id==""||file_id==undefined){
             $("#checkUpdateFir").modal("hide");
             alert("系统忙，稍后操作！");

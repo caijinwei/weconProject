@@ -62,12 +62,13 @@ public enum ErrorCodeOption {
     DivModel_IsError("没有可更新版本",300021),
     FileId_Is_Error("更新失败",300022),
     Mqtt_Transport_Error("更新失败",300023),
+    Driver_IsNot_Fount("通讯口配置失败，该驱动不存在",300024),
 
 
     Get_Groupid_Error("获取数组ID错误",50001),
 	
     Monitor_Existed("该分组下已经存在该监控点",60001),
-	Get_Data_Error("获取参数异常",60002);
+	Get_Data_Error("获取参数异常",60002) ;
 
     public int value;
     public String key;
