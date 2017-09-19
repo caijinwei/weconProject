@@ -13,7 +13,7 @@ public class ClientMQTT {
 
     public static final String HOST = "tcp://192.168.29.186:1883";
     public String topicPort = "topic11";
-    private static final String clientid = "client11";
+    private  String clientid ;
     private MqttClient client;
     private MqttConnectOptions options;
     private String userName = "admin";
@@ -22,8 +22,9 @@ public class ClientMQTT {
     //回调函数  获取到监听的信息
     private MqttCallback callback;
 
-    public ClientMQTT(String topic, MqttCallback callback) {
+    public ClientMQTT(String topic,String clientid, MqttCallback callback) {
         this.topicPort = topic;
+        this.clientid = clientid;
         this.callback = callback;
     }
 
@@ -66,7 +67,7 @@ public class ClientMQTT {
     }
 
     public static void main(String[] args) throws MqttException {
-        ClientMQTT client = new ClientMQTT("pibox/stc/2222/", new PushCallback());
-        client.start();
+//        ClientMQTT client = new ClientMQTT("pibox/stc/2222/", new PushCallback());
+//        client.start();
     }
 }

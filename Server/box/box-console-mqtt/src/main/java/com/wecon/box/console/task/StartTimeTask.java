@@ -38,7 +38,7 @@ public class StartTimeTask {
 
 					Trigger trigger2 = TimeTriggerUtil.getTrigger(BOX_NOTIFY_JOB, "1", 20);
 					//QuartzManage.createJob(scheduler, trigger, MQTT_JOB, null, null, MonitorTaskJob.class);
-					QuartzManage.createJob(scheduler, trigger2, BOX_NOTIFY_JOB, null, null, BoxNotifyTaskJob.class);
+//					QuartzManage.createJob(scheduler, trigger2, BOX_NOTIFY_JOB, null, null, BoxNotifyTaskJob.class);
 					
 
 				} catch (Exception e) {

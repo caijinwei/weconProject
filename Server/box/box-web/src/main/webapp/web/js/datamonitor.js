@@ -19,6 +19,7 @@ appModule
 						}
 					}
 
+					// 获取分组
 					$scope.act_group = function(deviceid) {
 
 						var params = {
@@ -87,15 +88,34 @@ appModule
 										actgroupId);
 							};
 							ws.onmessage = function(evt) {
-								$scope.paginationConf.totalItems = JSON
-										.parse(evt.data).piBoxActDateMode.totalRecord;
-								$scope.actDatas = JSON.parse(evt.data).piBoxActDateMode.list;
-								$scope.$apply();
-								angular.forEach($scope.actDatas, function(data,
-										index, array) {
-									$scope.editable_name(data);
-									$scope.editable_value(data);
-								});
+								if (JSON.parse(evt.data).piBoxActDateMode != null) {
+									$scope.paginationConf.totalItems = JSON
+											.parse(evt.data).piBoxActDateMode.totalRecord;
+									$scope.actDatas = JSON.parse(evt.data).piBoxActDateMode.list;
+									$scope.$apply();
+									angular.forEach($scope.actDatas, function(
+											data, index, array) {
+										$scope.editable_name(data);
+										$scope.editable_value(data);
+									});
+
+								} else {
+									// 下发数据到盒子反馈
+									scope.resultData = JSON.parse(evt.data).resultData;
+									$("#loadingModal").modal("hide");
+									if ($scope.resultData == 0) {
+
+										alert("数据下发失败，请检查盒子是否在线！");
+									} else {
+										alert("数据下发盒子成功！");
+									}
+									$scope.ws_send(
+											$scope.paginationConf.currentPage,
+											$scope.paginationConf.itemsPerPage,
+											actgroupId);
+
+								}
+
 							};
 							ws.onclose = function(evt) {
 								console.log(evt);
@@ -112,17 +132,46 @@ appModule
 						if (pageIndex == 0)
 							pageIndex = 1;
 						var params = {
+							markid : 0,
 							device_id : $scope.deviceid,
 							acc_dir_id : groupId,
 							pageIndex : pageIndex,
 							pageSize : pageSize
 
 						};
-
 						ws.send(angular.toJson(params));
 					}
+
 					$scope.ws_close = function() {
 						ws.close();
+					}
+					// 下发数据到盒子
+					$scope.putMess = function(model, value) {
+						var params = {
+							markid : 1,
+							value : value,
+							addr_id : model.id
+
+						};
+						ws.send(angular.toJson(params));
+
+						/*
+						 * T.common.ajax .request( "WeconBox",
+						 * "actDataAction/putMess", params, function(data, code,
+						 * msg) { if (code == 200) { $scope.resultData =
+						 * data.resultData;
+						 * 
+						 * if ($scope.resultData == 0) {
+						 * 
+						 * alert("数据下发失败，请检查盒子是否在线！"); } else {
+						 * alert("数据下发盒子成功！"); } $scope .ws_send(
+						 * $scope.paginationConf.currentPage,
+						 * $scope.paginationConf.itemsPerPage, actgroupId); }
+						 * else {
+						 * 
+						 * alert(code + "-" + msg); } }, function() {
+						 * alert("ajax error"); });
+						 */
 					}
 
 					// 复制监控点
@@ -428,7 +477,10 @@ appModule
 								if (!$.trim(value)) {
 									return '不能为空';
 								}
-                                
+								/*if (model.re_state != 1) {
+									return '检查盒子是否在线！';
+								}*/
+								$("#loadingModal").modal("show");
 								$scope.putMess(model, value);
 							}
 						});
@@ -464,38 +516,7 @@ appModule
 											alert("ajax error");
 										});
 					}
-					// 下发数据到盒子
-					$scope.putMess = function(model, value) {
-						var params = {
-							value : value,
-							addr_id : model.id
 
-						};
-						T.common.ajax.request("WeconBox",
-								"actDataAction/putMess", params, function(data,
-										code, msg) {
-									if (code == 200) {
-										$scope.resultData = data.resultData;
-										
-										if ($scope.resultData == 0) {
-											
-											alert("数据下发失败，请检查盒子是否在线！");
-										} else {
-											alert("数据下发盒子成功！");
-										}
-										$scope.ws_send(
-												$scope.paginationConf.currentPage,
-												$scope.paginationConf.itemsPerPage,
-												actgroupId);
-
-									} else {
-
-										alert(code + "-" + msg);
-									}
-								}, function() {
-									alert("ajax error");
-								});
-					}
 					/*
 					 * 展示所有监控点设置iframe的url属性
 					 */

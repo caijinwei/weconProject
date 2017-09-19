@@ -10,6 +10,8 @@ import com.wecon.box.constant.ConstKey;
 import com.wecon.box.entity.*;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
+import com.wecon.box.util.ClientMQTT;
+import com.wecon.box.util.ServerMqtt;
 import com.wecon.common.redis.RedisManager;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.core.AppContext;
@@ -17,6 +19,10 @@ import com.wecon.restful.core.Client;
 import redis.clients.jedis.JedisPubSub;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -47,6 +53,8 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	private SubscribeListener subscribeListener;
 
 	private Client client;
+	private ClientMQTT reclient;
+	private Map<String, Object> bParams;
 
 	private static final Logger logger = LogManager.getLogger(ActDataHandler.class.getName());
 
@@ -65,16 +73,143 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 		if (CommonUtils.isNullOrEmpty(params)) {
 			return;
 		}
-		// 推送消息给网页端
+		bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {
+		});
+		if ("0".equals(bParams.get("markid").toString())) {
+			logger.debug("WebSocket push begin");
+			session.sendMessage(new TextMessage(getStringRealData()));
+			logger.debug("WebSocket push end");
 
-		logger.debug("WebSocket push begin");
-		session.sendMessage(new TextMessage(getStringRealData()));
-		logger.debug("WebSocket push end");
+			// 订阅redis消息
+			if (null != machineCodeSet && null == subscribeListener) {
+				subscribeRealData();
+			}
 
-		// 订阅redis消息
-		if (null != machineCodeSet && null == subscribeListener) {
-			subscribeRealData();
+		} else if ("1".equals(bParams.get("markid").toString())) {
+			String value = bParams.get("value").toString();
+			String addr_id = bParams.get("addr_id").toString();
+			// 发送数据
+			putMQTTMess(value, addr_id);
+			// 订阅消息
+			if (!CommonUtils.isNullOrEmpty(addr_id)) {
+				RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(addr_id));
+				Device device = deviceApi.getDevice(realHisCfg.device_id);
+				SendvalueCallback sendvalueCallback = new SendvalueCallback(session, addr_id);
+				reclient = new ClientMQTT("pibox/cts/" + device.machine_code, "send" + session.getId(),
+						sendvalueCallback);
+				reclient.start();
+			}
+
 		}
+
+	}
+
+	class SendvalueCallback implements MqttCallback {
+		WebSocketSession session;
+		String addr_id;
+
+		public SendvalueCallback(WebSocketSession session, String addr_id) {
+			this.session = session;
+		}
+
+		@Override
+		public void connectionLost(Throwable arg0) {
+
+		}
+
+		@Override
+		public void deliveryComplete(IMqttDeliveryToken arg0) {
+
+		}
+
+		@Override
+		public void messageArrived(String arg0, MqttMessage arg1) throws Exception {
+			String[] idexs = arg0.split("/");
+			String reMessage = new String(arg1.getPayload(), "UTF-8").trim();
+			JSONObject jsonObject = JSONObject.parseObject(reMessage);
+			String machineCode = jsonObject.getString("machine_code");
+			// 机器码为空消息直接忽略
+			if (CommonUtils.isNullOrEmpty(jsonObject.getString("machine_code"))) {
+				return;
+			}
+			// 如果消息的机器码和主题中的机器码不匹配直接忽略消息
+			if (!idexs[2].equals(machineCode)) {
+				logger.info("主题中的机器码和消息的机器码不匹配！");
+				return;
+			}
+			// 数据为空
+			if (CommonUtils.isNullOrEmpty(jsonObject.getString("data"))) {
+				logger.info("data为空！");
+				return;
+			}
+			// act为空
+			if (CommonUtils.isNullOrEmpty(jsonObject.getInteger("act"))) {
+				logger.info("act为空！");
+				return;
+			}
+			if (CommonUtils.isNullOrEmpty(jsonObject.getInteger("feedback"))) {
+				logger.info("feedback为空！");
+				return;
+			}
+			if (addr_id.equals(jsonObject.getInteger("addr_id"))) {
+				JSONObject json = new JSONObject();
+				int upd_state = jsonObject.getInteger("upd_state");
+				if (1 == upd_state) {
+					json.put("resultData", 1);// 反馈成功信息
+
+				} else {
+					json.put("resultData", 0);
+				}
+				sendWSMassage(session, json.toJSONString());
+			}
+		}
+
+		// wbsock发送数据
+		public void sendWSMassage(WebSocketSession session, String message) throws IOException {
+			session.sendMessage(new TextMessage(message));
+		}
+
+	}
+
+	public void putMQTTMess(String value, String addr_id) throws MqttException {
+		ServerMqtt server = new ServerMqtt();
+		server.message = new MqttMessage();
+		server.message.setQos(1);
+		server.message.setRetained(true);
+		if (!CommonUtils.isNullOrEmpty(addr_id)) {
+			RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(addr_id));
+			if (realHisCfg != null) {
+				Device device = deviceApi.getDevice(realHisCfg.device_id);
+				if (device != null) {
+					PiBoxComAddr addr1 = new PiBoxComAddr();
+					addr1.addr_id = addr_id;
+					addr1.value = value;
+					List<PiBoxCom> operate_data_list = new ArrayList<PiBoxCom>();
+					PiBoxCom piBoxCom = new PiBoxCom();
+					List<PiBoxComAddr> piBoxComAddrs = new ArrayList<PiBoxComAddr>();
+					piBoxCom.com = String.valueOf(realHisCfg.plc_id);
+					piBoxComAddrs.add(addr1);
+					piBoxCom.addr_list = piBoxComAddrs;
+					operate_data_list.add(piBoxCom);
+
+					JSONObject jsonObject = new JSONObject();
+					jsonObject.put("act", 2000);
+					jsonObject.put("machine_code", device.machine_code);
+					JSONObject oplistObject = new JSONObject();
+					oplistObject.put("operate_data_list", operate_data_list);
+					jsonObject.put("data", oplistObject);
+					jsonObject.put("feedback", 1);
+					String message = jsonObject.toJSONString();
+					System.out.println(message);
+					server.message.setPayload((message).getBytes());
+					server.topic11 = server.client.getTopic("pibox/stc/" + device.machine_code);
+					server.publish(server.topic11, server.message);
+					server.client.disconnect();
+				}
+			}
+
+		}
+
 	}
 
 	/**
@@ -113,8 +248,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 
 	private String getStringRealData() {
 		try {
-			Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {
-			});
+
 			JSONObject json = new JSONObject();
 			/** 获取实时数据配置信息 **/
 			RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
