@@ -66,6 +66,18 @@ public class FirmwareAction {
         return new Output(data);
     }
 
+    @Description("删除固件")
+    @RequestMapping(value = "/delfirmware")
+    @WebApi(forceAuth = true, master = true, authority = {"0"})
+    public Output deleteFirmware(@RequestParam("id") Long id) {
+        Firmware model = firmwareApi.getFirmware(id);
+        firmwareApi.deleteFirmware(model);
+        //<editor-fold desc="操作日志">
+        dbLogUtil.addOperateLog(OpTypeOption.DelFirm, ResTypeOption.Firm, model.firmware_id, model);
+        //</editor-fold>
+        return new Output();
+    }
+
     @Description("获取固件列表")
     @RequestMapping(value = "/getfirmwarelist")
     @WebApi(forceAuth = true, master = true, authority = {"0"})

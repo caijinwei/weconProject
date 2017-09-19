@@ -57,6 +57,14 @@ public interface FirmwareApi {
     boolean updateFirmware(Firmware model);
 
     /**
+     * 删除固件
+     *
+     * @param model
+     * @return
+     */
+    boolean deleteFirmware(Firmware model);
+
+    /**
      * 获取指定设备类型的所有可用固件
      *
      * @param dev_model
