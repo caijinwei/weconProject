@@ -87,7 +87,7 @@
                     {{x.type==1?'管理者帐号':(x.type==2?'视图帐号':((x.type==0?'超管帐号':x.type)))}}
                 </td>
                 <td ng-click="chgState(x.account_id,x.username,x.state)">
-                    <div class="{{x.state?'glyphicon glyphicon-ok':'glyphicon glyphicon-remove'}}"></div>
+                    <div class="{{x.state==1?'glyphicon glyphicon-ok':'glyphicon glyphicon-remove'}}">{{x.state==1?'正常':(x.state==0?'禁用':(x.state==-1?'未激活':'未知'+x.state))}}</div>
                 </td>
                 <td>{{x.create_date|date:'yyyy-MM-dd HH:mm:ss'}}</td>
                 <td>

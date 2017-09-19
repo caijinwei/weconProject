@@ -39,10 +39,7 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by zengzhipeng on 2017/9/8.
@@ -63,7 +60,7 @@ public class FileAction {
     @Description("上传文件接口")
     @RequestMapping(value = "/fileupload")
     @WebApi(forceAuth = true, master = true, authority = {"0"})
-    public Output fileUploadAction() throws IOException, ServletException {
+    public Output fileUploadAction(@RequestParam("act") String act) throws IOException, ServletException {
         logger.debug("开始上传");
         final Session session = AppContext.getSession();
         final HttpServletRequest request = session.request;
@@ -81,32 +78,46 @@ public class FileAction {
         model.file_data = IOUtils.toByteArray(partFile.getInputStream());
         model.file_md5 = DigestUtils.md5Hex(model.file_data);
         model.file_size = Long.valueOf(model.file_data.length);
-        //获取版本信息
+        JSONObject dataOut = new JSONObject();
         File tempFile = File.createTempFile(model.file_name, "");
         FileOutputStream fos = new FileOutputStream(tempFile);
         fos.write(model.file_data);
         fos.close();
-        FileInputStream fis = new FileInputStream(tempFile);
-        fis.getChannel().position(fis.getChannel().size() - 256);
-        byte[] a = new byte[256];
-        fis.read(a);
-        fis.close();
-        String verStr = new String(a);
-        try {
-            String[] strs1 = verStr.split("VER:");
-            String[] strs2 = strs1[1].split(" ");
-            verStr = strs2[0];
-        } catch (Exception e) {
-            throw new BusinessException(ErrorCodeOption.FileGetVerError.key, ErrorCodeOption.FileGetVerError.value);
+        if (act.equals("firm")) {
+            //<editor-fold desc="对固件文件特殊处理,获取版本信息">
+            FileInputStream fis = new FileInputStream(tempFile);
+            fis.getChannel().position(fis.getChannel().size() - 256);
+            byte[] a = new byte[256];
+            fis.read(a);
+            fis.close();
+            String verStr = new String(a);
+            try {
+                String[] strs1 = verStr.split("VER:");
+                String[] strs2 = strs1[1].split(" ");
+                verStr = strs2[0];
+            } catch (Exception e) {
+                throw new BusinessException(ErrorCodeOption.FileGetVerError.key, ErrorCodeOption.FileGetVerError.value);
+            }
+            dataOut.put("version_code", verStr);
+            dataOut.put("version_name", model.file_name.substring(0, model.file_name.lastIndexOf(".") - 1));
+            //</editor-fold>
+        } else if (act.equals("driver")) {
+            //<editor-fold desc="对驱动文件特殊处理,获取最后修改时间--文件原始的最后修改没有获取到-后面使用md5">
+            /*SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(tempFile.lastModified());
+            model.file_lasttime = sdf.format(cal.getTime());
+            dataOut.put("file_lasttime", model.file_lasttime);*/
+            //</editor-fold>
+            //驱动名
+            dataOut.put("driver_name", model.file_name.substring(0, model.file_name.lastIndexOf(".")));
         }
+
         fileStorageApi.addFileStorage(model);
-        JSONObject dataOut = new JSONObject();
         dataOut.put("file_id", model.file_id);
         dataOut.put("file_name", model.file_name);
         dataOut.put("file_md5", model.file_md5);
         dataOut.put("file_size", model.file_size);
-        dataOut.put("version_code", verStr);
-        dataOut.put("version_name", model.file_name.substring(0, model.file_name.lastIndexOf(".") - 1));
         String token = UUID.randomUUID().toString().replace("-", "");
         String redisKey = String.format(ConstKey.REDIS_FILE_DOWNLOAD_TOKEN, model.file_id);
         RedisManager.set(ConstKey.REDIS_GROUP_NAME, redisKey, token, ConstKey.FILEDOWNLOAD_EXPIRE_TIME);//保存一小时

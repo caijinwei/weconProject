@@ -48,7 +48,7 @@ public class GroupOp {
             if(CommonUtils.isNullOrEmpty(machineCode)) continue;
             List<Map> mCfgLst = gCfgMap.get(machineCode);
             if(null == mCfgLst){
-                mCfgLst = new ArrayList<Map>();
+                mCfgLst = new ArrayList<>();
             }
             if(filterKeys.length > 0){
                 Map mr = new HashMap();

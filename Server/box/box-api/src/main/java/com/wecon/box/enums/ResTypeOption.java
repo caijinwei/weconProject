@@ -16,8 +16,8 @@ public enum ResTypeOption implements EnumVal {
     His("历史数据", 700),
     Alarm("报警数据", 800),
     File("文件", 900),
-    Firm("固件", 1000);
-
+    Firm("固件", 1000),
+    Write("操作实时数据", 1100);
     private String key;
 
     private int value;

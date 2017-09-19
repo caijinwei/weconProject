@@ -37,6 +37,10 @@ public class RealHisCfgParam {
 	public String rang;
 	@Label("描述")
 	public String describe;
+	@Label("进制")
+	public String digit_binary;
+	@Label("整数小数位数")
+	public String digit_count;
 	@Label("数据类型")
 	@NotNull
 	public int data_type;
@@ -44,6 +48,14 @@ public class RealHisCfgParam {
 	public long group_id;
 	@Label("历史采集周期")
 	public int his_cycle;
+
+	public void setDigit_count(String digit_count) {
+		this.digit_count = digit_count;
+	}
+
+	public void setDigit_binary(String digit_binary) {
+		this.digit_binary = digit_binary;
+	}
 
 	public void setId(long id) {
 		this.id = id;

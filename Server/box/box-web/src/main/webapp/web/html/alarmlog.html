@@ -74,8 +74,8 @@
 								<td>
 									<!-- <a href="#" title="详情"><span
 										class="glyphicon glyphicon-info-sign"></span></a> --> <a
-									href="#" title="确认" ng-click="confirmData(x)"><span class="glyphicon glyphicon-ok"
-										style="margin-left: 5px;"></span></a>
+									href="#" title="确认" ng-click="confirmData(x)"><span
+										class="glyphicon glyphicon-ok" style="margin-left: 5px;"></span></a>
 								</td>
 							</tr>
 						</tbody>
@@ -417,13 +417,7 @@
 											<option ng-repeat="x in infoDatas" value="{{x.plcId}}">{{$index+1}}-{{x.port}}</option>
 										</select>
 									</div>
-									<div class="row col-md-11 col-md-offset-1"
-										style="margin: 10px 0;">
-										<span class="col-md-3">数据格式</span> <select id="datatypeid"
-											class="col-md-9" style="height: 30px;">
-											<option ng-repeat="x in dataTypes" value="{{x.value}}">{{x.text}}</option>
-										</select>
-									</div>
+
 									<div class="row col-md-11 col-md-offset-1"
 										style="margin: 10px 0;">
 										<span class="col-md-3">地址类型</span> <select class="col-md-3"
@@ -437,7 +431,8 @@
 										</select>
 									</div>
 
-									<div id="datadigits" class="row col-md-11 col-md-offset-1"
+
+									<!-- <div id="datadigits" class="row col-md-11 col-md-offset-1"
 										style="margin: 10px 0; display: none;">
 										<div id="div-integer">
 											<span class="col-md-3">整数位数</span> <select id="integerdigits"
@@ -452,11 +447,11 @@
 
 											</select>
 										</div>
-									</div>
+									</div> -->
 									<div class="row col-md-11 col-md-offset-1"
 										style="margin: 10px 0;">
 										<div id="data-range">
-											<span class="col-md-3">数据范围</span> <input type="text"
+											<span class="col-md-3">地址范围</span> <input type="text"
 												class="col-md-9" style="height: 30px; padding-left: 5px;"
 												id="rangid" disabled />
 										</div>
@@ -465,6 +460,19 @@
 										style="margin: 10px 0;">
 										<span class="col-md-3">地址</span><input id="addrid" type="text"
 											class="col-md-9" style="height: 30px; padding-left: 5px;" />
+									</div>
+									<div class="row col-md-11 col-md-offset-1"
+										style="margin: 10px 0;">
+										<span class="col-md-3">数据格式</span> <select id="datatypeid"
+											class="col-md-9" style="height: 30px;">
+											<option ng-repeat="x in dataTypes" value="{{x.value}}">{{x.text}}</option>
+										</select>
+									</div>
+									<div class="row col-md-11 col-md-offset-1" id="datadigitid"
+										style="margin: 10px 0;">
+										<span class="col-md-3">整数/小数位数</span> <input type="text"
+											class="col-md-9" style="height: 30px; padding-left: 5px;"
+											value="1" id="dataid" />
 									</div>
 									<div id="bitsetting" class="row col-md-11 col-md-offset-1"
 										style="margin: 10px 0;">

@@ -55,6 +55,12 @@ public class AlarmCfgParam {
 	@Label("报警内容")
 	@NotNull
 	public String text;
+	@Label("整数小数位")
+	public String digit_count;
+
+	public void setDigit_count(String digit_count) {
+		this.digit_count = digit_count;
+	}
 
 	public void setAlarmcfg_id(long alarmcfg_id) {
 		this.alarmcfg_id = alarmcfg_id;

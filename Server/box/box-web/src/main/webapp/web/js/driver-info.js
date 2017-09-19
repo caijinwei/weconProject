@@ -1,5 +1,5 @@
 /**
- * Created by zengzhipeng on 2017/9/8.
+ * Created by zengzhipeng on 2017/9/16.
  */
 var appModule = angular.module('weconweb', []);
 appModule.controller("infoController", function ($scope, $http, $compile) {
@@ -11,11 +11,11 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 id: id
             };
             //加载基本信息
-            T.common.ajax.request("WeconBox", "firmwareaction/getfirmware", params, function (data, code, msg) {
+            T.common.ajax.request("WeconBox", "driveraction/getdriver", params, function (data, code, msg) {
                 if (code == 200) {
-                    if (data.firmware != null) {
-                        for (var p in data.firmware) {
-                            $('#' + p).val(data.firmware[p]);
+                    if (data.driver != null) {
+                        for (var p in data.driver) {
+                            $('#' + p).val(data.driver[p]);
                         }
                     } else {
                         alert("参数异常");
@@ -31,11 +31,11 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         //<editor-fold desc="固件文件上传">
         uploader = WebUploader.create({
             // 选完文件后，是否自动上传。
-            auto: true,
+            auto: false,
             // swf文件路径
             swf: '/box-web/web/lib/webuploader/Uploader.swf',
             // 文件接收服务端。
-            server: T.common.config.getRequestUrl("WeconBox") + 'fileact/fileupload?act=firm',
+            server: T.common.config.getRequestUrl("WeconBox") + 'fileact/fileupload?act=driver',
             // 选择文件的按钮。可选。
             // 内部根据当前运行是创建，可能是input元素，也可能是flash.
             pick: '#pickerFile',
@@ -132,7 +132,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      * 保存操作
      */
     $scope.save = function () {
-        var id = T.common.util.getParameter("id");
+        /*var id = T.common.util.getParameter("id");
         var params = new Object();
         var fields = $('#info .form-control');
         for (var i = 0; i < fields.length; i++) {
@@ -153,13 +153,13 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         T.common.ajax.request("WeconBox", "firmwareaction/savefirmware", params, function (data, code, msg) {
             if (code == 200) {
                 alert("操作成功");
-                location.href = "firmware-info.html?id=" + data.id;
+                location.href = "driver-info.html?id=" + data.id;
             } else {
                 alert(msg);
             }
         }, function () {
             alert("ajax error");
-        });
+        });*/
 
     }
 
@@ -167,6 +167,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      * 返回列表
      */
     $scope.backList = function () {
-        location.href = "firmware-list.html";
+        location.href = "driver-list.html";
     }
 })

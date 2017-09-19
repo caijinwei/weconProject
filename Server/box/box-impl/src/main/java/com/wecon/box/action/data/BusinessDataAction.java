@@ -9,6 +9,7 @@ import com.wecon.box.filter.AlarmCfgDataFilter;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.common.util.CommonUtils;
+import com.wecon.common.util.TimeUtil;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.BusinessException;
@@ -173,11 +174,11 @@ public class BusinessDataAction {
         Client client = AppContext.getSession().client;
         Page<AlarmCfgDataAlarmCfg> alarmCfgDataPage = null;
         AlarmCfgDataFilter filter = new AlarmCfgDataFilter();
-        filter.state = 1;
+        filter.state = param.state;
         filter.start_date = param.monitorBeginTime;
         filter.end_date = param.monitorEndTime;
         filter.account_id = client.userId;
-        Map<String, Object> bParams = new HashMap<String, Object>();
+        Map<String, Object> bParams = new HashMap<>();
         if(param.boxId != 0 && param.boxId != -100 && param.boxId != -200){
             bParams.put("boxId", param.boxId);
         }
@@ -196,6 +197,7 @@ public class BusinessDataAction {
         if(null != alarmCfgDataList){
             for(AlarmCfgDataAlarmCfg alarmCfg : alarmCfgDataList){
                 JSONObject data = new JSONObject();
+                data.put("monitorId", alarmCfg.alarm_cfg_id);
                 data.put("monitorName", alarmCfg.name);
                 data.put("state", alarmCfg.state);
                 data.put("number", alarmCfg.value);
@@ -260,6 +262,15 @@ public class BusinessDataAction {
         // 获取实时数据配置信息
         RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
         List<RealHisCfgDevice> realHisCfgDeviceList = null;
+        Map<String, Object> bParams = new HashMap<String, Object>();
+        if(param.boxId != 0){
+            bParams.put("boxId", param.boxId);
+        }
+        if(param.groupId != 0){
+            bParams.put("groupId", param.groupId);
+        }
+        param.pageIndex = 1;
+        param.pageSize = Integer.MAX_VALUE;
         /** 管理者账号 **/
         if (client.userInfo.getUserType() == 1) {
             /** 管理 **/
@@ -362,6 +373,8 @@ class BusinessDataParam {
     public int pageSize;
     @Label("监控点分组类型")
     public int type;
+    @Label("状态")
+    public int state;
 
     public void setBoxId(long boxId) {
         this.boxId = boxId;
@@ -393,5 +406,9 @@ class BusinessDataParam {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public void setState(int state) {
+        this.state = state;
     }
 }

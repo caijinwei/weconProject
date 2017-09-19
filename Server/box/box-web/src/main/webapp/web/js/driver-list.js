@@ -1,5 +1,5 @@
 /**
- * Created by zengzhipeng on 2017/9/14.
+ * Created by zengzhipeng on 2017/9/16.
  */
 var appModule = angular.module('weconweb', []);
 appModule.controller("listController", function ($scope, $http, $compile) {
@@ -23,7 +23,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
     $scope.getList = function (pageIndex, pageSize) {
         if (pageIndex == 0)
             pageIndex = 1;
-        $("#loadingModal").modal("show");
+        //$("#loadingModal").modal("show");
         var params = {
             pageIndex: pageIndex,
             pageSize: pageSize
@@ -33,37 +33,41 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             var f = $(fields[i]);
             params[f.attr('id')] = f.val();
         }
-        T.common.ajax.request("WeconBox", "firmwareaction/getfirmwarelist", params, function (data, code, msg) {
-            if (code == 200) {
-                $scope.paginationConf.totalItems = data.page.totalRecord;
-                $scope.pushlist = data.page.list;
-                $scope.$apply();
-                $("#loadingModal").modal("hide");
-            }
-        }, function () {
-        });
+        T.common.ajax.request("WeconBox", "driveraction/getdriverlist", params, function (data, code, msg) {
+         if (code == 200) {
+         $scope.paginationConf.totalItems = data.page.totalRecord;
+         $scope.pushlist = data.page.list;
+         $scope.$apply();
+         $("#loadingModal").modal("hide");
+         }
+         }, function () {
+         });
     }
     $scope.methods = {
         edit: function (model) {
-            location.href = "firmware-info.html?id=" + model.firmware_id;
+            location.href = "driver-info.html?id=" + model.driver_id;
         },
         delete: function (model) {
-            if (confirm("确认要删除此固件吗")) {
+            if (confirm("确认要删除此驱动吗")) {
                 var params = {
-                    id: model.firmware_id
-                }
-                T.common.ajax.request("WeconBox", "firmwareaction/delfirmware", params, function (data, code, msg) {
-                    if (code == 200) {
-                        alert("删除成功");
-                        $scope.getList($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
-                    }
-                }, function () {
-                });
+                 id: model.driver_id
+                 }
+                 T.common.ajax.request("WeconBox", "driveraction/deldriver", params, function (data, code, msg) {
+                 if (code == 200) {
+                 alert("删除成功");
+                 $scope.getList($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+                 }
+                 }, function () {
+                 });
             }
         }
     }
 
     $scope.addNew = function () {
-        location.href = "firmware-info.html";
+        location.href = "driver-info.html";
+    }
+
+    $scope.addNewBatch = function () {
+        location.href = "driver-batch.html";
     }
 })

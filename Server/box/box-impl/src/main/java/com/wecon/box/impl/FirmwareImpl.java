@@ -129,6 +129,15 @@ public class FirmwareImpl implements FirmwareApi {
     }
 
     @Override
+    public boolean deleteFirmware(Firmware model) {
+        String sql = "delete from firmware where firmware_id=?";
+        jdbcTemplate.update(sql, new Object[]{model.firmware_id});
+        sql = "delete from file_storage where file_id=?";
+        jdbcTemplate.update(sql, new Object[]{model.file_id});
+        return true;
+    }
+
+    @Override
     public List<FirmwareDetail> getFirmwareDetailList(String dev_model) {
         String sql = getFirmwareDetailSql() + "WHERE a.dev_model=?";
         List<FirmwareDetail> list = jdbcTemplate.query(sql,
@@ -196,7 +205,7 @@ public class FirmwareImpl implements FirmwareApi {
 
     private String getFirmwareSql() {
         String sql = "SELECT firmware_id,`description`,dev_model,file_id,firm_info,version_code,version_name,create_date,update_date " +
-                "FROM firmware " ;
+                "FROM firmware ";
         return sql;
     }
 }

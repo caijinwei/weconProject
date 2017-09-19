@@ -8,6 +8,8 @@ import com.wecon.box.entity.AlarmTrigger;
 import com.wecon.box.entity.Page;
 import com.wecon.common.util.TimeUtil;
 
+import com.wecon.common.util.CommonUtils;
+import com.wecon.common.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -29,7 +31,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	private final String SEL_COL = "alarmcfg_id,data_id,account_id,name,addr,addr_type,text,condition_type,state,plc_id,device_id,rid,data_limit,bind_state,create_date,update_date";
+	private final String SEL_COL = "alarmcfg_id,data_id,account_id,name,addr,addr_type,text,condition_type,state,plc_id,device_id,rid,data_limit,digit_count,bind_state,create_date,update_date";
 
 	@Override
 	public long saveAlarmCfg(final AlarmCfg alarmCfg) {
@@ -39,7 +41,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
 				PreparedStatement preState = con.prepareStatement(
-						"insert into alarm_cfg(data_id,account_id,plc_id,`name`,addr,addr_type,text,condition_type,state,device_id,rid,data_limit,bind_state,create_date,update_date)values(?,?,?,?,?,?,?,?,?,?,?,?,1,current_timestamp(),current_timestamp());",
+						"insert into alarm_cfg(data_id,account_id,plc_id,`name`,addr,addr_type,text,condition_type,state,device_id,rid,data_limit,digit_count,bind_state,create_date,update_date)values(?,?,?,?,?,?,?,?,?,?,?,?,?,1,current_timestamp(),current_timestamp());",
 						Statement.RETURN_GENERATED_KEYS);
 				preState.setLong(1, alarmCfg.data_id);
 				preState.setLong(2, alarmCfg.account_id);
@@ -53,6 +55,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 				preState.setLong(10, alarmCfg.device_id);
 				preState.setString(11, alarmCfg.rid);
 				preState.setString(12, alarmCfg.data_limit);
+				preState.setString(13, alarmCfg.digit_count);
 				return preState;
 			}
 		}, key);
@@ -78,7 +81,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			int pageSize) {
 		String sqlCount = "select count(0) from `alarm_cfg` ac,`account_dir` ad,`account_dir_rel` adr where 1=1 and ac.`alarmcfg_id`=adr.`ref_id` and ad.`id`=adr.`acc_dir_id` and ad.`type`=3 and ac.`account_id`=ad.`account_id` AND  ac.`device_id`=ad.`device_id` ";
 
-		String sql = " select ac.alarmcfg_id,ac.data_id,ac.account_id,ac.name,ac.addr,ac.addr_type,ac.text,ac.condition_type,ac.state,ac.device_id,ac.rid,ac.bind_state,ac.plc_id,ac.data_limit,ac.create_date,ac.update_date,adr.`ref_alais`,ad.`name` dirname,ad.`id` from `alarm_cfg` ac,`account_dir` ad,`account_dir_rel` adr where 1=1 and ac.`alarmcfg_id`=adr.`ref_id` and ad.`id`=adr.`acc_dir_id` and ad.`type`=3 and ac.`account_id`=ad.`account_id` and  ac.`device_id`=ad.`device_id`";
+		String sql = " select ac.alarmcfg_id,ac.data_id,ac.account_id,ac.name,ac.addr,ac.addr_type,ac.text,ac.condition_type,ac.state,ac.device_id,ac.rid,ac.bind_state,ac.plc_id,ac.data_limit,ac.digit_count,ac.create_date,ac.update_date,adr.`ref_alais`,ad.`name` dirname,ad.`id` from `alarm_cfg` ac,`account_dir` ad,`account_dir_rel` adr where 1=1 and ac.`alarmcfg_id`=adr.`ref_id` and ad.`id`=adr.`acc_dir_id` and ad.`type`=3 and ac.`account_id`=ad.`account_id` and  ac.`device_id`=ad.`device_id`";
 
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
@@ -126,6 +129,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 				model.rid = rs.getString("rid");
 				model.plc_id = rs.getLong("plc_id");
 				model.data_limit=rs.getString("data_limit");
+				model.digit_count=rs.getString("digit_count");
 				model.bind_state = rs.getInt("bind_state");
 				model.condition_type = rs.getInt("condition_type");
 				model.create_date = rs.getTimestamp("create_date");
@@ -183,6 +187,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 				model.rid = rs.getString("rid");
 				model.plc_id = rs.getLong("plc_id");
 				model.data_limit=rs.getString("data_limit");
+				model.digit_count=rs.getString("digit_count");
 				model.bind_state = rs.getInt("bind_state");
 				model.condition_type = rs.getInt("condition_type");
 				model.create_date = rs.getTimestamp("create_date");
@@ -229,6 +234,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 				new DefaultAlarmCfgExtendRowMapper());
 		List<AlarmTrigger> alarmCfgTriggerLst = jdbcTemplate.query(triSql, state,
 				new DefaultAlarmTriggerRowMapper());
+
 		if(null != alarmCfgExtendLst && null != alarmCfgTriggerLst){
 			for(AlarmCfgExtend ae : alarmCfgExtendLst){
 				List<AlarmTrigger> conditionList = new ArrayList<AlarmTrigger>();
@@ -248,21 +254,21 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 		if (alarmCfg == null) {
 			return false;
 		}
-		String sql = "update alarm_cfg set data_id = ?, account_id=?,name=?,addr=?,addr_type=?,text=?,condition_type=?,state=?,update_date=current_timestamp(),bind_state=?,plc_id=?,device_id=?,rid=? ,data_limit=? where alarmcfg_id = ?";
+		String sql = "update alarm_cfg set data_id = ?, account_id=?,name=?,addr=?,addr_type=?,text=?,condition_type=?,state=?,update_date=current_timestamp(),bind_state=?,plc_id=?,device_id=?,rid=? ,data_limit=?,digit_count=?  where alarmcfg_id = ?";
 
 		jdbcTemplate.update(sql,
 				new Object[] { alarmCfg.data_id, alarmCfg.account_id, alarmCfg.name, alarmCfg.addr, alarmCfg.addr_type,
 						alarmCfg.text, alarmCfg.condition_type, alarmCfg.state, alarmCfg.bind_state, alarmCfg.plc_id,
-						alarmCfg.device_id, alarmCfg.rid, alarmCfg.data_limit, alarmCfg.alarmcfg_id });
+						alarmCfg.device_id, alarmCfg.rid, alarmCfg.data_limit,alarmCfg.digit_count, alarmCfg.alarmcfg_id });
 		return true;
 	}
 
 	@Override
-	public boolean batchUpdateState(final List<int[]> updList) {
+	public boolean batchUpdateState(final List<String[]> updList) {
 		if (null == updList || updList.size() == 0) {
 			return false;
 		}
-		String sql = "update alarm_cfg set state = ? where alarmcfg_id = ?";
+		String sql = "update alarm_cfg set state = ? where alarmcfg_id = ? and date_format(update_date,'%Y-%m-%d %H:%i:%s') = ?";
 		jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
 			public int getBatchSize() {
 				return updList.size();
@@ -270,22 +276,27 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			}
 
 			public void setValues(PreparedStatement ps, int i) throws SQLException {
-				int[] arg = updList.get(i);
-				ps.setInt(1, arg[0]);
-				ps.setInt(2, arg[1]);
+				try {
+					String[] arg = updList.get(i);
+					ps.setInt(1, Integer.parseInt(arg[0]));
+					ps.setInt(2, Integer.parseInt(arg[1]));
+					ps.setString(3, arg[2]);
+				}catch (Exception e){
+					e.printStackTrace();
+				}
 			}
 		});
 		return true;
 	}
 
 	@Override
-	public boolean batchDeleteByPlcId(final List<Integer> ids) {
+	public boolean batchDeleteByPlcId(final List<Long> ids) {
 		if (null == ids || ids.size() == 0) {
 			return false;
 		}
 
 		StringBuilder idSb = new StringBuilder();
-		for (int id : ids) {
+		for (long id : ids) {
 			idSb.append(",").append(id);
 		}
 		String sql = "delete from alarm_cfg where plc_id in(" + idSb.substring(1) + ")";
@@ -295,19 +306,57 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 	}
 
 	@Override
-	public boolean batchDeleteById(final List<Integer> ids) {
+	public boolean batchDeleteById(final List<Long> ids) {
 		if (null == ids || ids.size() == 0) {
 			return false;
 		}
 
 		StringBuilder idSb = new StringBuilder();
-		for (int id : ids) {
+		for (long id : ids) {
 			idSb.append(",").append(id);
 		}
 		String sql = "delete from alarm_cfg where alarmcfg_id in(" + idSb.substring(1) + ")";
 		jdbcTemplate.update(sql);
 
 		return true;
+	}
+
+	@Override
+	public List<Long> getDeleteIdsByUpdTime(List<String[]> delArgList){
+		if(null == delArgList || delArgList.size() == 0){
+			return null;
+		}
+
+		StringBuilder idSb = new StringBuilder();
+		for(String[] args : delArgList){
+			idSb.append(",").append(args[0]);
+		}
+		List<AlarmCfgExtend> list = jdbcTemplate.query("select alarmcfg_id, update_date from alarm_cfg where alarmcfg_id in("+idSb.substring(1)+")", new RowMapper() {
+			@Override
+			public Object mapRow(ResultSet resultSet, int i) throws SQLException {
+				AlarmCfgExtend model = new AlarmCfgExtend();
+				model.alarmcfg_id = resultSet.getLong("alarmcfg_id");
+				model.upd_time = TimeUtil.getYYYYMMDDHHMMSSDate(model.update_date);
+				return model;
+			}
+		});
+
+		if(null != list){
+			List<Long> ids = new ArrayList<>();
+			for(String[] args : delArgList){
+				for(AlarmCfgExtend extend : list){
+					if(Integer.parseInt(args[0]) == extend.alarmcfg_id
+							&& args[1].equals(extend.upd_time)){
+						ids.add(extend.alarmcfg_id);
+						break;
+					}
+				}
+			}
+
+			return ids;
+		}
+
+		return null;
 	}
 
 	public static final class DefaultAlarmTriggerRowMapper implements RowMapper<AlarmTrigger> {
@@ -364,6 +413,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			model.state = rs.getInt("state");
 			model.rid = rs.getString("rid");
 			model.data_limit = rs.getString("data_limit");
+			model.digit_count = rs.getString("digit_count");
 			model.plc_id = rs.getLong("plc_id");
 			model.condition_type = rs.getInt("condition_type");
 			model.create_date = rs.getTimestamp("create_date");

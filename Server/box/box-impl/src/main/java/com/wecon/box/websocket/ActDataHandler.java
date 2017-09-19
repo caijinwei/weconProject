@@ -63,8 +63,8 @@ public class ActDataHandler extends AbstractWebSocketHandler {
         if (CommonUtils.isNullOrEmpty(params)) {
             return;
         }
-        //推送消息给移动端
 
+        //推送消息给移动端
         logger.debug("WebSocket push begin");
         session.sendMessage(new TextMessage(getStringRealData()));
         logger.debug("WebSocket push end");
@@ -212,6 +212,8 @@ public class ActDataHandler extends AbstractWebSocketHandler {
         logger.debug("关闭连接");
         //取消订阅
         subscribeListener.unsubscribe();
+        subscribeListener = null;
+        machineCodeSet = null;
         logger.debug("Redis取消订阅成功");
     }
 }
