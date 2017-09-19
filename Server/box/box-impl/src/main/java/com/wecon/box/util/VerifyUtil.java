@@ -45,8 +45,14 @@ public class VerifyUtil {
         String result = "";
         //分割 前面的“-”
         Integer index = version.indexOf("-");
-        String s = version.substring(0, index);
-        String tempV=version.substring(0, index);
+        String tempV=null;
+        if(index!=-1){
+            String s = version.substring(0, index);
+            tempV=version.substring(0, index);
+        }else{
+            tempV=version;
+        }
+
 
         //提取版本号
         String REGEX = "[[0-9]+\\.]+[0-9]+";
@@ -57,6 +63,9 @@ public class VerifyUtil {
         }
         System.out.println(result);
         return  result;
+    }
+    public static void main(String[] args){
+        getVersionNum("v5.0.0.0");
     }
 
     /*
@@ -92,7 +101,7 @@ public class VerifyUtil {
 
         return true;
     }
-    public static void main(String[] args){
-        System.out.println(isNewVersion(getVersionNum("sdsd2V4.0.0-P:A8"),getVersionNum("sdsd2V4.12.0-P:A8")));
-    }
+//    public static void main(String[] args){
+//        System.out.println(isNewVersion(getVersionNum("sdsd2V4.0.0-P:A8"),getVersionNum("sdsd2V4.12.0-P:A8")));
+//    }
 }

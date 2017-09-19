@@ -6,6 +6,7 @@ import com.wecon.box.util.ClientMQTT;
 import com.wecon.box.util.DebugInfoCallback;
 import com.wecon.box.util.ServerMqtt;
 import com.wecon.common.util.CommonUtils;
+import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.BusinessException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -98,9 +99,8 @@ public class DebugInfoHandler extends AbstractWebSocketHandler {
     * mqtt发送 数据
     * */
     public void mqttSend(String machine_code, Integer opType) throws MqttException {
-
-
-        ServerMqtt server = new ServerMqtt();
+        long userId=AppContext.getSession().client.userId;
+        ServerMqtt server = new ServerMqtt("dg"+userId);
         server.message = new MqttMessage();
         server.message.setQos(0);
         server.message.setRetained(true);

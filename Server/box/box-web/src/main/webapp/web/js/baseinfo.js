@@ -10,6 +10,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      * 盒子基本信息展示
      * */
     $scope.onInit = function () {
+        $("#loadingModal").modal("hide");
         $scope.device_id = T.common.util.getParameter("device_id");
         $scope.device_name = T.common.util.getParameter("device_name");
         $("#loadingModal").modal("show");
@@ -23,6 +24,9 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         T.common.ajax.request("WeconBox", "baseInfoAction/showBaseInfo", params, function (data, code, msg) {
             if (code == 200) {
                 $scope.infoData = data.device;
+
+                //固件更新时候要用到
+                $scope.dev_model = data.device.dev_model;
                 $scope.accounttype = data.userType;
                 var map = data.device.map;
                 if (map != "" && map != null) {
@@ -485,12 +489,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         ws.send(msg);
     }
     $scope.ws_close = function (state) {
-        if(state!=1){
+        if (state != 1) {
             alert("盒子已经离线");
             return;
         }
         ws.close();
-        ws="";
+        ws = "";
     }
     $scope.ws_log = function (data) {
         $('#wsLog').prepend('<p>' + data + '</p>');
@@ -520,31 +524,28 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             alert("WebSocket isn't supported by your Browser!");
         }
     }
-    $scope.openGetDeviceDebugInfo=function(machine_code,state){
-        if(state!=1){
+    $scope.openGetDeviceDebugInfo = function (machine_code, state) {
+        if (state != 1) {
             alert("盒子已经离线");
             return;
         }
-        if(ws==""||ws==undefined){
+        if (ws == "" || ws == undefined) {
             $scope.ws_connect(machine_code);
         }
     };
 
     //--------------------------------------------------------------------------固件信息------------------------------------------------------------------------------------------------------------
 
-    $scope.dev_firmShow=function(state){
-        if(state!=1){
-            alert("盒子已经离线");
-            return;
-        };
+    $scope.dev_firmShow = function (state) {
         var device_id = T.common.util.getParameter("device_id");
-        var params={
-            device_id:device_id
+        var params = {
+            device_id: device_id
         }
         T.common.ajax.request("WeconBox", "dirFirmAction/getDirFirmInfoByDevId", params, function (data, code, msg) {
             if (code == 200) {
-                $scope.devFirmInfo=data.devFirmInfo
-                console.log("获得到的固件信息",data.devFirmInfo);
+                $scope.devFirmInfo = data.devFirmInfo;
+                //固件更新要用到
+                $scope.localVersionCode = data.devFirmInfo.f_ver;
                 $scope.$apply();
             }
             else {
@@ -554,7 +555,62 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         }, function () {
             alert("ajax error");
         });
+    }
+    $scope.checkUpdateFir = function () {
+        var localVersionCode = $scope.localVersionCode;
+        var dev_model = $scope.dev_model;
+        console.log("参数model" + dev_model + "localVersionCode" + localVersionCode);
+        if (dev_model == "" || dev_model == undefined || localVersionCode == "" || localVersionCode == undefined) {
+            alert("系统错误");
+            return;
+        }
+        var params = {
+            dev_model: dev_model,
+            localVersionCode: localVersionCode
+        }
+        T.common.ajax.request("WeconBox", "dirFirmAction/getLatestFirmVersion", params, function (data, code, msg) {
+            if (code == 200) {
+                $("#checkUpdateFir").modal("show");
+                if (data.isNewVersion) {
+                    $("#updateNotice").prepend('<p>' + "最新版：" + data.versionCode + '</p>');
+                    $scope.file_id = data.file_id;
+                    $scope.fileData=data.fileData;
+                    console.log(data.fileData);
+                } else {
+                    $("#updateNotice").prepend('<p>' + "已经是最新版了，不需要更新！" + '</p>');
+                }
+            }
+            else {
+                $("#deletePlc").modal("hide");
+                alert(code + "-" + msg);
+            }
 
+        }, function () {
+            alert("ajax error");
+        });
+    }
+    $scope.updateFirFile = function (machine_code) {
+        var fileData=$scope.fileData;
+        var versionName=fileData.version_name;
+        var version_code=fileData.version_code;
+        var file_id=fileData.file_id;
+        var  params={
+            versionName:versionName,
+            version_code:version_code,
+            file_id:file_id,
+            machine_code:machine_code
+        }
+        console.log(params);
+        if(machine_code==""||machine_code==undefined||versionName==""||versionName==undefined||version_code==""||version_code==undefined||file_id==""||file_id==undefined){
+            $("#checkUpdateFir").modal("hide");
+            alert("系统忙，稍后操作！");
+        }
+        T.common.ajax.request("WeconBox", "dirFirmAction/updateFirmFile", params, function (data, code, msg) {
+            $("#checkUpdateFir").modal("hide");
+            alert("指令已下发盒子成功！");
+        }, function () {
+            alert("ajax error");
+        });
     }
 
 });

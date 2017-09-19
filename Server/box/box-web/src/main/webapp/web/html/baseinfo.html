@@ -21,6 +21,13 @@
             href="baseinfo.html?device_id={{device_id}}&device_name={{device_name}}">基本配置</a></li>
 </ul>
 <div class="container-fluid" style="margin-top: 40px;">
+    <div class="modal fade" id="loadingModal" tabindex="-1" role="dialog"
+         aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog modal-sm" role="document"
+             style="margin-top: 350px; text-align: center">
+            <img src="../image/loading.jpg" />
+        </div>
+    </div>
     <ul class="nav nav-tabs" role="tablist" id="baseConfigTab">
         <li class="active"><a href="#base-info" data-toggle="tab">基本信息</a></li>
         <li><a href="#com-port" data-toggle="tab" ng-click="initPlcSetting()">通讯口配置</a></li>
@@ -147,7 +154,7 @@
         <div class="tab-pane" id="com-port">
             <!--通讯口展示-->
             <div class="container-fluid">
-                <div class="row" style="margin-top: 40px;">
+                <div class="row" style="margin-top: 10px;">
                     <table class="table table-bordered">
                         <caption>
                             <!--data-target="#addConfig"-->
@@ -498,7 +505,7 @@
         <!------------------------------------------------------------------------------------------------调试信息接收------------------------------------------------------------------------------------------------------------------------------>
         <div class="tab-pane" id="debugInfo">
 
-            <div style="margin-top: 35px">
+            <div style="margin-top: 20px">
                 <button class="btn btn-info"
                         style="text-decoration: none"
                         ng-click="openGetDeviceDebugInfo(infoData.machine_code,infoData.state);">
@@ -526,7 +533,7 @@
             <!--</div>-->
 
 
-            <div class="panel panel-success" id="mqtt-log-containor">
+            <div class="panel panel-success" id="mqtt-log-containor" style="margin-top: 10px">
                 <div class="panel-heading">
                     <span class="label label-info">日志</span>
                     <!--<h3 class="panel-title" style="display:inline">日志</h3>-->
@@ -547,7 +554,7 @@
                     <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.f_id}}</span>
                 </div>
                 <div class="row" style="margin-top: 30px;">
-                    <span class="col-md-1">固件名称</span>
+                    <span class="col-md-1">版本名称</span>
                     <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.f_name}}</span>
                 </div>
                 <div class="row" style="margin-top: 30px;">
@@ -566,10 +573,34 @@
                 <div class="row" style="margin-top: 30px;">
                     <span class="col-md-1">操作</span>
                     <!--<div class="btn-group" style="margin-left: 10px;">-->
-                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="">
+                    <button type="button" class="btn btn-info" data-toggle="modal" ng-click="checkUpdateFir()">
                         查看固件更新
                     </button>
-
+                </div>
+            </div>
+            <!-- -->
+            <div class="modal" tabindex="-1" id="checkUpdateFir"
+                 data-backdrop="false">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span>&times;</span>
+                            </button>
+                            <h4 class="modal-title">固件版本更新</h4>
+                        </div>
+                        <div class="modal-body">
+                            <span id="updateNotice"></span>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-info"
+                                    ng-click="updateFirFile(infoData.machine_code)">更新
+                            </button>
+                            <button type="button" class="btn btn-default"
+                                    data-dismiss="modal">取消
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

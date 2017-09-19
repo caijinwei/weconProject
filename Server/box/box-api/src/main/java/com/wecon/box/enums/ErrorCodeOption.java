@@ -57,6 +57,9 @@ public enum ErrorCodeOption {
     DeviceId_Is_Unknown("盒子设备ID非法",300018),
     DebugInfo_PramaIsNotFount_MachineCode("关闭调试不成功缺失参数机器码",300019),
     GetDevFirm_PramaIsUnFormate_MachineCode("获取设备固件信息失败",300020),
+    DivModel_IsError("没有可更新版本",300021),
+    FileId_Is_Error("更新失败",300022),
+    Mqtt_Transport_Error("更新失败",300023),
 
 
     Get_Groupid_Error("获取数组ID错误",50001),

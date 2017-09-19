@@ -10,7 +10,6 @@ import com.wecon.box.util.BoxWebConfigContext;
 import com.wecon.common.redis.RedisManager;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.core.BusinessException;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -19,7 +18,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import javax.sql.rowset.serial.SerialBlob;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -136,7 +134,7 @@ public class FirmwareImpl implements FirmwareApi {
         List<FirmwareDetail> list = jdbcTemplate.query(sql,
                 new Object[]{dev_model},
                 new DefaultFirmwareDetailRowMapper());
-        return null;
+        return list;
     }
 
     public static final class DefaultFirmwareDetailRowMapper implements RowMapper<FirmwareDetail> {

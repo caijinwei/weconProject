@@ -12,7 +12,7 @@ public class ServerMqtt {
     //定义一个主题
 
     //定义MQTT的ID，可以在MQTT服务配置中指定
-    public static final String clientid = "server11";
+//    public static final String clientid = "server11";
 
     public MqttClient client;
     public MqttTopic topic11;
@@ -25,12 +25,20 @@ public class ServerMqtt {
      * 构造函数
      * @throws MqttException
      */
-    public ServerMqtt() throws MqttException {
+    public ServerMqtt(String clientid) throws MqttException {
         // MemoryPersistence设置clientid的保存形式，默认为以内存保存
         client = new MqttClient(HOST, clientid, new MemoryPersistence());
         connect();
     }
-
+    /*
+    * 构造函数
+    * 默认clientId是server11
+    * */
+    public ServerMqtt() throws MqttException {
+        // MemoryPersistence设置clientid的保存形式，默认为以内存保存
+        client = new MqttClient(HOST, "server11", new MemoryPersistence());
+        connect();
+    }
     /**
      *  用来连接服务器
      */
@@ -77,7 +85,7 @@ public class ServerMqtt {
      * @throws MqttException
      */
     public static void main(String[] args) throws MqttException {
-        ServerMqtt server = new ServerMqtt();
+        ServerMqtt server = new ServerMqtt("clientId");
         server.message = new MqttMessage();
         server.message.setQos(1);
         server.message.setRetained(true);
