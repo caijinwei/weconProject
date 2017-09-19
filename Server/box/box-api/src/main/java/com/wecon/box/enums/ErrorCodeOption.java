@@ -60,6 +60,7 @@ public enum ErrorCodeOption {
     DivModel_IsError("没有可更新版本",300021),
     FileId_Is_Error("更新失败",300022),
     Mqtt_Transport_Error("更新失败",300023),
+    Driver_IsNot_Fount("通讯口配置失败，该驱动不存在",300024),
 
 
     Get_Groupid_Error("获取数组ID错误",50001),

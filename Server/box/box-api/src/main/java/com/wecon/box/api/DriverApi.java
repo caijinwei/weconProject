@@ -55,6 +55,14 @@ public interface DriverApi {
      */
     Driver getDriver(String type);
 
+    /*
+    * 获取驱动信息
+    *
+    * @param driver
+    * @return
+    * */
+    Driver getDriverBydriver(String driver);
+
     /**
      * 获取驱动详情
      *
@@ -62,6 +70,7 @@ public interface DriverApi {
      * @return
      */
     DriverDetail getDriverDetail(Long driver_id);
+
 
     /**
      * 删除驱动
