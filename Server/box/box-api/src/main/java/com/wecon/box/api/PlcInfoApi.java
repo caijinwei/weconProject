@@ -2,6 +2,7 @@ package com.wecon.box.api;
 
 import com.wecon.box.entity.PlcInfo;
 import com.wecon.box.entity.PlcExtend;
+import com.wecon.box.entity.PlcInfoDetail;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -101,6 +102,11 @@ public interface PlcInfoApi {
     * @Params plc_id
     * */
     public PlcInfo findPlcInfoByPlcId(long plcId);
+
+	/*
+	* 根据设备id查看plcInfoDtail
+	* */
+	public List<PlcInfoDetail> getListPlcInfoDetail(long device_id);
 
 
 }

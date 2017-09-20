@@ -57,9 +57,8 @@ public class DirFirmAction {
     public Output getLatestFirmVersion(@RequestParam("dev_model") String dev_model, @RequestParam("localVersionCode") String localVserionCode) {
         List<FirmwareDetail> list = firmwareApi.getFirmwareDetailList(dev_model);
 
-
         //获取数据库中  该设备类型对应的最新版本号
-        FirmwareDetail result=null;
+        FirmwareDetail result = null;
         String leastVerCode = "";
         String leastVerCodeNum = "";
         long file_id = 0;
@@ -70,25 +69,24 @@ public class DirFirmAction {
             if (leastVerCodeNum == "" || leastVerCodeNum == null) {
                 leastVerCodeNum = VerifyUtil.getVersionNum(f.version_code);
                 leastVerCode = f.version_code;
-                result=f;
+                result = f;
                 continue;
             }
             String versionNum = VerifyUtil.getVersionNum(f.version_code);
             if (VerifyUtil.isNewVersion(leastVerCodeNum, versionNum)) {
                 leastVerCodeNum = versionNum;
                 leastVerCode = f.version_code;
-                result=f;
+                result = f;
             }
         }
         JSONObject data = new JSONObject();
         String localVersionCodeNum = VerifyUtil.getVersionNum(localVserionCode);
-        System.out.println("最新的version  " + leastVerCode);
         if (VerifyUtil.isNewVersion(localVersionCodeNum, leastVerCodeNum)) {
             //需要更新
             data.put("isNewVersion", "true");
             data.put("versionCode", leastVerCode);
             data.put("file_id", file_id);
-            data.put("fileData",result);
+            data.put("fileData", result);
         } else {
             data.put("isNewVersion", "false");
             data.put("versionCode", leastVerCode);
@@ -100,36 +98,36 @@ public class DirFirmAction {
 
     @Label("更新固件")
     @RequestMapping("updateFirmFile")
-    public Output updateFirm(@RequestParam("versionName")String versionName,@RequestParam("version_code")String versionCode, @RequestParam("file_id") long file_id, @RequestParam("machine_code") long machine_code) {
+    public Output updateFirm(@RequestParam("versionName") String versionName, @RequestParam("version_code") String versionCode, @RequestParam("file_id") long file_id, @RequestParam("machine_code") long machine_code) {
         if (file_id <= 0 || machine_code <= 0) {
             throw new BusinessException(ErrorCodeOption.FileId_Is_Error.key, ErrorCodeOption.FileId_Is_Error.value);
         }
         ServerMqtt mqttServer = null;
         long userId = AppContext.getSession().client.userId;
-        FileStorage fileStorage=fileStorageApi.getFileStorage(file_id);
-        if(fileStorage==null){
+        FileStorage fileStorage = fileStorageApi.getFileStorage(file_id);
+        if (fileStorage == null) {
             throw new BusinessException(ErrorCodeOption.FileId_Is_Error.key, ErrorCodeOption.FileId_Is_Error.value);
         }
         FileParm file = new FileParm();
-        file.file_md5=fileStorage.file_md5;
-        file.file_name=fileStorage.file_name;
-        file.version_code=versionCode;
-        file.version_name=versionName;
-        JSONObject fileO=new JSONObject();
-        file.file_base64= Base64Util.encode(fileStorage.file_data);
+        file.file_md5 = fileStorage.file_md5;
+        file.file_name = fileStorage.file_name;
+        file.version_code = versionCode;
+        file.version_name = versionName;
+        JSONObject fileO = new JSONObject();
+        file.file_base64 = Base64Util.encode(fileStorage.file_data);
         JSONObject.parseObject(JSONObject.toJSONString(file));
 
-        System.out.println("获取到的file:   "+file.toString());
-        System.out.println(JSONObject.toJSONString(file));
 
         JSONObject msg = new JSONObject();
         msg.put("act", 20007);
         msg.put("machine_code", machine_code);
-        msg.put("data",file);
+        msg.put("data", file);
         msg.put("feedback", 0);
 
         try {
-            mqttServer = new ServerMqtt("up" + userId);
+            if (mqttServer == null) {
+                mqttServer = new ServerMqtt("up" + userId);
+            }
             mqttServer.message = new MqttMessage();
             mqttServer.message.setQos(1);
             mqttServer.message.setRetained(true);
@@ -141,7 +139,7 @@ public class DirFirmAction {
         /*
         * pibox/cts/<machine_code>/logs
         * */
-            mqttServer.client.close();
+            mqttServer.client.disconnect();
         } catch (MqttException e) {
             System.out.println(e.getMessage());
             throw new BusinessException(ErrorCodeOption.Mqtt_Transport_Error.key, ErrorCodeOption.Mqtt_Transport_Error.value);

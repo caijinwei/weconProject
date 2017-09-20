@@ -44,11 +44,28 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         });
     }
     /*
+     * 点击刷新  更新用户的state状态
+     * */
+    $scope.flushState = function () {
+        $scope.infoData.state = "";
+        $scope.device_id = T.common.util.getParameter("device_id");
+        var params = {device_id: $scope.device_id};
+        T.common.ajax.request("WeconBox", "baseInfoAction/showBaseInfo", params, function (data, code, msg) {
+            if (code == 200) {
+                $scope.infoData.state = data.device.state;
+                $scope.$apply();
+            }
+            else {
+                alert(code + "-" + msg);
+            }
+        }, function () {
+            alert("ajax error");
+        });
+    }
+
+    /*
      * 盒子与账户解除关联
      * */
-    $scope.dedede = function () {
-        alert(111);
-    }
     $scope.deletePIBoxBtn = function (device_id) {
         var parmas =
         {
@@ -363,6 +380,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         $('#comtype').val(type[0].comtype);
         $('#box_stat_no').val(type[0].box_stat_no);
         $('#plc_stat_no').val(type[0].plc_stat_no);
+        console.log("获取到默认的对象", type[0]);
         $('#retry_times').val(type[0].retry_times);
         $('#wait_timeout').val(type[0].wait_timeout);
         $('#rev_timeout').val(type[0].rev_timeout);
@@ -544,7 +562,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         T.common.ajax.request("WeconBox", "dirFirmAction/getDirFirmInfoByDevId", params, function (data, code, msg) {
             if (code == 200) {
                 $scope.devFirmInfo = data.devFirmInfo;
-                console.log("固件对象",data.devFirmInfo);
+                console.log("固件对象", data.devFirmInfo);
                 //固件更新要用到
                 $scope.localVersionCode = data.devFirmInfo.f_ver;
                 $scope.$apply();
@@ -557,6 +575,147 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             alert("ajax error");
         });
     }
+
+    //检查更新
+    $scope.checkUpdate= function () {
+        var localVersionCode = $scope.localVersionCode;
+        var dev_model = $scope.dev_model;
+        if (dev_model == "" || dev_model == undefined || localVersionCode == "" || localVersionCode == undefined) {
+            alert("系统错误");
+            return;
+        }
+        var device_id = $scope.device_id;
+        if (device_id == "" || device_id == undefined) {
+            alert("系统忙，稍后操作");
+            return;
+        }
+        var params = {
+            device_id: device_id,
+            dev_model: dev_model,
+            localVersionCode: localVersionCode
+        }
+        T.common.ajax.request("WeconBox", "driveraction/checkUpdate", params, function (data, code, msg) {
+            if (code == 200) {
+                $("#checkUpdateFir").modal("show");
+                $scope.driverIsUpdate=data.driverData.isUpdate;
+                $scope.firmIsUpdate=data.firmData.isNewVersion;
+
+                //提示信息
+                if ($scope.driverIsUpdate||$scope.firmIsUpdate) {
+                    //用于展示提示内容
+                    $("#noticeDiv").empty();
+                    $("#noticeDiv").prepend('<div>确定更新</div>');
+                }else{
+                    $("#noticeDiv").empty();
+                    $("#noticeDiv").prepend('<div>已经是最新版了，不需要更新</div>');
+                }
+                if($scope.firmIsUpdate){
+                    $scope.file_id = data.firmData.file_id;
+                    $scope.fileData = data.firmData.fileData;
+                }
+                console.log("结果是：   ",data);
+            }
+            else {
+                alert(code + "-" + msg);
+            }
+        }, function () {
+            alert("ajax error");
+        });
+    }
+    //更新操作
+    $scope.update= function (machine_code)
+    {
+        var device_id = $scope.device_id;
+        var updateType=0;
+        if($scope.driverIsUpdate&&$scope.firmIsUpdate){
+            updateType=3;
+        }else if($scope.driverIsUpdate){
+            updateType=1;
+        }else if($scope.firmIsUpdate){
+            updateType=2
+        }else{
+            $("#checkUpdateFir").modal("hide");
+            return;
+        }
+        var fileData = $scope.fileData;
+        var versionName = fileData.version_name;
+        var version_code = fileData.version_code;
+        var file_id = fileData.file_id;
+        var params = {
+            updateType:updateType,
+            device_id: device_id,
+            machine_code:machine_code,
+            versionName: versionName,
+            version_code: version_code,
+            file_id: file_id
+        }
+        console.log("参数是：",params);
+        T.common.ajax.request("WeconBox", "driveraction/update", params, function (data, code, msg) {
+            if (code == 200) {
+                alert("指令已下发盒子成功！");
+                $("#checkUpdateFir").modal("hide");
+            }
+            else {
+                alert(code + "-" + msg);
+            }
+        }, function () {
+            alert("ajax error");
+        });
+    }
+
+    //检查更新所有驱动文件
+    $scope.chkUpdateDriver = function () {
+        var device_id = $scope.device_id;
+        if (device_id == "" || device_id == undefined) {
+            alert("系统忙，稍后操作");
+            return;
+        }
+        var params = {
+            device_id: device_id
+        }
+        T.common.ajax.request("WeconBox", "driveraction/checkUpdatePlcDriver", params, function (data, code, msg) {
+            if (code == 200) {
+                $("#checkUpdateFir").modal("show");
+                if (data.isUpdate) {
+                    //用于展示提示内容
+                    $("#noticeDiv").empty();
+                    $("#noticeDiv").prepend('<div>确定更新</div>');
+                }else{
+                    $("#noticeDiv").empty();
+                    $("#noticeDiv").prepend('<div>已经是最新版了，不需要更新</div>');
+                }
+            }
+            else {
+                alert(code + "-" + msg);
+            }
+        }, function () {
+            alert("ajax error");
+        });
+    }
+    //更新 plc全部驱动
+    $scope.updateAllDriver= function (machine_code) {
+        var device_id = $scope.device_id;
+        if (device_id == "" || device_id == undefined) {
+            alert("系统忙，稍后操作");
+            return;
+        }
+        var params = {
+            device_id: device_id,
+            machine_code:machine_code
+        }
+        T.common.ajax.request("WeconBox", "driveraction/updateAllDriver", params, function (data, code, msg) {
+            if (code == 200) {
+                alert("指令已下发盒子成功！");
+            }
+            else {
+                alert(code + "-" + msg);
+            }
+        }, function () {
+            alert("ajax error");
+        });
+    }
+
+    //检查更新驱动文件
     $scope.checkUpdateFir = function () {
         var localVersionCode = $scope.localVersionCode;
         var dev_model = $scope.dev_model;
@@ -574,11 +733,11 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 if (data.isNewVersion) {
                     //用于展示提示内容
                     $("#noticeDiv").empty();
-                    $("#noticeDiv").prepend('<div>最新版本:'+data.versionCode+'</div>');
+                    $("#noticeDiv").prepend('<div>最新版本:' + data.versionCode + '</div>');
 
 
                     $scope.file_id = data.file_id;
-                    $scope.fileData=data.fileData;
+                    $scope.fileData = data.fileData;
                 } else {
                     //用于展示提示内容
                     $("#noticeDiv").empty();
@@ -589,23 +748,22 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $("#deletePlc").modal("hide");
                 alert(code + "-" + msg);
             }
-
         }, function () {
             alert("ajax error");
         });
     }
     $scope.updateFirFile = function (machine_code) {
-        var fileData=$scope.fileData;
-        var versionName=fileData.version_name;
-        var version_code=fileData.version_code;
-        var file_id=fileData.file_id;
-        var  params={
-            versionName:versionName,
-            version_code:version_code,
-            file_id:file_id,
-            machine_code:machine_code
+        var fileData = $scope.fileData;
+        var versionName = fileData.version_name;
+        var version_code = fileData.version_code;
+        var file_id = fileData.file_id;
+        var params = {
+            versionName: versionName,
+            version_code: version_code,
+            file_id: file_id,
+            machine_code: machine_code
         }
-        if(machine_code==""||machine_code==undefined||versionName==""||versionName==undefined||version_code==""||version_code==undefined||file_id==""||file_id==undefined){
+        if (machine_code == "" || machine_code == undefined || versionName == "" || versionName == undefined || version_code == "" || version_code == undefined || file_id == "" || file_id == undefined) {
             $("#checkUpdateFir").modal("hide");
             alert("系统忙，稍后操作！");
         }

@@ -3,6 +3,7 @@ package com.wecon.box.impl;
 import com.wecon.box.api.PlcInfoApi;
 import com.wecon.box.entity.PlcExtend;
 import com.wecon.box.entity.PlcInfo;
+import com.wecon.box.entity.PlcInfoDetail;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.common.util.TimeUtil;
 import com.wecon.restful.core.BusinessException;
@@ -161,6 +162,16 @@ public class PlcInfoImpl implements PlcInfoApi {
     }
 
     @Override
+    public List<PlcInfoDetail> getListPlcInfoDetail(long device_id) {
+        String sql = "select " + SEL_COL + " ,file_md5 "+" from plc_info where device_id=?";
+        List<PlcInfoDetail> list = jdbcTemplate.query(sql, new Object[]{device_id}, new DefaultPlcInfoDtailRowMapper());
+        if (!list.isEmpty()) {
+            return list;
+        }
+        return null;
+    }
+
+    @Override
     public List<PlcExtend> getPlcExtendListByState(Object... state){
         String sql = "select p.*, d.machine_code from plc_info p, device d where p.device_id = d.device_id";
         if(null != state && state.length > 0){
@@ -259,9 +270,6 @@ public class PlcInfoImpl implements PlcInfoApi {
 
 
     public static final class DefaultPlcInfoRowMapper implements RowMapper<PlcInfo> {
-
-
-
         @Override
         public PlcInfo mapRow(ResultSet rs, int i) throws SQLException {
             PlcInfo model = new PlcInfo();
@@ -294,6 +302,43 @@ public class PlcInfoImpl implements PlcInfoApi {
             return model;
         }
     }
+
+    public static final class DefaultPlcInfoDtailRowMapper implements RowMapper<PlcInfoDetail> {
+        @Override
+        public PlcInfoDetail mapRow(ResultSet rs, int i) throws SQLException {
+            PlcInfoDetail model = new PlcInfoDetail();
+            model.plc_id = rs.getLong("plc_id");
+            model.device_id = rs.getLong("device_id");
+            model.type = rs.getString("type");
+            model.driver = rs.getString("driver");
+            model.box_stat_no = rs.getInt("box_stat_no");
+            model.plc_stat_no = rs.getInt("plc_stat_no");
+            model.port = rs.getString("port");
+            model.comtype = rs.getInt("comtype");
+            model.baudrate = rs.getString("baudrate");
+            model.stop_bit = rs.getInt("stop_bit");
+            model.data_length = rs.getInt("data_length");
+            model.check_bit = rs.getString("check_bit");
+            model.retry_times = rs.getInt("retry_times");
+            model.wait_timeout = rs.getInt("wait_timeout");
+            model.rev_timeout = rs.getInt("rev_timeout");
+            model.com_stepinterval = rs.getInt("com_stepinterval");
+            model.com_iodelaytime = rs.getInt("com_iodelaytime");
+            model.retry_timeout = rs.getInt("retry_timeout");
+            model.net_port = rs.getInt("net_port");
+            model.net_type = rs.getInt("net_type");
+            model.net_isbroadcast = rs.getInt("net_isbroadcast");
+            model.net_broadcastaddr = rs.getInt("net_broadcastaddr");
+            model.net_ipaddr = rs.getString("net_ipaddr");
+            model.state = rs.getInt("state");
+            model.create_date = rs.getTimestamp("create_date");
+            model.update_date = rs.getTimestamp("update_date");
+            model.file_md5=rs.getString("file_md5");
+            model.file_md5=rs.getString("file_md5");
+            return model;
+        }
+    }
+
 
     @Override
     public boolean isExistPort(long device_id, String port) {

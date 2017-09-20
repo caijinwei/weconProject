@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 /**
- * Created by Administrator on 2017/8/24.
+ * Created by caijinw on 2017/8/24.
  */
 @Component
 public class PlcListByType {
@@ -21,6 +21,7 @@ public class PlcListByType {
         ArrayList<PlcInfo> plcSetings = new ArrayList<PlcInfo>();
         for (Plc c : usbs) {
             PlcInfo plcInfo = new PlcInfo();
+            plcInfo.retry_times=2;
             plcInfo.ptype = c.getAttributes().get("Type");
             plcInfo.type = c.getAttributes().get("plctype");
             //通讯口   写死 com  com2  ethernet  USB  用这个主标识
@@ -36,7 +37,7 @@ public class PlcListByType {
             plcInfo.comtype = paseInt(c.getAttributes().get("ComType"));
             plcInfo.driver=c.getAttributes().get("Driver");
             //这边是默认值，可输入
-            plcInfo.baudrate = c.getAttributes().get("BoudRate");;
+            plcInfo.baudrate = c.getAttributes().get("BoudRate");
             plcInfo.wait_timeout = paseInt(c.getAttributes().get("WaitTimeout"));
             plcInfo.rev_timeout = paseInt(c.getAttributes().get("RevTimeout"));
             plcInfo.box_stat_no = paseInt(c.getAttributes().get("PlcStatNo"));

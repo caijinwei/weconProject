@@ -17,7 +17,7 @@
     <li><a href="datamonitor.html?device_id={{device_id}}&device_name={{device_name}}">数据监控</a></li>
     <li><a href="alarmlog.html?device_id={{device_id}}&device_name={{device_name}}">报警记录</a></li>
     <li><a href="historydata.html?device_id={{device_id}}&device_name={{device_name}}">历史数据</a></li>
-    <li class="active" ng-if="accounttype==1&&device_id>0"><a
+    <li class="active"><a
             href="baseinfo.html?device_id={{device_id}}&device_name={{device_name}}">基本配置</a></li>
 </ul>
 <div class="container-fluid" style="margin-top: 40px;">
@@ -32,7 +32,7 @@
         <li class="active"><a href="#base-info" data-toggle="tab">基本信息</a></li>
         <li><a href="#com-port" data-toggle="tab" ng-click="initPlcSetting()">通讯口配置</a></li>
         <!--<li><a href="#debugInfo" data-toggle="tab">调试信息</a></li>-->
-        <li><a href="#dev_firm" data-toggle="tab" ng-click="dev_firmShow(infoData.state)">固件信息</a></li>
+        <li><a href="#dev_firm" data-toggle="tab" ng-click="dev_firmShow(infoData.state)">版本信息</a></li>
     </ul>
     <div class="tab-content">
         <div class="tab-pane active" id="base-info">
@@ -52,6 +52,8 @@
                 <div class="row" style="margin-top: 12px;">
                     <span class="col-md-1">在线状态</span>
                     <span style="font-weight: bold;margin-left: 20px;">{{infoData.state==1?'在线':'离线'}}</span>
+                    <button type="button" style="margin-left: 30px" class="btn btn-info" ng-click="flushState()"/>
+                    刷新</button>
                 </div>
                 <div class="row" style="margin-top: 12px;">
                     <span class="col-md-1">机器码</span>
@@ -534,45 +536,25 @@
         <div class="tab-pane" id="dev_firm">
             <!-- 基本信息展示-->
             <div class="container-fluid" style="margin-top: 12px;font-size: 15px;">
-                <!--<div class="row" style="margin-top: 30px;">-->
-                <!--<span class="col-md-1">固件ID</span>-->
-                <!--<span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.f_id}}</span>-->
-                <!--</div>-->
-                <div class="row" style="margin-top: 30px;">
-                    <span class="col-md-1">版本名称</span>
-                    <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.f_name}}</span>
-                </div>
-                <div class="row" style="margin-top: 30px;">
-                    <span class="col-md-1">固件版本</span>
-                    <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.f_ver}}</span>
-                </div>
-                <div class="row" style="margin-top: 30px;">
-                    <span class="col-md-1">更新时间</span>
-                    <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.create_date|date:'yyyy-MM-dd HH:mm:ss'}}</span>
-                </div>
-                <div class="row" style="margin-top: 30px;">
-                    <span class="col-md-1">创建时间</span>
-                    <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.create_date|date:'yyyy-MM-dd HH:mm:ss'}}</span>
-                </div>
-
                 <div class="row" style="margin-top: 30px;">
                     <span class="col-md-1">操作</span>
                     <!--<div class="btn-group" style="margin-left: 10px;">-->
-                    <button type="button" class="btn btn-info" data-toggle="modal" ng-click="checkUpdateFir()">
+                    <button type="button" class="btn btn-info" data-toggle="modal" ng-click="checkUpdate()">
                         查看固件更新
                     </button>
                 </div>
             </div>
 
+            <!-- 固件信息-->
             <div class="panel panel-default">
                 <div class="panel-heading">固件信息</div>
                 <div class="panel-body">
-                    <div class="container-fluid" style="margin-top: 12px;font-size: 15px;">
+                    <div class="container-fluid" style="margin-top: 5px;font-size: 15px;">
                         <!--<div class="row" style="margin-top: 30px;">-->
                         <!--<span class="col-md-1">固件ID</span>-->
                         <!--<span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.f_id}}</span>-->
                         <!--</div>-->
-                        <div class="row" style="margin-top: 30px;">
+                        <div class="row" style="margin-top: 5px;">
                             <span class="col-md-1">版本名称</span>
                             <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.f_name}}</span>
                         </div>
@@ -587,14 +569,6 @@
                         <div class="row" style="margin-top: 30px;">
                             <span class="col-md-1">创建时间</span>
                             <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.create_date|date:'yyyy-MM-dd HH:mm:ss'}}</span>
-                        </div>
-
-                        <div class="row" style="margin-top: 30px;">
-                            <span class="col-md-1">操作</span>
-                            <!--<div class="btn-group" style="margin-left: 10px;">-->
-                            <button type="button" class="btn btn-info" data-toggle="modal" ng-click="checkUpdateFir()">
-                                查看固件更新
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -614,14 +588,11 @@
                         </div>
                         <div class="modal-body">
                             <span id="noticeDiv">
-                                <!--<div id="testtest" ng-show="noticeType==1">最新版：{{noticeVersionCode}}</div>-->
-                                <!--<div ng-show="noticeType==0">已经是最新版了，不需要更新！</div>-->
-
                             </span>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-info"
-                                    ng-click="updateFirFile(infoData.machine_code)">更新
+                                    ng-click="update(infoData.machine_code)">更新
                             </button>
                             <button type="button" class="btn btn-default"
                                     data-dismiss="modal">取消

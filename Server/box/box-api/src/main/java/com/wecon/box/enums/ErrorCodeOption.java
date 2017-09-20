@@ -61,6 +61,9 @@ public enum ErrorCodeOption {
     FileId_Is_Error("更新失败",300022),
     Mqtt_Transport_Error("更新失败",300023),
     Driver_IsNot_Fount("通讯口配置失败，该驱动不存在",300024),
+    UpdateDriver_ParamIs_Error("更新驱动文件失败",300025),
+    Mqtt_Disconnect_Error("mqtt关闭失败",300023),
+
 
 
     Get_Groupid_Error("获取数组ID错误",50001),

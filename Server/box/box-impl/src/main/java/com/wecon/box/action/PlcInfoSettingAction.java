@@ -5,6 +5,7 @@ import com.wecon.box.api.DevBindUserApi;
 import com.wecon.box.api.DriverApi;
 import com.wecon.box.api.PlcInfoApi;
 import com.wecon.box.entity.PlcInfo;
+import com.wecon.box.entity.PlcInfoDetail;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
@@ -23,13 +24,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
- * Created by Administrator on 2017/8/5.
+ * Created by caijinw on 2017/8/5.
  */
 
 @RestController
@@ -213,7 +211,6 @@ public class PlcInfoSettingAction {
                 }
             }
         }
-        System.out.println("plcInfoType=======================-------------------"+plcInfo.type);
         if(driverApi.getDriverBydriver(plcInfo.driver)==null){
             throw new BusinessException(ErrorCodeOption.Driver_IsNot_Fount.key,ErrorCodeOption.Device_NotFound.value);
         }
