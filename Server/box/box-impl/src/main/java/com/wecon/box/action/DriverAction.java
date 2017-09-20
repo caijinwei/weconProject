@@ -7,6 +7,8 @@ import com.wecon.box.api.FileStorageApi;
 import com.wecon.box.api.PlcInfoApi;
 import com.wecon.box.entity.*;
 import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.box.enums.OpTypeOption;
+import com.wecon.box.enums.ResTypeOption;
 import com.wecon.box.util.Base64Util;
 import com.wecon.box.util.DbLogUtil;
 import com.wecon.box.util.ServerMqtt;
