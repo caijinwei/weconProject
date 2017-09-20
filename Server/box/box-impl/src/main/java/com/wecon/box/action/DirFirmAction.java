@@ -153,8 +153,7 @@ public class DirFirmAction {
         } catch (MqttException e) {
             System.out.println(e.getMessage());
             throw new BusinessException(ErrorCodeOption.Mqtt_Transport_Error.key, ErrorCodeOption.Mqtt_Transport_Error.value);
-        }
-        ;
+        };
         return new Output();
     }
 

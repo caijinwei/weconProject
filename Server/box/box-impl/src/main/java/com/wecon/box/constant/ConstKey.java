@@ -47,5 +47,5 @@ public class ConstKey {
     /**
      * mqtt服务端下发给盒子的主题
      */
-    public final static String MQTT_SERVER_TOPICE = "pibox:actdata:%s";
+    public final static String MQTT_SERVER_TOPICE = "pibox/stc/%s";
 }
