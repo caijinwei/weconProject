@@ -1233,6 +1233,7 @@ appModule
                 var scalies = [];
                 if ($("#nameid").val() == "") {
                     alert("参数未配置完整！");
+                    return;
                 }
                 if ($('#registeraddr').css('display') == 'block') {
                     if ($("#addrid").val() == "") {

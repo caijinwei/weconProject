@@ -386,6 +386,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
                     String device_machine = realHisCfgDevice.machine_code;
                     machineCodeSet.add(device_machine);
                     Device device = deviceApi.getDevice(device_machine);
+                    realHisCfgDevice.box_state=device.state;
                     // 通过机器码去redis中获取数据
                     RedisPiBoxActData redisPiBoxActData = redisPiBoxApi.getRedisPiBoxActData(device_machine);
                     if (redisPiBoxActData != null) {
@@ -400,12 +401,12 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
                                     PiBoxComAddr piBoxComAddr = addr_list.get(x);
 
                                     if (realHisCfgDevice.id == Long.parseLong(piBoxComAddr.addr_id)) {
-                                        if (device.state == 0) {
-                                            realHisCfgDevice.re_state = "0";
-                                        } else {
-                                            realHisCfgDevice.re_state = piBoxComAddr.state;
-                                        }
-
+//                                        if (device.state == 0) {
+//                                            realHisCfgDevice.re_state = "0";
+//                                        } else {
+//                                            realHisCfgDevice.re_state = piBoxComAddr.state;
+//                                        }
+                                        realHisCfgDevice.re_state = piBoxComAddr.state;
                                         realHisCfgDevice.re_value = piBoxComAddr.value;
 
                                     }
