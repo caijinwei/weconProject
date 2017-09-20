@@ -9,6 +9,14 @@ appModule
 								.getParameter("device_id");
 						$scope.devicename = T.common.util
 								.getParameter("device_name");
+						// 获取用户权限
+						T.common.ajax.request("WeconBox", "user/userinfo",
+								new Object(), function(data, code, msg) {
+									$scope.accounttype = data.type;
+									$scope.$apply();
+									$("body").css("display", "block");
+								});
+
 						$scope.type = 0;
 						$scope.getDataType();
 						$scope.act_group($scope.deviceid);
@@ -33,14 +41,14 @@ appModule
 										function(data, code, msg) {
 											if (code == 200) {
 												$scope.dir_list = data.ActGroup;
-												$scope.accounttype = data.type;
+												// $scope.accounttype =
+												// data.type;
 												$scope.$apply();
 												if (data.ActGroup != null
 														&& $scope.type == 0) {
 													var fristGroupId = data.ActGroup[0].id;
 													actgroupId = fristGroupId;
-													$scope
-															.ws_connect(fristGroupId);
+													$scope.createWebSocket();
 												}
 
 											} else {
@@ -55,76 +63,118 @@ appModule
 					$scope.paginationConf = {
 						totalItems : $scope.count,
 					}
-					var actgroupId;
-					/**
-					 * webscoket发送数据
-					 */
-					var ws;
-					$scope.ws_connect = function(fristGroupId) {
-						if ("WebSocket" in window) {
+
+					var ws;// websocket实例
+					var actgroupId;// 分组id
+					var lockReconnect = false;// 避免重复连接
+
+					$scope.createWebSocket = function() {
+						try {
 							ws = new WebSocket(
 									T.common.requestUrl['WeconBoxWs']
 											+ '/actdataweb-websocket/websocket?'
 											+ T.common.websocket.getParams());
-							ws.onopen = function() {
-								$scope.paginationConf = {
-									currentPage : 1,
-									itemsPerPage : 10,
-									totalItems : $scope.count,
-									pagesLength : 15,
-									perPageOptions : [ 5, 10, 20, 50, 100 ],
-									rememberPerPage : 'perPageItems',
-									onChange : function() {
-										if (this.currentPage != 0) {
-											$scope.ws_send(this.currentPage,
-													this.itemsPerPage,
-													actgroupId);
-										}
+							$scope.initEventHandle();
+						} catch (e) {
+							$scope.reconnect();
+						}
+					}
+
+					$scope.initEventHandle = function() {
+						ws.onclose = function() {
+							$scope.reconnect();
+						};
+						ws.onerror = function() {
+							$scope.reconnect();
+						};
+						ws.onopen = function() {
+							$scope.paginationConf = {
+								currentPage : 1,
+								itemsPerPage : 10,
+								totalItems : $scope.count,
+								pagesLength : 15,
+								perPageOptions : [ 5, 10, 20, 50, 100 ],
+								rememberPerPage : 'perPageItems',
+								onChange : function() {
+									if (this.currentPage != 0) {
+										$scope.ws_send(this.currentPage,
+												this.itemsPerPage, actgroupId);
 									}
+								}
+							}
+							$scope.ws_send($scope.paginationConf.currentPage,
+									$scope.paginationConf.itemsPerPage,
+									actgroupId);
+
+							// 心跳检测重置
+							heartCheck.reset().start();
+						};
+						ws.onmessage = function(evt) {
+
+							if (JSON.parse(evt.data).piBoxActDateMode != null) {
+								$scope.paginationConf.totalItems = JSON
+										.parse(evt.data).piBoxActDateMode.totalRecord;
+								$scope.actDatas = JSON.parse(evt.data).piBoxActDateMode.list;
+								$scope.$apply();
+								angular.forEach($scope.actDatas, function(data,
+										index, array) {
+									$scope.editable_name(data);
+									$scope.editable_value(data);
+								});
+
+							} else {
+								// 下发数据到盒子反馈
+								$scope.resultData = JSON.parse(evt.data).resultData;
+
+								$("#loadingModal").modal("hide");
+								if ($scope.resultData == 0) {
+									alert(JSON.parse(evt.data).resultError);
+								} else {
+									alert("数据下发盒子成功！");
 								}
 								$scope.ws_send(
 										$scope.paginationConf.currentPage,
 										$scope.paginationConf.itemsPerPage,
 										actgroupId);
-							};
-							ws.onmessage = function(evt) {
-								if (JSON.parse(evt.data).piBoxActDateMode != null) {
-									$scope.paginationConf.totalItems = JSON
-											.parse(evt.data).piBoxActDateMode.totalRecord;
-									$scope.actDatas = JSON.parse(evt.data).piBoxActDateMode.list;
-									$scope.$apply();
-									angular.forEach($scope.actDatas, function(
-											data, index, array) {
-										$scope.editable_name(data);
-										$scope.editable_value(data);
-									});
+							}
+							// 如果获取到消息，心跳检测重置
+							// 拿到任何消息都说明当前连接是正常的
+							heartCheck.reset().start();
+						}
+					}
 
-								} else {
-									// 下发数据到盒子反馈
-									scope.resultData = JSON.parse(evt.data).resultData;
-									$("#loadingModal").modal("hide");
-									if ($scope.resultData == 0) {
+					$scope.reconnect = function() {
+						if (lockReconnect)
+							return;
+						lockReconnect = true;
+						// 没连接上会一直重连，设置延迟避免请求过多
+						setTimeout(function() {
+							createWebSocket();
+							lockReconnect = false;
+						}, 2000);
+					}
 
-										alert("数据下发失败，请检查盒子是否在线！");
-									} else {
-										alert("数据下发盒子成功！");
-									}
-									$scope.ws_send(
-											$scope.paginationConf.currentPage,
-											$scope.paginationConf.itemsPerPage,
-											actgroupId);
-
-								}
-
-							};
-							ws.onclose = function(evt) {
-								console.log(evt);
-							};
-							ws.onerror = function(evt) {
-								console.log(evt);
-							};
-						} else {
-							alert("WebSocket isn't supported by your Browser!");
+					// 心跳检测
+					var heartCheck = {
+						timeout : 60000,// 60秒
+						timeoutObj : null,
+						serverTimeoutObj : null,
+						reset : function() {
+							clearTimeout(this.timeoutObj);
+							clearTimeout(this.serverTimeoutObj);
+							return this;
+						},
+						start : function() {
+							var self = this;
+							this.timeoutObj = setTimeout(function() {
+								// 这里发送一个心跳，后端收到后，返回一个心跳消息，
+								// onmessage拿到返回的心跳就说明连接正常
+								ws.send("HeartBeat");
+								self.serverTimeoutObj = setTimeout(function() {// 如果超过一定时间还没重置，说明后端主动断开了
+									ws.close();// 如果onclose会执行reconnect，我们执行ws.close()就行了.如果直接执行reconnect
+									// 会触发onclose导致重连两次
+								}, self.timeout)
+							}, this.timeout)
 						}
 					}
 					$scope.ws_send = function(pageIndex, pageSize, groupId) {
@@ -151,29 +201,10 @@ appModule
 							markid : 1,
 							value : value,
 							addr_id : model.id
-
 						};
 						ws.send(angular.toJson(params));
 
-						/*
-						 * T.common.ajax .request( "WeconBox",
-						 * "actDataAction/putMess", params, function(data, code,
-						 * msg) { if (code == 200) { $scope.resultData =
-						 * data.resultData;
-						 * 
-						 * if ($scope.resultData == 0) {
-						 * 
-						 * alert("数据下发失败，请检查盒子是否在线！"); } else {
-						 * alert("数据下发盒子成功！"); } $scope .ws_send(
-						 * $scope.paginationConf.currentPage,
-						 * $scope.paginationConf.itemsPerPage, actgroupId); }
-						 * else {
-						 * 
-						 * alert(code + "-" + msg); } }, function() {
-						 * alert("ajax error"); });
-						 */
 					}
-
 					// 复制监控点
 					$scope.copymonitor = function(model) {
 						$scope.monitorid = model.id;// 监控点id
@@ -477,9 +508,9 @@ appModule
 								if (!$.trim(value)) {
 									return '不能为空';
 								}
-								/*if (model.re_state != 1) {
+								if (model.re_state != 1) {
 									return '检查盒子是否在线！';
-								}*/
+								}
 								$("#loadingModal").modal("show");
 								$scope.putMess(model, value);
 							}

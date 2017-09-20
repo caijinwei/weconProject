@@ -55,6 +55,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	private Client client;
 	private ClientMQTT reclient;
 	private Map<String, Object> bParams;
+	private String addr_id ;
 
 	private static final Logger logger = LogManager.getLogger(ActDataHandler.class.getName());
 
@@ -87,14 +88,14 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 
 		} else if ("1".equals(bParams.get("markid").toString())) {
 			String value = bParams.get("value").toString();
-			String addr_id = bParams.get("addr_id").toString();
+			addr_id = bParams.get("addr_id").toString();
 			// 发送数据
-			putMQTTMess(value, addr_id);
+			putMQTTMess(value);
 			// 订阅消息
 			if (!CommonUtils.isNullOrEmpty(addr_id)) {
 				RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(addr_id));
 				Device device = deviceApi.getDevice(realHisCfg.device_id);
-				SendvalueCallback sendvalueCallback = new SendvalueCallback(session, addr_id);
+				SendvalueCallback sendvalueCallback = new SendvalueCallback(session);
 				reclient = new ClientMQTT("pibox/cts/" + device.machine_code, "send" + session.getId(),
 						sendvalueCallback);
 				reclient.start();
@@ -106,9 +107,8 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 
 	class SendvalueCallback implements MqttCallback {
 		WebSocketSession session;
-		String addr_id;
 
-		public SendvalueCallback(WebSocketSession session, String addr_id) {
+		public SendvalueCallback(WebSocketSession session) {
 			this.session = session;
 		}
 
@@ -124,44 +124,71 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 
 		@Override
 		public void messageArrived(String arg0, MqttMessage arg1) throws Exception {
+
 			String[] idexs = arg0.split("/");
 			String reMessage = new String(arg1.getPayload(), "UTF-8").trim();
-			JSONObject jsonObject = JSONObject.parseObject(reMessage);
-			String machineCode = jsonObject.getString("machine_code");
-			// 机器码为空消息直接忽略
-			if (CommonUtils.isNullOrEmpty(jsonObject.getString("machine_code"))) {
-				return;
-			}
-			// 如果消息的机器码和主题中的机器码不匹配直接忽略消息
-			if (!idexs[2].equals(machineCode)) {
-				logger.info("主题中的机器码和消息的机器码不匹配！");
-				return;
-			}
-			// 数据为空
-			if (CommonUtils.isNullOrEmpty(jsonObject.getString("data"))) {
-				logger.info("data为空！");
-				return;
-			}
-			// act为空
-			if (CommonUtils.isNullOrEmpty(jsonObject.getInteger("act"))) {
-				logger.info("act为空！");
-				return;
-			}
-			if (CommonUtils.isNullOrEmpty(jsonObject.getInteger("feedback"))) {
-				logger.info("feedback为空！");
-				return;
-			}
-			if (addr_id.equals(jsonObject.getInteger("addr_id"))) {
-				JSONObject json = new JSONObject();
-				int upd_state = jsonObject.getInteger("upd_state");
-				if (1 == upd_state) {
-					json.put("resultData", 1);// 反馈成功信息
-
-				} else {
-					json.put("resultData", 0);
+		
+			JSONObject json = new JSONObject();
+			try {
+				JSONObject jsonObject = JSONObject.parseObject(reMessage);
+				String machineCode = jsonObject.getString("machine_code");
+				// 机器码为空消息直接忽略
+				if (CommonUtils.isNullOrEmpty(jsonObject.getString("machine_code"))) {
+					return;
 				}
-				sendWSMassage(session, json.toJSONString());
+				// 如果消息的机器码和主题中的机器码不匹配直接忽略消息
+				if (!idexs[2].equals(machineCode)) {
+					logger.info("主题中的机器码和消息的机器码不匹配！");
+					return;
+				}
+				// act为空
+				if (CommonUtils.isNullOrEmpty(jsonObject.getInteger("act"))) {
+
+					logger.info("act为空！");
+					return;
+				}
+				if (1 != jsonObject.getInteger("act")) {
+					logger.info("act不为1！");
+					return;
+				}
+				if (CommonUtils.isNullOrEmpty(jsonObject.getInteger("feedback_act"))) {
+					logger.info("feedback_act为空！");
+					return;
+				}
+				if(2000!=jsonObject.getInteger("feedback_act")){
+					logger.info("feedback_act不为2000！");
+					return;
+				}
+				// 数据为空
+				if (CommonUtils.isNullOrEmpty(jsonObject.getString("data"))) {
+					logger.info("data为空！");
+					return;
+				}
+				System.out.println("选中的addrid=="+addr_id);
+				System.out.println("接收的消息=="+reMessage);
+				JSONObject jsonBase = jsonObject.getJSONObject("data");
+				if (!CommonUtils.isNullOrEmpty(addr_id) && !CommonUtils.isNullOrEmpty(jsonBase.getInteger("addr_id"))) {
+					if (Integer.parseInt(addr_id)==jsonBase.getInteger("addr_id")) {
+
+						int upd_state = jsonBase.getInteger("upd_state");
+						if (1 == upd_state) {
+							json.put("resultData", 1);// 反馈成功信息
+
+						} else {
+							json.put("resultData", 0);
+							json.put("resultError", jsonBase.getInteger("upd_error"));
+						}
+						sendWSMassage(session, json.toJSONString());
+					}
+				}
+
+			} catch (Exception e) {
+				String simplename = e.getClass().getSimpleName();
+				if (!"JSONException".equals(simplename)) {
+					e.printStackTrace();
+				} 
 			}
+
 		}
 
 		// wbsock发送数据
@@ -171,7 +198,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 
 	}
 
-	public void putMQTTMess(String value, String addr_id) throws MqttException {
+	public void putMQTTMess(String value) throws MqttException {
 		ServerMqtt server = new ServerMqtt();
 		server.message = new MqttMessage();
 		server.message.setQos(1);
@@ -235,8 +262,9 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 		@Override
 		public void onMessage(String channel, String message) {
 			logger.debug("Subscribe callback，channel：" + channel + "message:" + message);
-			if (!CommonUtils.isNullOrEmpty(message)) {
+			if (!CommonUtils.isNullOrEmpty(message) && "0".equals(bParams.get("markid").toString())) {
 				try {
+
 					session.sendMessage(new TextMessage(getStringRealData()));
 				} catch (IOException e) {
 					e.printStackTrace();
