@@ -41,7 +41,7 @@
 			<!--搜索框-->
 			<form class="bs-example bs-example-form" role="form" ng-if="type==1">
 				<div class="input-group">
-					<input type="text" class="form-control"
+					<input id="searchinput" type="text" class="form-control"
 						placeholder="搜索：PIBox名称、序列号" /> <span class="input-group-btn">
 						<button class="btn btn-info" type="button">
 							<span class="glyphicon glyphicon-search"></span>
@@ -150,7 +150,7 @@
 						id="spanid_{{x.accountdirId}}"> {{x.accountdirName}} </span>
 				</a>
 					<ul id="dir_ul_{{x.accountdirId}}" sid="{{x.accountdirId}}">
-						<a
+						<a id="box_{{y.deviceId}}"
 							href="datamonitor.html?device_id={{y.deviceId}}&device_name={{y.deviceName}}"
 							id="{{y.deviceId}}" draggable="true" ondragstart="drag(event)"
 							ng-click="selectbox(y.deviceId)" class="list-group-item"

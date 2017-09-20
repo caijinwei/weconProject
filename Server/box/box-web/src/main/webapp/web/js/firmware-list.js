@@ -23,7 +23,6 @@ appModule.controller("listController", function ($scope, $http, $compile) {
     $scope.getList = function (pageIndex, pageSize) {
         if (pageIndex == 0)
             pageIndex = 1;
-        $("#loadingModal").modal("show");
         var params = {
             pageIndex: pageIndex,
             pageSize: pageSize
@@ -38,7 +37,6 @@ appModule.controller("listController", function ($scope, $http, $compile) {
                 $scope.paginationConf.totalItems = data.page.totalRecord;
                 $scope.pushlist = data.page.list;
                 $scope.$apply();
-                $("#loadingModal").modal("hide");
             }
         }, function () {
         });
