@@ -162,7 +162,7 @@ public class PlcInfoImpl implements PlcInfoApi {
 
     @Override
     public List<PlcExtend> getPlcExtendListByState(Object... state){
-        String sql = "select p.*, d.machine_code from plc_info p, device d where p.device_id = d.device_id";
+        String sql = "select p.*, d.machine_code, r.file_md5 from plc_info p, device d, driver r where p.device_id = d.device_id and p.type = r.type";
         if(null != state && state.length > 0){
             sql += " and p.state in (";
             StringBuffer inSb = new StringBuffer();
@@ -194,6 +194,44 @@ public class PlcInfoImpl implements PlcInfoApi {
                 try {
                     String[] arg = updList.get(i);
                     ps.setInt(1, Integer.parseInt(arg[0]));
+                    ps.setInt(2, Integer.parseInt(arg[1]));
+                    ps.setString(3, arg[2]);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
+        return true;
+    }
+
+    @Override
+    public boolean batchUpdateFileMd5(final List<String[]> updList){
+        if(null == updList || updList.size() == 0){
+            return false;
+        }
+
+        StringBuffer inSb = new StringBuffer();
+        for(String[] ss : updList){
+            inSb.append(",").append(ss[1]);
+        }
+
+        final List<String> fileMd5List = jdbcTemplate.query("select r.file_md5 from driver r, plc_info p where r.type=p.type and p.plc_id in("+inSb.substring(1)+")", new RowMapper() {
+            @Override
+            public String mapRow(ResultSet resultSet, int i) throws SQLException {
+                return resultSet.getString("file_md5");
+            }
+        });
+
+        String sql = "update plc_info set file_md5 = ? where plc_id = ? and date_format(update_date,'%Y-%m-%d %H:%i:%s') = ?";
+        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            public int getBatchSize() {
+                return updList.size();
+                //这个方法设定更新记录数，通常List里面存放的都是我们要更新的，所以返回list.size();
+            }
+            public void setValues(PreparedStatement ps, int i)throws SQLException {
+                try {
+                    String[] arg = updList.get(i);
+                    ps.setInt(1, Integer.parseInt(fileMd5List.get(i)));
                     ps.setInt(2, Integer.parseInt(arg[1]));
                     ps.setString(3, arg[2]);
                 }catch (Exception e){
@@ -373,6 +411,7 @@ public class PlcInfoImpl implements PlcInfoApi {
             model.update_date = rs.getTimestamp("update_date");
             model.upd_time = TimeUtil.getYYYYMMDDHHMMSSDate(model.update_date);
             model.machine_code = rs.getString("machine_code");
+            model.file_md5 = rs.getString("file_md5");
             return model;
         }
     }

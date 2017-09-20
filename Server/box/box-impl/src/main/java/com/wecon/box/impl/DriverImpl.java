@@ -14,12 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Base64Utils;
 
+import java.sql.Blob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by zengzhipeng on 2017/9/16.
@@ -155,6 +155,33 @@ public class DriverImpl implements DriverApi {
         if (!list.isEmpty()) {
             return list.get(0);
         }
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> getDriverExtend(long plcId){
+        String sql = "select d.machine_code, f.file_name, r.file_md5, f.file_data, r.type " +
+                "from device d, plc_info p, driver r, file_storage f " +
+                "where d.device_id=p.device_id and p.type=r.type and r.file_id=f.file_id and p.plc_id=?";
+        List<Map<String, Object>> list = jdbcTemplate.query(sql, new Object[]{plcId}, new RowMapper() {
+            @Override
+            public Map<String, Object> mapRow(ResultSet resultSet, int i) throws SQLException {
+                Map<String, Object> result = new HashMap<>();
+                result.put("machine_code", resultSet.getString("machine_code"));
+                result.put("file_name", resultSet.getString("file_name"));
+                result.put("file_md5", resultSet.getString("file_md5"));
+                Blob blob = resultSet.getBlob("file_data");
+                int blobLength = (int) blob.length();
+                result.put("file_base64", Base64Utils.encodeToString(blob.getBytes(1, blobLength)));
+                blob.free();
+                result.put("driver_type", resultSet.getString("type"));
+                return result;
+            }
+        });
+        if(!list.isEmpty()){
+            return list.get(0);
+        }
+
         return null;
     }
 
