@@ -91,17 +91,17 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                     $scope.$apply();
 
                     //绑定左侧盒子搜索的输入监听
-                    /*$('#searchinput').bind('input propertychange', function searchPIBox() {
+                    $('#searchinput').bind('input propertychange', function searchPIBox() {
                         var keyWord = $('#searchinput').val();
                         if (keyWord == "") {
-                            $scope.showSearchItems('');
+                            $scope.searchbox();
                             return;
                         }
                         var boxList = $scope.getBoxList();
                         var boxIds = $scope.getBoxIds();
                         var searchBoxIds = $scope.searchByRegExp(keyWord, boxList, boxIds);
                         $scope.showSearchItems(searchBoxIds);
-                    });*/
+                    });
 
                 } else {
 
