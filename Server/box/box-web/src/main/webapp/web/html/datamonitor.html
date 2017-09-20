@@ -77,7 +77,6 @@
 						</caption>
 						<thead>
 							<tr>
-								<th class="col-md-1">addr id</th>
 								<th class="col-md-1">状态</th>
 								<th class="col-md-1">名称</th>
 								<th class="col-md-1">数值</th>
@@ -88,8 +87,23 @@
 						</thead>
 						<tbody>
 							<tr ng-repeat="x in actDatas">
-								<td>{{x.id}}</td>
-								<td>{{x.re_state==null?"超时":x.re_state==0?"离线":x.re_state==1?"在线":"超时"}}</td>
+								<td><span ng-if="x.box_state==1" ng-switch="{{x.state}}">
+										<span ng-switch-when="0"> <span
+											ng-switch="{{x.re_state}}"><i ng-switch-when="0"
+												class="fa  fa-circle" style="color: gray;"
+												data-toggle="tooltip" title="离线"></i><i ng-switch-when="1"
+												class="fa  fa-circle" style="color: green;"
+												data-toggle="tooltip" title="在线"></i><i ng-switch-when="2"
+												class="fa  fa-circle" style="color: red;"
+												data-toggle="tooltip" title="超时"></i> </span>
+
+									</span> <span ng-switch-when="1"> <i class="fa  fa-circle"
+											style="color: orange;" data-toggle="tooltip" title="条目未下发"></i></span>
+										<span ng-switch-when="2"><i class="fa  fa-circle"
+											style="color: orange;" data-toggle="tooltip" title="条目未下发"></i></span>
+
+								</span> <span ng-if="x.box_state==0"><i class="fa  fa-circle"
+										style="color: gray;" data-toggle="tooltip" title="离线"></i></span></td>
 								<td><a href="#" id="act_name_{{x.id}}"
 									ng-if="(accounttype==1&&deviceid<0)||(accounttype==2)"
 									ng-click="editable_name(x);">{{x.ref_alais==''?x.name:x.ref_alais}}</a><span
@@ -125,7 +139,8 @@
 					</table>
 					<tm-pagination conf="paginationConf"></tm-pagination>
 					<div class="modal fade" id="loadingModal" tabindex="-1"
-						role="dialog" aria-labelledby="mySmallModalLabel" data-backdrop="static">
+						role="dialog" aria-labelledby="mySmallModalLabel"
+						data-backdrop="static">
 						<div class="modal-dialog modal-sm" role="document"
 							style="margin-top: 350px; text-align: center">
 							<img src="../image/loading.jpg" />
