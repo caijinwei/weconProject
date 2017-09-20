@@ -43,4 +43,9 @@ public class ConstKey {
      * 保存文件下载的token的key,由文件Id组成，值为随机生成的token,有设置过期时间
      */
     public final static String REDIS_FILE_DOWNLOAD_TOKEN = "pibox:filedownloadtoken:%s";
+
+    /**
+     * mqtt服务端下发给盒子的主题
+     */
+    public final static String MQTT_SERVER_TOPICE = "pibox:actdata:%s";
 }

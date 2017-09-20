@@ -2,9 +2,12 @@ package com.wecon.box.action;
 
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.DevFirmApi;
+import com.wecon.box.api.DeviceApi;
 import com.wecon.box.api.FileStorageApi;
 import com.wecon.box.api.FirmwareApi;
+import com.wecon.box.constant.ConstKey;
 import com.wecon.box.entity.DevFirm;
+import com.wecon.box.entity.Device;
 import com.wecon.box.entity.FileStorage;
 import com.wecon.box.entity.FirmwareDetail;
 import com.wecon.box.enums.ErrorCodeOption;
@@ -39,6 +42,9 @@ public class DirFirmAction {
 
     @Autowired
     FirmwareApi firmwareApi;
+
+    @Autowired
+    protected DeviceApi deviceApi;
 
     @Label("根据设备ID获取固件信息")
     @RequestMapping("/getDirFirmInfoByDevId")
@@ -98,9 +104,13 @@ public class DirFirmAction {
 
     @Label("更新固件")
     @RequestMapping("updateFirmFile")
-    public Output updateFirm(@RequestParam("versionName") String versionName, @RequestParam("version_code") String versionCode, @RequestParam("file_id") long file_id, @RequestParam("machine_code") long machine_code) {
-        if (file_id <= 0 || machine_code <= 0) {
+    public Output updateFirm(@RequestParam("versionName") String versionName, @RequestParam("version_code") String versionCode, @RequestParam("file_id") long file_id, @RequestParam("device_id") Long device_id) {
+        if (file_id <= 0) {
             throw new BusinessException(ErrorCodeOption.FileId_Is_Error.key, ErrorCodeOption.FileId_Is_Error.value);
+        }
+        Device deviceModel = deviceApi.getDevice(device_id);
+        if (deviceModel == null) {
+            throw new BusinessException(ErrorCodeOption.Device_NotFound.key, ErrorCodeOption.Device_NotFound.value);
         }
         ServerMqtt mqttServer = null;
         long userId = AppContext.getSession().client.userId;
@@ -120,7 +130,7 @@ public class DirFirmAction {
 
         JSONObject msg = new JSONObject();
         msg.put("act", 20007);
-        msg.put("machine_code", machine_code);
+        msg.put("machine_code", deviceModel.machine_code);
         msg.put("data", file);
         msg.put("feedback", 0);
 
@@ -134,7 +144,7 @@ public class DirFirmAction {
             //传输的消息体
             mqttServer.message.setPayload(msg.toString().getBytes());
             //pibox/<topic_type>/<machine_code>
-            mqttServer.topic11 = mqttServer.client.getTopic("pibox/stc/" + machine_code);
+            mqttServer.topic11 = mqttServer.client.getTopic(String.format(ConstKey.MQTT_SERVER_TOPICE, deviceModel.machine_code));
             mqttServer.publish(mqttServer.topic11, mqttServer.message);
         /*
         * pibox/cts/<machine_code>/logs
