@@ -73,21 +73,24 @@
 					</button>
 				</div>
 
-				<div class="btn-group" ng-if="type==1">
-					<a href="setting.html" target="content_frame" title="设置">
-						<button type="button" class="btn btn-default" id="btn-setting">
-							<span class="glyphicon glyphicon-cog btn-item"></span>
-						</button>
-					</a>
-				</div>
 				<div class="btn-group" data-toggle="tooltip" ng-if="type==1">
 					<a href="user/viewaccountmgr.html" target="content_frame"
-						title="视图账号管理">
+					   title="视图账号管理">
 						<button type="button" class="btn btn-default" id="btn-viewaccount">
 							<span class="glyphicon glyphicon-user"></span>
 						</button>
 					</a>
 				</div>
+
+				<div class="btn-group" data-toggle="tooltip" ng-if="type==1">
+					<a href="#" title="刷新盒子列表" ng-click="searchbox();">
+						<button type="button" class="btn btn-default" id="btn-setting">
+							<span class="glyphicon glyphicon-refresh btn-item"></span>
+						</button>
+					</a>
+				</div>
+
+
 			</div>
 			<!--添加盒子对话框-->
 			<div class="modal" id="addPIBox" tabindex="-1" data-backdrop="false">

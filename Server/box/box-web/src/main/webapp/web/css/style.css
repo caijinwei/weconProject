@@ -176,11 +176,11 @@ input[type="submit"] {
 	border-radius: 0;
 }
 
-#btn-setting {
+#btn-viewaccount {
 	border-radius: 0;
 }
 
-#btn-viewaccount {
+#btn-setting {
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
 }
