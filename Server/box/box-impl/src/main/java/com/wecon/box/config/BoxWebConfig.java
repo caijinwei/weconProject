@@ -15,6 +15,36 @@ public class BoxWebConfig {
      */
     private String fileDownloadUrl;
 
+    private String mqttHost;
+
+    private String mqttUsername;
+
+    private String mqttPwd;
+
+    public String getMqttHost() {
+        return mqttHost;
+    }
+
+    public void setMqttHost(String mqttHost) {
+        this.mqttHost = mqttHost;
+    }
+
+    public String getMqttUsername() {
+        return mqttUsername;
+    }
+
+    public void setMqttUsername(String mqttUsername) {
+        this.mqttUsername = mqttUsername;
+    }
+
+    public String getMqttPwd() {
+        return mqttPwd;
+    }
+
+    public void setMqttPwd(String mqttPwd) {
+        this.mqttPwd = mqttPwd;
+    }
+
     public String getEmailActiveUrl() {
         return emailActiveUrl;
     }

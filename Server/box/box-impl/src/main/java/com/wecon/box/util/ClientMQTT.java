@@ -13,18 +13,25 @@ import java.util.concurrent.ScheduledExecutorService;
 public class ClientMQTT {
 
 
-    public static final String HOST = "tcp://192.168.29.186:1883";
+    private String HOST ;
     public List<String> topicPort;
     private  String clientid ;
     private MqttClient client;
     private MqttConnectOptions options;
-    private String userName = "admin";
-    private String passWord = "password";
+    private String userName;
+    private String passWord;
     private ScheduledExecutorService scheduler;
     //回调函数  获取到监听的信息
     private MqttCallback callback;
 
+    private void init() {
+        HOST = BoxWebConfigContext.boxWebConfig.getMqttHost();
+        userName = BoxWebConfigContext.boxWebConfig.getMqttUsername();
+        passWord = BoxWebConfigContext.boxWebConfig.getMqttPwd();
+    }
+
     public ClientMQTT(String topic,String clientid, MqttCallback callback) {
+        init();
         this.topicPort = new ArrayList<String>();
         topicPort.add(topic);
         this.clientid = clientid;
@@ -32,6 +39,7 @@ public class ClientMQTT {
     }
 
     public ClientMQTT(List<String> topic,String clientid, MqttCallback callback) {
+        init();
         this.topicPort = topic;
         this.clientid = clientid;
         this.callback = callback;

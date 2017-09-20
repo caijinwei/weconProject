@@ -2,11 +2,15 @@ package com.wecon.box.action;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.wecon.box.api.DeviceApi;
 import com.wecon.box.api.DriverApi;
 import com.wecon.box.api.FileStorageApi;
 import com.wecon.box.api.PlcInfoApi;
+import com.wecon.box.constant.ConstKey;
 import com.wecon.box.entity.*;
 import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.box.enums.OpTypeOption;
+import com.wecon.box.enums.ResTypeOption;
 import com.wecon.box.util.Base64Util;
 import com.wecon.box.util.DbLogUtil;
 import com.wecon.box.util.ServerMqtt;
@@ -37,6 +41,8 @@ public class DriverAction {
 
     @Autowired
     protected DriverApi driverApi;
+    @Autowired
+    protected DeviceApi deviceApi;
 
     @Autowired
     protected DbLogUtil dbLogUtil;
@@ -155,14 +161,14 @@ public class DriverAction {
     @Label("更新")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping("update")
-    public Output update(@RequestParam("updateType") Integer updateType, @RequestParam("device_id") long device_id, @RequestParam("machine_code") long machineCode, @RequestParam("versionName") String versionName, @RequestParam("version_code") String versionCode, @RequestParam("file_id") long file_id) {
+    public Output update(@RequestParam("updateType") Integer updateType, @RequestParam("device_id") long device_id,  @RequestParam("versionName") String versionName, @RequestParam("version_code") String versionCode, @RequestParam("file_id") long file_id) {
         if (updateType == 1) {
-            updateAllDriver(device_id, machineCode);
+            updateAllDriver(device_id);
         } else if (updateType == 2) {
-            dirFirmAction.updateFirm(versionName, versionCode, file_id, machineCode);
+            dirFirmAction.updateFirm(versionName, versionCode, file_id, device_id);
         } else if (updateType == 3) {
-            updateAllDriver(device_id, machineCode);
-            dirFirmAction.updateFirm(versionName, versionCode, file_id, machineCode);
+            updateAllDriver(device_id);
+            dirFirmAction.updateFirm(versionName, versionCode, file_id, device_id);
         }
         return new Output();
     }
@@ -174,11 +180,9 @@ public class DriverAction {
         if (device_id <= 0) {
             throw new BusinessException(ErrorCodeOption.UpdateDriver_ParamIs_Error.key, ErrorCodeOption.UpdateDriver_ParamIs_Error.value);
         }
-        HashMap<String, Driver> driverMap = new HashMap<String, Driver>();
-        HashMap<String, PlcInfo> plcInfoMap = new HashMap<String, PlcInfo>();
         List<PlcInfoDetail> plcList = plcInfoApi.getListPlcInfoDetail(device_id);
         for (PlcInfoDetail p : plcList) {
-            if (!driverMap.containsKey(p.driver)) {
+            if (p.state == 0) {
                 //获取driver表的 driver对象
                 Driver driver = driverApi.getDriverBydriver(p.driver);
                 //file_md5不相同 存入map 准备更新
@@ -198,10 +202,14 @@ public class DriverAction {
     @Label("plc更新驱动")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping("updateAllDriver")
-    public Output updateAllDriver(@RequestParam("device_id") long device_id, @RequestParam("machine_code") long machineCode) {
+    public Output updateAllDriver(@RequestParam("device_id") long device_id) {
         ServerMqtt server = null;
-        if (device_id <= 0 || machineCode <= 0) {
+        if (device_id <= 0) {
             throw new BusinessException(ErrorCodeOption.UpdateDriver_ParamIs_Error.key, ErrorCodeOption.UpdateDriver_ParamIs_Error.value);
+        }
+        Device deviceModel = deviceApi.getDevice(device_id);
+        if (deviceModel == null) {
+            throw new BusinessException(ErrorCodeOption.Device_NotFound.key, ErrorCodeOption.Device_NotFound.value);
         }
         HashMap<String, Driver> driverMap = new HashMap<String, Driver>();
         HashMap<String, PlcInfo> plcInfoMap = new HashMap<String, PlcInfo>();
@@ -232,7 +240,7 @@ public class DriverAction {
                 param.driver_type = plcInfoMap.get("plc_" + driverEntry.getKey()).type;
                 JSONObject data = new JSONObject();
                 data.put("act", 2008);
-                data.put("machine_code", machineCode);
+                data.put("machine_code", deviceModel.machine_code);
                 data.put("data", param);
                 data.put("feedback", 1);
 
@@ -244,7 +252,7 @@ public class DriverAction {
                     server.message.setQos(1);
                     server.message.setRetained(true);
                     server.message.setPayload(data.toString().getBytes());
-                    server.topic11 = server.client.getTopic("pibox/stc/" + machineCode);
+                    server.topic11 = server.client.getTopic(String.format(ConstKey.MQTT_SERVER_TOPICE, deviceModel.machine_code));
                     server.publish(server.topic11, server.message);
                 } catch (MqttException e) {
                     throw new BusinessException(ErrorCodeOption.Mqtt_Transport_Error.key, ErrorCodeOption.Mqtt_Transport_Error.value);

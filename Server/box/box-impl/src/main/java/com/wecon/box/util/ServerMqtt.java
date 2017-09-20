@@ -8,7 +8,7 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
  */
 public class ServerMqtt {
     //tcp://MQTT安装的服务器地址:MQTT定义的端口号
-    public static final String HOST = "tcp://192.168.29.186:1883";
+    private String HOST;
     //定义一个主题
 
     //定义MQTT的ID，可以在MQTT服务配置中指定
@@ -16,31 +16,42 @@ public class ServerMqtt {
 
     public MqttClient client;
     public MqttTopic topic11;
-    public String userName = "admin";
-    public String passWord = "password";
+    private String userName;
+    private String passWord;
 
     public MqttMessage message;
 
     /**
      * 构造函数
+     *
      * @throws MqttException
      */
     public ServerMqtt(String clientid) throws MqttException {
+        init();
         // MemoryPersistence设置clientid的保存形式，默认为以内存保存
         client = new MqttClient(HOST, clientid, new MemoryPersistence());
         connect();
     }
+
     /*
     * 构造函数
     * 默认clientId是server11
     * */
     public ServerMqtt() throws MqttException {
+        init();
         // MemoryPersistence设置clientid的保存形式，默认为以内存保存
-        client = new MqttClient(HOST, "server11", new MemoryPersistence());
-        connect();
+        /*client = new MqttClient(HOST, "server11", new MemoryPersistence());
+        connect();*/
     }
+
+    private void init() {
+        HOST = BoxWebConfigContext.boxWebConfig.getMqttHost();
+        userName = BoxWebConfigContext.boxWebConfig.getMqttUsername();
+        passWord = BoxWebConfigContext.boxWebConfig.getMqttPwd();
+    }
+
     /**
-     *  用来连接服务器
+     * 用来连接服务器
      */
     private void connect() {
         MqttConnectOptions options = new MqttConnectOptions();
@@ -62,13 +73,12 @@ public class ServerMqtt {
     }
 
     /**
-     *
      * @param topic
      * @param message
      * @throws MqttPersistenceException
      * @throws MqttException
      */
-    public void publish(MqttTopic topic , MqttMessage message) throws MqttPersistenceException,
+    public void publish(MqttTopic topic, MqttMessage message) throws MqttPersistenceException,
             MqttException {
         MqttDeliveryToken token = topic.publish(message);
         token.waitForCompletion();
@@ -80,7 +90,8 @@ public class ServerMqtt {
     }
 
     /**
-     *  启动入口
+     * 启动入口
+     *
      * @param args
      * @throws MqttException
      */
@@ -91,7 +102,7 @@ public class ServerMqtt {
         server.message.setRetained(true);
         server.message.setPayload("hello,topic11".getBytes());
         server.topic11 = server.client.getTopic("pibox");
-        server.publish(server.topic11 , server.message);
+        server.publish(server.topic11, server.message);
         /*
         * pibox/cts/<machine_code>/logs
         * */

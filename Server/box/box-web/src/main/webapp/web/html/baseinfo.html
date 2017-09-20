@@ -2,7 +2,7 @@
 <html lang="en" ng-app="weconweb">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>基本信息</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="../css/style.css"/>
     <link rel="stylesheet" href="../lib/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -535,12 +535,12 @@
         <!------------------------------------------------------------------------------------------------固件信息------------------------------------------------------------------------------------------------------->
         <div class="tab-pane" id="dev_firm">
             <!-- 基本信息展示-->
-            <div class="container-fluid" style="margin-top: 12px;font-size: 15px;">
+            <div class="container-fluid" style="margin-bottom: 12px;font-size: 15px;">
                 <div class="row" style="margin-top: 30px;">
                     <span class="col-md-1">操作</span>
                     <!--<div class="btn-group" style="margin-left: 10px;">-->
                     <button type="button" class="btn btn-info" data-toggle="modal" ng-click="checkUpdate()">
-                        查看固件更新
+                        检查更新
                     </button>
                 </div>
             </div>
@@ -561,14 +561,6 @@
                         <div class="row" style="margin-top: 30px;">
                             <span class="col-md-1">固件版本</span>
                             <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.f_ver}}</span>
-                        </div>
-                        <div class="row" style="margin-top: 30px;">
-                            <span class="col-md-1">更新时间</span>
-                            <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.create_date|date:'yyyy-MM-dd HH:mm:ss'}}</span>
-                        </div>
-                        <div class="row" style="margin-top: 30px;">
-                            <span class="col-md-1">创建时间</span>
-                            <span style="font-weight: bold;margin-left: 20px;">{{devFirmInfo.create_date|date:'yyyy-MM-dd HH:mm:ss'}}</span>
                         </div>
                     </div>
                 </div>
@@ -592,7 +584,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-info"
-                                    ng-click="update(infoData.machine_code)">更新
+                                    ng-click="update()">更新
                             </button>
                             <button type="button" class="btn btn-default"
                                     data-dismiss="modal">取消

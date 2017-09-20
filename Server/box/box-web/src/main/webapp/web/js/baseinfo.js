@@ -561,11 +561,13 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         }
         T.common.ajax.request("WeconBox", "dirFirmAction/getDirFirmInfoByDevId", params, function (data, code, msg) {
             if (code == 200) {
-                $scope.devFirmInfo = data.devFirmInfo;
-                console.log("固件对象", data.devFirmInfo);
-                //固件更新要用到
-                $scope.localVersionCode = data.devFirmInfo.f_ver;
-                $scope.$apply();
+                if(data.devFirmInfo!=null) {
+                    $scope.devFirmInfo = data.devFirmInfo;
+                    console.log("固件对象", data.devFirmInfo);
+                    //固件更新要用到
+                    $scope.localVersionCode = data.devFirmInfo.f_ver;
+                    $scope.$apply();
+                }
             }
             else {
                 $("#deletePlc").modal("hide");
@@ -623,7 +625,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         });
     }
     //更新操作
-    $scope.update= function (machine_code)
+    $scope.update= function ()
     {
         var device_id = $scope.device_id;
         var updateType=0;
@@ -644,7 +646,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         var params = {
             updateType:updateType,
             device_id: device_id,
-            machine_code:machine_code,
             versionName: versionName,
             version_code: version_code,
             file_id: file_id
@@ -752,7 +753,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             alert("ajax error");
         });
     }
-    $scope.updateFirFile = function (machine_code) {
+    $scope.updateFirFile = function (device_id) {
         var fileData = $scope.fileData;
         var versionName = fileData.version_name;
         var version_code = fileData.version_code;
@@ -761,7 +762,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             versionName: versionName,
             version_code: version_code,
             file_id: file_id,
-            machine_code: machine_code
+            device_id: device_id
         }
         if (machine_code == "" || machine_code == undefined || versionName == "" || versionName == undefined || version_code == "" || version_code == undefined || file_id == "" || file_id == undefined) {
             $("#checkUpdateFir").modal("hide");
