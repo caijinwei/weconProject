@@ -50,6 +50,7 @@ public enum ErrorCodeOption {
     Get_HisList_Error("获取历史数据配置列表失败",30006),
     Get_AlarmList_Error("获取报警数据配置列表失败",30007),
     Get_ActList_Error("获取实时数据配置列表失败",30008),
+    Name_Repetition ("该盒子下已存在该配置名称",30009),
     Is_Exist_PlcPort("通讯协议被占用",300012),
     Is_Not_Params_DeviceID("没有输入参数",300013),
     UpdateFalse_DeviceName_Remark("设备别名和备注保存失败",300014),

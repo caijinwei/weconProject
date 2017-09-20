@@ -456,7 +456,7 @@ public class ActDataAction {
 			realHisCfgFilter.addr_type = -1;
 			realHisCfgFilter.data_type = 0;
 			realHisCfgFilter.his_cycle = -1;
-			realHisCfgFilter.state = -1;
+			realHisCfgFilter.state = 3;
 			realHisCfgFilter.bind_state = 1;
 
 			realHisCfgFilter.account_id = client.userId;
@@ -473,7 +473,7 @@ public class ActDataAction {
 			viewAccountRoleFilter.cfg_type = 1;
 			viewAccountRoleFilter.data_type = 0;
 			viewAccountRoleFilter.role_type = -1;
-			viewAccountRoleFilter.state = -1;
+			viewAccountRoleFilter.state = 3;
 			realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(viewAccountRoleFilter, pageIndex, pageSize);
 		}
 		json.put("actAllotData", realHisCfgDeviceList);
@@ -716,6 +716,11 @@ public class ActDataAction {
 			RealHisCfg oldrealHisCfg = null;
 			RealHisCfg realHisCfg = null;
 			if (realHisCfgParam.id > 0) {
+				RealHisCfg oldre = realHisCfgApi.getRealHisCfg(realHisCfgParam.device_id, realHisCfgParam.name);
+				if (oldre != null && oldre.id != realHisCfgParam.id) {
+					throw new BusinessException(ErrorCodeOption.Name_Repetition.key,
+							ErrorCodeOption.Name_Repetition.value);
+				}
 				oldrealHisCfg = realHisCfgApi.getRealHisCfg(realHisCfgParam.id);
 				realHisCfg = realHisCfgApi.getRealHisCfg(realHisCfgParam.id);
 				realHisCfg.account_id = account_id;
@@ -779,6 +784,11 @@ public class ActDataAction {
 				json.put("success", 0);
 
 			} else {
+				RealHisCfg newre = realHisCfgApi.getRealHisCfg(realHisCfgParam.device_id, realHisCfgParam.name);
+				if (newre != null) {
+					throw new BusinessException(ErrorCodeOption.Name_Repetition.key,
+							ErrorCodeOption.Name_Repetition.value);
+				}
 				realHisCfg = new RealHisCfg();
 				realHisCfg.account_id = account_id;
 				realHisCfg.addr = realHisCfgParam.addr;

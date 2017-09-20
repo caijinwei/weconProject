@@ -114,11 +114,6 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
     }
 
     class SendvalueCallback implements MqttCallback {
-        /*WebSocketSession session;
-
-        public SendvalueCallback(WebSocketSession session) {
-            this.session = session;
-        }*/
 
         @Override
         public void connectionLost(Throwable arg0) {
@@ -306,7 +301,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
                 realHisCfgFilter.addr_type = -1;
                 realHisCfgFilter.data_type = 0;
                 realHisCfgFilter.his_cycle = -1;
-                realHisCfgFilter.state = -1;
+                realHisCfgFilter.state = 3;
                 realHisCfgFilter.bind_state = 1;
 
                 realHisCfgFilter.account_id = client.userId;
@@ -328,7 +323,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
                 viewAccountRoleFilter.cfg_type = 1;
                 viewAccountRoleFilter.data_type = 0;
                 viewAccountRoleFilter.role_type = -1;
-                viewAccountRoleFilter.state = -1;
+                viewAccountRoleFilter.state = 3;
                 if (!CommonUtils.isNullOrEmpty(bParams.get("acc_dir_id"))) {
                     viewAccountRoleFilter.dirId = Long.parseLong(bParams.get("acc_dir_id").toString());
                 }
