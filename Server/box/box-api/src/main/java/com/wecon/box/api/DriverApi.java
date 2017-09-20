@@ -6,6 +6,7 @@ import com.wecon.box.entity.Page;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by zengzhipeng on 2017/9/16.
@@ -27,6 +28,14 @@ public interface DriverApi {
      * @return
      */
     boolean saveDriver(Driver model);
+
+    /**
+     * 更新驱动，根据id
+     *
+     * @param model
+     * @return
+     */
+    boolean updateDriver(Driver model);
 
     /**
      * 获取驱动的分页列表
@@ -71,6 +80,12 @@ public interface DriverApi {
      */
     DriverDetail getDriverDetail(Long driver_id);
 
+    /**
+     * 获取下发给盒子的数据
+     * @param plcId
+     * @return
+     */
+    Map<String, Object> getDriverExtend(long plcId);
 
     /**
      * 删除驱动

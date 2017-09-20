@@ -52,7 +52,7 @@ public class DebugInfoHandler extends AbstractWebSocketHandler {
         * mqtt监听主题
         * */
         DebugInfoCallback debugInfoCallback = new DebugInfoCallback(session);
-        client = new ClientMQTT("pibox/cts/" + machine_code+"/logs", debugInfoCallback);
+        client = new ClientMQTT("pibox/cts/" + machine_code+"/logs", "debug"+session.getId(),debugInfoCallback);
         client.start();
     }
 

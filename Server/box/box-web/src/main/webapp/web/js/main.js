@@ -35,7 +35,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                     alert(code + " " + msg);
                 }
             });
-
     }
 
     $scope.logout = function () {
@@ -56,7 +55,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      */
     $scope.boundBox = function () {
         if ($("#acc_dir_id").val() == "" || $("#machine_code").val() == ""
-            || $("#dev_password").val() == ""|| $("#dev_name").val()=="") {
+            || $("#dev_password").val() == "" || $("#dev_name").val() == "") {
             alert("必填参数没有填写完整");
             return;
         }
@@ -90,6 +89,20 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                     $scope.allDatas = data.allData;
                     $scope.deviceDatas = data.allData.deviceList;
                     $scope.$apply();
+
+                    //绑定左侧盒子搜索的输入监听
+                    $('#searchinput').bind('input propertychange', function searchPIBox() {
+                        var keyWord = $('#searchinput').val();
+                        if (keyWord == "") {
+                            $scope.searchbox();
+                            return;
+                        }
+                        var boxList = $scope.getBoxList();
+                        var boxIds = $scope.getBoxIds();
+                        var searchBoxIds = $scope.searchByRegExp(keyWord, boxList, boxIds);
+                        $scope.showSearchItems(searchBoxIds);
+                    });
+
                 } else {
 
                     alert(code + "-" + msg);
@@ -184,6 +197,82 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             });
 
     }
+
+    /**
+     * 搜索盒子
+     */
+    $scope.searchPIBox = function () {
+        var keyWord = $('#searchinput').val();
+        var boxList = $scope.getBoxList();
+        var boxIds = $scope.getBoxIds();
+        var searchBoxIds = $scope.searchByRegExp(keyWord, boxList, boxIds);
+        $scope.showSearchItems(searchBoxIds);
+    }
+    /**
+     * 获取盒子名称的值的集合
+     * @returns {Array}
+     */
+    $scope.getBoxList = function () {
+        var boxList = new Array();
+        var i = 0;
+        $('#side_nav').find('li ul a').each(function () {
+            boxList[i++] = $(this).text();
+        });
+        return boxList;
+    }
+    /**
+     * 获取所有盒子元素的ID
+     * @returns {Array}
+     */
+    $scope.getBoxIds = function () {
+        var boxIds = new Array();
+        var i = 0;
+        $('#side_nav').find('li ul a').each(function () {
+            boxIds[i++] = $(this).attr('id');
+        });
+        return boxIds;
+    }
+    /**
+     * 正则匹配
+     * @param keyWord
+     * @param list
+     * @param boxIds
+     * @returns {Array}
+     */
+    $scope.searchByRegExp = function (keyWord, list, boxIds) {
+        if (!(list instanceof Array)) {
+            return;
+        }
+        var len = list.length;
+        var arr = [];
+        var reg = new RegExp(keyWord);
+        for (var i = 0; i < len; i++) {
+            //如果字符串中不包含目标字符会返回-1
+            if (list[i].match(reg)) {
+                arr.push(boxIds[i]);
+            }
+        }
+        return arr;
+    }
+    /**
+     * 显示被搜索项
+     * @param boxIds
+     */
+    $scope.showSearchItems = function (boxIds) {
+        $('#side_nav').find('li a').each(function () {
+            $(this).find('span').attr('class', 'glyphicon glyphicon-folder-close');
+        })
+        $('#side_nav').find('li ul').each(function () {
+            $(this).css('display', 'none');
+            $(this).children().css('display', 'none');
+        });
+        for (var i = 0; i < boxIds.length; i++) {
+            $("#" + boxIds[i]).parent().css('display', 'block');
+            $("#" + boxIds[i]).css('display', 'block');
+            $("#" + boxIds[i]).parent().prev('a').find('span').attr('class', 'glyphicon glyphicon-folder-open');
+        }
+    }
+
 });
 var fromDirId;
 // 允许拖拽
@@ -216,7 +305,7 @@ function drop(ev) {
 /**
  * 重新加载分组
  */
-function reloadBoxList(){
+function reloadBoxList() {
     var appElement = document.querySelector('[ng-controller=infoController]');
     var $scope = angular.element(appElement).scope();
     $scope.searchbox();

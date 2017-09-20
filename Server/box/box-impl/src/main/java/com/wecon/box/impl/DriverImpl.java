@@ -5,19 +5,21 @@ import com.wecon.box.constant.ConstKey;
 import com.wecon.box.entity.Driver;
 import com.wecon.box.entity.DriverDetail;
 import com.wecon.box.entity.Page;
+import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.util.BoxWebConfigContext;
 import com.wecon.common.redis.RedisManager;
 import com.wecon.common.util.CommonUtils;
+import com.wecon.restful.core.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Base64Utils;
 
+import java.sql.Blob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by zengzhipeng on 2017/9/16.
@@ -56,10 +58,24 @@ public class DriverImpl implements DriverApi {
     @Override
     public boolean saveDriver(Driver model) {
         String sql = "update driver set driver=?,file_id=?,file_md5=?,`description`=?,update_date=current_timestamp() where `type` = ? ";
-        if (jdbcTemplate.update(sql, new Object[]{model.driver, model.file_id, model.file_md5, model.type, model.description}) == 0) {
+        if (jdbcTemplate.update(sql, new Object[]{model.driver, model.file_id, model.file_md5, model.description, model.type}) == 0) {
             sql = "insert into driver(`driver`,file_id,file_md5,`type`,`description`,create_date,update_date) values (?,?,?,?,?,current_timestamp(),current_timestamp() );";
             jdbcTemplate.update(sql, new Object[]{model.driver, model.file_id, model.file_md5, model.type, model.description});
         }
+        return true;
+    }
+
+    @Override
+    public boolean updateDriver(Driver model) {
+        String sql = "select count(1) from driver where driver_id<>? and `type` = ?  ";
+        int ret = jdbcTemplate.queryForObject(sql,
+                new Object[]{model.driver_id, model.type},
+                Integer.class);
+        if (ret > 0) {
+            throw new BusinessException(ErrorCodeOption.DriverExisted.key, ErrorCodeOption.DriverExisted.value);
+        }
+        sql = "update driver set `driver`=?,file_id=?,file_md5=?,`description`=?,`type` = ?,update_date=current_timestamp() where driver_id=?";
+        jdbcTemplate.update(sql, new Object[]{model.driver, model.file_id, model.file_md5, model.description, model.type, model.driver_id});
         return true;
     }
 
@@ -139,6 +155,33 @@ public class DriverImpl implements DriverApi {
         if (!list.isEmpty()) {
             return list.get(0);
         }
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> getDriverExtend(long plcId){
+        String sql = "select d.machine_code, f.file_name, r.file_md5, f.file_data, r.type " +
+                "from device d, plc_info p, driver r, file_storage f " +
+                "where d.device_id=p.device_id and p.type=r.type and r.file_id=f.file_id and p.plc_id=?";
+        List<Map<String, Object>> list = jdbcTemplate.query(sql, new Object[]{plcId}, new RowMapper() {
+            @Override
+            public Map<String, Object> mapRow(ResultSet resultSet, int i) throws SQLException {
+                Map<String, Object> result = new HashMap<>();
+                result.put("machine_code", resultSet.getString("machine_code"));
+                result.put("file_name", resultSet.getString("file_name"));
+                result.put("file_md5", resultSet.getString("file_md5"));
+                Blob blob = resultSet.getBlob("file_data");
+                int blobLength = (int) blob.length();
+                result.put("file_base64", Base64Utils.encodeToString(blob.getBytes(1, blobLength)));
+                blob.free();
+                result.put("driver_type", resultSet.getString("type"));
+                return result;
+            }
+        });
+        if(!list.isEmpty()){
+            return list.get(0);
+        }
+
         return null;
     }
 

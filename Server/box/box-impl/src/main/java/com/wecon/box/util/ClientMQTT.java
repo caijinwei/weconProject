@@ -3,6 +3,8 @@ package com.wecon.box.util;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
@@ -12,8 +14,8 @@ public class ClientMQTT {
 
 
     public static final String HOST = "tcp://192.168.29.186:1883";
-    public String topicPort = "topic11";
-    private static final String clientid = "client11";
+    public List<String> topicPort;
+    private  String clientid ;
     private MqttClient client;
     private MqttConnectOptions options;
     private String userName = "admin";
@@ -22,9 +24,23 @@ public class ClientMQTT {
     //回调函数  获取到监听的信息
     private MqttCallback callback;
 
-    public ClientMQTT(String topic, MqttCallback callback) {
-        this.topicPort = topic;
+    public ClientMQTT(String topic,String clientid, MqttCallback callback) {
+        this.topicPort = new ArrayList<String>();
+        topicPort.add(topic);
+        this.clientid = clientid;
         this.callback = callback;
+    }
+
+    public ClientMQTT(List<String> topic,String clientid, MqttCallback callback) {
+        this.topicPort = topic;
+        this.clientid = clientid;
+        this.callback = callback;
+    }
+
+    public boolean isConnected(){
+        if(client == null || !client.isConnected())
+            return false;
+        return true;
     }
 
     public void start() {
@@ -45,19 +61,45 @@ public class ClientMQTT {
             options.setKeepAliveInterval(20);
             // 设置回调
             client.setCallback(callback);
-            MqttTopic topic = client.getTopic(topicPort);
+//            MqttTopic topic = client.getTopic(topicPort);
             //setWill方法，如果项目中需要知道客户端是否掉线可以调用该方法。设置最终端口的通知消息
-            options.setWill(topic, "close".getBytes(), 2, true);
+//            options.setWill(topic, "close".getBytes(), 2, true);
 
             client.connect(options);
             //订阅消息
             int[] Qos = {1};
-            String[] topic1 = {topicPort};
-            client.subscribe(topic1, Qos);
+            String[] topics = new String[topicPort.size()];
+            topicPort.toArray(topics);
+            client.subscribe(topics, Qos);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void subscribe(String topic) throws MqttException {
+        if(client==null  || !client.isConnected()){
+            start();
+        }
+        //订阅消息
+        int[] Qos = {1};
+        topicPort.add(topic);
+        String[] topics = new String[topicPort.size()];
+        topicPort.toArray(topics);
+        client.subscribe(topics, Qos);
+    }
+
+    public void publish(String topic,String message) throws MqttException {
+        if(client==null  || !client.isConnected()){
+            start();
+        }
+        //发布消息
+        MqttTopic mqttTopic = client.getTopic(topic);
+        MqttMessage mqttMessage = new MqttMessage();
+        mqttMessage.setQos(2);
+        mqttMessage.setRetained(true);
+        mqttMessage.setPayload(message.getBytes());
+        mqttTopic.publish(mqttMessage);
     }
 
     public void close() throws MqttException {
@@ -66,7 +108,7 @@ public class ClientMQTT {
     }
 
     public static void main(String[] args) throws MqttException {
-        ClientMQTT client = new ClientMQTT("pibox/stc/2222/", new PushCallback());
-        client.start();
+//        ClientMQTT client = new ClientMQTT("pibox/stc/2222/", new PushCallback());
+//        client.start();
     }
 }

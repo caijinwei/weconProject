@@ -36,6 +36,8 @@ public enum ErrorCodeOption {
     //检查更新相关（固件，驱动升级）
     FirmwareExisted("此版本固件已经存在", 13000),
     FirmwareNotExist("操作的固件不存在", 13001),
+    DriverExisted("此驱动名已经被使用", 13002),
+    DriverNotExist("操作的驱动不存在", 13003),
 
     PiBoxDevice_IsNot_Found("盒子不存在",300009),
     Account_Permissions_No("账户权限不足，无法新增盒子", 30001),
@@ -48,6 +50,7 @@ public enum ErrorCodeOption {
     Get_HisList_Error("获取历史数据配置列表失败",30006),
     Get_AlarmList_Error("获取报警数据配置列表失败",30007),
     Get_ActList_Error("获取实时数据配置列表失败",30008),
+    Name_Repetition ("该盒子下已存在该配置名称",30009),
     Is_Exist_PlcPort("通讯协议被占用",300012),
     Is_Not_Params_DeviceID("没有输入参数",300013),
     UpdateFalse_DeviceName_Remark("设备别名和备注保存失败",300014),
@@ -69,7 +72,7 @@ public enum ErrorCodeOption {
     Get_Groupid_Error("获取数组ID错误",50001),
 	
     Monitor_Existed("该分组下已经存在该监控点",60001),
-	Get_Data_Error("获取参数异常",60002);
+	Get_Data_Error("获取参数异常",60002) ;
 
     public int value;
     public String key;

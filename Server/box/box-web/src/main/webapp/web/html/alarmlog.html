@@ -17,7 +17,7 @@
 
 </head>
 <body ng-controller="infoController" ng-init="onInit()"
-	style="margin-top: 20px;">
+	style="margin-top: 20px;display: none;">
 	<ol class="breadcrumb">
 		<li><a href="overview.html">主页</a></li>
 		<li class="active">{{devicename}}</li>
@@ -32,7 +32,7 @@
 			href="historydata.html?device_id={{deviceid}}&device_name={{devicename}}">历史数据</a></li>
 		<!-- <li ng-if="accounttype==1 && deviceid>0"><a
 			href="remotedownload.html?device_id={{deviceid}}&device_name={{devicename}}">远程下载</a></li> -->
-		<li ng-cloak ng-if="accounttype==1 && deviceid>0"><a
+		<li ng-if="accounttype==1 && deviceid>0"><a
 			href="baseinfo.html?device_id={{deviceid}}&device_name={{devicename}}">基本配置</a></li>
 	</ul>
 	<div class="container-fluid">
@@ -463,48 +463,6 @@
 											class="col-md-3">小数位数</span><input type="text"
 											class="col-md-3" style="height: 30px;" id="decid" />
 									</div>
-									<!-- <div id="datadigits" class="row col-md-11 col-md-offset-1"
-										style="margin: 10px 0; display: none;">
-										<div id="div-integer">
-											<span class="col-md-3">整数位数</span> <select id="integerdigits"
-												class="col-md-3" style="height: 30px;" onchange="getData()">
-
-											</select>
-										</div>
-										<div id="div-decimal">
-											<span class="col-md-3">小数位数</span> <select id="decimaldigits"
-												class="col-md-3" style="height: 30px;"
-												onchange="calcuSystem()">
-
-											</select>
-										</div>
-									</div> -->
-									<!-- <div class="row col-md-11 col-md-offset-1"
-										style="margin: 10px 0;">
-										<div id="data-range">
-											<span class="col-md-3">地址范围</span> <input type="text"
-												class="col-md-9" style="height: 30px; padding-left: 5px;"
-												id="rangid" disabled />
-										</div>
-									</div>
-									<div class="row col-md-11 col-md-offset-1"
-										style="margin: 10px 0;">
-										<span class="col-md-3">地址</span><input id="addrid" type="text"
-											class="col-md-9" style="height: 30px; padding-left: 5px;" />
-									</div>
-									<div class="row col-md-11 col-md-offset-1"
-										style="margin: 10px 0;">
-										<span class="col-md-3">数据格式</span> <select id="datatypeid"
-											class="col-md-9" style="height: 30px;">
-											<option ng-repeat="x in dataTypes" value="{{x.value}}">{{x.text}}</option>
-										</select>
-									</div>
-									<div class="row col-md-11 col-md-offset-1" id="datadigitid"
-										style="margin: 10px 0;">
-										<span class="col-md-3">整数/小数位数</span> <input type="text"
-											class="col-md-9" style="height: 30px; padding-left: 5px;"
-											value="1" id="dataid" />
-									</div> -->
 									<div id="bitsetting" class="row col-md-11 col-md-offset-1"
 										style="margin: 10px 0;">
 										<span class="col-md-3">位设置</span> <label class="radio-inline">

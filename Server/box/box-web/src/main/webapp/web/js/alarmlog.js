@@ -8,6 +8,14 @@ appModule
 								.getParameter("device_id");
 						$scope.devicename = T.common.util
 								.getParameter("device_name");
+						//获取用户权限
+						T.common.ajax.request("WeconBox",
+								"user/userinfo", new Object(),function(data, code, msg) {
+									$scope.accounttype = data.type;
+									$scope.$apply();
+									$("body").css("display","block");
+								});
+
 						$scope.getDataType();
 						$scope.paginationConf_current = {
 							currentPage : 1,
@@ -55,6 +63,7 @@ appModule
 							// alert("当前日期是：" + ev.date.valueOf());
 						});
 
+
 					}
 
 					$scope.paginationConf_current = {
@@ -89,7 +98,6 @@ appModule
 										function(data, code, msg) {
 											if (code == 200) {
 												$scope.alarmcurrents = data.alarmHisData.list;
-												$scope.accounttype = data.type;
 												$scope.paginationConf_current.totalItems = data.alarmHisData.totalRecord;
 												$scope.$apply();
 

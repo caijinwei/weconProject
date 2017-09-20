@@ -125,7 +125,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         var params = {
             drivers: angular.toJson(driverList)
         }
-        console.log(params);
         T.common.ajax.request("WeconBox", "driveraction/savedriver", params, function (data, code, msg) {
             if (code == 200) {
                 alert("操作成功");
