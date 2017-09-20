@@ -91,6 +91,7 @@ public class SignupEmailAction extends UserBaseAction {
             user.email = map.get(param.token);
             accountApi.updateAccountEmail(user);
             //<editor-fold desc="操作日志">
+
             dbLogUtil.updOperateLog(OpTypeOption.EmailActive, ResTypeOption.Account, user.account_id, oldUser, user);
             //</editor-fold>
             return new Output();

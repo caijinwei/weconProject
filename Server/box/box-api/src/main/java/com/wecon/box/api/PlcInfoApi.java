@@ -73,6 +73,13 @@ public interface PlcInfoApi {
 	boolean batchUpdateState(final List<String[]> updList);
 
 	/**
+	 * 批量更新file_md5
+	 * @param updList
+	 * @return
+     */
+	boolean batchUpdateFileMd5(final List<String[]> updList);
+
+	/**
 	 * 批量删除Plc
 	 * @param ids
 	 * @return

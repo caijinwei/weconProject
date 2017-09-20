@@ -9,6 +9,7 @@ import com.wecon.box.console.util.MqttConfigContext;
 import com.wecon.box.console.util.SpringContextHolder;
 import com.wecon.box.constant.Constant;
 import com.wecon.box.entity.*;
+import com.wecon.box.util.Base64Util;
 import com.wecon.box.util.Converter;
 import com.wecon.box.util.GroupOp;
 import com.wecon.common.util.CommonUtils;
@@ -35,8 +36,10 @@ public class BoxNotifyTask extends Thread {
     private final int ACT_UPDATE_ALARM_DATA_CONFIG = 2003; //更新报警数据配置
     private final int ACT_DELETE_MONITOR_CONFIG = 2004; //删除监控点配置
     private final int ACT_DELETE_PLC_CONFIG = 2005; //删除通讯口配置
+    private final int ACT_SEND_DRIVER_FILE = 2008; //下发驱动文件
 
     private final int UPD_STATE_SUCCESS = 1;
+    private final int UPD_STATE_GET_DRIVER = 0;
     private static final Logger logger = LogManager.getLogger(BoxNotifyTask.class);
     private static int sleepTime = 1000 * 30;
 
@@ -272,6 +275,33 @@ public class BoxNotifyTask extends Thread {
     }
 
     /**
+     * 下发驱动文件
+     * @param plcId
+     */
+    private synchronized void sendDriverFileHandle(long plcId){
+        try {
+            logger.info("sendDriverInfoHandle，开始从DB获取数据");
+            DriverApi driverApi = SpringContextHolder.getBean(DriverApi.class);
+            Map<String, Object> driverInfo = driverApi.getDriverExtend(plcId);
+            if(null != driverInfo){
+                BaseMsgResp<Map<String, Object>> baseMsgResp = new BaseMsgResp<Map<String, Object>>();
+                baseMsgResp.setAct(ACT_SEND_DRIVER_FILE);
+                baseMsgResp.setFeedback(BaseMsgResp.TYPE_FEEDBACK_NEED);
+                String machine_code = driverInfo.get("machine_code").toString();
+                baseMsgResp.setMachine_code(machine_code);
+                baseMsgResp.setData(driverInfo);
+                //发布数据给盒子
+                publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+machine_code);
+                logger.info("sendDriverInfoHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.error("sendDriverInfoHandle，通知盒子失败，"+e.getMessage());
+        }
+    }
+
+    /**
      * 处理盒子返回的消息
      * @param message
      */
@@ -295,7 +325,23 @@ public class BoxNotifyTask extends Thread {
             switch (fbAct){
                 case ACT_UPDATE_PLC_CONFIG : //更新通讯口配置反馈
                     List<Map> updComList = fbData.get("upd_com_list");
-                    plcInfoApi.batchUpdateState(getFeedbackUpdArgs(updComList, "com"));
+                    if(null != updComList && updComList.size() > 0){
+                        for(Map m : updComList){
+                            try {
+                                int upd_state = Integer.parseInt(m.get("upd_state").toString());
+                                long plcId = Long.parseLong(m.get("com").toString());
+                                if(UPD_STATE_GET_DRIVER == upd_state){
+                                    sendDriverFileHandle(plcId);
+                                }
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                        List<String[]> fUpdArgs = getFeedbackUpdArgs(updComList, "com");
+                        plcInfoApi.batchUpdateState(fUpdArgs);
+                        plcInfoApi.batchUpdateFileMd5(fUpdArgs);
+                    }
+
                     break;
                 case ACT_UPDATE_REAL_HISTORY_CONFIG : //更新实时和历史监控点配置
                     List<Map> updRealHisCfgList = fbData.get("upd_real_his_cfg_list");
@@ -326,6 +372,9 @@ public class BoxNotifyTask extends Thread {
                     realHisCfgApi.batchDeleteByPlcId(plcIds);
                     alarmCfgDataApi.batchDeleteByPlcId(plcIds);
                     realHisCfgDataApi.batchDeleteByPlcId(plcIds);
+                    break;
+                case ACT_SEND_DRIVER_FILE : //下发驱动文件
+
                     break;
             }
         }catch (NumberFormatException e){
