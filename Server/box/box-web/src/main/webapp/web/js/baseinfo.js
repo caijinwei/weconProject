@@ -27,6 +27,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 
                 //固件更新时候要用到
                 $scope.dev_model = data.device.dev_model;
+
                 $scope.accounttype = data.userType;
                 var map = data.device.map;
                 if (map != "" && map != null) {
@@ -582,8 +583,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     $scope.checkUpdate= function () {
         var localVersionCode = $scope.localVersionCode;
         var dev_model = $scope.dev_model;
-        if (dev_model == "" || dev_model == undefined || localVersionCode == "" || localVersionCode == undefined) {
-            alert("系统错误");
+        if(dev_model==""||dev_model==undefined){
+            alert("无法获取可更新设备类型");
+            return;
+        }
+        if(localVersionCode==""||localVersionCode==undefined){
+            alert("无法获取本地版本号");
             return;
         }
         var device_id = $scope.device_id;

@@ -161,7 +161,7 @@ public class DriverAction {
     @Label("更新")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping("update")
-    public Output update(@RequestParam("updateType") Integer updateType, @RequestParam("device_id") long device_id,  @RequestParam("versionName") String versionName, @RequestParam("version_code") String versionCode, @RequestParam("file_id") long file_id) {
+    public Output update(@RequestParam("updateType") Integer updateType, @RequestParam("device_id") long device_id, @RequestParam("versionName") String versionName, @RequestParam("version_code") String versionCode, @RequestParam("file_id") long file_id) {
         if (updateType == 1) {
             updateAllDriver(device_id);
         } else if (updateType == 2) {
@@ -181,6 +181,12 @@ public class DriverAction {
             throw new BusinessException(ErrorCodeOption.UpdateDriver_ParamIs_Error.key, ErrorCodeOption.UpdateDriver_ParamIs_Error.value);
         }
         List<PlcInfoDetail> plcList = plcInfoApi.getListPlcInfoDetail(device_id);
+       //没有配置plc就显示不更新
+        if (plcList == null) {
+            JSONObject data = new JSONObject();
+            data.put("isUpdate", false);
+            return new Output(data);
+        }
         for (PlcInfoDetail p : plcList) {
             if (p.state == 0) {
                 //获取driver表的 driver对象
