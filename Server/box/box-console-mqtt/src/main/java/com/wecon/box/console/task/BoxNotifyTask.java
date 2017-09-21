@@ -43,7 +43,7 @@ public class BoxNotifyTask extends Thread {
     private final int UPD_STATE_GET_DRIVER = 0;
     private static final Logger logger = LogManager.getLogger(BoxNotifyTask.class);
     private static int sleepTime = 1000 * 30;
-
+    private static int publishSleepTime = 100;
     public void run() {
         logger.info("BoxNotifyTask run start");
         while (true) {
@@ -96,6 +96,8 @@ public class BoxNotifyTask extends Thread {
                         //发布数据给盒子
                         publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
                         logger.info("updatePlcCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
+                        //防止发布过于频繁
+                        Thread.sleep(publishSleepTime);
                     }
                 }
             }
@@ -136,6 +138,8 @@ public class BoxNotifyTask extends Thread {
                         //发布数据给盒子
                         publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
                         logger.info("updateRealHisCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
+                        //防止发布过于频繁
+                        Thread.sleep(publishSleepTime);
                     }
                 }
             }
@@ -175,6 +179,8 @@ public class BoxNotifyTask extends Thread {
                         //发布数据给盒子
                         publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
                         logger.info("updateAlarmCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
+                        //防止发布过于频繁
+                        Thread.sleep(publishSleepTime);
                     }
                 }
             }
@@ -217,30 +223,37 @@ public class BoxNotifyTask extends Thread {
     }
 
     private synchronized void deleteRealHisCfgPublish(List<Map> cfgList, int delType){
-        Map<String, List<Map>> groupCfgMap = GroupOp.groupCfgByMachineCode(cfgList);
-        if(null != groupCfgMap){
-            for(Map.Entry<String, List<Map>> entry : groupCfgMap.entrySet()){
-                BaseMsgResp<Map<String, List<Map>>> baseMsgResp = new BaseMsgResp<Map<String, List<Map>>>();
-                baseMsgResp.setAct(ACT_DELETE_MONITOR_CONFIG);
-                baseMsgResp.setFeedback(BaseMsgResp.TYPE_FEEDBACK_NEED);
-                baseMsgResp.setMachine_code(entry.getKey());
-                Map<String, List<Map>> cfgComMap = GroupOp.groupCfgFilterByCom(entry.getValue(), "addr_id", "upd_time");
-                List<Map> cfgComList = new ArrayList<Map>();
-                for(Map.Entry<String, List<Map>> cfgEntry : cfgComMap.entrySet()){
-                    Map m = new HashMap();
-                    m.put("com", cfgEntry.getKey());
-                    m.put("del_type", delType);
-                    m.put("cfg_id_list", cfgEntry.getValue());
-                    cfgComList.add(m);
+        try {
+            Map<String, List<Map>> groupCfgMap = GroupOp.groupCfgByMachineCode(cfgList);
+            if(null != groupCfgMap){
+                for(Map.Entry<String, List<Map>> entry : groupCfgMap.entrySet()){
+                    BaseMsgResp<Map<String, List<Map>>> baseMsgResp = new BaseMsgResp<Map<String, List<Map>>>();
+                    baseMsgResp.setAct(ACT_DELETE_MONITOR_CONFIG);
+                    baseMsgResp.setFeedback(BaseMsgResp.TYPE_FEEDBACK_NEED);
+                    baseMsgResp.setMachine_code(entry.getKey());
+                    Map<String, List<Map>> cfgComMap = GroupOp.groupCfgFilterByCom(entry.getValue(), "addr_id", "upd_time");
+                    List<Map> cfgComList = new ArrayList<Map>();
+                    for(Map.Entry<String, List<Map>> cfgEntry : cfgComMap.entrySet()){
+                        Map m = new HashMap();
+                        m.put("com", cfgEntry.getKey());
+                        m.put("del_type", delType);
+                        m.put("cfg_id_list", cfgEntry.getValue());
+                        cfgComList.add(m);
+                    }
+                    Map<String, List<Map>> realHisCfgResp = new HashMap<String, List<Map>>();
+                    realHisCfgResp.put("del_cfg_list", cfgComList);
+                    baseMsgResp.setData(realHisCfgResp);
+                    //发布数据给盒子
+                    publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
+                    logger.info("deleteAllCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
+                    //防止发布过于频繁
+                    Thread.sleep(publishSleepTime);
                 }
-                Map<String, List<Map>> realHisCfgResp = new HashMap<String, List<Map>>();
-                realHisCfgResp.put("del_cfg_list", cfgComList);
-                baseMsgResp.setData(realHisCfgResp);
-                //发布数据给盒子
-                publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
-                logger.info("deleteAllCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
             }
+        }catch (Exception e){
+
         }
+
     }
 
     /**
@@ -266,6 +279,8 @@ public class BoxNotifyTask extends Thread {
                         //发布数据给盒子
                         publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
                         logger.info("deletePlcCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
+                        //防止发布过于频繁
+                        Thread.sleep(publishSleepTime);
                     }
                 }
             }
@@ -469,7 +484,7 @@ public class BoxNotifyTask extends Thread {
     private void publish(String message, String serverTopic){
         MqttTopic mqttTopic = mqttClient.getTopic(serverTopic);
         MqttMessage mqttMessage = new MqttMessage();
-        mqttMessage.setQos(2);
+        mqttMessage.setQos(0);
         mqttMessage.setRetained(true);
         mqttMessage.setPayload(message.getBytes());
         PublishTask publishTask = new PublishTask(mqttTopic, mqttMessage);
