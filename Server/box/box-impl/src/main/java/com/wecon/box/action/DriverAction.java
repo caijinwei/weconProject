@@ -150,6 +150,13 @@ public class DriverAction {
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping("checkUpdate")
     public Output checkUpdate(@RequestParam("dev_model") String dev_model, @RequestParam("localVersionCode") String localVserionCode, @RequestParam("device_id") long device_id) {
+        Device device=deviceApi.getDevice(device_id);
+        if(device==null){
+            throw new BusinessException(ErrorCodeOption.Device_NotFound.key,ErrorCodeOption.Device_NotFound.value);
+        }
+        if(device.state!=1){
+            throw new BusinessException(ErrorCodeOption.Device_State_Is_Disconnect.key,ErrorCodeOption.Device_State_Is_Disconnect.value);
+        }
         Object driverData = checkUpdatePlcDriver(device_id).getResult();
         Object firmData = dirFirmAction.getLatestFirmVersion(dev_model, localVserionCode).getResult();
         JSONObject data = new JSONObject();
@@ -162,6 +169,7 @@ public class DriverAction {
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping("update")
     public Output update(@RequestParam("updateType") Integer updateType, @RequestParam("device_id") long device_id, @RequestParam("versionName") String versionName, @RequestParam("version_code") String versionCode, @RequestParam("file_id") long file_id) {
+        int isUpdated=1;
         if (updateType == 1) {
             updateAllDriver(device_id);
         } else if (updateType == 2) {
@@ -169,8 +177,12 @@ public class DriverAction {
         } else if (updateType == 3) {
             updateAllDriver(device_id);
             dirFirmAction.updateFirm(versionName, versionCode, file_id, device_id);
+        }else{
+            isUpdated=0;
         }
-        return new Output();
+        JSONObject data=new JSONObject();
+        data.put("isUpdated",isUpdated);
+        return new Output(data);
     }
 
     @Label("遍历plc检查是否要更新驱动")
@@ -242,6 +254,9 @@ public class DriverAction {
                 param.file_base64 = Base64Util.encode(file.file_data);
                 param.file_name = file.file_name;
                 param.file_md5 = file.file_md5;
+                param.com=plcInfoMap.get("plc_" + driverEntry.getKey()).plc_id+"";
+                param.upd_time=plcInfoMap.get("plc_"+driverEntry.getKey()).update_date+"";
+
                 //取plcMap下的对应的type
                 param.driver_type = plcInfoMap.get("plc_" + driverEntry.getKey()).type;
                 JSONObject data = new JSONObject();
@@ -278,6 +293,8 @@ public class DriverAction {
 
 class DriverFileParam {
     public String file_name;
+    public String com;
+    public String upd_time;
     public String file_md5;
     public String file_base64;
     public String driver_type;

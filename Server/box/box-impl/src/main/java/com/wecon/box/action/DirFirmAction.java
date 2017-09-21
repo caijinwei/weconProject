@@ -129,10 +129,10 @@ public class DirFirmAction {
 
 
         JSONObject msg = new JSONObject();
-        msg.put("act", 20007);
+        msg.put("act", 2007);
         msg.put("machine_code", deviceModel.machine_code);
         msg.put("data", file);
-        msg.put("feedback", 0);
+        msg.put("feedback", 1);
 
         try {
             if (mqttServer == null) {

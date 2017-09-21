@@ -66,6 +66,7 @@ public enum ErrorCodeOption {
     Driver_IsNot_Fount("通讯口配置失败，该驱动不存在",300024),
     UpdateDriver_ParamIs_Error("更新驱动文件失败",300025),
     Mqtt_Disconnect_Error("mqtt关闭失败",300023),
+    Device_State_Is_Disconnect("盒子离线",300024),
 
 
 
