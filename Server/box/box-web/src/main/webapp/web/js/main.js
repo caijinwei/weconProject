@@ -14,6 +14,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                     $scope.username = data.username;
                     $scope.type = data.type;
                     $scope.$apply();
+                    $("i[name='i_box']").tooltip();
                     if (data.type == 1) {
                         $scope.searchbox();
                     } else if (data.type == 2) {
@@ -89,6 +90,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                     $scope.allDatas = data.allData;
                     $scope.deviceDatas = data.allData.deviceList;
                     $scope.$apply();
+                    $("i[name='i_box']").tooltip();
 
                     //绑定左侧盒子搜索的输入监听
                     $('#searchinput').bind('input propertychange', function searchPIBox() {
