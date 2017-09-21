@@ -1,7 +1,9 @@
 package com.wecon.box.websocket;
 
+import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.util.ClientMQTT;
 import com.wecon.box.util.DebugInfoCallback;
+import com.wecon.restful.core.BusinessException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -37,7 +39,13 @@ public class UpdateFileHandler extends AbstractWebSocketHandler {
         machine_code = message.getPayload();
 
         String messageNum=message.getPayload();
-
+        if(message==null){
+            throw new BusinessException(ErrorCodeOption.WebSocket_Update_ClientError.key,ErrorCodeOption.WebSocket_Update_ClientError.value);
+        }
+        Integer msgNum=Integer.parseInt(messageNum);
+        if(msgNum<=0){
+            throw new BusinessException(ErrorCodeOption.WebSocket_Update_ClientError.key,ErrorCodeOption.WebSocket_Update_ClientError.value);
+        }
         /*
         * mqtt监听主题
         * */
@@ -74,8 +82,6 @@ public class UpdateFileHandler extends AbstractWebSocketHandler {
 
         logger.debug("关闭连接");
     }
-
-
 
 }
 class UpdateFileCallback implements MqttCallback {

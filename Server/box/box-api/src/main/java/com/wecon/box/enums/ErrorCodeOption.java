@@ -67,6 +67,7 @@ public enum ErrorCodeOption {
     UpdateDriver_ParamIs_Error("更新驱动文件失败",300025),
     Mqtt_Disconnect_Error("mqtt关闭失败",300023),
     Device_State_Is_Disconnect("盒子离线",300024),
+    WebSocket_Update_ClientError("websocket监听异常",300025),
 
 
 

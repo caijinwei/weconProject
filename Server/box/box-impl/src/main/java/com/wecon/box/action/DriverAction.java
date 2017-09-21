@@ -164,7 +164,6 @@ public class DriverAction {
         data.put("firmData", firmData);
         return new Output(data);
     }
-
     @Label("更新")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping("update")

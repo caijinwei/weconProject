@@ -652,7 +652,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         }else{
             var versionName = "";
             var version_code = "";
-            var file_id = 0;
+            var file_id = '0';
         }
         var params = {
             updateType: updateType,
