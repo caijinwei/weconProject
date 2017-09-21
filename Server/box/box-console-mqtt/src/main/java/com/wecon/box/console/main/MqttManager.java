@@ -24,8 +24,8 @@ public class MqttManager {
 		ApplicationContext applicationContext = new ClassPathXmlApplicationContext("spring.xml");
 		BoxNotifyTask notifyTask = new BoxNotifyTask();
 		notifyTask.start();
-		MonitorTask monitorTask = new MonitorTask();
-		monitorTask.start();
+		/*MonitorTask monitorTask = new MonitorTask();
+		monitorTask.start();*/
 		// GetPublishClient
 		// getPublishClient=applicationContext.getBean(GetPublishClient.class);
 		// MqttClient client=getPublishClient.conMqtt();

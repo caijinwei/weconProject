@@ -2,6 +2,7 @@ package com.wecon.box.console.task;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.wecon.box.api.*;
 import com.wecon.box.console.config.ConnectOptions;
@@ -317,14 +318,14 @@ public class BoxNotifyTask extends Thread {
 
         try {
             //使用Map泛型主要是为了兼容所有类型反馈，比较灵活
-            BaseMsgFeedback<Map<String, List<Map>>> baseMsgFeedback =  JSON.parseObject(message,
-                    new TypeReference<BaseMsgFeedback<Map<String, List<Map>>>>(){});
+            BaseMsgFeedback<Map<String, Object>> baseMsgFeedback =  JSON.parseObject(message,
+                    new TypeReference<BaseMsgFeedback<Map<String, Object>>>(){});
             int fbAct = baseMsgFeedback.getFeedback_act();
-            Map<String, List<Map>> fbData = baseMsgFeedback.getData();
-            logger.info("接收盒子反馈消息，feedback_act："+fbAct+"。"+message);
+            Map<String, Object> fbData = baseMsgFeedback.getData();
+            //logger.info("接收盒子反馈消息，feedback_act："+fbAct+"。"+message);
             switch (fbAct){
                 case ACT_UPDATE_PLC_CONFIG : //更新通讯口配置反馈
-                    List<Map> updComList = fbData.get("upd_com_list");
+                    List<Map> updComList = (List<Map>)fbData.get("upd_com_list");
                     if(null != updComList && updComList.size() > 0){
                         for(Map m : updComList){
                             try {
@@ -344,27 +345,33 @@ public class BoxNotifyTask extends Thread {
 
                     break;
                 case ACT_UPDATE_REAL_HISTORY_CONFIG : //更新实时和历史监控点配置
-                    List<Map> updRealHisCfgList = fbData.get("upd_real_his_cfg_list");
+                    List<Map> updRealHisCfgList = (List<Map>)fbData.get("upd_real_his_cfg_list");
                     realHisCfgApi.batchUpdateState(getFeedbackUpdArgs(updRealHisCfgList, "addr_id"));
                     break;
                 case ACT_UPDATE_ALARM_DATA_CONFIG : //更新报警数据配置
-                    List<Map> updAlarmCfgList = fbData.get("upd_alarm_cfg_list");
+                    List<Map> updAlarmCfgList = (List<Map>)fbData.get("upd_alarm_cfg_list");
                     alarmCfgApi.batchUpdateState(getFeedbackUpdArgs(updAlarmCfgList, "addr_id"));
                     break;
                 case ACT_DELETE_MONITOR_CONFIG : //删除监控点配置
-                    List<Map> delCfgList = fbData.get("del_cfg_list");
+                    List<Map> delCfgList = (List<Map>)fbData.get("del_cfg_list");
                     List<Long> alarmCfgIds = alarmCfgApi.getDeleteIdsByUpdTime(getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_ALARM));
                     List<Long> realCfgIds = realHisCfgApi.getDeleteIdsByUpdTime(getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_REAL));
                     List<Long> hisCfgIds = realHisCfgApi.getDeleteIdsByUpdTime(getFeedbackDelArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_HISTORY));
-                    realCfgIds.addAll(hisCfgIds);
+                    List<Long> realHisCfgIds = new ArrayList<Long>();
+                    if(null != realCfgIds){
+                        realHisCfgIds.addAll(realCfgIds);
+                    }
+                    if(null != hisCfgIds){
+                        realHisCfgIds.addAll(hisCfgIds);
+                    }
                     //删除监控点配置、数据
-                    realHisCfgApi.batchDeleteById(realCfgIds);
-                    realHisCfgDataApi.batchDeleteById(realCfgIds);
+                    realHisCfgApi.batchDeleteById(realHisCfgIds);
+                    realHisCfgDataApi.batchDeleteById(realHisCfgIds);
                     alarmCfgApi.batchDeleteById(alarmCfgIds);
                     alarmCfgDataApi.batchDeleteById(alarmCfgIds);
                     break;
                 case ACT_DELETE_PLC_CONFIG : //删除通讯口配置
-                    List<Map> delComList = fbData.get("del_com_list");
+                    List<Map> delComList = (List<Map>)fbData.get("del_com_list");
                     List<Long> plcIds = plcInfoApi.getDeleteIdsByUpdTime(getFeedbackDelArgs(delComList, "com", 5));
                     //删除通讯口数据，实时历史报警配置、数据
                     plcInfoApi.batchDeletePlc(plcIds);
@@ -374,7 +381,16 @@ public class BoxNotifyTask extends Thread {
                     realHisCfgDataApi.batchDeleteByPlcId(plcIds);
                     break;
                 case ACT_SEND_DRIVER_FILE : //下发驱动文件
-
+                    String file_md5 = fbData.get("file_md5").toString();
+                    String upd_state = fbData.get("upd_state").toString();
+                    String upd_time = fbData.get("upd_time").toString();
+                    String com = fbData.get("com").toString();
+                    if(UPD_STATE_SUCCESS == Integer.parseInt(upd_state)){
+                        List<String[]> fUpdArgs = new ArrayList<String[]>();
+                        fUpdArgs.add(new String[]{Constant.State.STATE_SYNCED_BOX+"", com, upd_time});
+                        plcInfoApi.batchUpdateState(fUpdArgs);
+                        plcInfoApi.batchUpdateFileMd5(fUpdArgs);
+                    }
                     break;
             }
         }catch (NumberFormatException e){
@@ -478,7 +494,7 @@ public class BoxNotifyTask extends Thread {
     public class SubscribeCallback implements MqttCallback {
         public void connectionLost(Throwable cause) {
             // 连接丢失后，一般在这里面进行重连
-            logger.info("连接断开，可以做重连");
+            //logger.info("连接断开，可以做重连");
         }
 
         public void deliveryComplete(IMqttDeliveryToken token) {
@@ -487,7 +503,7 @@ public class BoxNotifyTask extends Thread {
 
         public void messageArrived(String topic, MqttMessage message) throws Exception {
             // subscribe后得到的消息会执行到这里面
-            logger.info("接收消息内容 : "+ new String(message.getPayload()));
+            logger.info("接收盒子反馈消息 : "+ new String(message.getPayload()));
             callBackHandle(new String(message.getPayload()));
         }
     }
