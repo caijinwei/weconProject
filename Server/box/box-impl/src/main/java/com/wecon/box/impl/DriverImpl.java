@@ -9,6 +9,7 @@ import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.util.BoxWebConfigContext;
 import com.wecon.common.redis.RedisManager;
 import com.wecon.common.util.CommonUtils;
+import com.wecon.common.util.TimeUtil;
 import com.wecon.restful.core.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -160,9 +161,9 @@ public class DriverImpl implements DriverApi {
 
     @Override
     public Map<String, Object> getDriverExtend(long plcId){
-        String sql = "select d.machine_code, f.file_name, r.file_md5, f.file_data, r.type " +
+        String sql = "select d.machine_code, f.file_name, r.file_md5, f.file_data, p.type, p.plc_id, p.update_date " +
                 "from device d, plc_info p, driver r, file_storage f " +
-                "where d.device_id=p.device_id and p.type=r.type and r.file_id=f.file_id and p.plc_id=?";
+                "where d.device_id=p.device_id and p.driver=r.driver and r.file_id=f.file_id and p.plc_id=?";
         List<Map<String, Object>> list = jdbcTemplate.query(sql, new Object[]{plcId}, new RowMapper() {
             @Override
             public Map<String, Object> mapRow(ResultSet resultSet, int i) throws SQLException {
@@ -175,6 +176,8 @@ public class DriverImpl implements DriverApi {
                 result.put("file_base64", Base64Utils.encodeToString(blob.getBytes(1, blobLength)));
                 blob.free();
                 result.put("driver_type", resultSet.getString("type"));
+                result.put("com", resultSet.getLong("plc_id")+"");
+                result.put("upd_time", TimeUtil.getYYYYMMDDHHMMSSDate(resultSet.getTimestamp("update_date")));
                 return result;
             }
         });

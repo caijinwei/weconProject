@@ -173,7 +173,7 @@ public class PlcInfoImpl implements PlcInfoApi {
 
     @Override
     public List<PlcExtend> getPlcExtendListByState(Object... state){
-        String sql = "select p.*, d.machine_code, r.file_md5 from plc_info p, device d, driver r where p.device_id = d.device_id and p.type = r.type";
+        String sql = "select p.*, d.machine_code, r.file_md5 as f_md5  from device d, plc_info p left join  driver r on p.driver = r.driver where p.device_id = d.device_id ";
         if(null != state && state.length > 0){
             sql += " and p.state in (";
             StringBuffer inSb = new StringBuffer();
@@ -226,7 +226,7 @@ public class PlcInfoImpl implements PlcInfoApi {
             inSb.append(",").append(ss[1]);
         }
 
-        final List<String> fileMd5List = jdbcTemplate.query("select r.file_md5 from driver r, plc_info p where r.type=p.type and p.plc_id in("+inSb.substring(1)+")", new RowMapper() {
+        final List<String> fileMd5List = jdbcTemplate.query("select r.file_md5 from driver r, plc_info p where r.driver=p.driver and p.plc_id in("+inSb.substring(1)+")", new RowMapper() {
             @Override
             public String mapRow(ResultSet resultSet, int i) throws SQLException {
                 return resultSet.getString("file_md5");
@@ -242,7 +242,7 @@ public class PlcInfoImpl implements PlcInfoApi {
             public void setValues(PreparedStatement ps, int i)throws SQLException {
                 try {
                     String[] arg = updList.get(i);
-                    ps.setInt(1, Integer.parseInt(fileMd5List.get(i)));
+                    ps.setString(1, fileMd5List.get(i));
                     ps.setInt(2, Integer.parseInt(arg[1]));
                     ps.setString(3, arg[2]);
                 }catch (Exception e){
@@ -456,7 +456,7 @@ public class PlcInfoImpl implements PlcInfoApi {
             model.update_date = rs.getTimestamp("update_date");
             model.upd_time = TimeUtil.getYYYYMMDDHHMMSSDate(model.update_date);
             model.machine_code = rs.getString("machine_code");
-            model.file_md5 = rs.getString("file_md5");
+            model.file_md5 = rs.getString("f_md5");
             return model;
         }
     }

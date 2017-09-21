@@ -589,7 +589,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	@Override
 	public List<RealHisCfgExtend> getRealHisCfgListByState(Object... state) {
 		String sql = "select " + SEL_COL
-				+ ",d.machine_code from real_his_cfg r ,device d, plc_info p where d.device_id=p.device_id and p.plc_id=r.plc_id";
+				+ ",d.machine_code from real_his_cfg r ,device d where d.device_id=r.device_id ";
 		if (null != state && state.length > 0) {
 			sql += " and r.state in (";
 			StringBuffer inSb = new StringBuffer();
