@@ -644,23 +644,21 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             $("#checkUpdateFir").modal("hide");
             return;
         }
-        if ($scope.fileData != "" && $scope.fileData != undefined) {
-            var fileData = $scope.fileData;
-            var versionName = fileData.version_name;
-            var version_code = fileData.version_code;
-            var file_id = fileData.file_id;
-        }else{
-            var versionName = "";
-            var version_code = "";
-            var file_id = 0;
-        }
         var params = {
             updateType: updateType,
-            device_id: device_id,
-            versionName: versionName,
-            version_code: version_code,
-            file_id: file_id
+            device_id: device_id
         }
+        if ($scope.fileData != "" && $scope.fileData != undefined) {
+            var fileData = $scope.fileData;
+            params["versionName"] = fileData.version_name;
+            params["version_code"] = fileData.version_code;
+            params["file_id"] = fileData.file_id;
+        }else{
+            params["versionName"] =  "";
+            params["version_code"] = "";
+            params["file_id"] = "0";
+        }
+
         console.log("参数是：", params);
         T.common.ajax.request("WeconBox", "driveraction/update", params, function (data, code, msg) {
             if (code == 200) {
