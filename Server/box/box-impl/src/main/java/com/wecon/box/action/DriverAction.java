@@ -164,12 +164,17 @@ public class DriverAction {
         data.put("firmData", firmData);
         return new Output(data);
     }
-
     @Label("更新")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
+/*
+*    params["versionName"] = fileData.version_name;
+            params["version_code"] = fileData.version_code;
+            params["file_id"] = fileData.file_id;
+* */
     @RequestMapping("update")
-    public Output update(@RequestParam("updateType") Integer updateType, @RequestParam("device_id") long device_id, @RequestParam("versionName") String versionName, @RequestParam("version_code") String versionCode, @RequestParam("file_id") long file_id) {
+    public Output update(@RequestParam("updateType") Integer updateType, @RequestParam(value="device_id" ) long device_id, @RequestParam(value = "versionName",defaultValue = "0") String versionName, @RequestParam(value="version_code",defaultValue = "0") String versionCode, @RequestParam(value="file_id",defaultValue = "0") long file_id) {
         int isUpdated=1;
+        System.out.println("获取到的----------------------------------------------------"+updateType);
         if (updateType == 1) {
             updateAllDriver(device_id);
         } else if (updateType == 2) {

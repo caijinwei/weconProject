@@ -104,7 +104,7 @@ public class DirFirmAction {
 
     @Label("更新固件")
     @RequestMapping("updateFirmFile")
-    public Output updateFirm(@RequestParam("versionName") String versionName, @RequestParam("version_code") String versionCode, @RequestParam("file_id") long file_id, @RequestParam("device_id") Long device_id) {
+    public Output updateFirm(@RequestParam(value = "versionName",defaultValue = "") String versionName, @RequestParam("version_code") String versionCode, @RequestParam("file_id") long file_id, @RequestParam("device_id") Long device_id) {
         if (file_id <= 0) {
             throw new BusinessException(ErrorCodeOption.FileId_Is_Error.key, ErrorCodeOption.FileId_Is_Error.value);
         }

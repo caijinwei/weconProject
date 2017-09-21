@@ -54,6 +54,14 @@ public class DeviceImpl implements DeviceApi {
 
     @Override
     public long saveDevice(final Device model) {
+        String sql = "select count(1) from device where machine_code = ? ";
+
+        int ret = jdbcTemplate.queryForObject(sql, new Object[]{model.machine_code},
+                Integer.class);
+        if (ret > 0) {
+            throw new BusinessException(ErrorCodeOption.Device_Code_Is_Be_Used.key,
+                    ErrorCodeOption.Device_Code_Is_Be_Used.value);
+        }
         KeyHolder key = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
@@ -80,7 +88,15 @@ public class DeviceImpl implements DeviceApi {
 
     @Override
     public boolean updateDevice(final Device model) {
-        String sql = "update device set machine_code=?,password=?,dev_model=?,`name`=?,remark=?,map=?,state=?,dir_id=?,update_date=current_timestamp() where device_id=?";
+        String sql = "select count(1) from device where machine_code = ? and device_id<>? ";
+
+        int ret = jdbcTemplate.queryForObject(sql, new Object[]{model.machine_code, model.device_id},
+                Integer.class);
+        if (ret > 0) {
+            throw new BusinessException(ErrorCodeOption.Device_Code_Is_Be_Used.key,
+                    ErrorCodeOption.Device_Code_Is_Be_Used.value);
+        }
+        sql = "update device set machine_code=?,password=?,dev_model=?,`name`=?,remark=?,map=?,state=?,dir_id=?,update_date=current_timestamp() where device_id=?";
         jdbcTemplate.update(sql, new Object[]{model.machine_code, model.password, model.dev_model, model.name,
                 model.remark, model.map, model.state, model.dir_id, model.device_id});
         return true;

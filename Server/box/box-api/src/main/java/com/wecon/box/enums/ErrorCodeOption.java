@@ -39,6 +39,9 @@ public enum ErrorCodeOption {
     DriverExisted("此驱动名已经被使用", 13002),
     DriverNotExist("操作的驱动不存在", 13003),
 
+    //设备
+    Device_Code_Is_Be_Used("设备机器码已使用", 14001),
+
     PiBoxDevice_IsNot_Found("盒子不存在",300009),
     Account_Permissions_No("账户权限不足，无法新增盒子", 30001),
     Device_NotFound("该设备不存在",30002),
@@ -67,6 +70,7 @@ public enum ErrorCodeOption {
     UpdateDriver_ParamIs_Error("更新驱动文件失败",300025),
     Mqtt_Disconnect_Error("mqtt关闭失败",300023),
     Device_State_Is_Disconnect("盒子离线",300024),
+    WebSocket_Update_ClientError("websocket监听异常",300025),
 
 
 
