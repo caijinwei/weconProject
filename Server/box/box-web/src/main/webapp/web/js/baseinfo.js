@@ -606,10 +606,11 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $("#checkUpdateFir").modal("show");
                 $scope.driverIsUpdate = data.driverData.isUpdate;
                 $scope.firmIsUpdate = data.firmData.isNewVersion;
+                console.log(data.firmData.isNewVersion);
                 console.log("固件需要更新么", data.firmData.isNewVersion);
 
                 //提示信息
-                if ($scope.driverIsUpdate || $scope.firmIsUpdate) {
+                if ($scope.driverIsUpdate=="true" || $scope.firmIsUpdate=="true") {
                     //用于展示提示内容
                     $("#noticeDiv").empty();
                     $("#noticeDiv").prepend('<div>确定更新</div>');
@@ -634,33 +635,27 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     $scope.update = function () {
         var device_id = $scope.device_id;
         var updateType = 0;
-        if ($scope.driverIsUpdate && $scope.firmIsUpdate) {
+        if ($scope.driverIsUpdate=="true" && $scope.firmIsUpdate=="true") {
             updateType = 3;
-        } else if ($scope.driverIsUpdate) {
+        } else if ($scope.driverIsUpdate=="true") {
             updateType = 1;
-        } else if ($scope.firmIsUpdate) {
+        } else if ($scope.firmIsUpdate=="true") {
             updateType = 2
         } else {
             $("#checkUpdateFir").modal("hide");
             return;
         }
-        if ($scope.fileData != "" && $scope.fileData != undefined) {
-            var fileData = $scope.fileData;
-            var versionName = fileData.version_name;
-            var version_code = fileData.version_code;
-            var file_id = fileData.file_id;
-        }else{
-            var versionName = "";
-            var version_code = "";
-            var file_id = '0';
-        }
         var params = {
             updateType: updateType,
-            device_id: device_id,
-            versionName: versionName,
-            version_code: version_code,
-            file_id: file_id
+            device_id: device_id
         }
+        if ($scope.fileData != "" && $scope.fileData != undefined) {
+            var fileData = $scope.fileData;
+            params["versionName"] = fileData.version_name;
+            params["version_code"] = fileData.version_code;
+            params["file_id"] = fileData.file_id;
+        }
+
         console.log("参数是：", params);
         T.common.ajax.request("WeconBox", "driveraction/update", params, function (data, code, msg) {
             if (code == 200) {

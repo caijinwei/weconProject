@@ -141,9 +141,9 @@
 			<ul id="side_nav" ng-cloak ng-if="type==1">
 				<li><a id="customid" ng-click="custom()"
 					href="datamonitor.html?device_id=-100&device_name=自定义监控点"
-					target="content_frame"> 
+					target="content_frame">
 					<span
-						class="glyphicon glyphicon-eye-open " id="customspanid"  > 自定义监控点</span>
+						class="glyphicon glyphicon-eye-open " id="customspanid"> 自定义监控点</span>
 				</a></li>
 
 				<li ng-repeat="x in allDatas"><a href="#"
@@ -157,7 +157,7 @@
 							href="datamonitor.html?device_id={{y.deviceId}}&device_name={{y.deviceName}}"
 							id="{{y.deviceId}}" draggable="true" ondragstart="drag(event)"
 							ng-click="selectbox(y.deviceId)" class="list-group-item"
-							target="content_frame" ng-repeat="y in x.deviceList"><i class="fa  fa-circle" ng-class="{true:'onlineIcon',false:'offlineIcon'}[y.deviceState==1]" data-toggle="tooltip" title="{{y.deviceState==1?'在线':'离线'}}"></i>{{y.deviceName}}</a>
+							target="content_frame" ng-repeat="y in x.deviceList"><i name="i_box" class="fa  fa-circle" ng-class="{true:'onlineIcon',false:'offlineIcon'}[y.deviceState==1]" data-toggle="tooltip" title="{{y.deviceState==1?'在线':'离线'}}"></i>{{y.deviceName}}</a>
 					</ul></li>
 
 			</ul>
