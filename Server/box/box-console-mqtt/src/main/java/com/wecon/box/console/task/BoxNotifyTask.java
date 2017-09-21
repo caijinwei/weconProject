@@ -484,7 +484,7 @@ public class BoxNotifyTask extends Thread {
     private void publish(String message, String serverTopic){
         MqttTopic mqttTopic = mqttClient.getTopic(serverTopic);
         MqttMessage mqttMessage = new MqttMessage();
-        mqttMessage.setQos(0);
+        mqttMessage.setQos(0); 
         mqttMessage.setRetained(true);
         mqttMessage.setPayload(message.getBytes());
         PublishTask publishTask = new PublishTask(mqttTopic, mqttMessage);
