@@ -339,7 +339,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			public Object mapRow(ResultSet resultSet, int i) throws SQLException {
 				AlarmCfgExtend model = new AlarmCfgExtend();
 				model.alarmcfg_id = resultSet.getLong("alarmcfg_id");
-				model.upd_time = TimeUtil.getYYYYMMDDHHMMSSDate(model.update_date);
+				model.upd_time = TimeUtil.getYYYYMMDDHHMMSSDate(resultSet.getTimestamp("update_date"));
 				return model;
 			}
 		});

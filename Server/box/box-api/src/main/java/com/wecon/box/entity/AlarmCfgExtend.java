@@ -13,7 +13,8 @@ public class AlarmCfgExtend extends AlarmCfg{
     public String machine_code;
     public List<AlarmTrigger> condition_list;
 
-    public static String[] UPDATE_ALARM_FIELD_FILTER = new String[]{"com","addr_id", "upd_time", "data_id", "name", "addr", "addr_type", "text", "condition_type", "condition_list", "rid"};
+    public static String[] UPDATE_ALARM_FIELD_FILTER = new String[]{"com","addr_id", "upd_time", "data_id", "name", "addr", "addr_type",
+            "text", "condition_type", "condition_list", "rid", "digit_count", "digit_binary", "data_limit"};
 
     public String getMachine_code() {
         return machine_code;

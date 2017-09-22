@@ -677,7 +677,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 					public Object mapRow(ResultSet resultSet, int i) throws SQLException {
 						RealHisCfgExtend model = new RealHisCfgExtend();
 						model.id = resultSet.getLong("id");
-						model.upd_time = TimeUtil.getYYYYMMDDHHMMSSDate(model.update_date);
+						model.upd_time = TimeUtil.getYYYYMMDDHHMMSSDate(resultSet.getTimestamp("update_date"));
 						return model;
 					}
 				});

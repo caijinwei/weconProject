@@ -18,7 +18,7 @@ public class Constant {
         public static final int STATE_NEW_CONFIG = 1;
 
         /**
-         * 更新配置
+         * 更新配置，没有修改驱动
          */
         public static final int STATE_UPDATE_CONFIG = 2;
 
@@ -26,6 +26,11 @@ public class Constant {
          * 删除配置
          */
         public static final int STATE_DELETE_CONFIG = 3;
+
+        /**
+         * 更新配置，有修改驱动
+         */
+        public static final int STATE_UPDATE_CONFIG_PD = 4;
     }
 
     public class DataType{

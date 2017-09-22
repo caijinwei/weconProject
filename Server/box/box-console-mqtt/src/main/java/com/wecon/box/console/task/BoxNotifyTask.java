@@ -24,13 +24,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by zengzhipeng on 2017/9/2.
  */
 public class BoxNotifyTask extends Thread {
     public static MqttClient mqttClient;
-    private final String clientId = "WECON_BOX_NOTIFY";
+    private final String clientId = "WECON_BOX_NOTIFY_A";
     private String serverTopicPrefix = "pibox/stc/";
     private final int ACT_UPDATE_PLC_CONFIG = 2001; //更新通讯口配置
     private final int ACT_UPDATE_REAL_HISTORY_CONFIG = 2002; //更新实时和历史监控点配置
@@ -41,9 +42,14 @@ public class BoxNotifyTask extends Thread {
 
     private final int UPD_STATE_SUCCESS = 1;
     private final int UPD_STATE_GET_DRIVER = 0;
-    private static final Logger logger = LogManager.getLogger(BoxNotifyTask.class);
+
     private static int sleepTime = 1000 * 30;
     private static int publishSleepTime = 100;
+
+    private Map<Long, PlcExtend> plcCfgCache = new ConcurrentHashMap<Long, PlcExtend>();
+
+    private static final Logger logger = LogManager.getLogger(BoxNotifyTask.class);
+
     public void run() {
         logger.info("BoxNotifyTask run start");
         while (true) {
@@ -83,6 +89,7 @@ public class BoxNotifyTask extends Thread {
             List<PlcExtend> plcExtendLst = plcInfoApi.getPlcExtendListByState(Constant.State.STATE_UPDATE_CONFIG, Constant.State.STATE_NEW_CONFIG);
             logger.info("updatePlcCfgHandle，获取更新条数："+(null==plcExtendLst?"0":plcExtendLst.size()));
             if(null != plcExtendLst){
+                putPlcCache(plcExtendLst);
                 Map<String, List<Map>> groupPlcExtends = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(plcExtendLst), PlcExtend.UPDATE_PLC_FIELD_FILTER);
                 if(null != groupPlcExtends){
                     for(Map.Entry<String, List<Map>> entry : groupPlcExtends.entrySet()){
@@ -356,8 +363,25 @@ public class BoxNotifyTask extends Thread {
                         List<String[]> fUpdArgs = getFeedbackUpdArgs(updComList, "com");
                         plcInfoApi.batchUpdateState(fUpdArgs);
                         plcInfoApi.batchUpdateFileMd5(fUpdArgs);
-                    }
 
+                        //状态为4的删除监控点下的配置
+                        List<Long> plcIds = plcInfoApi.getDeleteIdsByUpdTime(getFeedbackDelArgs(updComList, "com", null));
+                        for(Long id : plcIds){
+                            for(Map.Entry<Long, PlcExtend> entry : plcCfgCache.entrySet()){
+                                PlcExtend p = entry.getValue();
+                                if(id == p.plc_id && p.state != Constant.State.STATE_UPDATE_CONFIG_PD){
+                                    plcIds.remove(id);
+                                }
+                            }
+                        }
+                        alarmCfgApi.batchDeleteByPlcId(plcIds);
+                        realHisCfgApi.batchDeleteByPlcId(plcIds);
+                        alarmCfgDataApi.batchDeleteByPlcId(plcIds);
+                        realHisCfgDataApi.batchDeleteByPlcId(plcIds);
+
+                        //删除缓存数据
+                        removePlcCache(fUpdArgs);
+                    }
                     break;
                 case ACT_UPDATE_REAL_HISTORY_CONFIG : //更新实时和历史监控点配置
                     List<Map> updRealHisCfgList = (List<Map>)fbData.get("upd_real_his_cfg_list");
@@ -387,7 +411,7 @@ public class BoxNotifyTask extends Thread {
                     break;
                 case ACT_DELETE_PLC_CONFIG : //删除通讯口配置
                     List<Map> delComList = (List<Map>)fbData.get("del_com_list");
-                    List<Long> plcIds = plcInfoApi.getDeleteIdsByUpdTime(getFeedbackDelArgs(delComList, "com", 5));
+                    List<Long> plcIds = plcInfoApi.getDeleteIdsByUpdTime(getFeedbackDelArgs(delComList, "com", null));
                     //删除通讯口数据，实时历史报警配置、数据
                     plcInfoApi.batchDeletePlc(plcIds);
                     alarmCfgApi.batchDeleteByPlcId(plcIds);
@@ -396,7 +420,6 @@ public class BoxNotifyTask extends Thread {
                     realHisCfgDataApi.batchDeleteByPlcId(plcIds);
                     break;
                 case ACT_SEND_DRIVER_FILE : //下发驱动文件
-                    String file_md5 = fbData.get("file_md5").toString();
                     String upd_state = fbData.get("upd_state").toString();
                     String upd_time = fbData.get("upd_time").toString();
                     String com = fbData.get("com").toString();
@@ -435,7 +458,7 @@ public class BoxNotifyTask extends Thread {
         return null;
     }
 
-    private List<String[]> getFeedbackDelArgs(List<Map> delCfgList, String idKey, int delType){
+    private List<String[]> getFeedbackDelArgs(List<Map> delCfgList, String idKey, Integer delType){
         if(null != delCfgList){
             List<String[]> delArgList = new ArrayList<String[]>();
             for(Map m : delCfgList){
@@ -444,7 +467,7 @@ public class BoxNotifyTask extends Thread {
                         Object delTypeOj = m.get("del_type");
                         String id = m.get(idKey).toString();
                         String updTime = m.get("upd_time").toString();
-                        if(null != delTypeOj){
+                        if(null != delTypeOj && null != delType){
                             if(Integer.parseInt(delTypeOj.toString()) == delType){
                                 delArgList.add(new String[]{id, updTime});
                             }
@@ -459,6 +482,30 @@ public class BoxNotifyTask extends Thread {
             return delArgList;
         }
         return null;
+    }
+
+    private void putPlcCache(List<PlcExtend> plcExtendLst){
+        if(null == plcExtendLst || plcExtendLst.size() == 0){
+            return;
+        }
+        for(PlcExtend p : plcExtendLst){
+            plcCfgCache.put(p.plc_id, p);
+        }
+    }
+
+    private void removePlcCache(List<String[]> fUpdArgs){
+        if(null == fUpdArgs || fUpdArgs.size() == 0){
+            return;
+        }
+        for(Map.Entry<Long, PlcExtend> entry : plcCfgCache.entrySet()){
+            Long plc_id = entry.getValue().plc_id;
+            for(String[] args : fUpdArgs){
+                if(Long.parseLong(args[1]) == plc_id){
+                    plcCfgCache.remove(plc_id);
+                    break;
+                }
+            }
+        }
     }
 
     /**
