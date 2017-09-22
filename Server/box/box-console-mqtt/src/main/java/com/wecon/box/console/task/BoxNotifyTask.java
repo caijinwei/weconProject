@@ -366,18 +366,20 @@ public class BoxNotifyTask extends Thread {
 
                         //状态为4的删除监控点下的配置
                         List<Long> plcIds = plcInfoApi.getDeleteIdsByUpdTime(getFeedbackDelArgs(updComList, "com", null));
-                        for(Long id : plcIds){
-                            for(Map.Entry<Long, PlcExtend> entry : plcCfgCache.entrySet()){
-                                PlcExtend p = entry.getValue();
-                                if(id == p.plc_id && p.state != Constant.State.STATE_UPDATE_CONFIG_PD){
-                                    plcIds.remove(id);
+                        if(null != plcIds){
+                            for(Long id : plcIds){
+                                for(Map.Entry<Long, PlcExtend> entry : plcCfgCache.entrySet()){
+                                    PlcExtend p = entry.getValue();
+                                    if(id == p.plc_id && p.state != Constant.State.STATE_UPDATE_CONFIG_PD){
+                                        plcIds.remove(id);
+                                    }
                                 }
                             }
+                            alarmCfgApi.batchDeleteByPlcId(plcIds);
+                            realHisCfgApi.batchDeleteByPlcId(plcIds);
+                            alarmCfgDataApi.batchDeleteByPlcId(plcIds);
+                            realHisCfgDataApi.batchDeleteByPlcId(plcIds);
                         }
-                        alarmCfgApi.batchDeleteByPlcId(plcIds);
-                        realHisCfgApi.batchDeleteByPlcId(plcIds);
-                        alarmCfgDataApi.batchDeleteByPlcId(plcIds);
-                        realHisCfgDataApi.batchDeleteByPlcId(plcIds);
 
                         //删除缓存数据
                         removePlcCache(fUpdArgs);
