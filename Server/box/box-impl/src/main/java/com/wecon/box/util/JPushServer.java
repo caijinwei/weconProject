@@ -2,6 +2,8 @@ package com.wecon.box.util;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.wecon.restful.core.AppContext;
+import com.wecon.restful.core.Client;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -27,7 +29,8 @@ public class JPushServer {
      * 推送操作
      */
     public void push(String alert){
-        String alias = "77eb2c71e2094aa4aa6a57897c0bd8a6";//声明别名
+        Client client = AppContext.getSession().client;
+        String alias = client.userId+"";//声明别名
         try{
             String result = push(pushUrl, alias, alert, appKey, masterSecret, apns_production, time_to_live);
             System.out.print(result);

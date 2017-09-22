@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class BoxNotifyTask extends Thread {
     public static MqttClient mqttClient;
-    private final String clientId = "WECON_BOX_NOTIFY_A";
+    private final String clientId = "WECON_BOX_NOTIFY";
     private String serverTopicPrefix = "pibox/stc/";
     private final int ACT_UPDATE_PLC_CONFIG = 2001; //更新通讯口配置
     private final int ACT_UPDATE_REAL_HISTORY_CONFIG = 2002; //更新实时和历史监控点配置
