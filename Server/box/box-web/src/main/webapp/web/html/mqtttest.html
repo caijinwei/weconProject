@@ -113,8 +113,8 @@
                 $("#subscribe").show();
 
                 client = mqtt.connect('ws://' + host + ':' + port + '', {
-                    username: "admin",
-                    password: "password"
+                    username: $("#mqtt-username").val(),
+                    password: $("#mqtt-pwd").val()
                 });
                 client.on('connect', function () {
 
@@ -163,6 +163,14 @@
         <div class="form-group">
             <label class="sr-only" for="mqtt-port">MQTT Port</label>
             <input type="text" class="form-control" id="mqtt-port" placeholder="MQTT Port" value="9001">
+        </div>
+        <div class="form-group">
+            <label class="sr-only" for="mqtt-port">MQTT User</label>
+            <input type="text" class="form-control" id="mqtt-username" placeholder="MQTT User" value="admin">
+        </div>
+        <div class="form-group">
+            <label class="sr-only" for="mqtt-port">MQTT Pwd</label>
+            <input type="text" class="form-control" id="mqtt-pwd" placeholder="MQTT Pwd" value="password">
         </div>
         <button type="button" class="btn btn-primary" id="connectBtn">连接</button>
         <button type="button" class="btn btn-danger" id="disconnectBtn">断开</button>

@@ -1,5 +1,7 @@
 package com.wecon.box.util;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
@@ -11,11 +13,11 @@ import java.util.concurrent.ScheduledExecutorService;
  * Created by caijinw on 2017/9/13.
  */
 public class ClientMQTT {
+    private static final Logger logger = LogManager.getLogger(ClientMQTT.class.getName());
 
-
-    private String HOST ;
+    private String HOST;
     public List<String> topicPort;
-    private  String clientid ;
+    private String clientid;
     private MqttClient client;
     private MqttConnectOptions options;
     private String userName;
@@ -30,24 +32,28 @@ public class ClientMQTT {
         passWord = BoxWebConfigContext.boxWebConfig.getMqttPwd();
     }
 
-    public ClientMQTT(String topic,String clientid, MqttCallback callback) {
+    public ClientMQTT(String topic, String clientid, MqttCallback callback) {
         init();
         this.topicPort = new ArrayList<String>();
         topicPort.add(topic);
-        this.clientid = clientid;
+        int randomInt = (int) ((Math.random() * 9 + 1) * 100000);
+        this.clientid = clientid + "_" + randomInt;
         this.callback = callback;
+        logger.debug("mqtt clientid:" + this.clientid);
     }
 
-    public ClientMQTT(List<String> topic,String clientid, MqttCallback callback) {
+    public ClientMQTT(List<String> topic, String clientid, MqttCallback callback) {
         init();
         this.topicPort = topic;
-        this.clientid = clientid;
+        int randomInt = (int) ((Math.random() * 9 + 1) * 100000);
+        this.clientid = clientid + "_" + randomInt;
         this.callback = callback;
     }
 
-    public boolean isConnected(){
-        if(client == null || !client.isConnected())
+    public boolean isConnected() {
+        if (client == null || !client.isConnected())
             return false;
+        logger.debug("mqtt is Connected,clientId:" + this.clientid);
         return true;
     }
 
@@ -86,7 +92,7 @@ public class ClientMQTT {
     }
 
     public void subscribe(String topic) throws MqttException {
-        if(client==null  || !client.isConnected()){
+        if (client == null || !client.isConnected()) {
             start();
         }
         //订阅消息
@@ -97,8 +103,8 @@ public class ClientMQTT {
         client.subscribe(topics, Qos);
     }
 
-    public void publish(String topic,String message) throws MqttException {
-        if(client==null  || !client.isConnected()){
+    public void publish(String topic, String message) throws MqttException {
+        if (client == null || !client.isConnected()) {
             start();
         }
         //发布消息
