@@ -233,7 +233,7 @@ public class DriverAction {
             return new Output(data);
         }
         for (PlcInfoDetail p : plcList) {
-            if (p.state == 0) {
+//            if (p.state == 0) {
                 //获取driver表的 driver对象
                 Driver driver = driverApi.getDriverBydriver(p.driver);
                 //file_md5不相同 存入map 准备更新
@@ -243,7 +243,7 @@ public class DriverAction {
                     return new Output(data);
                 }
             }
-        }
+//        }
         JSONObject data = new JSONObject();
         data.put("isUpdate", false);
         return new Output(data);
@@ -313,7 +313,7 @@ public class DriverAction {
                 } catch (MqttException e) {
                     throw new BusinessException(ErrorCodeOption.Mqtt_Transport_Error.key, ErrorCodeOption.Mqtt_Transport_Error.value);
                 }
-                driverVerParams.add(new DriverVerParam("2", param.com,param.com));
+                driverVerParams.add(new DriverVerParam("2", param.com,param.upd_time));
             }
         }
         try {
@@ -350,7 +350,7 @@ class DriverVerParam {
     public DriverVerParam(String file_type,String com,String upd_time) {
         this.file_type=file_type;
         this.upd_time=upd_time;
-        this.com=this.com;
+        this.com=com;
     }
     public DriverVerParam(){
         super();
