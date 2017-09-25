@@ -464,10 +464,10 @@ appModule
 							id : $scope.delActGroupId,
 						};
 
-						if($scope.deviceid>0){
+						if ($scope.deviceid > 0) {
 							T.common.ajax.request("WeconBox",
-									"actDataAction/delActGroup", params, function(data,
-											code, msg) {
+									"actDataAction/delActGroup", params,
+									function(data, code, msg) {
 										if (code == 200) {
 
 											$("#deleteGroup").modal("hide");
@@ -482,11 +482,11 @@ appModule
 									}, function() {
 										alert("ajax error");
 									});
-							
-						}else{
+
+						} else {
 							T.common.ajax.request("WeconBox",
-									"userdiract/deluserdir", params, function(data,
-											code, msg) {
+									"userdiract/deluserdir", params, function(
+											data, code, msg) {
 										if (code == 200) {
 
 											$("#deleteGroup").modal("hide");
@@ -502,10 +502,9 @@ appModule
 									}, function() {
 										alert("ajax error");
 									});
-							
-							
+
 						}
-						
+
 					}
 
 					$scope.editable_name = function(model) {
@@ -1410,7 +1409,7 @@ appModule
 								if (parseInt($("#child_addrid").val(), 16) < parseInt(
 										child_rang[0], 16)
 										|| parseInt($("#child_addrid").val(),
-												16) >parseInt(child_rang[1],
+												16) > parseInt(child_rang[1],
 												16)) {
 									alert("寄存器地址子编号范围有误");
 									return;
@@ -1658,9 +1657,14 @@ appModule
 						}
 						var batchvalue;
 						if (mtype != 2) {
-							batchvalue="0";
-						}else{
-							batchvalue=$("#batchid").val();
+							batchvalue = "0";
+						} else {
+							batchvalue = $("#batchid").val();
+						}
+						if (mtype == 2) {
+
+							$("#loadingModalid").modal("show");// 批量添加转圈效果
+
 						}
 						var params = {
 							id : mid,
@@ -1699,10 +1703,14 @@ appModule
 												} else if (mtype == 1) {
 													alert("修改实时监控点成功");
 												} else {
+													$("#loadingModalid").modal(
+															"hide");
 													alert("批量添加实时监控点成功");
 												}
 
 											} else {
+												$("#loadingModalid").modal(
+												"hide");
 												alert(code + "-" + msg);
 											}
 										}, function() {
