@@ -44,6 +44,7 @@ public class DebugInfoHandler extends AbstractWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         machine_code = message.getPayload();
+        logger.debug("get message:"+machine_code);
         /*
         * mqtt 发送
         * */

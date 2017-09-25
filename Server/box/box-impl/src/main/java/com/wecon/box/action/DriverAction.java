@@ -173,20 +173,48 @@ public class DriverAction {
 * */
     @RequestMapping("update")
     public Output update(@RequestParam("updateType") Integer updateType, @RequestParam(value="device_id" ) long device_id, @RequestParam(value = "versionName",defaultValue = "0") String versionName, @RequestParam(value="version_code",defaultValue = "0") String versionCode, @RequestParam(value="file_id",defaultValue = "0") long file_id) {
+        Device device=deviceApi.getDevice(device_id);
+        if(device.state!=1){
+            throw new BusinessException(ErrorCodeOption.Device_State_Is_Disconnect.key,ErrorCodeOption.Device_State_Is_Disconnect.value);
+        }
+
         int isUpdated=1;
-        System.out.println("获取到的----------------------------------------------------"+updateType);
+        JSONObject data=new JSONObject();
+        List<DriverVerParam> driverVerParams=null;
         if (updateType == 1) {
-            updateAllDriver(device_id);
+            Object driverObject=updateAllDriver(device_id).getResult();
+
+            String list=String.valueOf(JSONObject.parseObject(driverObject.toString()).get("driverVerParam"));
+            driverVerParams=JSONObject.parseArray(list,DriverVerParam.class);
+
+
+            data.put("driUpcount",driverObject);
+            data.put("frimUpcount","undefined");
         } else if (updateType == 2) {
-            dirFirmAction.updateFirm(versionName, versionCode, file_id, device_id);
+            Object firmObject=dirFirmAction.updateFirm(versionName, versionCode, file_id, device_id).getResult();
+
+            String list=String.valueOf(JSONObject.parseObject(firmObject.toString()).get("driverVerParam"));
+            driverVerParams=JSONObject.parseArray(list,DriverVerParam.class);
+
+            data.put("frimUpcount",firmObject);
+            data.put("driUpcount","undefined");
         } else if (updateType == 3) {
-            updateAllDriver(device_id);
-            dirFirmAction.updateFirm(versionName, versionCode, file_id, device_id);
+            Object driverObject=updateAllDriver(device_id).getResult();
+            data.put("driUpcount",driverObject);
+            Object firmObject=dirFirmAction.updateFirm(versionName, versionCode, file_id, device_id).getResult();
+            data.put("frimUpcount",firmObject);
+
+            String driverlist=String.valueOf(JSONObject.parseObject(driverObject.toString()).get("driverVerParam"));
+            driverVerParams=JSONObject.parseArray(driverlist,DriverVerParam.class);
+            String firmlist=String.valueOf(JSONObject.parseObject(driverObject.toString()).get("driverVerParam"));
+            driverVerParams.addAll(JSONObject.parseArray(firmlist,DriverVerParam.class));
+
         }else{
             isUpdated=0;
         }
-        JSONObject data=new JSONObject();
+        data.put("machine_code",device.machine_code);
         data.put("isUpdated",isUpdated);
+        data.put("resultData",driverVerParams);
         return new Output(data);
     }
 
@@ -216,7 +244,6 @@ public class DriverAction {
                 }
             }
         }
-
         JSONObject data = new JSONObject();
         data.put("isUpdate", false);
         return new Output(data);
@@ -226,6 +253,8 @@ public class DriverAction {
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping("updateAllDriver")
     public Output updateAllDriver(@RequestParam("device_id") long device_id) {
+        List<DriverVerParam> driverVerParams =new ArrayList<DriverVerParam>();
+        Integer count=0;
         ServerMqtt server = null;
         if (device_id <= 0) {
             throw new BusinessException(ErrorCodeOption.UpdateDriver_ParamIs_Error.key, ErrorCodeOption.UpdateDriver_ParamIs_Error.value);
@@ -280,9 +309,11 @@ public class DriverAction {
                     server.message.setPayload(data.toString().getBytes());
                     server.topic11 = server.client.getTopic(String.format(ConstKey.MQTT_SERVER_TOPICE, deviceModel.machine_code));
                     server.publish(server.topic11, server.message);
+                    count++;
                 } catch (MqttException e) {
                     throw new BusinessException(ErrorCodeOption.Mqtt_Transport_Error.key, ErrorCodeOption.Mqtt_Transport_Error.value);
                 }
+                driverVerParams.add(new DriverVerParam("2", param.com,param.com));
             }
         }
         try {
@@ -290,9 +321,11 @@ public class DriverAction {
         } catch (MqttException e) {
             throw new BusinessException(ErrorCodeOption.Mqtt_Disconnect_Error.key, ErrorCodeOption.Mqtt_Disconnect_Error.value);
         }
+        JSONObject data=new JSONObject();
+        data.put("count",count);
 
-
-        return new Output();
+        data.put("driverVerParam",driverVerParams);
+        return new Output(data);
     }
 }
 
@@ -303,4 +336,23 @@ class DriverFileParam {
     public String file_md5;
     public String file_base64;
     public String driver_type;
+}
+
+class DriverVerParam {
+    public String file_type;
+    public String com;
+    public String upd_time;
+    public DriverVerParam(String file_type){
+        this.file_type=file_type;
+        this.com="undefind";
+        this.upd_time="undefind";
+    }
+    public DriverVerParam(String file_type,String com,String upd_time) {
+        this.file_type=file_type;
+        this.upd_time=upd_time;
+        this.com=this.com;
+    }
+    public DriverVerParam(){
+        super();
+    }
 }

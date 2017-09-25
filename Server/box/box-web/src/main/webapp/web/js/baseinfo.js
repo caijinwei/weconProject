@@ -382,7 +382,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         $('#comtype').val(type[0].comtype);
         $('#box_stat_no').val(type[0].box_stat_no);
         $('#plc_stat_no').val(type[0].plc_stat_no);
-        console.log("获取到默认的对象", type[0]);
         $('#retry_times').val(type[0].retry_times);
         $('#wait_timeout').val(type[0].wait_timeout);
         $('#rev_timeout').val(type[0].rev_timeout);
@@ -564,7 +563,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             if (code == 200) {
                 if (data.devFirmInfo != null) {
                     $scope.devFirmInfo = data.devFirmInfo;
-                    console.log("固件对象", data.devFirmInfo);
                     //固件更新要用到
                     $scope.localVersionCode = data.devFirmInfo.f_ver;
                     $scope.$apply();
@@ -606,8 +604,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $("#checkUpdateFir").modal("show");
                 $scope.driverIsUpdate = data.driverData.isUpdate;
                 $scope.firmIsUpdate = data.firmData.isNewVersion;
-                console.log(data.firmData.isNewVersion);
-                console.log("固件需要更新么", data.firmData.isNewVersion);
 
                 //提示信息
                 if ($scope.driverIsUpdate=="true" || $scope.firmIsUpdate=="true") {
@@ -622,7 +618,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                     $scope.file_id = data.firmData.file_id;
                     $scope.fileData = data.firmData.fileData;
                 }
-                console.log("结果是：   ", data);
             }
             else {
                 alert(code + "-" + msg);
@@ -656,12 +651,21 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             params["file_id"] = fileData.file_id;
         }
 
-        console.log("参数是：", params);
         T.common.ajax.request("WeconBox", "driveraction/update", params, function (data, code, msg) {
             if (code == 200) {
                 if (data.isUpdated == 1) {
                     alert("指令已下发盒子成功！");
                     $("#checkUpdateFir").modal("hide");
+                    var count=0;
+                    if(data.driUpcount!="undefined"&&data.driUpcount.count!=""){
+                        count=parseInt(data.driUpcount.count)+parseInt(count);
+                    }
+                    if(data.frimUpcount!="undefined"&&data.frimUpcount.count!=""){
+                        count=parseInt(data.frimUpcount.count)+parseInt(count);
+                    }
+                    $scope.wsf_connect(data.machine_code.toString(),count.toString(),data.resultData);
+                    console.log("获取到准备下发的数值",data.resultData);
+                    //$("#loadingModal").modal("show");
                 } else {
                     $("#checkUpdateFir").modal("hide");
                 }
@@ -788,39 +792,45 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 
 //-----------------------------------------------------更新 等待反馈------------------------------------------------------------------
     var wsf;
-    $scope.wsf_send = function (msg) {
-        ws.send(msg);
-    }
+
     $scope.wsf_close = function (state) {
         if (state != 1) {
             alert("盒子已经离线");
             return;
         }
-        ws.close();
-        ws = "";
+        wsf.close();
+        wsf = "";
     }
     $scope.wsf_log = function (data) {
-        $('#wsLog').prepend('<p>' + data + '</p>');
+       console.log(data);
     }
-    $scope.ws_clear = function () {
-        $("#wsLog").empty();
-        $scope.ws_log("Clear :)");
-    }
-    $scope.wsf_connect = function (machine_code) {
+
+    $scope.wsf_connect = function (machine_code,msgNum,vdata) {
         if ("WebSocket" in window) {
-            ws = new WebSocket(T.common.requestUrl['WeconBoxWs'] + 'updateFile-websocket/websocket?' + T.common.websocket.getParams());
-            ws.onopen = function () {
-                $scope.ws_send(machine_code);
+            wsf = new WebSocket(T.common.requestUrl['WeconBoxWs'] + 'updateFile-websocket/websocket?' + T.common.websocket.getParams());
+            wsf.onopen = function () {
+                //发送websocket的消息体
+                var params={
+                    machine_code:machine_code,
+                    msgNum:msgNum,
+                    data:vdata
+                }
+                wsf.send((JSON.stringify(params)));
             };
-            ws.onmessage = function (evt) {
-                $scope.ws_log(evt.data);
+            wsf.onmessage = function (evt) {
+                $scope.wsf_log("--------------------------websocket收到的消息-----------------------------"+evt.data);
+                if(evt.data.firm==1){
+                    alert("固件下发成功");
+                }
+                $scope.wsf_log("----------------"+evt.data.firm);
+                $("#loadingModal").modal("hide");
             };
-            ws.onclose = function (evt) {
-                $scope.ws_log('>>>关闭获取调试' + " ");
+            wsf.onclose = function (evt) {
+                $scope.wsf_log('>>>关闭获取调试' + " ");
                 console.log(evt);
             };
-            ws.onerror = function (evt) {
-                $scope.ws_log('>>>error' + " " + evt.data);
+            wsf.onerror = function (evt) {
+                $scope.wsf_log('>>>error' + " " + evt.data);
                 console.log(evt);
             };
         } else {

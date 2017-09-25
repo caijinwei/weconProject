@@ -1,8 +1,8 @@
 package com.wecon.box.websocket;
 
+import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.util.ClientMQTT;
-import com.wecon.box.util.DebugInfoCallback;
 import com.wecon.restful.core.BusinessException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,6 +16,9 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Timer;
 
 /**
@@ -23,11 +26,13 @@ import java.util.Timer;
  */
 @Component
 public class UpdateFileHandler extends AbstractWebSocketHandler {
+
     String machine_code;
     ClientMQTT client;
     private static final Logger logger = LogManager.getLogger(DebugInfoHandler.class.getName());
     private Timer timer;
 
+    private  int count=0;
     /*
      * @param session
      * @param message
@@ -36,60 +41,73 @@ public class UpdateFileHandler extends AbstractWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        machine_code = message.getPayload();
 
-        String messageNum=message.getPayload();
-        if(message==null){
+        /*
+        *    {
+        *       “machine_code”:"机器码"，
+        *        “msgNum”:“发送的条数”
+        *        “data”:{
+        *                     “file_type”:         1   固件文件
+        *                       upd_time :                最后更新时间
+        *                  }
+        *    }
+        *    {
+        *       “machine_code”:"机器码"，
+        *        “msgNum”:“发送的条数”
+        *        “data”:{
+        *                     “file_type”:            2  驱动文件
+        *                      "com"                      comId
+        *                      “upd_time”              最后更新时间
+        *                 }
+        *    }
+        *
+        * */
+        String messages = message.getPayload();
+        JSONObject data = JSONObject.parseObject(messages);
+        String machine_code = data.get("machine_code").toString();
+        count=Integer.parseInt(data.get("msgNum").toString());
+        if(count<=0){
             throw new BusinessException(ErrorCodeOption.WebSocket_Update_ClientError.key,ErrorCodeOption.WebSocket_Update_ClientError.value);
         }
-        Integer msgNum=Integer.parseInt(messageNum);
-        if(msgNum<=0){
-            throw new BusinessException(ErrorCodeOption.WebSocket_Update_ClientError.key,ErrorCodeOption.WebSocket_Update_ClientError.value);
-        }
+        //获取到需要验证的固件驱动信息
+        List<JSONObject> verifyObjects=JSONObject.parseArray(String.valueOf(data.get("data")),JSONObject.class);
+
         /*
         * mqtt监听主题
         * */
-        DebugInfoCallback debugInfoCallback = new DebugInfoCallback(session);
-
-        client = new ClientMQTT("pibox/cts/" + machine_code , "upb" + session.getId(), debugInfoCallback);
+        UpdateFileCallback updateFileCallback = new UpdateFileCallback(session,count,verifyObjects);
+        client = new ClientMQTT("pibox/cts/" + machine_code , "upb" + session.getId(), updateFileCallback);
         client.start();
     }
 
-    /**
-     * 连接成功后
-     * @param session
-     * @throws Exception
-     */
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        logger.debug("连接成功");
-        session.sendMessage(new TextMessage("连接成功"));
+        logger.debug("websocket连接成功");
+        session.sendMessage(new TextMessage("websocket连接成功"));
     }
 
-    /**
-     * 关闭连接后
-     *
-     * @param session
-     * @param status
-     * @throws Exception
-     */
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        if (this.timer != null) {
-            this.timer.cancel();
-            logger.debug("timer cancel");
-        }
-
-        logger.debug("关闭连接");
+        logger.debug("服务的连接关闭");
+        super.afterConnectionClosed(session, status);
     }
-
 }
+
+/*
+*
+* */
+
 class UpdateFileCallback implements MqttCallback {
     WebSocketSession session;
-
-    public UpdateFileCallback(WebSocketSession session){
-        this.session=session;
+    List<JSONObject> msgs=new ArrayList<JSONObject>();
+    List<JSONObject> verifyObjects;
+    int count=0;
+    public UpdateFileCallback(WebSocketSession session,int count,List<JSONObject> verifyObjects) {
+        this.session = session;
+        this.count=count;
+        this.verifyObjects=verifyObjects;
     }
+
     @Override
     public void connectionLost(Throwable throwable) {
 
@@ -97,17 +115,67 @@ class UpdateFileCallback implements MqttCallback {
 
     @Override
     public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
-        new String(mqttMessage.getPayload());
 
-        sendWSMassage(session,new String(mqttMessage.getPayload(),"UTF-8"));
-    }
+        System.out.println("收到的mqtt信息是    "+JSONObject.parseObject(new String(mqttMessage.getPayload())));
+        HashMap<String,String> result=new HashMap<String,String>();
+        JSONObject feedBack=JSONObject.parseObject(new String(mqttMessage.getPayload()));
+            //如果不是反馈消息  直接忽略
+            if(!String.valueOf(feedBack.get("act")).equals("1")){
+                return;
+            }
+            //固件信息升级的反馈
+            if(String.valueOf(feedBack.get("feedback")).equals("2007")){
+                JSONObject data=JSONObject.parseObject(String.valueOf(feedBack.get("data")));
+                String upd_state=data.get("upd_state").toString();
+                result.put("firm",upd_state);
+                count--;
+            }
+            //驱动信息升级反馈
+            else if(String.valueOf(feedBack.get("feedback")).equals("2008")){
+                JSONObject data=JSONObject.parseObject(String.valueOf(feedBack.get("data")));
+                String upd_state=data.get("upd_state").toString();
+                String com=data.get("com").toString();
+                String upd_time=data.get("upd_time").toString();
+                //验证更新时间是否一致
+                for(JSONObject verify:verifyObjects){
+//                    JSONObject innerData=JSONObject.parseObject(String.valueOf(verify.get("data")));
+//                    if(String.valueOf(innerData.get("file_type")).equals("2")&&String.valueOf(innerData.get("com")).equals(com)){
+//                        if(!String.valueOf(innerData.get("upd_time")).equals(upd_time)){
+//                            result.put(com,"-1");
+//                        }else{
+//                            count--;
+//                            break;
+//                        }
+//                    }
+                    if(String.valueOf(verify.get("file_type")).equals("2")&&String.valueOf(verify.get("com")).equals(com)){
+                        if(!String.valueOf(verify.get("upd_time")).equals(upd_time)){
+                            result.put(com,"-1");
+                        }else{
+                            count--;
+                            break;
+                        }
+                    }
+                }
+            }else{
+                return;
+            }
+        //已经收到全部的反馈
+            if(count<=0) {
+                JSONObject data=new JSONObject();
+                data.put("data",result);
+                sendWSMassage(session, data.toString());
+                msgs.add(JSONObject.parseObject(new String(mqttMessage.getPayload())));
+            }
+        }
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
     }
+
     //wbsock发送数据
-    public void sendWSMassage(WebSocketSession session,String message) throws IOException {
+    public void sendWSMassage(WebSocketSession session, String message) throws IOException {
         session.sendMessage(new TextMessage(message));
     }
+
 }
 

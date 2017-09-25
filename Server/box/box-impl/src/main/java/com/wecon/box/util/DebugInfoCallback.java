@@ -15,6 +15,7 @@ import java.io.IOException;
 public class DebugInfoCallback implements MqttCallback{
 
     WebSocketSession session;
+
     public DebugInfoCallback(WebSocketSession session){
         this.session=session;
     }

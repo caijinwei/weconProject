@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -105,6 +106,8 @@ public class DirFirmAction {
     @Label("更新固件")
     @RequestMapping("updateFirmFile")
     public Output updateFirm(@RequestParam(value = "versionName",defaultValue = "") String versionName, @RequestParam("version_code") String versionCode, @RequestParam("file_id") long file_id, @RequestParam("device_id") Long device_id) {
+        List<DriverVerParam> firmVerParams=new ArrayList<DriverVerParam>();
+        int count=0;
         if (file_id <= 0) {
             throw new BusinessException(ErrorCodeOption.FileId_Is_Error.key, ErrorCodeOption.FileId_Is_Error.value);
         }
@@ -129,7 +132,7 @@ public class DirFirmAction {
 
 
         JSONObject msg = new JSONObject();
-        msg.put("act", 2007);
+        msg.put("l", 2007);
         msg.put("machine_code", deviceModel.machine_code);
         msg.put("data", file);
         msg.put("feedback", 1);
@@ -146,15 +149,17 @@ public class DirFirmAction {
             //pibox/<topic_type>/<machine_code>
             mqttServer.topic11 = mqttServer.client.getTopic(String.format(ConstKey.MQTT_SERVER_TOPICE, deviceModel.machine_code));
             mqttServer.publish(mqttServer.topic11, mqttServer.message);
-        /*
-        * pibox/cts/<machine_code>/logs
-        * */
+            count++;
             mqttServer.client.disconnect();
+            firmVerParams.add(new DriverVerParam("1"));
         } catch (MqttException e) {
             System.out.println(e.getMessage());
             throw new BusinessException(ErrorCodeOption.Mqtt_Transport_Error.key, ErrorCodeOption.Mqtt_Transport_Error.value);
         };
-        return new Output();
+        JSONObject data=new JSONObject();
+        data.put("count",count);
+        data.put("driverVerParam",firmVerParams);
+        return new Output(data);
     }
 
     class FileParm {
@@ -163,7 +168,6 @@ public class DirFirmAction {
         public String file_base64;
         public String version_code;
         public String version_name;
-
     }
 
 
