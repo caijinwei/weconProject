@@ -17,7 +17,7 @@
 
 </head>
 <body ng-controller="infoController" ng-init="onInit()"
-	style="margin-top: 20px;display: none;">
+	style="margin-top: 20px; display: none;">
 	<ol class="breadcrumb">
 		<li><a href="overview.html">主页</a></li>
 		<li class="active">{{devicename}}</li>
@@ -195,7 +195,7 @@
 						</caption>
 						<thead>
 							<tr>
-									<th class="col-md-2">状态<span data-action="label_group"></span></th>
+								<th class="col-md-2">状态<span data-action="label_group"></span></th>
 								<th class="col-md-1">名称<span data-action="label_name"></span></th>
 								<th class="col-md-3">触发条件<span data-action="label_trigger"></span></th>
 								<th class="col-md-3">报警内容<span
@@ -206,11 +206,11 @@
 						</thead>
 						<tbody>
 							<tr ng-repeat="x in listalrmCfgTrigger">
-							<td>{{x.state==0?"已同步盒子":x.state==1?"新增":x.state==2?"已变更":x.state==3?"已删除":x.state}}</td>
+								<td>{{x.state==0?"已同步盒子":x.state==1?"新增":x.state==2?"已变更":x.state==3?"已删除":x.state}}</td>
 								<td>{{x.name}}</td>
 								<td>{{x.triggerValue}}</td>
 								<td>{{x.text}}</td>
-								<td>{{x.dirName}}</td>			
+								<td>{{x.dirName}}</td>
 								<td><a href="#" style="text-decoration: none"> <span
 										class="glyphicon glyphicon-edit" data-toggle="modal"
 										data-target="#addAlarmRecord" ng-click="editmonitor(x);"
@@ -460,6 +460,13 @@
 											class="col-md-3" style="height: 30px;" id="dataid" /> <span
 											class="col-md-3">小数位数</span><input type="text"
 											class="col-md-3" style="height: 30px;" id="decid" />
+									</div>
+									<div class="row col-md-11 col-md-offset-1"
+										style="margin: 10px 0;" id="div_stringid">
+										<span class="col-md-3">操作字符</span><input id="stringid"
+											type="text" class="col-md-3"
+											style="height: 30px; padding-left: 5px;" /><span>&nbsp;&nbsp;个&nbsp;(1~256)</span>
+
 									</div>
 									<div id="bitsetting" class="row col-md-11 col-md-offset-1"
 										style="margin: 10px 0;">

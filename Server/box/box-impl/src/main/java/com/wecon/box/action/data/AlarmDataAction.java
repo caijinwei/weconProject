@@ -400,8 +400,9 @@ public class AlarmDataAction {
 								oldalarmCfg, alarmCfg);
 						// 获取分组信息
 						if (alarmCfgParam.group_id > 0) {
-							AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(-1,
+							AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(alarmCfgParam.group_id,
 									alarmCfgParam.alarmcfg_id);
+							
 
 							if (accountDirRel != null) {
 

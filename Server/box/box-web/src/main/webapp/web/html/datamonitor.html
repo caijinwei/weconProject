@@ -80,7 +80,6 @@
 								<th class="col-md-1">状态</th>
 								<th class="col-md-1">名称</th>
 								<th class="col-md-1">数值</th>
-								<th class="col-md-1">配置状态</th>
 								<th class="col-md-2">描述</th>
 								<th class="col-md-3">操作</th>
 							</tr>
@@ -89,20 +88,21 @@
 							<tr ng-repeat="x in actDatas">
 								<td><span ng-if="x.box_state==1" ng-switch="{{x.state}}">
 										<span ng-switch-when="0"> <span
-											ng-switch="{{x.re_state}}"><i ng-switch-when="0"
+											ng-switch="{{x.re_state}}"><i name="act_i_state" ng-switch-when="0"
 												class="fa  fa-circle" style="color: gray;"
-												data-toggle="tooltip" title="离线"></i><i ng-switch-when="1"
+												data-toggle="tooltip" title="离线"></i><i name="act_i_state"  ng-switch-when="1"
 												class="fa  fa-circle" style="color: green;"
-												data-toggle="tooltip" title="在线"></i><i ng-switch-when="2"
+												data-toggle="tooltip" title="在线"></i><i name="act_i_state" ng-switch-when="2"
 												class="fa  fa-circle" style="color: red;"
 												data-toggle="tooltip" title="超时"></i> </span>
 
-									</span> <span ng-switch-when="1"> <i class="fa  fa-circle"
-											style="color: orange;" data-toggle="tooltip" title="条目未下发"></i></span>
-										<span ng-switch-when="2"><i class="fa  fa-circle"
+									</span> <span ng-switch-when="1"> <i name="act_i_state"
+											class="fa  fa-circle" style="color: orange;"
+											data-toggle="tooltip" title="条目未下发"></i></span>
+										<span ng-switch-when="2"><i name="act_i_state"  class="fa  fa-circle"
 											style="color: orange;" data-toggle="tooltip" title="条目未下发"></i></span>
 
-								</span> <span ng-if="x.box_state==0"><i class="fa  fa-circle"
+								</span> <span ng-if="x.box_state==0"><i name="act_i_state" class="fa  fa-circle"
 										style="color: gray;" data-toggle="tooltip" title="离线"></i></span></td>
 								<td><a href="#" id="act_name_{{x.id}}"
 									ng-if="(accounttype==1&&deviceid<0)||(accounttype==2)"
@@ -112,7 +112,6 @@
 									ng-click="editable_value(x);"
 									ng-if="(accounttype==1)||(accounttype==2&&x.role_type==3)">{{x.re_value}}</a><span
 									ng-if="accounttype==2&&x.role_type!=3">{{x.re_value}}</span></td>
-								<td>{{x.state==0?"已同步盒子":x.state==1?"新增":x.state==2?"已变更":x.state==3?"已删除":x.state}}</td>
 								<td>{{x.describe}}</td>
 								<td><a href="#" title="编辑" data-toggle="modal"
 									data-target="#addpoint" ng-cloak
@@ -218,6 +217,13 @@
 												class="col-md-3" style="height: 30px;" id="dataid" /> <span
 												class="col-md-3">小数位数</span><input type="text"
 												class="col-md-3" style="height: 30px;" id="decid" />
+										</div>
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;" id="div_stringid">
+											<span class="col-md-3">操作字符</span><input id="stringid"
+												type="text" class="col-md-3"
+												style="height: 30px; padding-left: 5px;" /><span>&nbsp;&nbsp;个&nbsp;(1~256)</span>
+
 										</div>
 										<div class="row col-md-11 col-md-offset-1"
 											style="margin: 10px 0;" id="divbatchid">

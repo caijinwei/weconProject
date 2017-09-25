@@ -973,7 +973,6 @@ public class ActDataAction {
 											addrs[1] = String.valueOf(Long.toHexString(0));
 										} else {
 											jinwei = afteraddr / Long.parseLong(dig_limit[1], 16);
-											System.out.println(Long.parseLong(dig_limit[1], 16));
 											remainder = afteraddr % Long.parseLong(dig_limit[1], 16);
 											addrs[1] = String.valueOf(Long.toHexString(remainder));
 										}
