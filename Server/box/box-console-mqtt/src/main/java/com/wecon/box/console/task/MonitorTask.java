@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.wecon.box.util.JPushServer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -410,6 +411,8 @@ public class MonitorTask extends Thread {
 							// 批量保存报警数据成功
 							alarmCfgDataApi.saveAlarmCfgData(listInsertAlarmCfgData);
 							System.out.println("alarmCfgData add success !");
+							//极光推送给客户端
+							new JPushServer().push(JSON.toJSONString(listInsertAlarmCfgData));
 							if (jsonObject.getInteger("feedback") == 1) {
 								SendMessage(machineCode, ALARM_DATA);
 							}

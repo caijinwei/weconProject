@@ -173,7 +173,7 @@ public class PlcInfoImpl implements PlcInfoApi {
 
     @Override
     public List<PlcExtend> getPlcExtendListByState(Object... state){
-        String sql = "select p.*, d.machine_code, r.file_md5 as f_md5  from device d, plc_info p left join  driver r on p.driver = r.driver where p.device_id = d.device_id ";
+        String sql = "select p.*, d.machine_code, r.file_md5 as f_md5  from device d, plc_info p left join  driver r on p.driver = r.driver where p.device_id = d.device_id and d.state=1 ";
         if(null != state && state.length > 0){
             sql += " and p.state in (";
             StringBuffer inSb = new StringBuffer();
@@ -283,7 +283,7 @@ public class PlcInfoImpl implements PlcInfoApi {
             public Object mapRow(ResultSet resultSet, int i) throws SQLException {
                 PlcExtend model = new PlcExtend();
                 model.plc_id = resultSet.getLong("plc_id");
-                model.upd_time = TimeUtil.getYYYYMMDDHHMMSSDate(model.update_date);
+                model.upd_time = TimeUtil.getYYYYMMDDHHMMSSDate(resultSet.getTimestamp("update_date"));
                 return model;
             }
         });

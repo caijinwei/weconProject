@@ -195,24 +195,22 @@
 						</caption>
 						<thead>
 							<tr>
-								<th class="col-md-1">编码<span data-action="label_encoding"></span></th>
+									<th class="col-md-2">状态<span data-action="label_group"></span></th>
 								<th class="col-md-1">名称<span data-action="label_name"></span></th>
 								<th class="col-md-3">触发条件<span data-action="label_trigger"></span></th>
 								<th class="col-md-3">报警内容<span
 									data-action="label_alarmcontent"></span></th>
 								<th class="col-md-2">分组<span data-action="label_group"></span></th>
-								<th class="col-md-2">配置状态<span data-action="label_group"></span></th>
 								<th class="col-md-2">操作<span data-action="label_operation"></span></th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr ng-repeat="x in listalrmCfgTrigger">
-								<td>{{x.alarmcfg_id}}</td>
+							<td>{{x.state==0?"已同步盒子":x.state==1?"新增":x.state==2?"已变更":x.state==3?"已删除":x.state}}</td>
 								<td>{{x.name}}</td>
 								<td>{{x.triggerValue}}</td>
 								<td>{{x.text}}</td>
-								<td>{{x.dirName}}</td>
-								<td>{{x.state==0?"已同步盒子":x.state==1?"新增":x.state==2?"已变更":x.state==3?"已删除":x.state}}</td>
+								<td>{{x.dirName}}</td>			
 								<td><a href="#" style="text-decoration: none"> <span
 										class="glyphicon glyphicon-edit" data-toggle="modal"
 										data-target="#addAlarmRecord" ng-click="editmonitor(x);"

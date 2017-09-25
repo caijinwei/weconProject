@@ -8,12 +8,12 @@ appModule
 								.getParameter("device_id");
 						$scope.devicename = T.common.util
 								.getParameter("device_name");
-						//获取用户权限
-						T.common.ajax.request("WeconBox",
-								"user/userinfo", new Object(),function(data, code, msg) {
+						// 获取用户权限
+						T.common.ajax.request("WeconBox", "user/userinfo",
+								new Object(), function(data, code, msg) {
 									$scope.accounttype = data.type;
 									$scope.$apply();
-									$("body").css("display","block");
+									$("body").css("display", "block");
 								});
 
 						$scope.commointor_submit();
@@ -46,7 +46,6 @@ appModule
 								function(data, code, msg) {
 									if (code == 200) {
 										$scope.commonitors = data.monitors;
-
 
 										if ($scope.commonitors == "") {
 											$("#searchid").attr("disabled",
@@ -899,8 +898,10 @@ appModule
 									alert("寄存器地址主编号格式错误");
 									return;
 								}
-								if (parseInt($("#addrid").val(), 8) < parseInt(rang[0])
-										|| parseInt($("#addrid").val(), 8) > parseInt(rang[1])) {
+								if (parseInt($("#addrid").val(), 8) < parseInt(
+										rang[0], 8)
+										|| parseInt($("#addrid").val(), 8) > parseInt(
+												rang[1], 8)) {
 									alert("寄存器地址主编号范围有误");
 									return;
 								}
@@ -925,8 +926,10 @@ appModule
 									alert("寄存器地址主编号格式错误");
 									return;
 								}
-								if (parseInt($("#addrid").val(), 16) < parseInt(rang[0])
-										|| parseInt($("#addrid").val(), 16) > parseInt(rang[1])) {
+								if (parseInt($("#addrid").val(), 16) < parseInt(
+										rang[0], 16)
+										|| parseInt($("#addrid").val(), 16) > parseInt(
+												rang[1], 16)) {
 									alert("寄存器地址主编号范围有误");
 									return;
 
@@ -955,8 +958,10 @@ appModule
 									alert("寄存器地址子编号格式错误");
 									return;
 								}
-								if (parseInt($("#child_addrid").val(), 8) < parseInt(child_rang[0])
-										|| parseInt($("#child_addrid").val(), 8) > parseInt(child_rang[1])) {
+								if (parseInt($("#child_addrid").val(), 8) < parseInt(
+										child_rang[0], 8)
+										|| parseInt($("#child_addrid").val(), 8) >parseInt(
+												child_rang[1], 8)) {
 									alert("寄存器地址子编号范围有误");
 									return;
 								}
@@ -981,9 +986,11 @@ appModule
 									alert("寄存器地址子编号格式错误");
 									return;
 								}
-								if (parseInt($("#child_addrid").val(), 16) < parseInt(child_rang[0])
+								if (parseInt($("#child_addrid").val(), 16) < parseInt(
+										child_rang[0], 16)
 										|| parseInt($("#child_addrid").val(),
-												16) > parseInt(child_rang[1])) {
+												16) > parseInt(child_rang[1],
+												16)) {
 									alert("寄存器地址子编号范围有误");
 									return;
 								}
@@ -1019,39 +1026,39 @@ appModule
 							}
 
 							if ($("#datatypeid").val() == 100) {
-								if ($("#dataid").val().length < 1
-										|| $("#dataid").val().length > 16) {
+								if ($("#dataid").val() < 1
+										|| $("#dataid").val() > 16) {
 									alert("整数范围有误");
 									return;
 								}
 
 							} else if ($("#datatypeid").val() == 101) {
-								if ($("#dataid").val().length < 1
-										|| $("#dataid").val().length > 6) {
+								if ($("#dataid").val() < 1
+										|| $("#dataid").val() > 6) {
 									alert("整数范围有误");
 									return;
 								}
 
 							} else if ($("#datatypeid").val() == 102) {
-								if ($("#dataid").val().length < 1
-										|| $("#dataid").val().length > 4) {
+								if ($("#dataid").val() < 1
+										|| $("#dataid").val() > 4) {
 									alert("整数范围有误");
 									return;
 								}
 
 							} else if ($("#datatypeid").val() == 103) {
-								if ($("#dataid").val().length < 0
-										|| $("#dataid").val().length > 4) {
+								if ($("#dataid").val() < 0
+										|| $("#dataid").val() > 4) {
 									alert("整数范围有误");
 									return;
 								}
-								if ($("#decid").val().length < 0
-										|| $("#decid").val().length > 4) {
+								if ($("#decid").val() < 0
+										|| $("#decid").val() > 4) {
 									alert("小数数范围有误");
 									return;
 								}
-								var totle = parseInt($("#dataid").val().length)
-										+ parseInt($("#decid").val().length);
+								var totle = parseInt($("#dataid").val())
+										+ parseInt($("#decid").val());
 								if (totle < 1 || totle > 4) {
 									alert("整数位数+小数位数必须大于1小于4");
 									return;
@@ -1059,57 +1066,57 @@ appModule
 								}
 							} else if ($("#datatypeid").val() == 104
 									|| $("#datatypeid").val() == 105) {
-								if ($("#dataid").val().length < 0
-										|| $("#dataid").val().length > 5) {
+								if ($("#dataid").val() < 0
+										|| $("#dataid").val() > 5) {
 									alert("整数范围有误");
 									return;
 								}
-								if ($("#decid").val().length < 0
-										|| $("#decid").val().length > 5) {
+								if ($("#decid").val() < 0
+										|| $("#decid").val() > 5) {
 									alert("小数数范围有误");
 									return;
 								}
-								var totle = parseInt($("#dataid").val().length)
-										+ parseInt($("#decid").val().length);
+								var totle = parseInt($("#dataid").val())
+										+ parseInt($("#decid").val());
 								if (totle < 1 || totle > 5) {
 									alert("整数位数+小数位数必须大于1小于5");
 									return;
 
 								}
 							} else if ($("#datatypeid").val() == 200) {
-								if ($("#dataid").val().length < 1
-										|| $("#dataid").val().length > 32) {
+								if ($("#dataid").val() < 1
+										|| $("#dataid").val() > 32) {
 									alert("整数范围有误");
 									return;
 								}
 
 							} else if ($("#datatypeid").val() == 201) {
-								if ($("#dataid").val().length < 1
-										|| $("#dataid").val().length > 11) {
+								if ($("#dataid").val() < 1
+										|| $("#dataid").val() > 11) {
 									alert("整数范围有误");
 									return;
 								}
 
 							} else if ($("#datatypeid").val() == 202) {
-								if ($("#dataid").val().length < 1
-										|| $("#dataid").val().length > 8) {
+								if ($("#dataid").val() < 1
+										|| $("#dataid").val() > 8) {
 									alert("整数范围有误");
 									return;
 								}
 
 							} else if ($("#datatypeid").val() == 203) {
-								if ($("#dataid").val().length < 0
-										|| $("#dataid").val().length > 8) {
+								if ($("#dataid").val() < 0
+										|| $("#dataid").val() > 8) {
 									alert("整数范围有误");
 									return;
 								}
-								if ($("#decid").val().length < 0
-										|| $("#decid").val().length > 8) {
+								if ($("#decid").val() < 0
+										|| $("#decid").val() > 8) {
 									alert("小数数范围有误");
 									return;
 								}
-								var totle = parseInt($("#dataid").val().length)
-										+ parseInt($("#decid").val().length);
+								var totle = parseInt($("#dataid").val())
+										+ parseInt($("#decid").val());
 								if (totle < 1 || totle > 8) {
 									alert("整数位数+小数位数必须大于1小于8");
 									return;
@@ -1118,35 +1125,35 @@ appModule
 
 							} else if ($("#datatypeid").val() == 204
 									|| $("#datatypeid").val() == 205) {
-								if ($("#dataid").val().length < 0
-										|| $("#dataid").val().length > 10) {
+								if ($("#dataid").val() < 0
+										|| $("#dataid").val() > 10) {
 									alert("整数范围有误");
 									return;
 								}
-								if ($("#decid").val().length < 0
-										|| $("#decid").val().length > 10) {
+								if ($("#decid").val() < 0
+										|| $("#decid").val() > 10) {
 									alert("小数数范围有误");
 									return;
 								}
-								var totle = parseInt($("#dataid").val().length)
-										+ parseInt($("#decid").val().length);
+								var totle = parseInt($("#dataid").val())
+										+ parseInt($("#decid").val());
 								if (totle < 1 || totle > 10) {
 									alert("整数位数+小数位数必须大于1小于10");
 									return;
 
 								} else if ($("#datatypeid").val() == 206) {
-									if ($("#dataid").val().length < 0
-											|| $("#dataid").val().length > 7) {
+									if ($("#dataid").val() < 0
+											|| $("#dataid").val() > 7) {
 										alert("整数范围有误");
 										return;
 									}
-									if ($("#decid").val().length < 0
-											|| $("#decid").val().length > 7) {
+									if ($("#decid").val() < 0
+											|| $("#decid").val() > 7) {
 										alert("小数数范围有误");
 										return;
 									}
-									var totle = parseInt($("#dataid").val().length)
-											+ parseInt($("#decid").val().length);
+									var totle = parseInt($("#dataid").val())
+											+ parseInt($("#decid").val());
 									if (totle < 1 || totle > 7) {
 										alert("整数位数+小数位数必须大于1小于7");
 										return;
@@ -1164,18 +1171,18 @@ appModule
 									$("#decid").val("");
 
 								} else if ($("#datatypeid").val() == 406) {
-									if ($("#dataid").val().length < 0
-											|| $("#dataid").val().length > 15) {
+									if ($("#dataid").val() < 0
+											|| $("#dataid").val() > 15) {
 										alert("整数范围有误");
 										return;
 									}
-									if ($("#decid").val().length < 0
-											|| $("#decid").val().length > 15) {
+									if ($("#decid").val() < 0
+											|| $("#decid").val() > 15) {
 										alert("小数数范围有误");
 										return;
 									}
-									var totle = parseInt($("#dataid").val().length)
-											+ parseInt($("#decid").val().length);
+									var totle = parseInt($("#dataid").val())
+											+ parseInt($("#decid").val());
 									if (totle < 1 || totle > 15) {
 										alert("整数位数+小数位数必须大于1小于15");
 										return;

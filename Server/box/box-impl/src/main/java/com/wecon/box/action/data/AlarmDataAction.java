@@ -26,6 +26,7 @@ import com.wecon.box.entity.AlarmCfgDataAlarmCfg;
 import com.wecon.box.entity.AlarmCfgTrigger;
 import com.wecon.box.entity.AlarmTrigger;
 import com.wecon.box.entity.Page;
+import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
@@ -111,9 +112,8 @@ public class AlarmDataAction {
 		return new Output(json);
 
 	}
-
 	/**
-	 * 通过机器码获取对应的实时数据组
+	 * 通过机器码获取对应的报警数据组
 	 * 
 	 * @param device_id
 	 * @return
@@ -153,6 +153,41 @@ public class AlarmDataAction {
 		json.put("type", client.userInfo.getUserType());
 		return new Output(json);
 
+	}
+	@WebApi(forceAuth = true, master = true)
+	@Description("通过盒子ID获取报警配置分组")
+	@RequestMapping(value = "/delAlarmGroup")
+	public Output delAlarmGroup(@RequestParam("id") Integer id){
+		AccountDir dir = accountDirApi.getAccountDir(id);
+		
+			List<AccountDirRel> dirrel = accountDirRelApi.getAccountDirRel(dir.id);
+			for (AccountDirRel acc : dirrel) {
+				AlarmCfg alarmCfg =alarmCfgApi.getAlarmcfg(acc.ref_id);
+				alarmCfg.state=3;
+				alarmCfgApi.upAlarmCfg(alarmCfg);// 删除分组下的报警配置
+			}
+		
+		if (dir != null && dir.account_id == AppContext.getSession().client.userId) {
+			accountDirApi.delAccountDir(id);
+			// <editor-fold desc="操作日志">
+			dbLogUtil.addOperateLog(OpTypeOption.DelDir, ResTypeOption.Dir, id, dir);
+			// </editor-fold>
+		} else {
+			throw new BusinessException(ErrorCodeOption.OnlyOperateOneselfGroup.key,
+					ErrorCodeOption.OnlyOperateOneselfGroup.value);
+		}
+		return new Output();
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 	}
 
 	@Description("获取组下的报警配置")

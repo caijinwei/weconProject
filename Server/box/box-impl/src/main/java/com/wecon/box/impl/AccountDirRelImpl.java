@@ -79,6 +79,24 @@ public class AccountDirRelImpl implements AccountDirRelApi {
         }
         return null;
     }
+    @Override
+    public List<AccountDirRel> getAccountDirRel(long acc_dir_id) {
+    	  String sql = "select " + SEL_COL + " from account_dir_rel where 1=1  ";
+          StringBuffer condition = new StringBuffer("");
+  		List<Object> params = new ArrayList<Object>();
+  		if (acc_dir_id > 0) {
+  			condition.append("and acc_dir_id=? ");
+  			params.add(acc_dir_id);
+  		}
+  		sql=sql+ condition; 
+          List<AccountDirRel> list = jdbcTemplate.query(sql, params.toArray(),
+                  new DefaultAccountDirRelRowMapper());
+          if (!list.isEmpty()) {
+              return list;
+          }
+          return null;
+    	
+    }
 
     @Override
     public boolean upAccountDirRel(AccountDirRel model) {
