@@ -122,6 +122,7 @@ appModule
 									$scope.editable_name(data);
 									$scope.editable_value(data);
 								});
+								 $("i[name='act_i_state']").tooltip();
 
 							} else {
 								// 下发数据到盒子反馈
@@ -464,10 +465,10 @@ appModule
 							id : $scope.delActGroupId,
 						};
 
-						if($scope.deviceid>0){
+						if ($scope.deviceid > 0) {
 							T.common.ajax.request("WeconBox",
-									"actDataAction/delActGroup", params, function(data,
-											code, msg) {
+									"actDataAction/delActGroup", params,
+									function(data, code, msg) {
 										if (code == 200) {
 
 											$("#deleteGroup").modal("hide");
@@ -482,11 +483,11 @@ appModule
 									}, function() {
 										alert("ajax error");
 									});
-							
-						}else{
+
+						} else {
 							T.common.ajax.request("WeconBox",
-									"userdiract/deluserdir", params, function(data,
-											code, msg) {
+									"userdiract/deluserdir", params, function(
+											data, code, msg) {
 										if (code == 200) {
 
 											$("#deleteGroup").modal("hide");
@@ -502,10 +503,9 @@ appModule
 									}, function() {
 										alert("ajax error");
 									});
-							
-							
+
 						}
-						
+
 					}
 
 					$scope.editable_name = function(model) {
@@ -680,16 +680,27 @@ appModule
 														$('#datadigitid').css(
 																'display',
 																'none');
+														$('#div_stringid').css(
+																'display',
+																'none');
 														$("#dataid").val("");
 														$("#decid").val("");
+														$("#stringid").val("");
 
 													} else {
 														$('#datadigitid').css(
 																'display',
 																'block');
 													}
-													$("#dataid").val(minfo.num);
-													$("#decid").val(minfo.dec);
+													if ($("#datatypeid").val() == 1000) {
+														$("#stringid").val(
+																minfo.num);
+													} else {
+														$("#dataid").val(
+																minfo.num);
+														$("#decid").val(
+																minfo.dec);
+													}
 
 												} else {
 													if (dealtype == 0) {
@@ -841,10 +852,16 @@ appModule
 																	.css(
 																			'display',
 																			'none');
+															$('#div_stringid')
+																	.css(
+																			'display',
+																			'none');
 
 															$("#dataid")
 																	.val("");
 															$("#decid").val("");
+															$("#stringid").val(
+																	"");
 														} else {
 															$('#divdatatypeid')
 																	.css(
@@ -925,17 +942,33 @@ appModule
 																		.css(
 																				'display',
 																				'none');
+																$(
+																		'#div_stringid')
+																		.css(
+																				'display',
+																				'none');
 															} else {
 																$(
 																		'#divdatatypeid')
 																		.css(
 																				'display',
 																				'block');
-																$(
-																		'#datadigitid')
-																		.css(
-																				'display',
-																				'block');
+																if ($(
+																		"#datatypeid")
+																		.val() == 1000) {
+																	$(
+																			'#div_stringid')
+																			.css(
+																					'display',
+																					'block');
+																} else {
+																	$(
+																			'#datadigitid')
+																			.css(
+																					'display',
+																					'block');
+																}
+
 															}
 
 															if ($scope.addrvalues != null) {
@@ -974,17 +1007,32 @@ appModule
 																		.css(
 																				'display',
 																				'none');
+																$(
+																		'#div_stringid')
+																		.css(
+																				'display',
+																				'none');
 															} else {
 																$(
 																		'#divdatatypeid')
 																		.css(
 																				'display',
 																				'block');
-																$(
-																		'#datadigitid')
-																		.css(
-																				'display',
-																				'block');
+																if ($(
+																		"#datatypeid")
+																		.val() == 1000) {
+																	$(
+																			'#div_stringid')
+																			.css(
+																					'display',
+																					'block');
+																} else {
+																	$(
+																			'#datadigitid')
+																			.css(
+																					'display',
+																					'block');
+																}
 															}
 
 														}
@@ -1006,11 +1054,17 @@ appModule
 						if ($("#addrtypeid").val() == 0) {
 							$('#divdatatypeid').css('display', 'none');
 							$('#datadigitid').css('display', 'none');
+							$('#div_stringid').css('display', 'none');
 							$("#dataid").val("");
 							$("#decid").val("");
+							$("#stringid").val("");
 						} else {
 							$('#divdatatypeid').css('display', 'block');
-							$('#datadigitid').css('display', 'block');
+							if ($("#datatypeid").val() == 1000) {
+								$('#div_stringid').css('display', 'block');
+							} else {
+								$('#datadigitid').css('display', 'block');
+							}
 						}
 					});
 					$scope.changeaddrtype = function(value) {
@@ -1087,6 +1141,7 @@ appModule
 
 										$('#child_registeraddr').css('display',
 												'none');
+
 										$("#child_rangid").html("");
 										$("#child_scaleid").html("");
 
@@ -1110,6 +1165,9 @@ appModule
 							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#decid").attr("placeholder", "无小数");
 							$("#decid").val("");
+							$("#stringid").val("");
+							$('#datadigitid').css('display', 'block');
+							$('#div_stringid').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 101) {
 							$("#dataid").attr("placeholder", "1~6");
@@ -1117,36 +1175,54 @@ appModule
 							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#decid").attr("placeholder", "无小数");
 							$("#decid").val("");
+							$("#stringid").val("");
+							$('#datadigitid').css('display', 'block');
+							$('#div_stringid').css('display', 'none');
 						} else if ($("#datatypeid").val() == 102) {
 							$("#dataid").attr("placeholder", "1~4");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#decid").attr("placeholder", "无小数");
 							$("#decid").val("");
+							$("#stringid").val("");
+							$('#datadigitid').css('display', 'block');
+							$('#div_stringid').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 103) {
 							$("#dataid").attr("placeholder", "0~4");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~4");
+							$("#stringid").val("");
+							$('#datadigitid').css('display', 'block');
+							$('#div_stringid').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 104) {
 							$("#dataid").attr("placeholder", "0~5");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~5");
+							$("#stringid").val("");
+							$('#datadigitid').css('display', 'block');
+							$('#div_stringid').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 105) {
 							$("#dataid").attr("placeholder", "0~5");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~5");
+							$("#stringid").val("");
+							$('#datadigitid').css('display', 'block');
+							$('#div_stringid').css('display', 'none');
 						} else if ($("#datatypeid").val() == 200) {
 							$("#dataid").attr("placeholder", "1~32");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#decid").attr("placeholder", "无小数");
 							$("#decid").val("");
+							$("#stringid").val("");
+							$('#datadigitid').css('display', 'block');
+							$('#div_stringid').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 201) {
 							$("#dataid").attr("placeholder", "1~11");
@@ -1154,36 +1230,54 @@ appModule
 							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#decid").attr("placeholder", "无小数");
 							$("#decid").val("");
+							$("#stringid").val("");
+							$('#datadigitid').css('display', 'block');
+							$('#div_stringid').css('display', 'none');
 						} else if ($("#datatypeid").val() == 202) {
 							$("#dataid").attr("placeholder", "1~8");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", true); // 设置为不可编辑
 							$("#decid").attr("placeholder", "无小数");
 							$("#decid").val("");
+							$("#stringid").val("");
+							$('#datadigitid').css('display', 'block');
+							$('#div_stringid').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 203) {
 							$("#dataid").attr("placeholder", "0~8");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~8");
+							$("#stringid").val("");
+							$('#datadigitid').css('display', 'block');
+							$('#div_stringid').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 204) {
 							$("#dataid").attr("placeholder", "0~10");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~10");
+							$("#stringid").val("");
+							$('#datadigitid').css('display', 'block');
+							$('#div_stringid').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 205) {
 							$("#dataid").attr("placeholder", "0~10");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~10");
+							$("#stringid").val("");
+							$('#datadigitid').css('display', 'block');
+							$('#div_stringid').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 206) {
 							$("#dataid").attr("placeholder", "0~7");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~7");
+							$("#stringid").val("");
+							$('#datadigitid').css('display', 'block');
+							$('#div_stringid').css('display', 'none');
 						} else if ($("#datatypeid").val() == 400) {
 							$("#dataid").attr("placeholder", "暂时没用");
 							$("#decid").attr("placeholder", "暂时没用");
@@ -1191,6 +1285,9 @@ appModule
 							$("#decid").attr("disabled", true); // 设置为可编辑
 							$("#dataid").val("");
 							$("#decid").val("");
+							$("#stringid").val("");
+							$('#datadigitid').css('display', 'block');
+							$('#div_stringid').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 401) {
 							$("#dataid").attr("placeholder", "暂时没用");
@@ -1199,6 +1296,9 @@ appModule
 							$("#decid").attr("disabled", true); // 设置为可编辑
 							$("#dataid").val("");
 							$("#decid").val("");
+							$("#stringid").val("");
+							$('#datadigitid').css('display', 'block');
+							$('#div_stringid').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 402) {
 							$("#dataid").attr("placeholder", "暂时没用");
@@ -1207,6 +1307,9 @@ appModule
 							$("#decid").attr("disabled", true); // 设置为可编辑
 							$("#dataid").val("");
 							$("#decid").val("");
+							$("#stringid").val("");
+							$('#datadigitid').css('display', 'block');
+							$('#div_stringid').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 403) {
 							$("#dataid").attr("placeholder", "暂时没用");
@@ -1215,7 +1318,9 @@ appModule
 							$("#decid").attr("disabled", true); // 设置为可编辑
 							$("#dataid").val("");
 							$("#decid").val("");
-
+							$("#stringid").val("");
+							$('#datadigitid').css('display', 'block');
+							$('#div_stringid').css('display', 'none');
 						} else if ($("#datatypeid").val() == 404) {
 							$("#dataid").attr("placeholder", "暂时没用");
 							$("#decid").attr("placeholder", "暂时没用");
@@ -1223,6 +1328,9 @@ appModule
 							$("#decid").attr("disabled", true); // 设置为可编辑
 							$("#dataid").val("");
 							$("#decid").val("");
+							$("#stringid").val("");
+							$('#datadigitid').css('display', 'block');
+							$('#div_stringid').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 405) {
 							$("#dataid").attr("placeholder", "暂时没用");
@@ -1231,12 +1339,17 @@ appModule
 							$("#decid").attr("disabled", true); // 设置为可编辑
 							$("#dataid").val("");
 							$("#decid").val("");
+							$("#stringid").val("");
+							$('#datadigitid').css('display', 'block');
+							$('#div_stringid').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 406) {
 							$("#dataid").attr("placeholder", "0~15");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~15");
+							$('#datadigitid').css('display', 'block');
+							$('#div_stringid').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 1000) {
 							$("#dataid").attr("placeholder", "无整数");
@@ -1245,6 +1358,9 @@ appModule
 							$("#decid").attr("disabled", true); // 设置为可编辑
 							$("#dataid").val("");
 							$("#decid").val("");
+							$('#datadigitid').css('display', 'none');
+							$('#div_stringid').css('display', 'block');
+
 						}
 
 					}
@@ -1410,7 +1526,7 @@ appModule
 								if (parseInt($("#child_addrid").val(), 16) < parseInt(
 										child_rang[0], 16)
 										|| parseInt($("#child_addrid").val(),
-												16) >parseInt(child_rang[1],
+												16) > parseInt(child_rang[1],
 												16)) {
 									alert("寄存器地址子编号范围有误");
 									return;
@@ -1430,201 +1546,223 @@ appModule
 						}
 						if ($("#addrtypeid").val() != 0) {
 							var regnum = /^0|[1-9]\d*$/;
-							var datadisabled = $("#dataid").prop("disabled");
-							if (!datadisabled) {
-								if (!regnum.test($("#dataid").val())) {
-									alert("整数位数格式错误");
+							if ($("#datatypeid").val() == 1000) {
+								$("#dataid").val("");
+								$("#decid").val("");
+								if (!regnum.test($("#stringid").val())) {
+									alert("操作字符只能输入正整数");
 									return;
 								}
+								if ($("#stringid").val() < 1
+										|| $("#stringid").val() > 256) {
+									alert("操作字符范围是1~256");
+									return;
+								}
+								num = $("#stringid").val();
+								digit_counts.push(num);
 
-							}
-							var decdisabled = $("#decid").prop("disabled");
-							if (!decdisabled) {
-								if (!regnum.test($("#dataid").val())) {
-									alert("小数位数格式错误");
-									return;
-								}
-							}
+							} else {
 
-							if ($("#datatypeid").val() == 100) {
-								if ($("#dataid").val() < 1
-										|| $("#dataid").val() > 16) {
-									alert("整数范围有误");
-									return;
-								}
-
-							} else if ($("#datatypeid").val() == 101) {
-								if ($("#dataid").val() < 1
-										|| $("#dataid").val() > 6) {
-									alert("整数范围有误");
-									return;
-								}
-
-							} else if ($("#datatypeid").val() == 102) {
-								if ($("#dataid").val() < 1
-										|| $("#dataid").val() > 4) {
-									alert("整数范围有误");
-									return;
-								}
-
-							} else if ($("#datatypeid").val() == 103) {
-								if ($("#dataid").val() < 0
-										|| $("#dataid").val() > 4) {
-									alert("整数范围有误");
-									return;
-								}
-								if ($("#decid").val() < 0
-										|| $("#decid").val() > 4) {
-									alert("小数数范围有误");
-									return;
-								}
-								var totle = parseInt($("#dataid").val())
-										+ parseInt($("#decid").val());
-								if (totle < 1 || totle > 4) {
-									alert("整数位数+小数位数必须大于1小于4");
-									return;
+								var datadisabled = $("#dataid")
+										.prop("disabled");
+								if (!datadisabled) {
+									if (!regnum.test($("#dataid").val())) {
+										alert("整数位数格式错误");
+										return;
+									}
 
 								}
-							} else if ($("#datatypeid").val() == 104
-									|| $("#datatypeid").val() == 105) {
-								if ($("#dataid").val() < 0
-										|| $("#dataid").val() > 5) {
-									alert("整数范围有误");
-									return;
-								}
-								if ($("#decid").val() < 0
-										|| $("#decid").val() > 5) {
-									alert("小数数范围有误");
-									return;
-								}
-								var totle = parseInt($("#dataid").val())
-										+ parseInt($("#decid").val());
-								if (totle < 1 || totle > 5) {
-									alert("整数位数+小数位数必须大于1小于5");
-									return;
-
-								}
-							} else if ($("#datatypeid").val() == 200) {
-								if ($("#dataid").val() < 1
-										|| $("#dataid").val() > 32) {
-									alert("整数范围有误");
-									return;
+								var decdisabled = $("#decid").prop("disabled");
+								if (!decdisabled) {
+									if (!regnum.test($("#dataid").val())) {
+										alert("小数位数格式错误");
+										return;
+									}
 								}
 
-							} else if ($("#datatypeid").val() == 201) {
-								if ($("#dataid").val() < 1
-										|| $("#dataid").val() > 11) {
-									alert("整数范围有误");
-									return;
-								}
+								if ($("#datatypeid").val() == 100) {
+									if ($("#dataid").val() < 1
+											|| $("#dataid").val() > 16) {
+										alert("整数范围有误");
+										return;
+									}
 
-							} else if ($("#datatypeid").val() == 202) {
-								if ($("#dataid").val() < 1
-										|| $("#dataid").val() > 8) {
-									alert("整数范围有误");
-									return;
-								}
+								} else if ($("#datatypeid").val() == 101) {
+									if ($("#dataid").val() < 1
+											|| $("#dataid").val() > 6) {
+										alert("整数范围有误");
+										return;
+									}
 
-							} else if ($("#datatypeid").val() == 203) {
-								if ($("#dataid").val() < 0
-										|| $("#dataid").val() > 8) {
-									alert("整数范围有误");
-									return;
-								}
-								if ($("#decid").val() < 0
-										|| $("#decid").val() > 8) {
-									alert("小数数范围有误");
-									return;
-								}
-								var totle = parseInt($("#dataid").val())
-										+ parseInt($("#decid").val());
-								if (totle < 1 || totle > 8) {
-									alert("整数位数+小数位数必须大于1小于8");
-									return;
+								} else if ($("#datatypeid").val() == 102) {
+									if ($("#dataid").val() < 1
+											|| $("#dataid").val() > 4) {
+										alert("整数范围有误");
+										return;
+									}
 
-								}
-
-							} else if ($("#datatypeid").val() == 204
-									|| $("#datatypeid").val() == 205) {
-								if ($("#dataid").val() < 0
-										|| $("#dataid").val() > 10) {
-									alert("整数范围有误");
-									return;
-								}
-								if ($("#decid").val() < 0
-										|| $("#decid").val() > 10) {
-									alert("小数数范围有误");
-									return;
-								}
-								var totle = parseInt($("#dataid").val())
-										+ parseInt($("#decid").val());
-								if (totle < 1 || totle > 10) {
-									alert("整数位数+小数位数必须大于1小于10");
-									return;
-
-								} else if ($("#datatypeid").val() == 206) {
+								} else if ($("#datatypeid").val() == 103) {
 									if ($("#dataid").val() < 0
-											|| $("#dataid").val() > 7) {
+											|| $("#dataid").val() > 4) {
 										alert("整数范围有误");
 										return;
 									}
 									if ($("#decid").val() < 0
-											|| $("#decid").val() > 7) {
+											|| $("#decid").val() > 4) {
 										alert("小数数范围有误");
 										return;
 									}
 									var totle = parseInt($("#dataid").val())
 											+ parseInt($("#decid").val());
-									if (totle < 1 || totle > 7) {
-										alert("整数位数+小数位数必须大于1小于7");
+									if (totle < 1 || totle > 4) {
+										alert("整数位数+小数位数范围是1~4");
 										return;
 
 									}
-
-								} else if ($("#datatypeid").val() == 400
-										|| $("#datatypeid").val() == 401
-										|| $("#datatypeid").val() == 402
-										|| $("#datatypeid").val() == 403
-										|| $("#datatypeid").val() == 404
-										|| $("#datatypeid").val() == 405
-										|| $("#datatypeid").val() == 1000) {
-									$("#dataid").val("");
-									$("#decid").val("");
-
-								} else if ($("#datatypeid").val() == 406) {
+								} else if ($("#datatypeid").val() == 104
+										|| $("#datatypeid").val() == 105) {
 									if ($("#dataid").val() < 0
-											|| $("#dataid").val() > 15) {
+											|| $("#dataid").val() > 5) {
 										alert("整数范围有误");
 										return;
 									}
 									if ($("#decid").val() < 0
-											|| $("#decid").val() > 15) {
+											|| $("#decid").val() > 5) {
 										alert("小数数范围有误");
 										return;
 									}
 									var totle = parseInt($("#dataid").val())
 											+ parseInt($("#decid").val());
-									if (totle < 1 || totle > 15) {
-										alert("整数位数+小数位数必须大于1小于15");
+									if (totle < 1 || totle > 5) {
+										alert("整数位数+小数位数范围是1~5");
+										return;
+
+									}
+								} else if ($("#datatypeid").val() == 200) {
+									if ($("#dataid").val() < 1
+											|| $("#dataid").val() > 32) {
+										alert("整数范围有误");
 										return;
 									}
-								}
 
+								} else if ($("#datatypeid").val() == 201) {
+									if ($("#dataid").val() < 1
+											|| $("#dataid").val() > 11) {
+										alert("整数范围有误");
+										return;
+									}
+
+								} else if ($("#datatypeid").val() == 202) {
+									if ($("#dataid").val() < 1
+											|| $("#dataid").val() > 8) {
+										alert("整数范围有误");
+										return;
+									}
+
+								} else if ($("#datatypeid").val() == 203) {
+									if ($("#dataid").val() < 0
+											|| $("#dataid").val() > 8) {
+										alert("整数范围有误");
+										return;
+									}
+									if ($("#decid").val() < 0
+											|| $("#decid").val() > 8) {
+										alert("小数数范围有误");
+										return;
+									}
+									var totle = parseInt($("#dataid").val())
+											+ parseInt($("#decid").val());
+									if (totle < 1 || totle > 8) {
+										alert("整数位数+小数位数范围是1~8");
+										return;
+
+									}
+
+								} else if ($("#datatypeid").val() == 204
+										|| $("#datatypeid").val() == 205) {
+									if ($("#dataid").val() < 0
+											|| $("#dataid").val() > 10) {
+										alert("整数范围有误");
+										return;
+									}
+									if ($("#decid").val() < 0
+											|| $("#decid").val() > 10) {
+										alert("小数数范围有误");
+										return;
+									}
+									var totle = parseInt($("#dataid").val())
+											+ parseInt($("#decid").val());
+									if (totle < 1 || totle > 10) {
+										alert("整数位数+小数位数范围是1~10");
+										return;
+
+									} else if ($("#datatypeid").val() == 206) {
+										if ($("#dataid").val() < 0
+												|| $("#dataid").val() > 7) {
+											alert("整数范围有误");
+											return;
+										}
+										if ($("#decid").val() < 0
+												|| $("#decid").val() > 7) {
+											alert("小数数范围有误");
+											return;
+										}
+										var totle = parseInt($("#dataid").val())
+												+ parseInt($("#decid").val());
+										if (totle < 1 || totle > 7) {
+											alert("整数位数+小数位数范围是1~7");
+											return;
+
+										}
+
+									} else if ($("#datatypeid").val() == 400
+											|| $("#datatypeid").val() == 401
+											|| $("#datatypeid").val() == 402
+											|| $("#datatypeid").val() == 403
+											|| $("#datatypeid").val() == 404
+											|| $("#datatypeid").val() == 405) {
+										$("#dataid").val("");
+										$("#decid").val("");
+
+									} else if ($("#datatypeid").val() == 406) {
+										if ($("#dataid").val() < 0
+												|| $("#dataid").val() > 15) {
+											alert("整数范围有误");
+											return;
+										}
+										if ($("#decid").val() < 0
+												|| $("#decid").val() > 15) {
+											alert("小数数范围有误");
+											return;
+										}
+										var totle = parseInt($("#dataid").val())
+												+ parseInt($("#decid").val());
+										if (totle < 1 || totle > 15) {
+											alert("整数位数+小数位数范围是1~15");
+											return;
+										}
+									}
+
+								}
+								if (!$("#dataid").prop("disabled")) {
+									num = $("#dataid").val();
+									digit_counts.push(num);
+								}
+								if (!$("#decid").prop("disabled")) {
+									dec = $("#decid").val();
+									digit_counts.push(dec);
+								}
 							}
+
 						} else {
 							$('#divdatatypeid').css('display', 'none');
 							$('#datadigitid').css('display', 'none');
+							$('#div_stringid').css('display', 'none');
 							$("#dataid").val("");
 							$("#decid").val("");
+							$("#stringid").val("");
 						}
-						if (!$("#dataid").prop("disabled")) {
-							num = $("#dataid").val();
-							digit_counts.push(num);
-						}
-						if (!$("#decid").prop("disabled")) {
-							dec = $("#decid").val();
-							digit_counts.push(dec);
-						}
+
 						var rang_datas = rangs.join(",");
 						var addr_datas = addrs.join(",");
 						var scalie_datas = scalies.join(",");
@@ -1651,16 +1789,21 @@ appModule
 								return;
 							}
 							if ($("#batchid").val() > 40) {
-								alert("请输入批量个数大于0小于40的正整数");
+								alert("请输入批量个数大于0小于等于40的正整数");
 								return;
 							}
 
 						}
 						var batchvalue;
 						if (mtype != 2) {
-							batchvalue="0";
-						}else{
-							batchvalue=$("#batchid").val();
+							batchvalue = "0";
+						} else {
+							batchvalue = $("#batchid").val();
+						}
+						if (mtype == 2) {
+
+							$("#loadingModalid").modal("show");// 批量添加转圈效果
+
 						}
 						var params = {
 							id : mid,
@@ -1699,10 +1842,14 @@ appModule
 												} else if (mtype == 1) {
 													alert("修改实时监控点成功");
 												} else {
+													$("#loadingModalid").modal(
+															"hide");
 													alert("批量添加实时监控点成功");
 												}
 
 											} else {
+												$("#loadingModalid").modal(
+														"hide");
 												alert(code + "-" + msg);
 											}
 										}, function() {
