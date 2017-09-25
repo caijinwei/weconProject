@@ -63,6 +63,10 @@ appModule.controller("listController", function ($scope, $http, $compile) {
      * 新增视图帐号
      */
     $scope.addviewuser = function () {
+        if ($("#username").val().trim() == "" || $("#password").val().trim() == "") {
+            alert("请输入帐号和密码");
+            return;
+        }
         $("#loadingModal").modal("show");
         var params = {
             username: $("#username").val().trim(),
@@ -124,7 +128,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
         viewpoint1: function (model) {
             location = "viewpoint.html?type=1&viewid=" + model.account_id + "&name=" + model.username;
         },
-        viewpointalarm:function (model) {
+        viewpointalarm: function (model) {
             location = "viewpointalarm.html?type=2&viewid=" + model.account_id + "&name=" + model.username;
         }
     }

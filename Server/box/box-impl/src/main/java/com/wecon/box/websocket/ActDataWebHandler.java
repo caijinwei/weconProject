@@ -458,6 +458,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
         subscribeListener.unsubscribe();
         subscribeListener = null;
         machineCodeSet = null;
+        reclient = null;
         logger.debug("Redis取消订阅成功");
     }
 }
