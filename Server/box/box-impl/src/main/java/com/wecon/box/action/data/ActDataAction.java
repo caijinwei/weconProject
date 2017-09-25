@@ -448,6 +448,7 @@ public class ActDataAction {
 			RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(monitorid));
 			realHisCfg.state = 3;// 删除配置状态
 			realHisCfgApi.updateRealHisCfg(realHisCfg);
+			accountDirRelApi.delAccountDir(Long.parseLong(acc_dir_id), Long.parseLong(monitorid));
 			if (realHisCfg.data_type == 0) {// 删除实时数据配置日志
 				dbLogUtil.addOperateLog(OpTypeOption.DelAct, ResTypeOption.Act, realHisCfg.id, realHisCfg);
 
