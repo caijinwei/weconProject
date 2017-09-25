@@ -166,11 +166,7 @@ public class DriverAction {
     }
     @Label("更新")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
-/*
-*    params["versionName"] = fileData.version_name;
-            params["version_code"] = fileData.version_code;
-            params["file_id"] = fileData.file_id;
-* */
+
     @RequestMapping("update")
     public Output update(@RequestParam("updateType") Integer updateType, @RequestParam(value="device_id" ) long device_id, @RequestParam(value = "versionName",defaultValue = "0") String versionName, @RequestParam(value="version_code",defaultValue = "0") String versionCode, @RequestParam(value="file_id",defaultValue = "0") long file_id) {
         Device device=deviceApi.getDevice(device_id);
@@ -206,6 +202,8 @@ public class DriverAction {
 
             String driverlist=String.valueOf(JSONObject.parseObject(driverObject.toString()).get("driverVerParam"));
             driverVerParams=JSONObject.parseArray(driverlist,DriverVerParam.class);
+
+            //固件验证信息下发  不需要
             String firmlist=String.valueOf(JSONObject.parseObject(driverObject.toString()).get("driverVerParam"));
             driverVerParams.addAll(JSONObject.parseArray(firmlist,DriverVerParam.class));
 

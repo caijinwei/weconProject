@@ -630,17 +630,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     $scope.update = function () {
         var device_id = $scope.device_id;
         var updateType = 0;
-        alert("驱动更新"+$scope.driverIsUpdate);
-        alert("固件更新"+$scope.firmIsUpdate);
         if ($scope.driverIsUpdate == true && $scope.firmIsUpdate == "true") {
             updateType = 3;
-            alert(3);
         } else if ($scope.driverIsUpdate == true) {
             updateType = 1;
-            alert(1);
         } else if ($scope.firmIsUpdate == "true") {
             updateType = 2
-            alert(2);
         } else {
             $("#checkUpdateFir").modal("hide");
             return;
