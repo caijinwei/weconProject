@@ -132,7 +132,7 @@ public class DirFirmAction {
 
 
         JSONObject msg = new JSONObject();
-        msg.put("l", 2007);
+        msg.put("act", 2007);
         msg.put("machine_code", deviceModel.machine_code);
         msg.put("data", file);
         msg.put("feedback", 1);

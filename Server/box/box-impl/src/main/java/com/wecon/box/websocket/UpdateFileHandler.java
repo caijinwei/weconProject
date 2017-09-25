@@ -132,14 +132,19 @@ class UpdateFileCallback implements MqttCallback {
             return;
         }
         //固件信息升级的反馈
-        if (String.valueOf(feedBack.get("feedback")).equals("2007")) {
+        if (String.valueOf(feedBack.get("feedback_act")).equals("2007")) {
+//            for (JSONObject verify : verifyObjects) {
+//                if(verify.get("file_type")==1){
+//                    verifyObjects.re
+//                }
+//            }
             JSONObject data = JSONObject.parseObject(String.valueOf(feedBack.get("data")));
             String upd_state = data.get("upd_state").toString();
             result.put("firm", upd_state);
             count--;
         }
         //驱动信息升级反馈
-        else if (String.valueOf(feedBack.get("feedback")).equals("2008")) {
+        else if (String.valueOf(feedBack.get("feedback_act")).equals("2008")) {
             JSONObject data = JSONObject.parseObject(String.valueOf(feedBack.get("data")));
             String upd_state = data.get("upd_state").toString();
             String com = data.get("com").toString();
@@ -174,7 +179,6 @@ class UpdateFileCallback implements MqttCallback {
         }
         //已经收到全部的反馈
         if (count <= 0) {
-            result.put("test","1");
             JSONObject data =  JSONObject.parseObject(JSON.toJSONString(result));
             sendWSMassage(session, data.toString());
         }

@@ -829,9 +829,9 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                     if (i=="firm") {
                         //console.log(i);
                         //console.log(jsonResult[i]);
-                        $('#upNotice').prepend('<p>固件升级'+(jsonResult[i]==1?'成功':(jsonResult[i]==-1?'文件写入失败':(jsonResult[i]==-2?'md5不匹配':('文件拷贝失败'))))+'</p>');
+                        $('#upNotice').prepend('<p>固件升级'+(jsonResult[i]==1?'成功':(jsonResult[i]==-1?'文件写入失败':(jsonResult[i]==-2?'md5不匹配':(jsonResult[i]==-3?'文件拷贝失败':(jsonResult[i]==-4?'服务器下发版本较低，不更新':'未知错误'))))) + '</p>');
                     }else {
-                        $('#upNotice').prepend('<p>驱动'+i + (jsonResult[i]==1?'成功':(jsonResult[i]==-1?'文件写入失败':(jsonResult[i]==-2?'md5不匹配':('文件拷贝失败')))) + '</p>');
+                        $('#upNotice').prepend('<p>驱动'+i + (jsonResult[i]==1?'成功':(jsonResult[i]==-1?'文件写入失败':(jsonResult[i]==-2?'md5不匹配':(jsonResult[i]==-3?'文件拷贝失败':(jsonResult[i]==-4?'服务器下发版本较低，不更新':'未知错误'))))) + '</p>');
                     }
                 }
                 $("#noticeModal").modal("show");
