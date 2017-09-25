@@ -1,11 +1,10 @@
 package com.wecon.box.action.data;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
 import javax.validation.Valid;
-
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,6 +118,32 @@ public class ActDataAction {
 		json.put("ActGroup", accountDirList);
 		json.put("type", client.userInfo.getUserType());
 		return new Output(json);
+
+	}
+
+	@WebApi(forceAuth = true, master = true, authority = { "1" })
+	@Description("删除实时数据分组")
+	@RequestMapping(value = "/delActGroup")
+	public Output delActGroup(@RequestParam("id") Integer id) {
+		AccountDir dir = accountDirApi.getAccountDir(id);
+		if (dir.device_id > 0) {
+			List<AccountDirRel> dirrel = accountDirRelApi.getAccountDirRel(dir.id);
+			for (AccountDirRel acc : dirrel) {
+				RealHisCfg realHisCfg =realHisCfgApi.getRealHisCfg(acc.ref_id);
+				realHisCfg.state=3;
+				realHisCfgApi.updateRealHisCfg(realHisCfg);// 删除分组下的监控点
+			}
+		}
+		if (dir != null && dir.account_id == AppContext.getSession().client.userId) {
+			accountDirApi.delAccountDir(id);
+			// <editor-fold desc="操作日志">
+			dbLogUtil.addOperateLog(OpTypeOption.DelDir, ResTypeOption.Dir, id, dir);
+			// </editor-fold>
+		} else {
+			throw new BusinessException(ErrorCodeOption.OnlyOperateOneselfGroup.key,
+					ErrorCodeOption.OnlyOperateOneselfGroup.value);
+		}
+		return new Output();
 
 	}
 
@@ -577,24 +602,27 @@ public class ActDataAction {
 						attr.put("addrvalue", value);
 						attr.put("range", range);
 						attr.put("mJinzhi", mJinzhi);
-						if (0 != Integer.parseInt(bitCount)) {// 有小数位数
-							String bJinzhi = attris
-									.get("BJinzhi");/**
+						if (!CommonUtils.isNullOrEmpty(bitCount)) {
+							if (0 != Integer.parseInt(bitCount)) {// 有小数位数
+								String bJinzhi = attris.get(
+										"BJinzhi");/**
 													 * 整数位进制 d-十进制 o-八进制 h-十六进制
 													 **/
-							if ("d".equals(bJinzhi.toLowerCase())) {
-								bJinzhi = "十进制";
-							} else if ("o".equals(bJinzhi.toLowerCase())) {
-								bJinzhi = "八进制";
-							} else if ("h".equals(bJinzhi.toLowerCase())) {
-								bJinzhi = "十六进制";
-							}
-							String bRange = attris.get("BRange");
-							attr.put("bitCount", bitCount);
-							attr.put("bJinzhi", bJinzhi);
-							attr.put("bRange", bRange);
+								if ("d".equals(bJinzhi.toLowerCase())) {
+									bJinzhi = "十进制";
+								} else if ("o".equals(bJinzhi.toLowerCase())) {
+									bJinzhi = "八进制";
+								} else if ("h".equals(bJinzhi.toLowerCase())) {
+									bJinzhi = "十六进制";
+								}
+								String bRange = attris.get("BRange");
+								attr.put("bitCount", bitCount);
+								attr.put("bJinzhi", bJinzhi);
+								attr.put("bRange", bRange);
 
+							}
 						}
+
 						arr.add(attr);
 					}
 					if (arr.size() > 0) {
@@ -791,10 +819,8 @@ public class ActDataAction {
 				}
 				realHisCfg = new RealHisCfg();
 				realHisCfg.account_id = account_id;
-				realHisCfg.addr = realHisCfgParam.addr;
 				realHisCfg.addr_type = realHisCfgParam.addr_type;
 				realHisCfg.data_id = realHisCfgParam.data_id;
-				realHisCfg.name = realHisCfgParam.name;
 				realHisCfg.plc_id = realHisCfgParam.plc_id;
 				realHisCfg.device_id = realHisCfgParam.device_id;
 				realHisCfg.rid = realHisCfgParam.rid;
@@ -819,28 +845,244 @@ public class ActDataAction {
 					}
 
 				}
-				long id = realHisCfgApi.saveRealHisCfg(realHisCfg);
-				if (id > 0) {
-					if (realHisCfg.data_type == 0) {// 实时数据配置
-						dbLogUtil.addOperateLog(OpTypeOption.AddAct, ResTypeOption.Act, realHisCfg.id, realHisCfg);
-					} else {
-						// 历史数据配置
-						dbLogUtil.addOperateLog(OpTypeOption.AddHis, ResTypeOption.His, realHisCfg.id, realHisCfg);
+				if (realHisCfgParam.batch > 0) {
+					if (!CommonUtils.isNullOrEmpty(realHisCfgParam.digit_binary)
+							&& !CommonUtils.isNullOrEmpty(realHisCfgParam.rang)
+							&& !CommonUtils.isNullOrEmpty(realHisCfgParam.addr)) {
+						for (int i = 0; i < realHisCfgParam.batch; i++) {
+							String binarys[] = realHisCfgParam.digit_binary.split(",");
+							String rangs[] = realHisCfgParam.rang.split(",");
+							String addrs[] = realHisCfgParam.addr.split(",");
+							if (binarys.length == 1) {
+								String limit[] = rangs[0].split(" ");
+								if ("八进制".equals(binarys[0])) {
+									// 前端设置的主编号地址
+									long setaddr = Long.parseLong(addrs[0], 8);
+									int inc = Integer.parseInt(realHisCfgParam.increase) * i;
+									long increase = Long.parseLong(String.valueOf(inc));
+									// 添加后地址
+									long afteraddr = setaddr + increase;
+									if (Long.parseLong(limit[0], 8) > afteraddr
+											|| afteraddr > Long.parseLong(limit[1], 8)) {
+										continue;
+									}
+									realHisCfg.addr = String.valueOf(Long.toOctalString(afteraddr));
+
+								} else if ("十进制".equals(binarys[0])) {
+									// 前端设置的主编号地址
+									long setaddr = Long.parseLong(addrs[0]);
+
+									int inc = Integer.parseInt(realHisCfgParam.increase) * i;
+									long increase = Long.parseLong(String.valueOf(inc));
+									// 添加后地址
+									long afteraddr = setaddr + increase;
+									if (Long.parseLong(limit[0]) > afteraddr || afteraddr > Long.parseLong(limit[1])) {
+										continue;
+									}
+									realHisCfg.addr = String.valueOf(afteraddr);
+
+								} else if ("十六进制".equals(binarys[0])) {
+									// 前端设置的主编号地址
+									long setaddr = Long.parseLong(addrs[0], 16);
+									int inc = Integer.parseInt(realHisCfgParam.increase) * i;
+									long increase = Long.parseLong(String.valueOf(inc));
+									// 添加后地址
+									long afteraddr = setaddr + increase;
+
+									if (Long.parseLong(limit[0], 16) > afteraddr
+											|| afteraddr > Long.parseLong(limit[1], 16)) {
+										continue;
+									}
+									realHisCfg.addr = String.valueOf(Long.toHexString(afteraddr));
+
+								}
+
+							} else if (binarys.length == 2) {
+
+								String dig_limit[] = rangs[1].split(" ");// 子编号范围
+								long remainder = 0;// 余数
+								long jinwei = 0;
+								if ("八进制".equals(binarys[1])) {
+
+									// 前端设置的子编号地址
+									long childaddr = Long.parseLong(addrs[1], 8);
+
+									int inc = Integer.parseInt(realHisCfgParam.increase) * i;
+									long increase = Long.parseLong(String.valueOf(inc));
+									// 添加后地址
+									long afteraddr = childaddr + increase;
+									if (Long.parseLong(dig_limit[0], 8) > afteraddr) {
+										continue;
+									}
+									if (Long.parseLong(dig_limit[1]) <= afteraddr) {
+										if (afteraddr % Long.parseLong(dig_limit[1], 8) == 0) {
+											jinwei = afteraddr / Long.parseLong(dig_limit[1], 8);
+											addrs[1] = String.valueOf(Long.toOctalString(0));
+										} else {
+											jinwei = afteraddr / Long.parseLong(dig_limit[1], 8);
+											remainder = afteraddr % Long.parseLong(dig_limit[1], 8);
+											addrs[1] = String.valueOf(Long.toOctalString(remainder));
+										}
+
+									} else {
+
+										addrs[1] = String.valueOf(Long.toOctalString(afteraddr));// 没进位
+									}
+
+								} else if ("十进制".equals(binarys[1])) {
+									// 前端设置的子编号地址
+									long childaddr = Long.parseLong(addrs[1]);
+
+									int inc = Integer.parseInt(realHisCfgParam.increase) * i;
+									long increase = Long.parseLong(String.valueOf(inc));
+									// 添加后地址
+									long afteraddr = childaddr + increase;
+									if (Long.parseLong(dig_limit[0]) > afteraddr) {
+										continue;
+									}
+									if (Long.parseLong(dig_limit[1]) <= afteraddr) {
+										if (afteraddr % Long.parseLong(dig_limit[1]) == 0) {
+											jinwei = afteraddr / Long.parseLong(dig_limit[1]);
+											addrs[1] = "0";
+										} else {
+											jinwei = afteraddr / Long.parseLong(dig_limit[1]);
+											remainder = afteraddr % Long.parseLong(dig_limit[1]);
+											addrs[1] = String.valueOf(remainder);
+										}
+
+									} else {
+
+										addrs[1] = String.valueOf(afteraddr);// 没进位
+									}
+
+								} else if ("十六进制".equals(binarys[1])) {
+
+									// 前端设置的子编号地址
+									long childaddr = Long.parseLong(addrs[1], 16);
+
+									int inc = Integer.parseInt(realHisCfgParam.increase) * i;
+									long increase = Long.parseLong(String.valueOf(inc));
+									// 添加后地址
+									long afteraddr = childaddr + increase;
+									if (Long.parseLong(dig_limit[0], 16) > afteraddr) {
+										continue;
+									}
+									if (Long.parseLong(dig_limit[1], 16) <= afteraddr) {
+										if (afteraddr % Long.parseLong(dig_limit[1], 16) == 0) {
+											jinwei = afteraddr / Long.parseLong(dig_limit[1], 16);
+											addrs[1] = String.valueOf(Long.toHexString(0));
+										} else {
+											jinwei = afteraddr / Long.parseLong(dig_limit[1], 16);
+											System.out.println(Long.parseLong(dig_limit[1], 16));
+											remainder = afteraddr % Long.parseLong(dig_limit[1], 16);
+											addrs[1] = String.valueOf(Long.toHexString(remainder));
+										}
+
+									} else {
+
+										addrs[1] = String.valueOf(String.valueOf(Long.toHexString(afteraddr)));// 没进位
+									}
+								}
+								String limit[] = rangs[0].split(" ");// 主编号范围
+								if ("八进制".equals(binarys[0])) {
+									long mainaddr = Long.parseLong(addrs[0], 8);
+									long afteraddr = mainaddr + jinwei;
+									if (Long.parseLong(limit[0], 8) > afteraddr
+											|| afteraddr > Long.parseLong(limit[1], 8)) {
+										continue;
+									}
+									addrs[0] = String.valueOf(Long.toOctalString(afteraddr));// 主编号地址
+									realHisCfg.addr = addrs[0] + "," + addrs[1];
+
+								} else if ("十进制".equals(binarys[0])) {
+									long mainaddr = Long.parseLong(addrs[0]);
+									long afteraddr = mainaddr + jinwei;
+									if (Long.parseLong(limit[0]) > afteraddr || afteraddr > Long.parseLong(limit[1])) {
+										continue;
+									}
+									addrs[0] = String.valueOf(afteraddr);// 主编号地址
+
+									realHisCfg.addr = addrs[0] + "," + addrs[1];
+
+								} else if ("十六进制".equals(binarys[0])) {
+									long mainaddr = Long.parseLong(addrs[0], 16);
+									long afteraddr = mainaddr + jinwei;
+									if (Long.parseLong(limit[0], 16) > afteraddr
+											|| afteraddr > Long.parseLong(limit[1], 16)) {
+										continue;
+									}
+									addrs[0] = String.valueOf(String.valueOf(Long.toHexString(afteraddr)));// 主编号地址
+									realHisCfg.addr = addrs[0] + "," + addrs[1];
+
+								}
+
+							}
+							if (i > 0) {
+								realHisCfg.name = realHisCfgParam.name + "_" + i;
+							} else {
+								realHisCfg.name = realHisCfgParam.name;
+							}
+
+							RealHisCfg rename = realHisCfgApi.getRealHisCfg(realHisCfgParam.device_id, realHisCfg.name);
+							if (rename != null) {
+								realHisCfg.name = realHisCfgParam.name + "_" + new Date().getTime();
+							}
+
+							long id = realHisCfgApi.saveRealHisCfg(realHisCfg);
+							if (id > 0) {
+								if (realHisCfg.data_type == 0) {// 实时数据配置
+									dbLogUtil.addOperateLog(OpTypeOption.AddAct, ResTypeOption.Act, realHisCfg.id,
+											realHisCfg);
+								} else {
+									// 历史数据配置
+									dbLogUtil.addOperateLog(OpTypeOption.AddHis, ResTypeOption.His, realHisCfg.id,
+											realHisCfg);
+								}
+
+								if (realHisCfgParam.data_type == 0) {
+									realHisCfg = realHisCfgApi.getRealHisCfg(id);
+									AccountDirRel accountDirRel = accountDirRelApi
+											.getAccountDirRel(realHisCfgParam.group_id, realHisCfg.id);
+									if (accountDirRel == null) {
+										accountDirRel = new AccountDirRel();
+										accountDirRel.acc_dir_id = realHisCfgParam.group_id;
+										accountDirRel.ref_id = realHisCfg.id;
+										accountDirRel.ref_alais = realHisCfg.name;
+										accountDirRelApi.saveAccountDirRel(accountDirRel);
+									}
+								}
+							}
+						}
+
 					}
 
-					if (realHisCfgParam.data_type == 0) {
-						realHisCfg = realHisCfgApi.getRealHisCfg(id);
-						AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(realHisCfgParam.group_id,
-								realHisCfg.id);
-						if (accountDirRel == null) {
-							accountDirRel = new AccountDirRel();
-							accountDirRel.acc_dir_id = realHisCfgParam.group_id;
-							accountDirRel.ref_id = realHisCfg.id;
-							accountDirRel.ref_alais = realHisCfg.name;
-							accountDirRelApi.saveAccountDirRel(accountDirRel);
+				} else {
+					realHisCfg.name = realHisCfgParam.name;
+					realHisCfg.addr = realHisCfgParam.addr;
+					long reid = realHisCfgApi.saveRealHisCfg(realHisCfg);
+					if (reid > 0) {
+						if (realHisCfg.data_type == 0) {// 实时数据配置
+							dbLogUtil.addOperateLog(OpTypeOption.AddAct, ResTypeOption.Act, realHisCfg.id, realHisCfg);
+						} else {
+							// 历史数据配置
+							dbLogUtil.addOperateLog(OpTypeOption.AddHis, ResTypeOption.His, realHisCfg.id, realHisCfg);
+						}
+
+						if (realHisCfgParam.data_type == 0) {
+							realHisCfg = realHisCfgApi.getRealHisCfg(reid);
+							AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(realHisCfgParam.group_id,
+									realHisCfg.id);
+							if (accountDirRel == null) {
+								accountDirRel = new AccountDirRel();
+								accountDirRel.acc_dir_id = realHisCfgParam.group_id;
+								accountDirRel.ref_id = realHisCfg.id;
+								accountDirRel.ref_alais = realHisCfg.name;
+								accountDirRelApi.saveAccountDirRel(accountDirRel);
+							}
 						}
 					}
 				}
+
 				json.put("success", 1);
 			}
 

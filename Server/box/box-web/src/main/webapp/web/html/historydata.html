@@ -221,7 +221,6 @@
 						</caption>
 						<thead>
 							<tr>
-								<th>编码</th>
 								<th>状态</th>
 								<th>名称</th>
 								<th>周期(秒)</th>
@@ -233,7 +232,6 @@
 						</thead>
 						<tbody>
 							<tr ng-repeat="x in hisConfs">
-								<td>{{x.id}}</td>
 								<td>{{x.state==0?"已同步盒子":x.state==1?"新增":x.state==2?"已变更":x.state==3?"已删除":x.state}}</td>
 								</td>
 								<td>{{x.name}}</td>

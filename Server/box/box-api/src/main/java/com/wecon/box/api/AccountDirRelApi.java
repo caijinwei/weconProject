@@ -28,6 +28,7 @@ public interface AccountDirRelApi {
 	 * @return
 	 */
 	public AccountDirRel getAccountDirRel(long acc_dir_id, long ref_id);
+	public List<AccountDirRel> getAccountDirRel(long acc_dir_id);
 
 	/**
 	 * 更新别名

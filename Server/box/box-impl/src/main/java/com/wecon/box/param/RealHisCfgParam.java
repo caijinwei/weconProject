@@ -48,6 +48,18 @@ public class RealHisCfgParam {
 	public long group_id;
 	@Label("历史采集周期")
 	public int his_cycle;
+	@Label("批量个数")
+	public int batch;
+	@Label("增量")
+	public String increase;
+
+	public void setBatch(int batch) {
+		this.batch = batch;
+	}
+
+	public void setIncrease(String increase) {
+		this.increase = increase;
+	}
 
 	public void setDigit_count(String digit_count) {
 		this.digit_count = digit_count;

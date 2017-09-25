@@ -59,7 +59,7 @@
 						<caption>
 							<button type="button" class="btn btn-primary" data-toggle="modal"
 								ng-cloak ng-if="accounttype==1 && deviceid>0"
-								data-target="#addpoint" ng-click="	addmonitor();">
+								data-target="#addpoint" ng-click="addmonitor();">
 								<span class="glyphicon glyphicon-plus"></span> 添加监控点
 							</button>
 							<button type="button" class="btn btn-primary" data-toggle="modal"
@@ -68,12 +68,12 @@
 								data-target="#dispatchpoint" ng-click="showRestList()">
 								<span class="fa fa-indent"></span> 分配监控点
 							</button>
-							<!-- 	<button type="button" class="btn btn-primary" data-toggle="modal"
+							<button type="button" class="btn btn-primary" data-toggle="modal"
 								ng-cloak ng-if="accounttype==1 && deviceid>0"
-								data-target="#addpoint" ng-click="showAllPlcConf(0);">
+								data-target="#addpoint" ng-click="batchmonitor();">
 								<span class="glyphicon glyphicon-list"
 									style="margin-left: 15px;"></span> 批量添加
-							</button> -->
+							</button>
 						</caption>
 						<thead>
 							<tr>
@@ -155,7 +155,7 @@
 									<button type="button" class="close" data-dismiss="modal">
 										<span>&times;</span>
 									</button>
-									<h4 class="modal-title">{{showtype==0?"添加监控数据":"编辑监控数据"}}</h4>
+									<h4 class="modal-title">{{showtype==0?"添加监控数据":showtype==1?"编辑监控数据":"批量监控数据"}}</h4>
 								</div>
 								<div class="modal-body">
 									<div class="container-fluid">
@@ -185,16 +185,6 @@
 
 											</select>
 										</div>
-
-
-										<!-- <div class="row col-md-11 col-md-offset-1"
-											style="margin: 10px 0;">
-											<div id="data-range">
-												<span class="col-md-3">地址范围</span> <input type="text"
-													class="col-md-9" style="height: 30px; padding-left: 5px;"
-													id="rangid" disabled />
-											</div>
-										</div> -->
 										<div class="row col-md-11 col-md-offset-1"
 											style="margin: 10px 0;" id="registeraddr">
 											<span class="col-md-3">寄存器地址(主编号)</span><input id="addrid"
@@ -228,6 +218,16 @@
 												class="col-md-3" style="height: 30px;" id="dataid" /> <span
 												class="col-md-3">小数位数</span><input type="text"
 												class="col-md-3" style="height: 30px;" id="decid" />
+										</div>
+										<div class="row col-md-11 col-md-offset-1"
+											style="margin: 10px 0;" id="divbatchid">
+											<span class="col-md-3">批量个数</span> <input type="number"
+												min="1" max="40" class="col-md-3"
+												style="height: 30px; padding-left: 5px;" value="1"
+												id="batchid" /> <span class="col-md-3">增量</span> <input
+												type="number" class="col-md-3"
+												style="height: 30px; padding-left: 5px;" value="1"
+												id="increaseid" />
 										</div>
 										<div class="row col-md-11 col-md-offset-1"
 											style="margin: 10px 0;">
