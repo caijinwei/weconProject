@@ -69,11 +69,6 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 				session.sendMessage(new TextMessage(getStringRealData(bParams, session)));
 				logger.debug("WebSocket push end");
 
-				// 订阅redis消息
-				// if (null != machineCodeSet ) {
-				// subscribeRealData(session, bParams,machineCodeSet);
-				// }
-
 			} else if ("1".equals(bParams.get("markid").toString())) {
 				String value = bParams.get("value").toString();
 				String addr_id = bParams.get("addr_id").toString();
@@ -266,12 +261,15 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 		cachedThreadPool.execute(new Runnable() {
 			public void run() {
 				logger.debug("Redis begin subscribe realData");
-				String[] machineCodeArray = new String[machineCodeSet.size()];
-				int i = 0;
-				for (String machineCode : machineCodeSet) {
-					machineCodeArray[i++] = machineCode;
+				if (machineCodeSet != null) {
+					String[] machineCodeArray = new String[machineCodeSet.size()];
+					int i = 0;
+					for (String machineCode : machineCodeSet) {
+						machineCodeArray[i++] = machineCode;
+					}
+					RedisManager.subscribe(ConstKey.REDIS_GROUP_NAME, subscribeListener, machineCodeArray);
 				}
-				RedisManager.subscribe(ConstKey.REDIS_GROUP_NAME, subscribeListener, machineCodeArray);
+
 			}
 		});
 	}
@@ -315,133 +313,136 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 			// Client client = AppContext.getSession().client;
 			// logger.debug("用户client==="+client.userInfo.toString());
 			Client client = clients.get(session.getId());
-			Page<RealHisCfgDevice> realHisCfgDeviceList = null;
-			if (client.userInfo.getUserType() == 1) {
-				/** 管理 **/
-				realHisCfgFilter.addr_type = -1;
-				realHisCfgFilter.data_type = 0;
-				realHisCfgFilter.his_cycle = -1;
-				realHisCfgFilter.state = 3;
-				realHisCfgFilter.bind_state = 1;
+			if (client != null) {
 
-				realHisCfgFilter.account_id = client.userId;
+				Page<RealHisCfgDevice> realHisCfgDeviceList = null;
+				if (client.userInfo.getUserType() == 1) {
+					/** 管理 **/
+					realHisCfgFilter.addr_type = -1;
+					realHisCfgFilter.data_type = 0;
+					realHisCfgFilter.his_cycle = -1;
+					realHisCfgFilter.state = 3;
+					realHisCfgFilter.bind_state = 1;
 
-				if (!CommonUtils.isNullOrEmpty(bParams.get("acc_dir_id"))) {
-					realHisCfgFilter.dirId = Long.parseLong(bParams.get("acc_dir_id").toString());
+					realHisCfgFilter.account_id = client.userId;
+
+					if (!CommonUtils.isNullOrEmpty(bParams.get("acc_dir_id"))) {
+						realHisCfgFilter.dirId = Long.parseLong(bParams.get("acc_dir_id").toString());
+					}
+					if (!CommonUtils.isNullOrEmpty(bParams.get("device_id"))) {
+						realHisCfgFilter.device_id = Long.parseLong(bParams.get("device_id").toString());
+					}
+					realHisCfgDeviceList = realHisCfgApi.getRealHisCfgList(realHisCfgFilter,
+							Integer.parseInt(bParams.get("pageIndex").toString()),
+							Integer.parseInt(bParams.get("pageSize").toString()));
+
+				} else if (client.userInfo.getUserType() == 2) {
+					/** 视图 **/
+
+					viewAccountRoleFilter.view_id = client.userId;
+					viewAccountRoleFilter.cfg_type = 1;
+					viewAccountRoleFilter.data_type = 0;
+					viewAccountRoleFilter.role_type = -1;
+					viewAccountRoleFilter.state = 3;
+					if (!CommonUtils.isNullOrEmpty(bParams.get("acc_dir_id"))) {
+						viewAccountRoleFilter.dirId = Long.parseLong(bParams.get("acc_dir_id").toString());
+					}
+					realHisCfgDeviceList = realHisCfgApi.getRealHisCfgList(viewAccountRoleFilter,
+							Integer.parseInt(bParams.get("pageIndex").toString()),
+							Integer.parseInt(bParams.get("pageSize").toString()));
 				}
-				if (!CommonUtils.isNullOrEmpty(bParams.get("device_id"))) {
-					realHisCfgFilter.device_id = Long.parseLong(bParams.get("device_id").toString());
-				}
-				realHisCfgDeviceList = realHisCfgApi.getRealHisCfgList(realHisCfgFilter,
-						Integer.parseInt(bParams.get("pageIndex").toString()),
-						Integer.parseInt(bParams.get("pageSize").toString()));
 
-			} else if (client.userInfo.getUserType() == 2) {
-				/** 视图 **/
-
-				viewAccountRoleFilter.view_id = client.userId;
-				viewAccountRoleFilter.cfg_type = 1;
-				viewAccountRoleFilter.data_type = 0;
-				viewAccountRoleFilter.role_type = -1;
-				viewAccountRoleFilter.state = 3;
-				if (!CommonUtils.isNullOrEmpty(bParams.get("acc_dir_id"))) {
-					viewAccountRoleFilter.dirId = Long.parseLong(bParams.get("acc_dir_id").toString());
-				}
-				realHisCfgDeviceList = realHisCfgApi.getRealHisCfgList(viewAccountRoleFilter,
-						Integer.parseInt(bParams.get("pageIndex").toString()),
-						Integer.parseInt(bParams.get("pageSize").toString()));
-			}
-
-			// 如果该账号下无实时数据配置文件直接返回空
-			if (realHisCfgDeviceList != null && realHisCfgDeviceList.getList().size() > 0) {
-				machineCodeSet = new HashSet<>();
-				for (int i = 0; i < realHisCfgDeviceList.getList().size(); i++) {
-					RealHisCfgDevice realHisCfgDevice = realHisCfgDeviceList.getList().get(i);
-					// 整数位 小数位分割
-					if (realHisCfgDevice.digit_count != null) {
-						String[] numdecs = realHisCfgDevice.digit_count.split(",");
-						if (numdecs != null) {
-							if (numdecs.length == 1) {
-								realHisCfgDevice.num = numdecs[0];
-							} else if (numdecs.length == 2) {
-								realHisCfgDevice.num = numdecs[0];
-								realHisCfgDevice.dec = numdecs[1];
+				// 如果该账号下无实时数据配置文件直接返回空
+				if (realHisCfgDeviceList != null && realHisCfgDeviceList.getList().size() > 0) {
+					machineCodeSet = new HashSet<>();
+					for (int i = 0; i < realHisCfgDeviceList.getList().size(); i++) {
+						RealHisCfgDevice realHisCfgDevice = realHisCfgDeviceList.getList().get(i);
+						// 整数位 小数位分割
+						if (realHisCfgDevice.digit_count != null) {
+							String[] numdecs = realHisCfgDevice.digit_count.split(",");
+							if (numdecs != null) {
+								if (numdecs.length == 1) {
+									realHisCfgDevice.num = numdecs[0];
+								} else if (numdecs.length == 2) {
+									realHisCfgDevice.num = numdecs[0];
+									realHisCfgDevice.dec = numdecs[1];
+								}
 							}
 						}
-					}
-					// 主子编号范围分割
-					if (realHisCfgDevice.data_limit != null) {
-						String[] numdecs = realHisCfgDevice.data_limit.split(",");
-						if (numdecs != null) {
-							if (numdecs.length == 1) {
-								realHisCfgDevice.main_limit = numdecs[0];
-							} else if (numdecs.length == 2) {
-								realHisCfgDevice.main_limit = numdecs[0];
-								realHisCfgDevice.child_limit = numdecs[1];
+						// 主子编号范围分割
+						if (realHisCfgDevice.data_limit != null) {
+							String[] numdecs = realHisCfgDevice.data_limit.split(",");
+							if (numdecs != null) {
+								if (numdecs.length == 1) {
+									realHisCfgDevice.main_limit = numdecs[0];
+								} else if (numdecs.length == 2) {
+									realHisCfgDevice.main_limit = numdecs[0];
+									realHisCfgDevice.child_limit = numdecs[1];
+								}
 							}
 						}
-					}
-					// 主子编号进制分割
-					if (realHisCfgDevice.digit_binary != null) {
-						String[] numdecs = realHisCfgDevice.digit_binary.split(",");
-						if (numdecs != null) {
-							if (numdecs.length == 1) {
-								realHisCfgDevice.main_binary = numdecs[0];
-							} else if (numdecs.length == 2) {
-								realHisCfgDevice.main_binary = numdecs[0];
-								realHisCfgDevice.child_binary = numdecs[1];
+						// 主子编号进制分割
+						if (realHisCfgDevice.digit_binary != null) {
+							String[] numdecs = realHisCfgDevice.digit_binary.split(",");
+							if (numdecs != null) {
+								if (numdecs.length == 1) {
+									realHisCfgDevice.main_binary = numdecs[0];
+								} else if (numdecs.length == 2) {
+									realHisCfgDevice.main_binary = numdecs[0];
+									realHisCfgDevice.child_binary = numdecs[1];
+								}
 							}
 						}
-					}
-					// 主子地址分割
-					String[] addrs = realHisCfgDevice.addr.split(",");
-					if (addrs != null) {
-						if (addrs.length == 1) {
-							realHisCfgDevice.main_addr = addrs[0];
-						} else if (addrs.length == 2) {
-							realHisCfgDevice.main_addr = addrs[0];
-							realHisCfgDevice.child_addr = addrs[1];
+						// 主子地址分割
+						String[] addrs = realHisCfgDevice.addr.split(",");
+						if (addrs != null) {
+							if (addrs.length == 1) {
+								realHisCfgDevice.main_addr = addrs[0];
+							} else if (addrs.length == 2) {
+								realHisCfgDevice.main_addr = addrs[0];
+								realHisCfgDevice.child_addr = addrs[1];
+							}
 						}
-					}
-					String device_machine = realHisCfgDevice.machine_code;
-					machineCodeSet.add(device_machine);
-					Device device = deviceApi.getDevice(device_machine);
-					realHisCfgDevice.box_state = device.state;
-					// 通过机器码去redis中获取数据
-					RedisPiBoxActData redisPiBoxActData = redisPiBoxApi.getRedisPiBoxActData(device_machine);
-					if (redisPiBoxActData != null) {
-						List<PiBoxCom> act_time_data_list = redisPiBoxActData.act_time_data_list;
-						for (int j = 0; j < act_time_data_list.size(); j++) {
-							PiBoxCom piBoxCom = act_time_data_list.get(j);
+						String device_machine = realHisCfgDevice.machine_code;
+						machineCodeSet.add(device_machine);
+						Device device = deviceApi.getDevice(device_machine);
+						realHisCfgDevice.box_state = device.state;
+						// 通过机器码去redis中获取数据
+						RedisPiBoxActData redisPiBoxActData = redisPiBoxApi.getRedisPiBoxActData(device_machine);
+						if (redisPiBoxActData != null) {
+							List<PiBoxCom> act_time_data_list = redisPiBoxActData.act_time_data_list;
+							for (int j = 0; j < act_time_data_list.size(); j++) {
+								PiBoxCom piBoxCom = act_time_data_list.get(j);
 
-							if (realHisCfgDevice.plc_id == Long.parseLong(piBoxCom.com)) {
+								if (realHisCfgDevice.plc_id == Long.parseLong(piBoxCom.com)) {
 
-								List<PiBoxComAddr> addr_list = piBoxCom.addr_list;
-								for (int x = 0; x < addr_list.size(); x++) {
-									PiBoxComAddr piBoxComAddr = addr_list.get(x);
+									List<PiBoxComAddr> addr_list = piBoxCom.addr_list;
+									for (int x = 0; x < addr_list.size(); x++) {
+										PiBoxComAddr piBoxComAddr = addr_list.get(x);
 
-									if (realHisCfgDevice.id == Long.parseLong(piBoxComAddr.addr_id)) {
-										// if (device.state == 0) {
-										// realHisCfgDevice.re_state = "0";
-										// } else {
-										// realHisCfgDevice.re_state =
-										// piBoxComAddr.state;
-										// }
-										realHisCfgDevice.re_state = piBoxComAddr.state;
-										realHisCfgDevice.re_value = piBoxComAddr.value;
+										if (realHisCfgDevice.id == Long.parseLong(piBoxComAddr.addr_id)) {
+											// if (device.state == 0) {
+											// realHisCfgDevice.re_state = "0";
+											// } else {
+											// realHisCfgDevice.re_state =
+											// piBoxComAddr.state;
+											// }
+											realHisCfgDevice.re_state = piBoxComAddr.state;
+											realHisCfgDevice.re_value = piBoxComAddr.value;
+
+										}
 
 									}
 
 								}
 
 							}
-
 						}
 					}
 				}
+				subscribeRealData(session, bParams, machineCodeSet);
+				json.put("piBoxActDateMode", realHisCfgDeviceList);
 			}
-			subscribeRealData(session, bParams, machineCodeSet);
-			json.put("piBoxActDateMode", realHisCfgDeviceList);
 			logger.debug("Websocket push msg: " + json.toJSONString());
 			return json.toJSONString();
 		} catch (Exception e) {
@@ -465,9 +466,6 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 			Client client = AppContext.getSession().client;
 			logger.debug("client==" + client);
 			clients.put(session.getId(), client);
-			// if (client == null) {
-			// client = AppContext.getSession().client;
-			// }
 
 			logger.debug("连接成功获取client==" + client.userInfo.toString());
 		} catch (Exception e) {
@@ -489,11 +487,6 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 		try {
 			logger.debug("关闭连接");
 			clients.remove(session.getId());
-			// 取消订阅
-			// subscribeListener.unsubscribe();
-			// subscribeListener = null;
-			// machineCodeSet = null;
-			// reclient = null;
 			logger.debug("Redis取消订阅成功");
 		} catch (Exception e) {
 			e.printStackTrace();
