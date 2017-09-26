@@ -185,7 +185,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             target_ref_id: target_ref_id,
             from_acc_dir_id: from_acc_dir_id,
             from_ref_id: from_ref_id
-
         }
         console.log(params);
         T.common.ajax.request("WeconBox", "baseInfoAction/dragToUpdateDir",

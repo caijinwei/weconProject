@@ -91,6 +91,10 @@
         </property>
     </bean>
 
+    <!-- 注放ApplicationContext实例 -->
+    <bean id="springContextHolder" class="com.wecon.box.util.SpringContextHolder"
+          lazy-init="false" />
+
     <websocket:handlers allowed-origins="*">
         <websocket:mapping handler="wsTestHandler" path="/wstest-websocket"/>
         <websocket:mapping handler="actDataHandler" path="/actdata-websocket"/>
