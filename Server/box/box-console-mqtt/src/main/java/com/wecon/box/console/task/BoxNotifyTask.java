@@ -337,6 +337,7 @@ public class BoxNotifyTask extends Thread {
         AlarmCfgApi alarmCfgApi = SpringContextHolder.getBean(AlarmCfgApi.class);
         AlarmCfgDataApi alarmCfgDataApi = SpringContextHolder.getBean(AlarmCfgDataApi.class);
         RealHisCfgDataApi realHisCfgDataApi = SpringContextHolder.getBean(RealHisCfgDataApi.class);
+        ViewAccountRoleApi viewAccountRoleApi = SpringContextHolder.getBean(ViewAccountRoleApi.class);
 
         try {
             //使用Map泛型主要是为了兼容所有类型反馈，比较灵活
@@ -405,11 +406,13 @@ public class BoxNotifyTask extends Thread {
                     if(null != hisCfgIds){
                         realHisCfgIds.addAll(hisCfgIds);
                     }
-                    //删除监控点配置、数据
+                    //删除监控点配置、数据、权限
                     realHisCfgApi.batchDeleteById(realHisCfgIds);
                     realHisCfgDataApi.batchDeleteById(realHisCfgIds);
                     alarmCfgApi.batchDeleteById(alarmCfgIds);
                     alarmCfgDataApi.batchDeleteById(alarmCfgIds);
+                    viewAccountRoleApi.batchDeleteViewAccRoleByCfgId(realHisCfgIds, 1);
+                    viewAccountRoleApi.batchDeleteViewAccRoleByCfgId(alarmCfgIds, 2);
                     break;
                 case ACT_DELETE_PLC_CONFIG : //删除通讯口配置
                     List<Map> delComList = (List<Map>)fbData.get("del_com_list");

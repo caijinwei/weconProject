@@ -115,5 +115,14 @@ public interface PlcInfoApi {
 	* */
 	public List<PlcInfoDetail> getListPlcInfoDetail(long device_id);
 
+	/*
+	* 更新plcdetaled
+	* */
+	public void savePlcInfoDetail(PlcInfoDetail detail);
+
+	/*
+	* 查找plcDetail
+	* */
+	public PlcInfoDetail getPlcInfoDetail(long plc_id);
 
 }

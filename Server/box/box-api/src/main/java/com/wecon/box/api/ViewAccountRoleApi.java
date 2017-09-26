@@ -117,4 +117,12 @@ public interface ViewAccountRoleApi {
 	* 根据视图账户ID  监控点ID  监控点类型 获取ViewAccountRoleView
 	* */
 	public ViewAccountRole findViewAccountRoleById(long accId,Integer cfgType);
+
+	/**
+	 * 批量删除数据
+	 * @param cfgIds
+	 * @param type
+     * @return
+     */
+	boolean batchDeleteViewAccRoleByCfgId(final List<Long> cfgIds, int type);
 }

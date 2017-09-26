@@ -1,6 +1,7 @@
 package com.wecon.box.impl;
 
 import com.wecon.box.api.AlarmCfgApi;
+
 import com.wecon.box.entity.AlarmCfg;
 import com.wecon.box.entity.AlarmCfgExtend;
 import com.wecon.box.entity.AlarmCfgTrigger;
@@ -10,6 +11,9 @@ import com.wecon.box.impl.AlarmCfgDataImpl.DefaultAlarmCfgDataAlarmCfgRowMapper;
 import com.wecon.common.util.TimeUtil;
 
 import com.wecon.common.util.CommonUtils;
+
+import com.wecon.box.entity.*;
+
 import com.wecon.common.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -219,7 +223,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 
 	@Override
 	public List<AlarmCfgExtend> getAlarmCfgExtendListByState(Object... state) {
-		String sql = "select a.alarmcfg_id,a.plc_id,a.data_id,a.account_id,a.name,a.addr,a.addr_type,a.text,a.condition_type,a.state,a.create_date,a.update_date,a.rid,a.data_limit,d.machine_code"
+		String sql = "select a.alarmcfg_id,a.plc_id,a.data_id,a.account_id,a.name,a.addr,a.addr_type,a.text,a.condition_type,a.state,a.create_date,a.update_date,a.rid,a.data_limit,a.digit_count,a.digit_binary,d.machine_code"
 				+ " from alarm_cfg a ,device d where a.device_id=d.device_id and d.state=1 ";
 		String triSql = "select at.alarmcfg_id,at.type, at.value from alarm_trigger at, alarm_cfg a where at.alarmcfg_id=a.alarmcfg_id";
 		if(null != state && state.length > 0){
@@ -406,7 +410,9 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			model.addr_type = rs.getInt("addr_type");
 			model.text = rs.getString("text");
 			model.state = rs.getInt("state");
-			model.data_limit=rs.getString("data_limit");
+			model.data_limit = rs.getString("data_limit");
+			model.digit_count = rs.getString("digit_count");
+			model.digit_binary = rs.getString("digit_binary");
 			model.condition_type = rs.getInt("condition_type");
 			model.create_date = rs.getTimestamp("create_date");
 			model.update_date = rs.getTimestamp("update_date");
@@ -494,5 +500,12 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 		return true;
 	}
 
-	
+	@Override
+	public void deleteAlarmCfg(long plc_id) {
+		Object[] args=new Object[]{plc_id};
+		String sql="delete from alarm_cfg where plc_id=?";
+		jdbcTemplate.update(sql,args);
+	}
+
+
 }

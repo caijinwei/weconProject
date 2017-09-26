@@ -202,6 +202,22 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     /**
      * 提交接口请求
      */
+
+        //提醒
+    $scope.chgTypeNotice = function () {
+        if ($("#plc_id").val() == 0) {
+            $scope.addPlcInfosetting_submit();
+        } else {
+            var oldType = $scope.plcInfoById.type;
+            if ($('#type').val() != oldType) {
+                $("#noticeType").modal("show");
+            } else {
+                $scope.addPlcInfosetting_submit();
+            }
+        }
+    }
+
+    //提交后台
     $scope.addPlcInfosetting_submit = function () {
         var params = {
             plc_id: $("#plc_id").val(),
@@ -278,6 +294,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
          * 当plc_id 不等于0
          * 对plc_id的通讯口就行修改编辑
          * */
+
         T.common.ajax.request("WeconBox", "plcInfoAction/savePlcInfo", params, function (data, code, msg) {
             if (code == 200) {
                 alert("操作成功");
@@ -460,7 +477,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         }, function () {
             alert("ajax error");
         });
-
     }
     /*
      * 进行输入框IP地址验证
@@ -826,12 +842,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 console.log(jsonResult);
                 $('#upNotice').empty();
                 for (var i in jsonResult) {
-                    if (i=="firm") {
+                    if (i == "firm") {
                         //console.log(i);
                         //console.log(jsonResult[i]);
-                        $('#upNotice').prepend('<p>固件升级'+(jsonResult[i]==1?'成功':(jsonResult[i]==-1?'文件写入失败':(jsonResult[i]==-2?'md5不匹配':(jsonResult[i]==-3?'文件拷贝失败':(jsonResult[i]==-4?'服务器下发版本较低，不更新':'未知错误'))))) + '</p>');
-                    }else {
-                        $('#upNotice').prepend('<p>驱动'+i + (jsonResult[i]==1?'成功':(jsonResult[i]==-1?'文件写入失败':(jsonResult[i]==-2?'md5不匹配':(jsonResult[i]==-3?'文件拷贝失败':(jsonResult[i]==-4?'服务器下发版本较低，不更新':'未知错误'))))) + '</p>');
+                        $('#upNotice').prepend('<p>固件升级' + (jsonResult[i] == 1 ? '成功' : (jsonResult[i] == -1 ? '文件写入失败' : (jsonResult[i] == -2 ? 'md5不匹配' : (jsonResult[i] == -3 ? '文件拷贝失败' : (jsonResult[i] == -4 ? '服务器下发版本较低，不更新' : '未知错误'))))) + '</p>');
+                    } else {
+                        $('#upNotice').prepend('<p>驱动' + i + (jsonResult[i] == 1 ? '成功' : (jsonResult[i] == -1 ? '文件写入失败' : (jsonResult[i] == -2 ? 'md5不匹配' : (jsonResult[i] == -3 ? '文件拷贝失败' : (jsonResult[i] == -4 ? '服务器下发版本较低，不更新' : '未知错误'))))) + '</p>');
                     }
                 }
                 $("#noticeModal").modal("show");

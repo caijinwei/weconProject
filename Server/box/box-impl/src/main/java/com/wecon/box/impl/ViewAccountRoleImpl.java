@@ -302,7 +302,7 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
                 }
             });
         } catch (Exception e) {
-            Logger.getLogger(AccountImpl.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(ViewAccountRoleImpl.class.getName()).log(Level.SEVERE, null, e);
             throw new BusinessException(ErrorCodeOption.Viewpoint_Dlete_False.key,
                     ErrorCodeOption.Viewpoint_Dlete_False.value);
         }
@@ -344,6 +344,21 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
             Object[] args = new Object[]{cfgIds.get(i), type};
             jdbcTemplate.update(sql, args);
         }
+    }
+
+    @Override
+    public boolean batchDeleteViewAccRoleByCfgId(final List<Long> cfgIds, int type){
+        if(null == cfgIds || cfgIds.size() == 0){
+            return false;
+        }
+        StringBuilder idSb = new StringBuilder();
+        for(long id : cfgIds){
+            idSb.append(",").append(id);
+        }
+        String sql = "delete from view_account_role where cfg_id in("+idSb.substring(1)+") and cfg_type=?";
+        jdbcTemplate.update(sql, new Object[]{type});
+
+        return true;
     }
 
     @Override

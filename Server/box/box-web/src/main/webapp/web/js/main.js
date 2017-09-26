@@ -185,7 +185,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             target_ref_id: target_ref_id,
             from_acc_dir_id: from_acc_dir_id,
             from_ref_id: from_ref_id
-
         }
         console.log(params);
         T.common.ajax.request("WeconBox", "baseInfoAction/dragToUpdateDir",
@@ -301,7 +300,7 @@ function drop(ev) {
     var appElement = document.querySelector('[ng-controller=infoController]');
     var $scope = angular.element(appElement).scope();
     $scope.dragToUpdateDir($('#' + data).parent().attr("sid"), $('#' + data)
-        .attr("id"), fromDirId, $('#' + data).attr("id"));
+        .attr("data_devid"), fromDirId, $('#' + data).attr("data_devid"));
 }
 
 /**

@@ -102,4 +102,9 @@ public interface AlarmCfgApi {
 	 * @return
 	 */
 	public int getAlamBxo(long account_id);
+
+	/*
+	* 删除通讯口下的实时监控点
+	* */
+	public void deleteAlarmCfg(long plc_id);
 }
