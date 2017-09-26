@@ -17,6 +17,8 @@ import com.wecon.box.api.AccountDirRelApi;
 import com.wecon.box.api.AlarmCfgApi;
 import com.wecon.box.api.AlarmCfgDataApi;
 import com.wecon.box.api.AlarmTriggerApi;
+import com.wecon.box.api.DevBindUserApi;
+import com.wecon.box.api.DeviceApi;
 import com.wecon.box.api.ViewAccountRoleApi;
 import com.wecon.box.entity.AccountDir;
 import com.wecon.box.entity.AccountDirRel;
@@ -25,13 +27,14 @@ import com.wecon.box.entity.AlarmCfgData;
 import com.wecon.box.entity.AlarmCfgDataAlarmCfg;
 import com.wecon.box.entity.AlarmCfgTrigger;
 import com.wecon.box.entity.AlarmTrigger;
+import com.wecon.box.entity.DevBindUser;
 import com.wecon.box.entity.Page;
-import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
 import com.wecon.box.filter.AlarmCfgDataFilter;
 import com.wecon.box.filter.AlarmTriggerFilter;
+import com.wecon.box.filter.DevBindUserFilter;
 import com.wecon.box.param.AlarmCfgParam;
 import com.wecon.box.param.AlarmDataParam;
 import com.wecon.box.util.DbLogUtil;
@@ -61,6 +64,10 @@ public class AlarmDataAction {
 	private AlarmTriggerApi alarmTriggerApi;
 	@Autowired
 	private ViewAccountRoleApi viewAccountRoleApi;
+	@Autowired
+	private DeviceApi deviceApi;
+	@Autowired
+	private DevBindUserApi devBindUserApi;
 	@Autowired
 	protected DbLogUtil dbLogUtil;
 
@@ -112,6 +119,7 @@ public class AlarmDataAction {
 		return new Output(json);
 
 	}
+
 	/**
 	 * 通过机器码获取对应的报警数据组
 	 * 
@@ -154,19 +162,20 @@ public class AlarmDataAction {
 		return new Output(json);
 
 	}
+
 	@WebApi(forceAuth = true, master = true)
 	@Description("通过盒子ID获取报警配置分组")
 	@RequestMapping(value = "/delAlarmGroup")
-	public Output delAlarmGroup(@RequestParam("id") Integer id){
+	public Output delAlarmGroup(@RequestParam("id") Integer id) {
 		AccountDir dir = accountDirApi.getAccountDir(id);
-		
-			List<AccountDirRel> dirrel = accountDirRelApi.getAccountDirRel(dir.id);
-			for (AccountDirRel acc : dirrel) {
-				AlarmCfg alarmCfg =alarmCfgApi.getAlarmcfg(acc.ref_id);
-				alarmCfg.state=3;
-				alarmCfgApi.upAlarmCfg(alarmCfg);// 删除分组下的报警配置
-			}
-		
+
+		List<AccountDirRel> dirrel = accountDirRelApi.getAccountDirRel(dir.id);
+		for (AccountDirRel acc : dirrel) {
+			AlarmCfg alarmCfg = alarmCfgApi.getAlarmcfg(acc.ref_id);
+			alarmCfg.state = 3;
+			alarmCfgApi.upAlarmCfg(alarmCfg);// 删除分组下的报警配置
+		}
+
 		if (dir != null && dir.account_id == AppContext.getSession().client.userId) {
 			accountDirApi.delAccountDir(id);
 			// <editor-fold desc="操作日志">
@@ -177,17 +186,7 @@ public class AlarmDataAction {
 					ErrorCodeOption.OnlyOperateOneselfGroup.value);
 		}
 		return new Output();
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+
 	}
 
 	@Description("获取组下的报警配置")
@@ -402,7 +401,6 @@ public class AlarmDataAction {
 						if (alarmCfgParam.group_id > 0) {
 							AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(alarmCfgParam.group_id,
 									alarmCfgParam.alarmcfg_id);
-							
 
 							if (accountDirRel != null) {
 
@@ -534,4 +532,29 @@ public class AlarmDataAction {
 
 	}
 
+	@Description("当前报警条目、当前报警盒子数、在线盒子数、总盒子数")
+	@RequestMapping(value = "/boxInfo")
+	public Output boxInfo() {
+		Client client = AppContext.getSession().client;
+		AlarmCfgDataFilter filter = new AlarmCfgDataFilter();
+		filter.account_id = client.userId;
+		filter.state = 1;
+		Page<AlarmCfgDataAlarmCfg> alarmCfgDataAlarmCfgList = alarmCfgDataApi.getRealHisCfgDataList(filter, -1, -1);
+		JSONObject json = new JSONObject();
+		// 当前报警条目
+		json.put("nowalarm", alarmCfgDataAlarmCfgList.getList().size());
+		// 当前报警盒子数
+		int alarmbox = alarmCfgApi.getAlamBxo(client.userId);
+		json.put("alarmbox", alarmbox);
+		// 盒子总数
+		int allbox = devBindUserApi.getDevBindUserCount(client.userId);
+		json.put("allbox", allbox);
+		// 在线盒子数
+		int onlinebox = deviceApi.getDeviceList(client.userId, 1);
+		json.put("onlinebox", onlinebox);
+		JSONObject alljson = new JSONObject();
+		alljson.put("allBoxInfo", json);
+		return new Output(alljson);
+
+	}
 }

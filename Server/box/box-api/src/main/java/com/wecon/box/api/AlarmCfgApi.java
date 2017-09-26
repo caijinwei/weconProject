@@ -95,4 +95,11 @@ public interface AlarmCfgApi {
 	* 盒子跟换用户  监控点迁移
 	* */
 	public boolean updatePointAccAndState(long accountId,long deviceId) ;
+	/**
+	 * 通过用户获取当前报警盒子数
+	 * 
+	 * @param account_id
+	 * @return
+	 */
+	public int getAlamBxo(long account_id);
 }

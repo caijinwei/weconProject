@@ -58,7 +58,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 
 		return true;
 	}
-
+	
 	@Override
 	public List<AlarmCfgDataAlarmCfg> getAlarmCfgData(AlarmCfgDataFilter filter) {
 
@@ -194,7 +194,12 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<AlarmCfgDataAlarmCfg> page = new Page<AlarmCfgDataAlarmCfg>(pageIndex, pageSize, totalRecord);
 		String sort = " order by acd.monitor_time desc";
-		sql += condition + sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
+		if(pageIndex>0&&pageSize>0){
+			sql += condition + sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
+		}else{
+			sql += condition + sort;//不分页
+		}
+		
 		List<AlarmCfgDataAlarmCfg> list = jdbcTemplate.query(sql, params.toArray(),
 				new DefaultAlarmCfgDataAlarmCfgRowMapper());
 		page.setList(list);
@@ -392,5 +397,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 			return model;
 		}
 	}
+
+	
 
 }

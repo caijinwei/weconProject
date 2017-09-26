@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" id="overview-html">
+<html lang="en" id="overview-html" ng-app="weconweb">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -7,17 +7,15 @@
     <!--<script src="http://apps.bdimg.com/libs/jquery/2.0.0/jquery.min.js"></script>-->
     <link rel="stylesheet" type="text/css" href="../css/style.css" />
     <link rel="stylesheet" href="../lib/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="../lib/jquery/jquery-3.2.1.min.js"></script>
-    <script src="../lib/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="../lib/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
-<body id="overview-body" >
+<body   ng-controller="listController" ng-init="onInit()" id="overview-body" >
     <div class="container-fluid">
         <div class="row state-overview">
             <div class="col-md-3">
                 <div class="state-panel">
                     <div class="state-line">
-                        <div class="state-value red ng-binding">15</div>
+                        <div class="state-value red ng-binding">{{boxInfo.nowalarm}}</div>
                     </div>
                     <div class="state-symbol">
                         <i class="user alarm-num fa-2 red"></i>
@@ -30,7 +28,7 @@
             <div class="col-md-3">
                 <div class="state-panel">
                     <div class="state-line">
-                        <div class="state-value yellow ng-binding">6</div>
+                        <div class="state-value yellow ng-binding">{{boxInfo.alarmbox}}</div>
                     </div>
                     <div class="state-symbol">
                         <i class="user alarm-box-num fa-2 yellow"></i>
@@ -43,7 +41,7 @@
             <div class="col-md-3">
                 <div class="state-panel">
                     <div class="state-line">
-                        <div class="state-value purple ng-binding">13</div>
+                        <div class="state-value purple ng-binding">{{boxInfo.onlinebox}}</div>
                     </div>
                     <div class="state-symbol">
                         <i class="user online-box-num fa-2 purple"></i>
@@ -56,7 +54,7 @@
             <div class="col-md-3">
                 <div class="state-panel">
                     <div class="state-line">
-                        <div class="state-value blue ng-binding">25</div>
+                        <div class="state-value blue ng-binding">{{boxInfo.allbox}}</div>
                     </div>
                     <div class="state-symbol">
                         <i class="user total-box-num fa-2 blue"></i>
@@ -68,6 +66,12 @@
             </div>
         </div>
     </div>
+    <script src="../lib/jquery/jquery-3.2.1.min.js"></script>
+	<script src="../lib/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="../lib/bootstrap/collapse/bootstrap-collapse.js"></script>
+	<script src="../lib/angular/angular.min.js" type="text/javascript"></script>
+	<script src="../lib/wecon-common.js" type="text/javascript"></script>
+	<script src="../js/overview.js" type="text/javascript"></script>
 
     <!--<footer>-->
         <!--<div class="pull-right">-->

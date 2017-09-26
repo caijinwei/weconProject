@@ -76,7 +76,7 @@ appModule
 					}
 
 					/**
-					 * 提交当前接口请求
+					 * 提交当前报警接口请求
 					 */
 					$scope.alarm_submit = function(pageIndex, pageSize) {
 						$("#loadingModal").modal("show");

@@ -24,6 +24,7 @@ public interface AlarmCfgDataApi {
 	 * @return
 	 */
 	public void saveAlarmCfgData(List<AlarmCfgData> listmodel);
+
 	/**
 	 * 更新报警数据
 	 * 
@@ -58,17 +59,21 @@ public interface AlarmCfgDataApi {
 
 	/**
 	 * 批量删除报警配置数据根据plc_id
+	 * 
 	 * @param ids
 	 * @return
-     */
+	 */
 	boolean batchDeleteByPlcId(List<Long> ids);
 
 	/**
 	 * 批量删除报警配置数据根据alarm_cfg_id
+	 * 
 	 * @param ids
 	 * @return
-     */
+	 */
 	boolean batchDeleteById(final List<Long> ids);
+
+	
 
 	/**
 	 * 分页查询报警数据
@@ -79,10 +84,12 @@ public interface AlarmCfgDataApi {
 	 * @return
 	 */
 	Page<AlarmCfgDataAlarmCfg> getRealHisCfgDataList(AlarmCfgDataFilter filter, int pageIndex, int pageSize);
-	
+
 	Page<AlarmCfgDataAlarmCfg> getViewRealHisCfgDataList(AlarmCfgDataFilter filter, int pageIndex, int pageSize);
 
-	Page<AlarmCfgDataAlarmCfg> getAdminAlarmCfgDataPage(AlarmCfgDataFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize);
+	Page<AlarmCfgDataAlarmCfg> getAdminAlarmCfgDataPage(AlarmCfgDataFilter filter, Map<String, Object> bParams,
+			int pageIndex, int pageSize);
 
-	Page<AlarmCfgDataAlarmCfg> getViewAlarmCfgDataPage(AlarmCfgDataFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize);
+	Page<AlarmCfgDataAlarmCfg> getViewAlarmCfgDataPage(AlarmCfgDataFilter filter, Map<String, Object> bParams,
+			int pageIndex, int pageSize);
 }

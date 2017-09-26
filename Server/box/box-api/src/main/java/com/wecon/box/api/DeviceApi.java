@@ -58,6 +58,13 @@ public interface DeviceApi {
 	 */
 	
 	public List<Device> getDeviceList(long account_id,long account_dir_id);
+	/**
+	 * 获取盒子在线离线数
+	 * @param account_id
+	 * @param state
+	 * @return
+	 */
+	public int getDeviceList(long account_id,int state);
 
     /**
      * 根据device_id删除设备信息

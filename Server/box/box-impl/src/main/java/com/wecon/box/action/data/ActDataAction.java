@@ -136,9 +136,7 @@ public class ActDataAction {
 		}
 		if (dir != null && dir.account_id == AppContext.getSession().client.userId) {
 			accountDirApi.delAccountDir(id);
-			// <editor-fold desc="操作日志">
 			dbLogUtil.addOperateLog(OpTypeOption.DelDir, ResTypeOption.Dir, id, dir);
-			// </editor-fold>
 		} else {
 			throw new BusinessException(ErrorCodeOption.OnlyOperateOneselfGroup.key,
 					ErrorCodeOption.OnlyOperateOneselfGroup.value);
