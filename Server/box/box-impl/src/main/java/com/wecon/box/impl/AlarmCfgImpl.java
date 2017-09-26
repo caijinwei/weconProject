@@ -7,13 +7,6 @@ import com.wecon.box.entity.AlarmCfgExtend;
 import com.wecon.box.entity.AlarmCfgTrigger;
 import com.wecon.box.entity.AlarmTrigger;
 import com.wecon.box.entity.Page;
-import com.wecon.box.impl.AlarmCfgDataImpl.DefaultAlarmCfgDataAlarmCfgRowMapper;
-import com.wecon.common.util.TimeUtil;
-
-import com.wecon.common.util.CommonUtils;
-
-import com.wecon.box.entity.*;
-
 import com.wecon.common.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;

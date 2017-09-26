@@ -370,6 +370,14 @@ public class AlarmDataAction {
 	@RequestMapping(value = "/addUpdataAlarmMonitor")
 	public Output addUpdataAlarmMonitor(@Valid AlarmCfgParam alarmCfgParam) {
 		long account_id = AppContext.getSession().client.userId;
+		DevBindUserFilter devBindUser=new DevBindUserFilter();
+		devBindUser.account_id=account_id;
+		devBindUser.device_id=alarmCfgParam.device_id;
+		List<DevBindUser> listDeviceBindUser=devBindUserApi.getDevBindUser(devBindUser);
+		if(listDeviceBindUser.size()!=1){
+			throw new BusinessException(ErrorCodeOption.Device_AlreadyBind.key,
+					ErrorCodeOption.Device_AlreadyBind.value);
+		}
 		if (alarmCfgParam != null) {
 			AlarmCfg oldalarmCfg = null;
 			AlarmCfg alarmCfg = null;

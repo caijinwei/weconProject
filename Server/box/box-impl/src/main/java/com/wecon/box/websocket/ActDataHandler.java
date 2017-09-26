@@ -208,12 +208,12 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 			if (client == null) {
 				client = AppContext.getSession().client;
 			}
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.debug("afterConnectionEstablished，" + e.getMessage());
 		}
-		
+
 	}
 
 	/**
@@ -224,7 +224,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 	 * @throws Exception
 	 */
 	@Override
-	public void afterConnectionClosed(WebSocketSession session, CloseStatus status){
+	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
 		try {
 			logger.debug("关闭连接");
 			// 取消订阅
@@ -236,6 +236,6 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 			e.printStackTrace();
 			logger.debug("afterConnectionClosed，" + e.getMessage());
 		}
-		
+
 	}
 }

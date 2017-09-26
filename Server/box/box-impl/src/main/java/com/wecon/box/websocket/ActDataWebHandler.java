@@ -42,19 +42,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	private RealHisCfgApi realHisCfgApi;
 	@Autowired
 	private DeviceApi deviceApi;
-
-	private String params;
-
-	private Set<String> machineCodeSet;
-
-	private WebSocketSession session;
-
-	private SubscribeListener subscribeListener;
-
-	private Client client;
-	private ClientMQTT reclient;
-	private Map<String, Object> bParams;
-	private String addr_id;
+	private Map<String, Client> clients = new HashMap<String, Client>();
 
 	private static final Logger logger = LogManager.getLogger(ActDataHandler.class.getName());
 
@@ -69,42 +57,42 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	protected void handleTextMessage(WebSocketSession session, TextMessage message) {
 
 		try {
-			this.params = message.getPayload();
+			String params = message.getPayload();
 			logger.debug("Server received message: " + params);
 			if (CommonUtils.isNullOrEmpty(params)) {
 				return;
 			}
-			bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {
+			Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {
 			});
 			if ("0".equals(bParams.get("markid").toString())) {
 				logger.debug("WebSocket push begin");
-				session.sendMessage(new TextMessage(getStringRealData()));
+				session.sendMessage(new TextMessage(getStringRealData(bParams, session)));
 				logger.debug("WebSocket push end");
 
 				// 订阅redis消息
-				if (null != machineCodeSet && null == subscribeListener) {
-					subscribeRealData();
-				}
+				// if (null != machineCodeSet ) {
+				// subscribeRealData(session, bParams,machineCodeSet);
+				// }
 
 			} else if ("1".equals(bParams.get("markid").toString())) {
 				String value = bParams.get("value").toString();
-				addr_id = bParams.get("addr_id").toString();
+				String addr_id = bParams.get("addr_id").toString();
 				// 订阅消息
 				if (!CommonUtils.isNullOrEmpty(addr_id)) {
 					RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(addr_id));
 					Device device = deviceApi.getDevice(realHisCfg.device_id);
 					String subscribeTopic = "pibox/cts/" + device.machine_code;
-					if (reclient == null || !reclient.isConnected()) {
-						SendvalueCallback sendvalueCallback = new SendvalueCallback();
-						reclient = new ClientMQTT(subscribeTopic, "send" + session.getId(), sendvalueCallback);
-						reclient.start();
-					}
+
+					SendvalueCallback sendvalueCallback = new SendvalueCallback(session, addr_id);
+					ClientMQTT reclient = new ClientMQTT(subscribeTopic, "send" + session.getId(), sendvalueCallback);
+					reclient.start();
+
 					if (!reclient.topicPort.contains(subscribeTopic)) {
 						reclient.subscribe(subscribeTopic);
 					}
 				}
 				// 发送数据
-				putMQTTMess(value);
+				putMQTTMess(value, session, addr_id);
 			}
 		} catch (Exception ex) {
 			logger.error(ex);
@@ -112,6 +100,13 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	}
 
 	class SendvalueCallback implements MqttCallback {
+		private WebSocketSession session;
+		private String addr_id;
+
+		public SendvalueCallback(WebSocketSession session, String addr_id) {
+			this.session = session;
+			this.addr_id = addr_id;
+		}
 
 		@Override
 		public void connectionLost(Throwable arg0) {
@@ -217,7 +212,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 
 	}
 
-	public void putMQTTMess(String value) {
+	public void putMQTTMess(String value, WebSocketSession session, String addr_id) {
 		try {
 			if (!CommonUtils.isNullOrEmpty(addr_id)) {
 				RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(addr_id));
@@ -245,11 +240,11 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 						String message = jsonObject.toJSONString();
 						logger.debug("put mqtt : " + message);
 						String topic = "pibox/stc/" + device.machine_code;
-						if (reclient == null || !reclient.isConnected()) {
-							SendvalueCallback sendvalueCallback = new SendvalueCallback();
-							reclient = new ClientMQTT(topic, "send" + session.getId(), sendvalueCallback);
-							reclient.start();
-						}
+
+						SendvalueCallback sendvalueCallback = new SendvalueCallback(session, addr_id);
+						ClientMQTT reclient = new ClientMQTT(topic, "send" + session.getId(), sendvalueCallback);
+						reclient.start();
+
 						reclient.publish(topic, message);
 					}
 				}
@@ -264,8 +259,9 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	/**
 	 * 订阅redis消息
 	 */
-	private void subscribeRealData() {
-		subscribeListener = new SubscribeListener();
+	private void subscribeRealData(WebSocketSession session, Map<String, Object> bParams,
+			final Set<String> machineCodeSet) {
+		final SubscribeListener subscribeListener = new SubscribeListener(session, bParams);
 		ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
 		cachedThreadPool.execute(new Runnable() {
 			public void run() {
@@ -281,13 +277,24 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	}
 
 	class SubscribeListener extends JedisPubSub {
+		/**
+		 * 
+		 */
+		private WebSocketSession session;
+		private Map<String, Object> bParams;
+
+		public SubscribeListener(WebSocketSession session, Map<String, Object> bParams) {
+			this.session = session;
+			this.bParams = bParams;
+		}
+
 		@Override
 		public void onMessage(String channel, String message) {
 			logger.debug("Subscribe callback，channel：" + channel + "message:" + message);
 			if (!CommonUtils.isNullOrEmpty(message) && "0".equals(bParams.get("markid").toString())) {
 				try {
 
-					session.sendMessage(new TextMessage(getStringRealData()));
+					session.sendMessage(new TextMessage(getStringRealData(bParams, session)));
 				} catch (IOException e) {
 					e.printStackTrace();
 					logger.debug("Subscribe callback error，" + e.getMessage());
@@ -296,15 +303,18 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 		}
 	}
 
-	private String getStringRealData() {
+	private String getStringRealData(Map<String, Object> bParams, WebSocketSession session) {
 		try {
 
 			JSONObject json = new JSONObject();
+			Set<String> machineCodeSet = null;
 			/** 获取实时数据配置信息 **/
 			RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
 			/** 通过视图获取配置信息 **/
 			ViewAccountRoleFilter viewAccountRoleFilter = new ViewAccountRoleFilter();
-
+			// Client client = AppContext.getSession().client;
+			// logger.debug("用户client==="+client.userInfo.toString());
+			Client client = clients.get(session.getId());
 			Page<RealHisCfgDevice> realHisCfgDeviceList = null;
 			if (client.userInfo.getUserType() == 1) {
 				/** 管理 **/
@@ -430,6 +440,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 					}
 				}
 			}
+			subscribeRealData(session, bParams, machineCodeSet);
 			json.put("piBoxActDateMode", realHisCfgDeviceList);
 			logger.debug("Websocket push msg: " + json.toJSONString());
 			return json.toJSONString();
@@ -449,11 +460,16 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) {
 		try {
+			logger.debug("session====" + session);
 			logger.debug("连接成功");
-			if (client == null) {
-				client = AppContext.getSession().client;
-			}
-			this.session = session;
+			Client client = AppContext.getSession().client;
+			logger.debug("client==" + client);
+			clients.put(session.getId(), client);
+			// if (client == null) {
+			// client = AppContext.getSession().client;
+			// }
+
+			logger.debug("连接成功获取client==" + client.userInfo.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.debug("afterConnectionEstablished，" + e.getMessage());
@@ -472,11 +488,12 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
 		try {
 			logger.debug("关闭连接");
+			clients.remove(session.getId());
 			// 取消订阅
-			subscribeListener.unsubscribe();
-			subscribeListener = null;
-			machineCodeSet = null;
-			reclient = null;
+			// subscribeListener.unsubscribe();
+			// subscribeListener = null;
+			// machineCodeSet = null;
+			// reclient = null;
 			logger.debug("Redis取消订阅成功");
 		} catch (Exception e) {
 			e.printStackTrace();

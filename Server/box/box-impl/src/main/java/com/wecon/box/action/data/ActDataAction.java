@@ -16,6 +16,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.AccountDirApi;
 import com.wecon.box.api.AccountDirRelApi;
+import com.wecon.box.api.DevBindUserApi;
 import com.wecon.box.api.DeviceApi;
 import com.wecon.box.api.PlcInfoApi;
 import com.wecon.box.api.RealHisCfgApi;
@@ -23,6 +24,7 @@ import com.wecon.box.api.RedisPiBoxApi;
 import com.wecon.box.api.ViewAccountRoleApi;
 import com.wecon.box.entity.AccountDir;
 import com.wecon.box.entity.AccountDirRel;
+import com.wecon.box.entity.DevBindUser;
 import com.wecon.box.entity.Device;
 import com.wecon.box.entity.Page;
 import com.wecon.box.entity.PiBoxCom;
@@ -37,6 +39,7 @@ import com.wecon.box.entity.plcdom.Res;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
+import com.wecon.box.filter.DevBindUserFilter;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.box.param.RealHisCfgParam;
@@ -75,6 +78,8 @@ public class ActDataAction {
 	private ViewAccountRoleApi viewAccountRoleApi;
 	@Autowired
 	private DeviceApi deviceApi;
+	@Autowired
+	private DevBindUserApi devBindUserApi;
 	@Autowired
 	protected DbLogUtil dbLogUtil;
 
@@ -739,6 +744,14 @@ public class ActDataAction {
 	public Output addUpdataMonitor(@Valid RealHisCfgParam realHisCfgParam) {
 		JSONObject json = new JSONObject();
 		long account_id = AppContext.getSession().client.userId;
+		DevBindUserFilter devBindUser=new DevBindUserFilter();
+		devBindUser.account_id=account_id;
+		devBindUser.device_id=realHisCfgParam.device_id;
+		List<DevBindUser> listDeviceBindUser=devBindUserApi.getDevBindUser(devBindUser);
+		if(listDeviceBindUser.size()!=1){
+			throw new BusinessException(ErrorCodeOption.Device_AlreadyBind.key,
+					ErrorCodeOption.Device_AlreadyBind.value);
+		}
 		if (realHisCfgParam != null) {
 			RealHisCfg oldrealHisCfg = null;
 			RealHisCfg realHisCfg = null;
