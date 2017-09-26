@@ -1,11 +1,8 @@
 package com.wecon.box.action;
 
 import com.alibaba.fastjson.JSONObject;
-import com.wecon.box.api.DevBindUserApi;
-import com.wecon.box.api.DriverApi;
-import com.wecon.box.api.PlcInfoApi;
+import com.wecon.box.api.*;
 import com.wecon.box.entity.PlcInfo;
-import com.wecon.box.entity.PlcInfoDetail;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
@@ -24,7 +21,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by caijinw on 2017/8/5.
@@ -43,6 +43,10 @@ public class PlcInfoSettingAction {
     DbLogUtil dbLogUtil;
     @Autowired
     DriverApi driverApi;
+    @Autowired
+    RealHisCfgApi realHisCfgApi;
+    @Autowired
+    AlarmCfgApi alarmCfgApi;
 
 //    @Description("新增plc配置")
 //    @RequestMapping(value = "/addPlcInfo")
@@ -214,10 +218,25 @@ public class PlcInfoSettingAction {
         if(driverApi.getDriverBydriver(plcInfo.driver)==null){
             throw new BusinessException(ErrorCodeOption.Driver_IsNot_Fount.key,ErrorCodeOption.Device_NotFound.value);
         }
+        //更新操作
         if (plcInfo.plc_id > 0) {
-            plcInfo.state = 2;
             PlcInfo oldPlc=plcInfoApi.findPlcInfoByPlcId(plcInfo.plc_id);
-            plcInfoApi.updatePlcInfo(plcInfo);
+            //修改驱动名称
+            //设置state为4  且  将通讯口下的监控点全部删除掉
+            if(!oldPlc.type.equals(plcInfo.type)){
+                plcInfo.state=4;
+                plcInfoApi.updatePlcInfo(plcInfo);
+
+                ArrayList<Long> plc_ids=new ArrayList<Long>();
+                plc_ids.add(plcInfo.plc_id);
+                realHisCfgApi.batchDeleteById(plc_ids);
+                alarmCfgApi.deleteAlarmCfg(plcInfo.plc_id);
+
+            }else {
+                //没有修改驱动名称
+                plcInfo.state = 2;
+                plcInfoApi.updatePlcInfo(plcInfo);
+            }
             // <editor - fold desc = "操作日志" >
             dbLogUtil.updOperateLog(OpTypeOption.UpdatePlc,ResTypeOption.Plc,oldPlc.plc_id,plcInfo,oldPlc);
             //</editor-fold>
@@ -225,7 +244,7 @@ public class PlcInfoSettingAction {
             plcInfo.state = 1;
             long newPlcInfoId=plcInfoApi.savePlcInfo(plcInfo);
             // <editor - fold desc = "操作日志" >
-            dbLogUtil.addOperateLog(OpTypeOption.UpdatePlc,ResTypeOption.Plc,newPlcInfoId,plcInfo);
+            dbLogUtil.addOperateLog(OpTypeOption.AddPlc,ResTypeOption.Plc,newPlcInfoId,plcInfo);
             //</editor-fold>
         }
         return new Output();

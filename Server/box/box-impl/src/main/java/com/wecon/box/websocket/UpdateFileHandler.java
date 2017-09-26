@@ -2,8 +2,11 @@ package com.wecon.box.websocket;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.wecon.box.api.PlcInfoApi;
+import com.wecon.box.entity.PlcInfoDetail;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.util.ClientMQTT;
+import com.wecon.box.util.SpringContextHolder;
 import com.wecon.restful.core.BusinessException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -98,8 +101,10 @@ public class UpdateFileHandler extends AbstractWebSocketHandler {
 * */
 
 class UpdateFileCallback implements MqttCallback {
+    private static final Logger logger = LogManager.getLogger(UpdateFileHandler.class.getName());
     WebSocketSession session;
     List<JSONObject> verifyObjects;
+    HashMap<String, String> result=new HashMap<String,String>();
     int count = 0;
 
     public UpdateFileCallback(WebSocketSession session, int count, List<JSONObject> verifyObjects) {
@@ -113,19 +118,16 @@ class UpdateFileCallback implements MqttCallback {
     }
 
     @Override
-    public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
+    public void messageArrived(String s, MqttMessage mqttMessage) {
 
         //处理不是JOSN格式的消息，直接抛弃
         try {
             JSONObject getPayMsg=JSONObject.parseObject(new String(mqttMessage.getPayload()));
             JSONObject.parseObject(String.valueOf(getPayMsg.get("data")));
         }catch (Exception e){
-//            String simpleName=e.getClass().getSimpleName();
-//            if(simpleName.equals("JSONException"))
             return;
         }
         System.out.println("收到的mqtt信息是    " + JSONObject.parseObject(new String(mqttMessage.getPayload())));
-        HashMap<String, String> result = new HashMap<String, String>();
         JSONObject feedBack = JSONObject.parseObject(new String(mqttMessage.getPayload()));
         //如果不是反馈消息  直接忽略
         if (!String.valueOf(feedBack.get("act")).equals("1")) {
@@ -133,15 +135,18 @@ class UpdateFileCallback implements MqttCallback {
         }
         //固件信息升级的反馈
         if (String.valueOf(feedBack.get("feedback_act")).equals("2007")) {
-//            for (JSONObject verify : verifyObjects) {
-//                if(verify.get("file_type")==1){
-//                    verifyObjects.re
-//                }
-//            }
-            JSONObject data = JSONObject.parseObject(String.valueOf(feedBack.get("data")));
-            String upd_state = data.get("upd_state").toString();
-            result.put("firm", upd_state);
-            count--;
+            for (JSONObject verify : verifyObjects) {
+                //将后台验证信息删除   （计数）
+                if(verify.get("file_type").equals("1")){
+                    verifyObjects.remove(verify);
+                    JSONObject data = JSONObject.parseObject(String.valueOf(feedBack.get("data")));
+                    String upd_state = data.get("upd_state").toString();
+                    result.put("firm", upd_state);
+                    count--;
+                    break;
+                }
+            }
+
         }
         //驱动信息升级反馈
         else if (String.valueOf(feedBack.get("feedback_act")).equals("2008")) {
@@ -151,20 +156,21 @@ class UpdateFileCallback implements MqttCallback {
             String upd_time = data.get("upd_time").toString();
             //验证更新时间是否一致
             for (JSONObject verify : verifyObjects) {
-//                    JSONObject innerData=JSONObject.parseObject(String.valueOf(verify.get("data")));
-//                    if(String.valueOf(innerData.get("file_type")).equals("2")&&String.valueOf(innerData.get("com")).equals(com)){
-//                        if(!String.valueOf(innerData.get("upd_time")).equals(upd_time)){
-//                            result.put(com,"-1");
-//                        }else{
-//                            count--;
-//                            break;
-//                        }
-//                    }
                 System.out.println(verify.get("com"));
                 if (String.valueOf(verify.get("file_type")).equals("2") && String.valueOf(verify.get("com")).equals(com)) {
                     verifyObjects.remove(verify);
                     if (!String.valueOf(verify.get("upd_time")).equals(upd_time)) {
-                        result.put(com, "-1");
+                        String upd_date=data.get("upd_state")+"";
+                        result.put(com,upd_date);
+                        //反馈状态  成功  写入数据库
+                        if(upd_date.equals("1")) {
+                            //数据库 更新 plc表  file_md5
+                            PlcInfoApi plcInfoApi = SpringContextHolder.getBean(PlcInfoApi.class);
+                            long plc_id = Long.parseLong(com);
+                            PlcInfoDetail plcInfo = plcInfoApi.getPlcInfoDetail(plc_id);
+                            plcInfo.file_md5 = String.valueOf(data.get("file_md5"));
+                            plcInfoApi.savePlcInfoDetail(plcInfo);
+                        }
                         count--;
                         break;
                     } else {
@@ -180,7 +186,11 @@ class UpdateFileCallback implements MqttCallback {
         //已经收到全部的反馈
         if (count <= 0) {
             JSONObject data =  JSONObject.parseObject(JSON.toJSONString(result));
-            sendWSMassage(session, data.toString());
+            try {
+                sendWSMassage(session, data.toString());
+            } catch (IOException e) {
+                logger.debug(""+e);
+            }
         }
     }
 

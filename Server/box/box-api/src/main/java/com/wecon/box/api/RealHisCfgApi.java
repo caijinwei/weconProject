@@ -44,7 +44,7 @@ public interface RealHisCfgApi {
 	/**
 	 * 通过设备id和名称获取监控配置
 	 * 
-	 * @param id
+	 * @param device_id
 	 * @return
 	 */
 	public RealHisCfg getRealHisCfg(long device_id,String name);

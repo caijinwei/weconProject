@@ -1,14 +1,7 @@
 package com.wecon.box.impl;
 
 import com.wecon.box.api.AlarmCfgApi;
-import com.wecon.box.entity.AlarmCfg;
-import com.wecon.box.entity.AlarmCfgExtend;
-import com.wecon.box.entity.AlarmCfgTrigger;
-import com.wecon.box.entity.AlarmTrigger;
-import com.wecon.box.entity.Page;
-import com.wecon.common.util.TimeUtil;
-
-import com.wecon.common.util.CommonUtils;
+import com.wecon.box.entity.*;
 import com.wecon.common.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -477,5 +470,12 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 		return true;
 	}
 
-	
+	@Override
+	public void deleteAlarmCfg(long plc_id) {
+		Object[] args=new Object[]{plc_id};
+		String sql="delete from alarm_cfg where plc_id=?";
+		jdbcTemplate.update(sql,args);
+	}
+
+
 }

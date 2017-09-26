@@ -95,4 +95,9 @@ public interface AlarmCfgApi {
 	* 盒子跟换用户  监控点迁移
 	* */
 	public boolean updatePointAccAndState(long accountId,long deviceId) ;
+
+	/*
+	* 删除通讯口下的实时监控点
+	* */
+	public void deleteAlarmCfg(long plc_id);
 }

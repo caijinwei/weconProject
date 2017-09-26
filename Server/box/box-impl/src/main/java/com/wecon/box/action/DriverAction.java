@@ -200,13 +200,12 @@ public class DriverAction {
             Object firmObject=dirFirmAction.updateFirm(versionName, versionCode, file_id, device_id).getResult();
             data.put("frimUpcount",firmObject);
 
+            //驱动验证信息
             String driverlist=String.valueOf(JSONObject.parseObject(driverObject.toString()).get("driverVerParam"));
             driverVerParams=JSONObject.parseArray(driverlist,DriverVerParam.class);
-
-            //固件验证信息下发  不需要
-            String firmlist=String.valueOf(JSONObject.parseObject(driverObject.toString()).get("driverVerParam"));
+            //固件验证信息
+            String firmlist=String.valueOf(JSONObject.parseObject(firmObject.toString()).get("driverVerParam"));
             driverVerParams.addAll(JSONObject.parseArray(firmlist,DriverVerParam.class));
-
         }else{
             isUpdated=0;
         }
@@ -325,6 +324,7 @@ public class DriverAction {
         data.put("driverVerParam",driverVerParams);
         return new Output(data);
     }
+
 }
 
 class DriverFileParam {

@@ -61,35 +61,35 @@ public class PlcInfoImpl implements PlcInfoApi {
                 String sql = "INSERT INTO plc_info (device_id,type,driver,box_stat_no,plc_stat_no,port,comtype,baudrate,stop_bit, " +
                         "data_length,check_bit,retry_times,wait_timeout,rev_timeout,com_stepinterval,com_iodelaytime,retry_timeout,net_port,net_type,net_isbroadcast,net_broadcastaddr  " +
                         ",net_ipaddr,state,create_date,update_date) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP(),CURRENT_TIMESTAMP())";
-                PreparedStatement  preState=con.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
-                preState.setLong(1,model.device_id);
+                PreparedStatement preState = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                preState.setLong(1, model.device_id);
                 preState.setString(2, model.type);
                 preState.setString(3, model.driver);
                 preState.setInt(4, model.box_stat_no);
                 preState.setInt(5, model.plc_stat_no);
-                preState.setString(6,model.port);
-                preState.setInt(7,model.comtype);
-                preState.setString(8,model.baudrate);
-                preState.setInt(9,model.stop_bit);
-                preState.setInt(10,model.data_length);
-                preState.setString(11,model.check_bit);
+                preState.setString(6, model.port);
+                preState.setInt(7, model.comtype);
+                preState.setString(8, model.baudrate);
+                preState.setInt(9, model.stop_bit);
+                preState.setInt(10, model.data_length);
+                preState.setString(11, model.check_bit);
 
-                preState.setInt(12,model.retry_times);
-                preState.setInt(13,model.wait_timeout);
-                preState.setInt(14,model.rev_timeout);
-                preState.setInt(15,model.com_stepinterval);
-                preState.setInt(16,model.com_iodelaytime);
-                preState.setInt(17,model.retry_timeout);
-                preState.setInt(18,model.net_port);
-                preState.setInt(19,model.net_type);
-                preState.setInt(20,model.net_isbroadcast);
-                preState.setInt(21,model.net_broadcastaddr);
-                preState.setString(22,model.net_ipaddr);
-                preState.setInt(23,model.state);
+                preState.setInt(12, model.retry_times);
+                preState.setInt(13, model.wait_timeout);
+                preState.setInt(14, model.rev_timeout);
+                preState.setInt(15, model.com_stepinterval);
+                preState.setInt(16, model.com_iodelaytime);
+                preState.setInt(17, model.retry_timeout);
+                preState.setInt(18, model.net_port);
+                preState.setInt(19, model.net_type);
+                preState.setInt(20, model.net_isbroadcast);
+                preState.setInt(21, model.net_broadcastaddr);
+                preState.setString(22, model.net_ipaddr);
+                preState.setInt(23, model.state);
                 return preState;
             }
-        },key);
-       return key.getKey().longValue();
+        }, key);
+        return key.getKey().longValue();
     }
 
     /*
@@ -106,7 +106,7 @@ public class PlcInfoImpl implements PlcInfoApi {
                 model.port = resultSet.getString("port");
                 model.comtype = resultSet.getInt("comtype");
                 model.type = resultSet.getString("type");
-                model.state=resultSet.getInt("state");
+                model.state = resultSet.getInt("state");
                 return model;
             }
         });
@@ -132,12 +132,23 @@ public class PlcInfoImpl implements PlcInfoApi {
     @Override
     public PlcInfo getPlcInfo(long plc_id) {
         String sql = "select " + SEL_COL + " from plc_info where plc_id=?";
-        List<PlcInfo> list = jdbcTemplate.query(sql, new Object[] { plc_id }, new DefaultPlcInfoRowMapper());
+        List<PlcInfo> list = jdbcTemplate.query(sql, new Object[]{plc_id}, new DefaultPlcInfoRowMapper());
         if (!list.isEmpty()) {
             return list.get(0);
         }
         return null;
     }
+
+    @Override
+    public PlcInfoDetail getPlcInfoDetail(long plc_id) {
+        String sql = "select " + SEL_COL + ",file_md5 " + " from plc_info where plc_id=?";
+        List<PlcInfoDetail> list = jdbcTemplate.query(sql, new Object[]{plc_id}, new DefaultPlcInfoDtailRowMapper());
+        if (!list.isEmpty()) {
+            return list.get(0);
+        }
+        return null;
+    }
+
 
     @Override
     public void delPlcInfo(long plc_id) {
@@ -154,16 +165,17 @@ public class PlcInfoImpl implements PlcInfoApi {
         }
         return null;
     }
+
     @Override
     public PlcInfo findPlcInfoByPlcId(long plcId) {
-        String sql="select "+SEL_COL+"  FROM plc_info where plc_id=?";
-        PlcInfo info=jdbcTemplate.queryForObject(sql,new Object[]{plcId},new DefaultPlcInfoRowMapper());
+        String sql = "select " + SEL_COL + "  FROM plc_info where plc_id=?";
+        PlcInfo info = jdbcTemplate.queryForObject(sql, new Object[]{plcId}, new DefaultPlcInfoRowMapper());
         return info;
     }
 
     @Override
     public List<PlcInfoDetail> getListPlcInfoDetail(long device_id) {
-        String sql = "select " + SEL_COL + " ,file_md5 "+" from plc_info where device_id=?";
+        String sql = "select " + SEL_COL + " ,file_md5 " + " from plc_info where device_id=?";
         List<PlcInfoDetail> list = jdbcTemplate.query(sql, new Object[]{device_id}, new DefaultPlcInfoDtailRowMapper());
         if (!list.isEmpty()) {
             return list;
@@ -172,12 +184,27 @@ public class PlcInfoImpl implements PlcInfoApi {
     }
 
     @Override
-    public List<PlcExtend> getPlcExtendListByState(Object... state){
+    public void savePlcInfoDetail(PlcInfoDetail model) {
+
+        String sql = "UPDATE plc_info SET  " +
+                "device_id=?,type=?,driver=?,box_stat_no=?,plc_stat_no=?,port=?,comtype=?,baudrate=?,stop_bit=?, " +
+                "data_length=?,check_bit=?,retry_times=?,wait_timeout=?,rev_timeout=?,com_stepinterval=?,com_iodelaytime=?, " +
+                "retry_timeout=?,net_port=?,net_type=?,net_isbroadcast=?,net_broadcastaddr=?,net_ipaddr=?,state=?,file_md5=?,update_date=NOW()" +
+                "WHERE plc_id=?";
+        Object args[] = {model.device_id, model.type, model.driver, model.box_stat_no, model.plc_stat_no, model.port, model.comtype, model.baudrate, model.stop_bit, model.data_length, model.check_bit,
+                model.retry_times, model.wait_timeout, model.rev_timeout, model.com_stepinterval, model.com_iodelaytime, model.rev_timeout, model.net_port, model.net_type, model.net_isbroadcast, model.net_broadcastaddr,
+                model.net_ipaddr, model.state,model.file_md5,model.plc_id};
+        jdbcTemplate.update(sql, args);
+
+    }
+
+    @Override
+    public List<PlcExtend> getPlcExtendListByState(Object... state) {
         String sql = "select p.*, d.machine_code, r.file_md5 as f_md5  from device d, plc_info p left join  driver r on p.driver = r.driver where p.device_id = d.device_id and d.state=1 ";
-        if(null != state && state.length > 0){
+        if (null != state && state.length > 0) {
             sql += " and p.state in (";
             StringBuffer inSb = new StringBuffer();
-            for(Object o : state){
+            for (Object o : state) {
                 inSb.append(",?");
             }
             sql += inSb.substring(1);
@@ -191,8 +218,8 @@ public class PlcInfoImpl implements PlcInfoApi {
     }
 
     @Override
-    public boolean batchUpdateState(final List<String[]> updList){
-        if(null == updList || updList.size() == 0){
+    public boolean batchUpdateState(final List<String[]> updList) {
+        if (null == updList || updList.size() == 0) {
             return false;
         }
         String sql = "update plc_info set state = ? where plc_id = ? and date_format(update_date,'%Y-%m-%d %H:%i:%s') = ?";
@@ -201,13 +228,14 @@ public class PlcInfoImpl implements PlcInfoApi {
                 return updList.size();
                 //这个方法设定更新记录数，通常List里面存放的都是我们要更新的，所以返回list.size();
             }
-            public void setValues(PreparedStatement ps, int i)throws SQLException {
+
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
                 try {
                     String[] arg = updList.get(i);
                     ps.setInt(1, Integer.parseInt(arg[0]));
                     ps.setInt(2, Integer.parseInt(arg[1]));
                     ps.setString(3, arg[2]);
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -216,17 +244,17 @@ public class PlcInfoImpl implements PlcInfoApi {
     }
 
     @Override
-    public boolean batchUpdateFileMd5(final List<String[]> updList){
-        if(null == updList || updList.size() == 0){
+    public boolean batchUpdateFileMd5(final List<String[]> updList) {
+        if (null == updList || updList.size() == 0) {
             return false;
         }
 
         StringBuffer inSb = new StringBuffer();
-        for(String[] ss : updList){
+        for (String[] ss : updList) {
             inSb.append(",").append(ss[1]);
         }
 
-        final List<String> fileMd5List = jdbcTemplate.query("select r.file_md5 from driver r, plc_info p where r.driver=p.driver and p.plc_id in("+inSb.substring(1)+")", new RowMapper() {
+        final List<String> fileMd5List = jdbcTemplate.query("select r.file_md5 from driver r, plc_info p where r.driver=p.driver and p.plc_id in(" + inSb.substring(1) + ")", new RowMapper() {
             @Override
             public String mapRow(ResultSet resultSet, int i) throws SQLException {
                 return resultSet.getString("file_md5");
@@ -239,13 +267,14 @@ public class PlcInfoImpl implements PlcInfoApi {
                 return updList.size();
                 //这个方法设定更新记录数，通常List里面存放的都是我们要更新的，所以返回list.size();
             }
-            public void setValues(PreparedStatement ps, int i)throws SQLException {
+
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
                 try {
                     String[] arg = updList.get(i);
                     ps.setString(1, fileMd5List.get(i));
                     ps.setInt(2, Integer.parseInt(arg[1]));
                     ps.setString(3, arg[2]);
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -254,31 +283,31 @@ public class PlcInfoImpl implements PlcInfoApi {
     }
 
     @Override
-    public boolean batchDeletePlc(final List<Long> ids){
-        if(null == ids || ids.size() == 0){
+    public boolean batchDeletePlc(final List<Long> ids) {
+        if (null == ids || ids.size() == 0) {
             return false;
         }
         StringBuilder idSb = new StringBuilder();
-        for(long id : ids){
+        for (long id : ids) {
             idSb.append(",").append(id);
         }
-        String sql = "delete from plc_info where plc_id in("+idSb.substring(1)+")";
+        String sql = "delete from plc_info where plc_id in(" + idSb.substring(1) + ")";
         jdbcTemplate.update(sql);
 
         return true;
     }
 
     @Override
-    public List<Long> getDeleteIdsByUpdTime(List<String[]> delArgList){
-        if(null == delArgList || delArgList.size() == 0){
+    public List<Long> getDeleteIdsByUpdTime(List<String[]> delArgList) {
+        if (null == delArgList || delArgList.size() == 0) {
             return null;
         }
 
         StringBuilder idSb = new StringBuilder();
-        for(String[] args : delArgList){
+        for (String[] args : delArgList) {
             idSb.append(",").append(args[0]);
         }
-        List<PlcExtend> plcInfoList = jdbcTemplate.query("select plc_id, update_date from plc_info where plc_id in("+idSb.substring(1)+")", new RowMapper() {
+        List<PlcExtend> plcInfoList = jdbcTemplate.query("select plc_id, update_date from plc_info where plc_id in(" + idSb.substring(1) + ")", new RowMapper() {
             @Override
             public Object mapRow(ResultSet resultSet, int i) throws SQLException {
                 PlcExtend model = new PlcExtend();
@@ -288,12 +317,12 @@ public class PlcInfoImpl implements PlcInfoApi {
             }
         });
 
-        if(null != plcInfoList){
+        if (null != plcInfoList) {
             List<Long> plcIds = new ArrayList<>();
-            for(String[] args : delArgList){
-                for(PlcExtend plcExtend : plcInfoList){
-                    if(Integer.parseInt(args[0]) == plcExtend.plc_id
-                            && args[1].equals(plcExtend.upd_time)){
+            for (String[] args : delArgList) {
+                for (PlcExtend plcExtend : plcInfoList) {
+                    if (Integer.parseInt(args[0]) == plcExtend.plc_id
+                            && args[1].equals(plcExtend.upd_time)) {
                         plcIds.add(plcExtend.plc_id);
                         break;
                     }
@@ -371,8 +400,7 @@ public class PlcInfoImpl implements PlcInfoApi {
             model.state = rs.getInt("state");
             model.create_date = rs.getTimestamp("create_date");
             model.update_date = rs.getTimestamp("update_date");
-            model.file_md5=rs.getString("file_md5");
-            model.file_md5=rs.getString("file_md5");
+            model.file_md5 = rs.getString("file_md5");
             return model;
         }
     }
@@ -422,13 +450,12 @@ public class PlcInfoImpl implements PlcInfoApi {
     }
 
 
-
     public static final class DefaultPlcExtendRowMapper implements RowMapper<PlcExtend> {
         @Override
         public PlcExtend mapRow(ResultSet rs, int i) throws SQLException {
             PlcExtend model = new PlcExtend();
             model.plc_id = rs.getLong("plc_id");
-            model.com = model.plc_id+"";
+            model.com = model.plc_id + "";
             model.device_id = rs.getLong("device_id");
             model.type = rs.getString("type");
             model.driver = rs.getString("driver");
