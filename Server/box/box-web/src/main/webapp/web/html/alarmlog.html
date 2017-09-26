@@ -451,7 +451,7 @@
 										style="margin: 10px 0;" id="divdatatypeid">
 										<span class="col-md-3">数据格式</span> <select id="datatypeid"
 											class="col-md-9" style="height: 30px;">
-											<option ng-repeat="x in dataTypes" value="{{x.value}}">{{x.text}}</option>
+											<option ng-repeat="x in dataTypes" value="{{x.value}} " ng-if="x.value!=1000">{{x.text}}</option>
 										</select>
 									</div>
 									<div class="row col-md-11 col-md-offset-1"
