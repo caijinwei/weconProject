@@ -111,6 +111,7 @@ public class BusinessDataAction {
             arr.add(data);
         }
         json.put("list", arr);
+        json.put("totalPage", realHisCfgDevicePage.getTotalPage());
         return new Output(json);
     }
 
@@ -160,6 +161,7 @@ public class BusinessDataAction {
         }
 
         json.put("list", arr);
+        json.put("totalPage", realHisCfgDataPage.getTotalPage());
         return new Output(json);
     }
 
@@ -205,6 +207,7 @@ public class BusinessDataAction {
                 arr.add(data);
             }
             json.put("list", arr);
+            json.put("totalPage", alarmCfgDataPage.getTotalPage());
         }
 
         return new Output(json);

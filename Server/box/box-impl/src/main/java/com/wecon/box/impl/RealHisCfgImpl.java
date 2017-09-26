@@ -775,6 +775,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.addr_type = rs.getInt("addr_type");
 			model.describe = rs.getString("describe");
 			model.digit_count = rs.getString("digit_count");
+			model.digit_binary = rs.getString("digit_binary");
 			model.data_limit = rs.getString("data_limit");
 			model.his_cycle = rs.getInt("his_cycle");
 			model.data_type = rs.getInt("data_type");

@@ -347,6 +347,21 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
     }
 
     @Override
+    public boolean batchDeleteViewAccRoleByCfgId(final List<Long> cfgIds, int type){
+        if(null == cfgIds || cfgIds.size() == 0){
+            return false;
+        }
+        StringBuilder idSb = new StringBuilder();
+        for(long id : cfgIds){
+            idSb.append(",").append(id);
+        }
+        String sql = "delete from view_account_role where cfg_id in("+idSb.substring(1)+") and cfg_type=?";
+        jdbcTemplate.update(sql, new Object[]{type});
+
+        return true;
+    }
+
+    @Override
     public ViewAccountRole findViewAccountRoleById(long accId,  Integer cgfId) {
         String sql="SELECT * FROM view_account_role a WHERE a.cfg_id=? AND a.view_id=? ";
         Object[] args=new Object[]{cgfId,accId};
