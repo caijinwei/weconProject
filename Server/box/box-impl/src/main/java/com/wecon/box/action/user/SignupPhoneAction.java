@@ -53,7 +53,7 @@ public class SignupPhoneAction extends UserBaseAction {
                 SmsUtil.sendSMS(phonenum, String.valueOf(vercode));
             } else if (VerifyUtil.isValidEmail(phonenum)) {
                 //发送到邮箱
-                EmailUtil.send(phonenum, "pibox - 验证码", String.valueOf(vercode));
+                EmailUtil.send(phonenum, "V-BOX - 验证码", String.valueOf(vercode));
             }
         }
 

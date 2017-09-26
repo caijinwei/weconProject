@@ -92,6 +92,7 @@
     </bean>
 
     <websocket:handlers allowed-origins="*">
+        <websocket:mapping handler="wsTestHandler" path="/wstest-websocket"/>
         <websocket:mapping handler="actDataHandler" path="/actdata-websocket"/>
         <websocket:mapping handler="actDataWebHandler" path="/actdataweb-websocket"/>
         <websocket:mapping path="/debugInfo-websocket/"
@@ -105,6 +106,7 @@
 
         <websocket:sockjs/>
     </websocket:handlers>
+    <bean id="wsTestHandler" class="com.wecon.box.websocket.WsTestHandler"></bean>
     <bean id="updateFileHandler" class="com.wecon.box.websocket.UpdateFileHandler"></bean>
     <bean id="actDataHandler" class="com.wecon.box.websocket.ActDataHandler"/>
     <bean id="actDataWebHandler" class="com.wecon.box.websocket.ActDataWebHandler"/>

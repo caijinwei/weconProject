@@ -153,16 +153,7 @@
                 <label class="col-xs-2 col-sm-2 col-md-2 control-label">发送消息</label>
 
                 <div class="col-xs-9 col-sm-9 col-md-9">
-                    <input type="text" class="form-control" id="wsMsg" placeholder="发送消息">
-                </div>
-            </div>
-            <div class="row form-group">
-                <label class="col-xs-2 col-sm-2 col-md-2 control-label">使用SockJS</label>
-
-                <div class="col-xs-9 col-sm-9 col-md-9">
-                    <button type="button" class="btn btn-primary" ng-click="ws_connect();">连接</button>
-                    <button type="button" class="btn btn-primary" ng-click="ws_send();">发送消息</button>
-                    <button type="button" class="btn btn-primary" ng-click="ws_close();">关闭</button>
+                    <input type="text" class="form-control" id="wsMsg" placeholder="发送消息" value="{markid:1}">
                 </div>
             </div>
             <div class="row form-group">

@@ -37,7 +37,7 @@ public class SmsUtil {
             //手机号码
             sb.append("&mobile=" + mobile);
             //消息内容转URL标准码
-            sb.append("&content=" + URLEncoder.encode(content + "【wecon-pibox】", "GBK"));
+            sb.append("&content=" + URLEncoder.encode(content + "【V-BOX】", "GBK"));
             // 创建url对象
             URL url = new URL(sb.toString());
             // 打开url连接

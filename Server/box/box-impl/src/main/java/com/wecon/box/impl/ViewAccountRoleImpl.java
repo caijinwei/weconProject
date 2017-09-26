@@ -302,7 +302,7 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
                 }
             });
         } catch (Exception e) {
-            Logger.getLogger(AccountImpl.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(ViewAccountRoleImpl.class.getName()).log(Level.SEVERE, null, e);
             throw new BusinessException(ErrorCodeOption.Viewpoint_Dlete_False.key,
                     ErrorCodeOption.Viewpoint_Dlete_False.value);
         }
