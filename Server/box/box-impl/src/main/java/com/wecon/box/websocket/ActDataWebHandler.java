@@ -26,7 +26,6 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
-
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -258,9 +257,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	 * 订阅redis消息
 	 */
 	private void subscribeRealData(WebSocketSession session, Map<String, Object> bParams,final Set<String> machineCodeSet) {
-		logger.debug("subscribeRealData...................");
 		final SubscribeListener subscribeListener = new SubscribeListener(session, bParams);
-		
 		subscribeListeners.put(session.getId(), subscribeListener);
 		ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
 		cachedThreadPool.execute(new Runnable() {
@@ -313,8 +310,6 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 			RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
 			/** 通过视图获取配置信息 **/
 			ViewAccountRoleFilter viewAccountRoleFilter = new ViewAccountRoleFilter();
-			// Client client = AppContext.getSession().client;
-			// logger.debug("用户client==="+client.userInfo.toString());
 			Client client = clients.get(session.getId());
 			logger.debug("显示client==" + client.userInfo.toString());
 			logger.debug("显示session.getId()==" + session.getId());
@@ -425,12 +420,6 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 										PiBoxComAddr piBoxComAddr = addr_list.get(x);
 
 										if (realHisCfgDevice.id == Long.parseLong(piBoxComAddr.addr_id)) {
-											// if (device.state == 0) {
-											// realHisCfgDevice.re_state = "0";
-											// } else {
-											// realHisCfgDevice.re_state =
-											// piBoxComAddr.state;
-											// }
 											realHisCfgDevice.re_state = piBoxComAddr.state;
 											realHisCfgDevice.re_value = piBoxComAddr.value;
 

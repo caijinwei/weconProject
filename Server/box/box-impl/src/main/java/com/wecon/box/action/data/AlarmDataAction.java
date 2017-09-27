@@ -170,17 +170,16 @@ public class AlarmDataAction {
 		AccountDir dir = accountDirApi.getAccountDir(id);
 
 		List<AccountDirRel> dirrel = accountDirRelApi.getAccountDirRel(dir.id);
-		for (AccountDirRel acc : dirrel) {
-			AlarmCfg alarmCfg = alarmCfgApi.getAlarmcfg(acc.ref_id);
-			alarmCfg.state = 3;
-			alarmCfgApi.upAlarmCfg(alarmCfg);// 删除分组下的报警配置
+		if (dirrel != null) {
+			for (AccountDirRel acc : dirrel) {
+				AlarmCfg alarmCfg = alarmCfgApi.getAlarmcfg(acc.ref_id);
+				alarmCfg.state = 3;
+				alarmCfgApi.upAlarmCfg(alarmCfg);// 删除分组下的报警配置
+			}
 		}
-
 		if (dir != null && dir.account_id == AppContext.getSession().client.userId) {
 			accountDirApi.delAccountDir(id);
-			// <editor-fold desc="操作日志">
 			dbLogUtil.addOperateLog(OpTypeOption.DelDir, ResTypeOption.Dir, id, dir);
-			// </editor-fold>
 		} else {
 			throw new BusinessException(ErrorCodeOption.OnlyOperateOneselfGroup.key,
 					ErrorCodeOption.OnlyOperateOneselfGroup.value);
@@ -370,11 +369,11 @@ public class AlarmDataAction {
 	@RequestMapping(value = "/addUpdataAlarmMonitor")
 	public Output addUpdataAlarmMonitor(@Valid AlarmCfgParam alarmCfgParam) {
 		long account_id = AppContext.getSession().client.userId;
-		DevBindUserFilter devBindUser=new DevBindUserFilter();
-		devBindUser.account_id=account_id;
-		devBindUser.device_id=alarmCfgParam.device_id;
-		List<DevBindUser> listDeviceBindUser=devBindUserApi.getDevBindUser(devBindUser);
-		if(listDeviceBindUser.size()!=1){
+		DevBindUserFilter devBindUser = new DevBindUserFilter();
+		devBindUser.account_id = account_id;
+		devBindUser.device_id = alarmCfgParam.device_id;
+		List<DevBindUser> listDeviceBindUser = devBindUserApi.getDevBindUser(devBindUser);
+		if (listDeviceBindUser.size() != 1) {
 			throw new BusinessException(ErrorCodeOption.Device_AlreadyBind.key,
 					ErrorCodeOption.Device_AlreadyBind.value);
 		}
@@ -503,14 +502,25 @@ public class AlarmDataAction {
 	@WebApi(forceAuth = true, master = true, authority = { "1" })
 	@RequestMapping(value = "/delAlrmCfg")
 	public Output delAlrmCfg(@RequestParam("alarmcfg_id") String alarmcfg_id) {
+		long account_id = AppContext.getSession().client.userId;
+		if (!CommonUtils.isNullOrEmpty(alarmcfg_id)) {
+			AlarmCfg alarmCfg = alarmCfgApi.getAlarmcfg(Long.parseLong(alarmcfg_id));
+			DevBindUserFilter devBindUser = new DevBindUserFilter();
+			devBindUser.account_id = account_id;
+			devBindUser.device_id = alarmCfg.device_id;
+			List<DevBindUser> listDeviceBindUser = devBindUserApi.getDevBindUser(devBindUser);
+			if (listDeviceBindUser.size() != 1) {
+				throw new BusinessException(ErrorCodeOption.Device_AlreadyBind.key,
+						ErrorCodeOption.Device_AlreadyBind.value);
+			}
+			// 1.删除分配给视图账号的配置
+			viewAccountRoleApi.deletePoint(2, Long.parseLong(alarmcfg_id));
+			// 2.更改配置状态，等待盒子发送数据把配置物理删除
 
-		// 1.删除分配给视图账号的配置
-		viewAccountRoleApi.deletePoint(2, Long.parseLong(alarmcfg_id));
-		// 2.更改配置状态，等待盒子发送数据把配置物理删除
-		AlarmCfg alarmCfg = alarmCfgApi.getAlarmcfg(Long.parseLong(alarmcfg_id));
-		alarmCfg.state = 3;// 删除配置状态
-		alarmCfgApi.upAlarmCfg(alarmCfg);
-		dbLogUtil.addOperateLog(OpTypeOption.DelAlarm, ResTypeOption.Alarm, alarmCfg.alarmcfg_id, alarmCfg);
+			alarmCfg.state = 3;// 删除配置状态
+			alarmCfgApi.upAlarmCfg(alarmCfg);
+			dbLogUtil.addOperateLog(OpTypeOption.DelAlarm, ResTypeOption.Alarm, alarmCfg.alarmcfg_id, alarmCfg);
+		}
 
 		return new Output();
 

@@ -7,22 +7,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSONObject;
+import com.wecon.box.api.DevBindUserApi;
 import com.wecon.box.api.PlcInfoApi;
 import com.wecon.box.api.RealHisCfgApi;
 import com.wecon.box.api.RealHisCfgDataApi;
 import com.wecon.box.api.ViewAccountRoleApi;
+import com.wecon.box.entity.DevBindUser;
 import com.wecon.box.entity.Page;
 import com.wecon.box.entity.PlcInfo;
 import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.entity.RealHisCfgData;
 import com.wecon.box.entity.RealHisCfgDevice;
 import com.wecon.box.enums.DataTypeOption;
+import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.box.filter.DevBindUserFilter;
 import com.wecon.box.filter.RealHisCfgDataFilter;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
+import com.wecon.restful.core.BusinessException;
 import com.wecon.restful.core.Client;
 import com.wecon.restful.core.Output;
 
@@ -40,6 +45,8 @@ public class HisDataAction {
 	private PlcInfoApi plcInfoApi;
 	@Autowired
 	private ViewAccountRoleApi viewAccountRoleApi;
+	@Autowired
+	private DevBindUserApi devBindUserApi;
 
 	@WebApi(forceAuth = true, master = true)
 	@Description("获取改账户下的plc和对应的监控点")
@@ -227,9 +234,19 @@ public class HisDataAction {
 	@RequestMapping(value = "/delHisMonitor")
 	public Output delHisMonitor(@RequestParam("monitorid") String monitorid) {
 		if (!CommonUtils.isNullOrEmpty(monitorid)) {
+			Client client = AppContext.getSession().client;
+			RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(monitorid));
+			DevBindUserFilter devBindUser=new DevBindUserFilter();
+			devBindUser.account_id=client.userId;
+			devBindUser.device_id=realHisCfg.device_id;
+			List<DevBindUser> listDeviceBindUser=devBindUserApi.getDevBindUser(devBindUser);
+			if(listDeviceBindUser.size()!=1){
+				throw new BusinessException(ErrorCodeOption.Device_AlreadyBind.key,
+						ErrorCodeOption.Device_AlreadyBind.value);
+			}
 			viewAccountRoleApi.deletePoint(1, Long.parseLong(monitorid));
 
-			RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(monitorid));
+		
 			realHisCfg.state = 3;// 删除配置状态
 			realHisCfgApi.updateRealHisCfg(realHisCfg);
 		}
