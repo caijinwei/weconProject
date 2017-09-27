@@ -1392,7 +1392,7 @@ appModule
 						$scope.delmonitorid = model.id;// 监控点id
 						$("#delgroupid").html("确定要删除【" + model.name + "】数据吗？");
 					}
-					// 移除监控点
+					// 删除监控点
 					$scope.del_monitor_group = function() {
 
 						var params = {
