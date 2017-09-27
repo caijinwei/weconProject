@@ -35,6 +35,7 @@ public class UpdateFileHandler extends AbstractWebSocketHandler {
     ClientMQTT client;
     private static final Logger logger = LogManager.getLogger(DebugInfoHandler.class.getName());
     private Timer timer;
+    Map<String,ClientMQTT> clientMQTTMap=new HashMap<String,ClientMQTT>();
     /*
      * @param session
      * @param message
@@ -79,7 +80,8 @@ public class UpdateFileHandler extends AbstractWebSocketHandler {
         * mqtt监听主题
         * */
         UpdateFileCallback updateFileCallback = new UpdateFileCallback(session, count, verifyObjects);
-        client = new ClientMQTT("pibox/cts/" + machine_code, "upb" + session.getId(), updateFileCallback);
+        clientMQTTMap.put(session.getId(),new ClientMQTT("pibox/cts/" + machine_code, "upb" + session.getId(), updateFileCallback));
+        client=clientMQTTMap.get(session.getId());
         client.start();
     }
 
