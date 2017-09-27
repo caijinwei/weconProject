@@ -3,12 +3,14 @@ package com.wecon.box.action.user;
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.entity.Account;
 import com.wecon.box.entity.Page;
+import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
 import com.wecon.box.filter.AccountFilter;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
+import com.wecon.restful.core.BusinessException;
 import com.wecon.restful.core.Output;
 import com.wecon.restful.doc.Label;
 import org.hibernate.validator.constraints.Length;
@@ -53,6 +55,9 @@ public class ViewUserAction extends UserBaseAction {
     @RequestMapping("user/chgviewuserstate")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     public Output chgViewUserState(@Valid ViewUserChgStateParam param) {
+        if (AppContext.getSession().client.userId != accountApi.getManagerId(param.user_id)) {
+            throw new BusinessException(ErrorCodeOption.NotOperateRole.key, ErrorCodeOption.NotOperateRole.value);
+        }
         Account viewUserInfo = accountApi.getAccount(param.user_id);
         Account viewUserInfoOld = accountApi.getAccount(param.user_id);
         viewUserInfo.state = param.state;
@@ -85,7 +90,7 @@ public class ViewUserAction extends UserBaseAction {
     public Output chgAccountInfo(@RequestParam("account_id") long accountId, @RequestParam("state") Integer state, @RequestParam("password") String password) {
         Account oldAcc = accountApi.getAccount(accountId);
         Account newAcc = accountApi.getAccount(accountId);
-        if (CommonUtils.isNotNull(password)&&!password.equals("")) {
+        if (CommonUtils.isNotNull(password) && !password.equals("")) {
             newAcc.password = password;
             accountApi.updatePwd(accountId, password);
             //<editor-fold desc="操作日志">

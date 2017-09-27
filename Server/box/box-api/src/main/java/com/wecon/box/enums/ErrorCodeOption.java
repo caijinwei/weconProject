@@ -6,6 +6,7 @@ package com.wecon.box.enums;
  */
 public enum ErrorCodeOption {
     Unknown("未知错误", 10000),
+    NotOperateRole("没有操作权限", 10001),
     //用户操作相关
     AccountExisted("用户已经存在,不能注册", 11000),
     EmailError("邮箱格式有错", 11001),

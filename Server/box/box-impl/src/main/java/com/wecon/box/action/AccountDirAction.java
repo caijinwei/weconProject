@@ -97,7 +97,7 @@ public class AccountDirAction {
             //盒子分组下有盒子需要先转移盒子
             if (dir.type == 0) {
                 List<Device> devices = deviceApi.getDeviceList(dir.account_id, dir.id);
-                if (devices.size() > 0) {
+                if (devices != null && devices.size() > 0) {
                     throw new BusinessException(ErrorCodeOption.DelGroupHasDevice.key, ErrorCodeOption.DelGroupHasDevice.value);
                 }
             }
