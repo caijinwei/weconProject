@@ -164,7 +164,7 @@ public class AlarmDataAction {
 	}
 
 	@WebApi(forceAuth = true, master = true)
-	@Description("通过盒子ID获取报警配置分组")
+	@Description("删除报警分组")
 	@RequestMapping(value = "/delAlarmGroup")
 	public Output delAlarmGroup(@RequestParam("id") Integer id) {
 		AccountDir dir = accountDirApi.getAccountDir(id);
