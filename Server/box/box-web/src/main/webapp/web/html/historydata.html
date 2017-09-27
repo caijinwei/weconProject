@@ -17,7 +17,7 @@
 
 </head>
 <body ng-controller="infoController" ng-init="onInit()"
-	style="margin-top: 20px;display: none;">
+	style="margin-top: 20px; display: none;">
 	<ol class="breadcrumb">
 		<li><a href="overview.html">主页</a></li>
 		<li class="active">{{devicename}}</li>
@@ -221,7 +221,7 @@
 						</caption>
 						<thead>
 							<tr>
-								<th>状态</th>
+								<th>编码</th>
 								<th>名称</th>
 								<th>周期(秒)</th>
 								<th>连接设备</th>
@@ -232,8 +232,9 @@
 						</thead>
 						<tbody>
 							<tr ng-repeat="x in hisConfs">
-								<td>{{x.state==0?"已同步盒子":x.state==1?"新增":x.state==2?"已变更":x.state==3?"已删除":x.state}}</td>
-								</td>
+								<td><span ng-if="x.state!=0"><i name="his_i_state"
+										class="fa  fa-circle" style="color: orange;"
+										data-toggle="tooltip" title="条目未下发"></i></span> {{x.id}}</td>
 								<td>{{x.name}}</td>
 								<td>{{x.his_cycle}}</td>
 								<td>{{x.condevice}}</td>
@@ -345,7 +346,8 @@
 								style="margin: 10px 0;" id="divdatatypeid">
 								<span class="col-md-3">数据格式</span> <select id="datatypeid"
 									class="col-md-9" style="height: 30px;">
-									<option ng-repeat="x in dataTypes" value="{{x.value}}" ng-if="x.value!=400&&x.value!=401&&x.value!=402&&x.value!=403&&x.value!=404&&x.value!=405">{{x.text}}</option>
+									<option ng-repeat="x in dataTypes" value="{{x.value}}"
+										ng-if="x.value!=400&&x.value!=401&&x.value!=402&&x.value!=403&&x.value!=404&&x.value!=405">{{x.text}}</option>
 								</select>
 							</div>
 							<div class="row col-md-11 col-md-offset-1"

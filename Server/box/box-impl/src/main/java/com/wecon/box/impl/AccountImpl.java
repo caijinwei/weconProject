@@ -164,6 +164,7 @@ public class AccountImpl implements AccountApi {
     public boolean updateAccountState(Account model) {
         String sql = "update account set state=?,update_date=current_timestamp()  where account_id=?";
         jdbcTemplate.update(sql, new Object[]{model.state, model.account_id});
+        SessionManager.deleteUserSession(model.account_id);
         return true;
     }
 
@@ -284,6 +285,15 @@ public class AccountImpl implements AccountApi {
     }
 
     @Override
+    public long getManagerId(long viewId) {
+        String sql = "SELECT manager_id FROM account_relation WHERE view_id=?;";
+        long managerId = jdbcTemplate.queryForObject(sql,
+                new Object[]{viewId},
+                Long.class);
+        return managerId;
+    }
+
+    @Override
     public boolean addViewAccount(final long managerId, final Account viewAccount) {
         TransactionTemplate tt = new TransactionTemplate(transactionManager);
         try {
@@ -343,7 +353,7 @@ public class AccountImpl implements AccountApi {
 
     @Override
     public List<Account> getAllAccounts() {
-        String sql = "SELECT "+SEL_COL+" FROM account where 1=1";
+        String sql = "SELECT " + SEL_COL + " FROM account where 1=1";
         return jdbcTemplate.query(sql, new DefaultAccountRowMapper());
     }
 

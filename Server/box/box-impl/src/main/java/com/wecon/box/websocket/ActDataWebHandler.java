@@ -263,7 +263,6 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 		cachedThreadPool.execute(new Runnable() {
 			public void run() {
 				logger.debug("Redis begin subscribe realData");
-
 				String[] machineCodeArray = new String[machineCodeSet.size()];
 				int i = 0;
 				for (String machineCode : machineCodeSet) {

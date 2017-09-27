@@ -125,6 +125,14 @@ public interface AccountApi {
     Page<Account> getViewAccountList(long managerId, int pageIndex, int pageSize);
 
     /**
+     * 获取视图帐号的管理帐号Id
+     *
+     * @param viewId
+     * @return
+     */
+    long getManagerId(long viewId);
+
+    /**
      * 新增视图帐号
      *
      * @param managerId
@@ -132,12 +140,14 @@ public interface AccountApi {
      * @return
      */
     boolean addViewAccount(long managerId, Account viewAccount);
+
     /*
     * 更新账户信息
     * @param accountId
     * @param pwd
     * */
-    void updatePwd(long accountId,String pwd);
+    void updatePwd(long accountId, String pwd);
+
     /*
     * 获取全部的account
     * */

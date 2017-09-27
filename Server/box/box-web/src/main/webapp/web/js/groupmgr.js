@@ -46,7 +46,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             $("#id").val(model.id);
         },
         del: function (model) {
-            if (confirm("删除分组会同时删除盒子与分组的绑定，确认要删除分组吗?")) {
+            if (confirm("确认要删除分组吗?")) {
                 var params = {
                     id: model.id
                 };

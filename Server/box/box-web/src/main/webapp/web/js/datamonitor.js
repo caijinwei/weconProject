@@ -1386,7 +1386,6 @@ appModule
 					}
 					// 批量添加监控点
 					$scope.batchmonitor = function() {
-
 						mid = -1;
 						$("#dataid").val("");
 						$("#decid").val("");
@@ -1394,9 +1393,7 @@ appModule
 						$scope.showAllPlcConf(2);
 
 					}
-
 					// 保存添加/修改监控点
-
 					$scope.saveupmonitor = function() {
 						var num;
 						var dec;

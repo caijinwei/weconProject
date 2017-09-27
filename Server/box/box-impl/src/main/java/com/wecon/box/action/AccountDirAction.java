@@ -2,7 +2,9 @@ package com.wecon.box.action;
 
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.AccountDirApi;
+import com.wecon.box.api.DeviceApi;
 import com.wecon.box.entity.AccountDir;
+import com.wecon.box.entity.Device;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
@@ -32,6 +34,9 @@ import java.util.List;
 public class AccountDirAction {
     @Autowired
     private AccountDirApi accountDirApi;
+
+    @Autowired
+    private DeviceApi deviceApi;
 
     @Autowired
     protected DbLogUtil dbLogUtil;
@@ -89,6 +94,14 @@ public class AccountDirAction {
     public Output delAccountDir(@RequestParam("id") Integer id) {
         AccountDir dir = accountDirApi.getAccountDir(id);
         if (dir != null && dir.account_id == AppContext.getSession().client.userId) {
+            //盒子分组下有盒子需要先转移盒子
+            if (dir.type == 0) {
+                List<Device> devices = deviceApi.getDeviceList(dir.account_id, dir.id);
+                if (devices != null && devices.size() > 0) {
+                    throw new BusinessException(ErrorCodeOption.DelGroupHasDevice.key, ErrorCodeOption.DelGroupHasDevice.value);
+                }
+            }
+
             accountDirApi.delAccountDir(id);
             //<editor-fold desc="操作日志">
             dbLogUtil.addOperateLog(OpTypeOption.DelDir, ResTypeOption.Dir, id, dir);

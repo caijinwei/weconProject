@@ -6,6 +6,7 @@ package com.wecon.box.enums;
  */
 public enum ErrorCodeOption {
     Unknown("未知错误", 10000),
+    NotOperateRole("没有操作权限", 10001),
     //用户操作相关
     AccountExisted("用户已经存在,不能注册", 11000),
     EmailError("邮箱格式有错", 11001),
@@ -25,6 +26,7 @@ public enum ErrorCodeOption {
     AccountEmailExisted("邮箱已经被使用", 11015),
     AccountPhoneExisted("手机号码已经被使用", 11016),
     PhonenumAndEmailError("手机号码和邮箱格式有错", 11017),
+    DelGroupHasDevice("此分组下还有绑定的设备，请先解绑或转移到其他分组", 11018),
 
     //文件操作相关
     UploadFileError("上传文件异常", 12000),
