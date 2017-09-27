@@ -62,12 +62,15 @@ public class Session {
         // 该参数在spring mock
         String test = request.getServletContext().getInitParameter("offline.test");
 
+        logger.debug("Session test = " + test);
+
         // 非离线本地单元测试
         if (!"true".equals(test)) {
             this.fillParam();
-
+            logger.debug("Session fillParam" );
             client = new Client();
             client.init(this);
+            logger.debug("client.init" );
 
             String baseUrl = request.getRequestURI();
             int begin = baseUrl.indexOf("/api/");

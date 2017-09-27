@@ -1,6 +1,8 @@
 package com.wecon.restful.core;
 
 import com.wecon.common.redis.RedisManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Set;
 
@@ -11,6 +13,7 @@ public class SessionManager {
     private static final String RedisGroupName = "session";
     private static final String RedisKey = "UserSession:Guid:%s";
     private static final String UserSidGroupKey = "UserSession:UserID:%s";
+    private static final Logger logger = LogManager.getLogger(SessionManager.class);
 
     /**
      * redis会话保持
@@ -115,13 +118,17 @@ public class SessionManager {
      * @sessionId 会话ID
      */
     public static SessionState.UserInfo getUserInfo(String sessionId) {
+        logger.debug("SessionManager getUserInfo,sessionid:" + sessionId);
         if (sessionId != null && !sessionId.isEmpty()) {
             String sessionRedisKey = java.lang.String.format(RedisKey, sessionId);
             byte[] value = RedisManager.get(RedisGroupName, sessionRedisKey.getBytes());
+            logger.debug("SessionManager getUserInfo get value");
             if (value != null) {
                 try {
+                    logger.debug("SessionManager getUserInfo,value.length:" + value.length);
                     return SessionState.UserInfo.parseFrom(value);
                 } catch (Exception ex) {
+                    logger.error(ex);
                     throw new RuntimeException(ex);
                 }
             }

@@ -50,9 +50,9 @@
 				</div>
 			</form>
 			<!--按钮组：分组管理、添加盒子、设置-->
-			<div class="btn-group btn-group-justified main-btn-group">
-				<div class="btn-group">
-					<a href="main.html" title="主页">
+			<div class="btn-group btn-group-justified main-btn-group" ng-if="type==1">
+				<div class="btn-group" ng-if="type==1">
+					<a href="overview.html" target="content_frame" title="主页">
 						<button type="button" class="btn btn-default" id="btn-home">
 							<span class="glyphicon glyphicon-home"></span>
 						</button>
@@ -164,9 +164,9 @@
 
 			<ul class=" nav nav-pills nav-stacked" role="tablist"
 				id="overviewtab" style="margin-top: 40px;" ng-cloak ng-if="type==2">
-				<li><a href="datamonitor.html?device_id=-200&device_name=数据监控"
+				<li class="active"><a href="datamonitor.html?device_id=-200&device_name=数据监控"
 					target="content_frame"> <span
-						class="glyphicon glyphicon-eye-open"> 数据监控</span>
+						class="glyphicon glyphicon-eye-open" style="color: white;"> 数据监控</span>
 				</a></li>
 				<li><a href="alarmlog.html?device_id=-200&device_name=报警记录"
 					target="content_frame"> <span
@@ -203,7 +203,8 @@
 			</ul>
 		</div>
 		<div id="right" class="col-xs-9 col-sm-9 col-md-10 col-lg-10">
-			<iframe src="overview.html" name="content_frame" frameborder="0"></iframe>
+			<iframe src="overview.html" name="content_frame" frameborder="0" ng-if="type==1"></iframe>
+			<iframe src="datamonitor.html?device_id=-200&device_name=数据监控" name="content_frame" frameborder="0" ng-if="type==2"></iframe>
 		</div>
 	</div>
 	<script src="../lib/jquery/jquery-3.2.1.min.js"></script>
