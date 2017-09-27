@@ -25,6 +25,7 @@ public enum ErrorCodeOption {
     AccountEmailExisted("邮箱已经被使用", 11015),
     AccountPhoneExisted("手机号码已经被使用", 11016),
     PhonenumAndEmailError("手机号码和邮箱格式有错", 11017),
+    DelGroupHasDevice("此分组下还有绑定的设备，请先解绑或转移到其他分组", 11018),
 
     //文件操作相关
     UploadFileError("上传文件异常", 12000),
