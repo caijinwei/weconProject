@@ -33,8 +33,8 @@ public class RedisManager {
             }
 
             JedisPoolConfig poolconfig = new JedisPoolConfig();
-            poolconfig.setMaxTotal(30);
-            poolconfig.setMaxIdle(5);
+            poolconfig.setMaxTotal(1000);
+            poolconfig.setMaxIdle(200);
             poolconfig.setMaxWaitMillis(100000L);
             poolconfig.setTestOnBorrow(true);
 

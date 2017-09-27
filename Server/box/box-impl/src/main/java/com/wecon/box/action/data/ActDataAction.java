@@ -436,7 +436,7 @@ public class ActDataAction {
 	@RequestMapping(value = "/delMonitor")
 	public Output delMonitor(@RequestParam("monitorid") String monitorid, @RequestParam("acc_dir_id") String acc_dir_id,
 			@RequestParam("isdel") String isdel) {
-
+		Client client = AppContext.getSession().client;
 		if (CommonUtils.isNullOrEmpty(monitorid) || CommonUtils.isNullOrEmpty(acc_dir_id)
 				|| CommonUtils.isNullOrEmpty(isdel)) {
 			throw new BusinessException(ErrorCodeOption.Get_Data_Error.key, ErrorCodeOption.Get_Data_Error.value);
@@ -445,10 +445,20 @@ public class ActDataAction {
 			// 移除该分组下的监控点
 			accountDirRelApi.delAccountDir(Long.parseLong(acc_dir_id), Long.parseLong(monitorid));
 		} else {
+			RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(monitorid));
+			DevBindUserFilter devBindUser=new DevBindUserFilter();
+			devBindUser.account_id=client.userId;
+			devBindUser.device_id=realHisCfg.device_id;
+			List<DevBindUser> listDeviceBindUser=devBindUserApi.getDevBindUser(devBindUser);
+			if(listDeviceBindUser.size()!=1){
+				throw new BusinessException(ErrorCodeOption.Device_AlreadyBind.key,
+						ErrorCodeOption.Device_AlreadyBind.value);
+			}
+			
 			// 1.删除分配给视图账号的配置
 			viewAccountRoleApi.deletePoint(1, Long.parseLong(monitorid));
 			// 2.更改配置状态，等待盒子发送数据把配置物理删除
-			RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(monitorid));
+		
 			realHisCfg.state = 3;// 删除配置状态
 			realHisCfgApi.updateRealHisCfg(realHisCfg);
 			accountDirRelApi.delAccountDir(Long.parseLong(acc_dir_id), Long.parseLong(monitorid));

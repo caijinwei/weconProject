@@ -151,6 +151,13 @@ public interface RealHisCfgApi {
 	 */
 	List<Long> getDeleteIdsByUpdTime(List<String[]> delArgList);
 
+	/**
+	 * 根据plc获取实时历史配置id
+	 * @param plcIds
+	 * @return
+     */
+	List<Long> getRealHisCfgIdsByPlcIds(List<Long> plcIds);
+
 	/*
 	* 查找id根据device_id
 	* */

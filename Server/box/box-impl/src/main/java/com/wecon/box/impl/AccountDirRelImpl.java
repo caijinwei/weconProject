@@ -189,5 +189,24 @@ public class AccountDirRelImpl implements AccountDirRelApi {
 
     }
 
+    @Override
+    public boolean batchDeleteAccDirRelByCfgId(final List<Long> cfgIds, int... types){
+        if(null == cfgIds || cfgIds.size() == 0){
+            return false;
+        }
+        StringBuilder idSb = new StringBuilder();
+        for(long id : cfgIds){
+            idSb.append(",").append(id);
+        }
 
+        StringBuffer typeSb = new StringBuffer();
+        for (int type : types) {
+            typeSb.append(",").append(type);
+        }
+
+        String sql = "delete from account_dir_rel where ref_id in("+idSb.substring(1)+") and acc_dir_id in (select id from account_dir where type in("+typeSb.substring(1)+"))";
+        jdbcTemplate.update(sql);
+
+        return true;
+    }
 }

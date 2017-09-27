@@ -78,4 +78,12 @@ public interface AccountDirRelApi {
   * DELETE FROM account_dir_rel WHERE ref_id=1111 AND acc_dir_id IN (SELECT id FROM account_dir WHERE type=0 AND account_id=12);
    * */
 	public void deleteAccDeviceRel(Integer deviceId, Integer accountId);
+
+	/**
+	 * 根据配置id批量删除数据
+	 * @param cfgIds
+	 * @param types
+     * @return
+     */
+	boolean batchDeleteAccDirRelByCfgId(final List<Long> cfgIds, int... types);
 }

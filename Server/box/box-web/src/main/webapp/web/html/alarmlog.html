@@ -236,7 +236,7 @@
 								</button>
 								<h4 class="modal-title">分组设置</h4>
 							</div>
-							<div class="modal-body">
+							<div class="modal-body" style="height: 300px; overflow: auto;">
 								<div class="container-fluid">
 									<div class="row">
 										<table class="table table-bordered table-hover">
@@ -451,7 +451,8 @@
 										style="margin: 10px 0;" id="divdatatypeid">
 										<span class="col-md-3">数据格式</span> <select id="datatypeid"
 											class="col-md-9" style="height: 30px;">
-											<option ng-repeat="x in dataTypes" value="{{x.value}} " ng-if="x.value!=1000">{{x.text}}</option>
+											<option ng-repeat="x in dataTypes" value="{{x.value}} "
+												ng-if="x.value!=1000&&x.value!=400&&x.value!=401&&x.value!=402&&x.value!=403&&x.value!=404&&x.value!=405">{{x.text}}</option>
 										</select>
 									</div>
 									<div class="row col-md-11 col-md-offset-1"

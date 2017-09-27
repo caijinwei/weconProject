@@ -53,6 +53,7 @@ public class SpringMvcInterceptor implements HandlerInterceptor
 			return true;
 		}
 
+		logger.debug("初始化会话上下文");
 		// 初始化会话上下文
 		Session session = new Session(request, response);
 		AppContext.setSession(session);
