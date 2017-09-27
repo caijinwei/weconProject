@@ -13,8 +13,6 @@
 <link href="../css/page.css" rel="stylesheet" type="text/css" />
 <link rel="stylesheet"
 	href="../lib/bootstrap/datetimepicker/css/bootstrap-datetimepicker.min.css">
-
-
 </head>
 <body ng-controller="infoController" ng-init="onInit()"
 	style="margin-top: 20px; display: none;">
@@ -195,7 +193,7 @@
 						</caption>
 						<thead>
 							<tr>
-								<th class="col-md-2">状态<span data-action="label_group"></span></th>
+								<th class="col-md-2">编码<span data-action="label_group"></span></th>
 								<th class="col-md-1">名称<span data-action="label_name"></span></th>
 								<th class="col-md-3">触发条件<span data-action="label_trigger"></span></th>
 								<th class="col-md-3">报警内容<span
@@ -206,7 +204,9 @@
 						</thead>
 						<tbody>
 							<tr ng-repeat="x in listalrmCfgTrigger">
-								<td>{{x.state==0?"已同步盒子":x.state==1?"新增":x.state==2?"已变更":x.state==3?"已删除":x.state}}</td>
+								<td><span ng-if="x.state!=0"><i name="alarm_i_state"
+										class="fa  fa-circle" style="color: orange;"
+										data-toggle="tooltip" title="条目未下发"></i></span> {{x.alarmcfg_id}}</td>
 								<td>{{x.name}}</td>
 								<td>{{x.triggerValue}}</td>
 								<td>{{x.text}}</td>

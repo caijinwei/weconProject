@@ -98,6 +98,7 @@ appModule
 											if (code == 200) {
 												$scope.alarmcurrents = data.alarmHisData.list;
 												$scope.paginationConf_current.totalItems = data.alarmHisData.totalRecord;
+											
 												$scope.$apply();
 
 												$("#loadingModal")
@@ -1037,6 +1038,7 @@ appModule
 												$scope.paginationConf_alarmcfg.totalItems = data.listalrmCfgTrigger.totalRecord;
 												$scope.listalrmCfgTrigger = data.listalrmCfgTrigger.list;
 												$scope.$apply();
+											    $("i[name='alarm_i_state']").tooltip();
 
 											} else {
 												alert(code + "-" + msg);

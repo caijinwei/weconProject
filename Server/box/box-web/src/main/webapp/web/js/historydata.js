@@ -46,7 +46,6 @@ appModule
 								function(data, code, msg) {
 									if (code == 200) {
 										$scope.commonitors = data.monitors;
-
 										if ($scope.commonitors == "") {
 											$("#searchid").attr("disabled",
 													true);
@@ -1446,6 +1445,7 @@ appModule
 												$scope.paginationConf_register.totalItems = data.HisAllotData.totalRecord;
 												$scope.hisConfs = data.HisAllotData.list;
 												$scope.$apply();
+												 $("i[name='his_i_state']").tooltip();
 
 											} else {
 												alert(code + "-" + msg);
