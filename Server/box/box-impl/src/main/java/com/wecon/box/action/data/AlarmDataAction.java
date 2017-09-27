@@ -516,7 +516,6 @@ public class AlarmDataAction {
 			// 1.删除分配给视图账号的配置
 			viewAccountRoleApi.deletePoint(2, Long.parseLong(alarmcfg_id));
 			// 2.更改配置状态，等待盒子发送数据把配置物理删除
-
 			alarmCfg.state = 3;// 删除配置状态
 			alarmCfgApi.upAlarmCfg(alarmCfg);
 			dbLogUtil.addOperateLog(OpTypeOption.DelAlarm, ResTypeOption.Alarm, alarmCfg.alarmcfg_id, alarmCfg);

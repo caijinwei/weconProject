@@ -88,22 +88,24 @@
 							<tr ng-repeat="x in actDatas">
 								<td><span ng-if="x.box_state==1" ng-switch="{{x.state}}">
 										<span ng-switch-when="0"> <span
-											ng-switch="{{x.re_state}}"><i name="act_i_state" ng-switch-when="0"
-												class="fa  fa-circle" style="color: gray;"
-												data-toggle="tooltip" title="离线"></i><i name="act_i_state"  ng-switch-when="1"
-												class="fa  fa-circle" style="color: green;"
-												data-toggle="tooltip" title="在线"></i><i name="act_i_state" ng-switch-when="2"
-												class="fa  fa-circle" style="color: red;"
-												data-toggle="tooltip" title="超时"></i> </span>
+											ng-switch="{{x.re_state}}"><i name="act_i_state"
+												ng-switch-when="0" class="fa  fa-circle"
+												style="color: gray;" data-toggle="tooltip" title="离线"></i><i
+												name="act_i_state" ng-switch-when="1" class="fa  fa-circle"
+												style="color: green;" data-toggle="tooltip" title="在线"></i><i
+												name="act_i_state" ng-switch-when="2" class="fa  fa-circle"
+												style="color: red;" data-toggle="tooltip" title="超时"></i> </span>
 
 									</span> <span ng-switch-when="1"> <i name="act_i_state"
 											class="fa  fa-circle" style="color: orange;"
+											data-toggle="tooltip" title="条目未下发"></i></span> <span
+										ng-switch-when="2"><i name="act_i_state"
+											class="fa  fa-circle" style="color: orange;"
 											data-toggle="tooltip" title="条目未下发"></i></span>
-										<span ng-switch-when="2"><i name="act_i_state"  class="fa  fa-circle"
-											style="color: orange;" data-toggle="tooltip" title="条目未下发"></i></span>
 
-								</span> <span ng-if="x.box_state==0"><i name="act_i_state" class="fa  fa-circle"
-										style="color: gray;" data-toggle="tooltip" title="离线"></i></span></td>
+								</span> <span ng-if="x.box_state==0"><i name="act_i_state"
+										class="fa  fa-circle" style="color: gray;"
+										data-toggle="tooltip" title="离线"></i></span></td>
 								<td><a href="#" id="act_name_{{x.id}}"
 									ng-if="(accounttype==1&&deviceid<0)||(accounttype==2)"
 									ng-click="editable_name(x);">{{x.ref_alais==''?x.name:x.ref_alais}}</a><span
@@ -208,7 +210,8 @@
 											style="margin: 10px 0;" id="divdatatypeid">
 											<span class="col-md-3">数据格式</span> <select id="datatypeid"
 												class="col-md-9" style="height: 30px;">
-												<option ng-repeat="x in dataTypes" value="{{x.value}}">{{x.text}}</option>
+												<option ng-repeat="x in dataTypes" value="{{x.value}}"
+													ng-if="x.value!=400&&x.value!=401&&x.value!=402&&x.value!=403&&x.value!=404&&x.value!=405">{{x.text}}</option>
 											</select>
 										</div>
 										<div class="row col-md-11 col-md-offset-1"
