@@ -12,5 +12,6 @@ public class ViewAccountRoleView extends RealHisCfg {
     public long role_type;
     public Timestamp create_date;
     public Timestamp update_date;
+    public String deviceName;
 
 }

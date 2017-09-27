@@ -149,6 +149,16 @@ public class PlcInfoImpl implements PlcInfoApi {
         return null;
     }
 
+    @Override
+    public List<PlcInfoDetail> getActiveListPlcInfoDetail(long device_id) {
+        String sql = "select " + SEL_COL + " ,file_md5 " + " from plc_info where device_id=? AND state!=3";
+        List<PlcInfoDetail> list = jdbcTemplate.query(sql, new Object[]{device_id}, new DefaultPlcInfoDtailRowMapper());
+        if (!list.isEmpty()) {
+            return list;
+        }
+        return null;
+    }
+
 
     @Override
     public void delPlcInfo(long plc_id) {

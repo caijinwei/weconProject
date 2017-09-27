@@ -189,7 +189,7 @@ public class DriverAction {
         } else if (updateType == 2) {
             Object firmObject=dirFirmAction.updateFirm(versionName, versionCode, file_id, device_id).getResult();
 
-            String list=String.valueOf(JSONObject.parseObject(firmObject.toString()).get("driverVerParam"));
+            String list=String.valueOf(JSONObject.parseObject(firmObject.toString()).get("firmVerParams"));
             driverVerParams=JSONObject.parseArray(list,DriverVerParam.class);
 
             data.put("frimUpcount",firmObject);
@@ -204,7 +204,7 @@ public class DriverAction {
             String driverlist=String.valueOf(JSONObject.parseObject(driverObject.toString()).get("driverVerParam"));
             driverVerParams=JSONObject.parseArray(driverlist,DriverVerParam.class);
             //固件验证信息
-            String firmlist=String.valueOf(JSONObject.parseObject(firmObject.toString()).get("driverVerParam"));
+            String firmlist=String.valueOf(JSONObject.parseObject(firmObject.toString()).get("firmVerParams"));
             driverVerParams.addAll(JSONObject.parseArray(firmlist,DriverVerParam.class));
         }else{
             isUpdated=0;
@@ -222,7 +222,9 @@ public class DriverAction {
         if (device_id <= 0) {
             throw new BusinessException(ErrorCodeOption.UpdateDriver_ParamIs_Error.key, ErrorCodeOption.UpdateDriver_ParamIs_Error.value);
         }
-        List<PlcInfoDetail> plcList = plcInfoApi.getListPlcInfoDetail(device_id);
+        //获取 非删除配置的plc
+        List<PlcInfoDetail> plcList = plcInfoApi.getActiveListPlcInfoDetail(device_id);
+
        //没有配置plc就显示不更新
         if (plcList == null) {
             JSONObject data = new JSONObject();
@@ -263,7 +265,7 @@ public class DriverAction {
         HashMap<String, Driver> driverMap = new HashMap<String, Driver>();
         HashMap<String, PlcInfo> plcInfoMap = new HashMap<String, PlcInfo>();
 
-        List<PlcInfoDetail> plcList = plcInfoApi.getListPlcInfoDetail(device_id);
+        List<PlcInfoDetail> plcList = plcInfoApi.getActiveListPlcInfoDetail(device_id);
         for (PlcInfoDetail p : plcList) {
             if (!driverMap.containsKey(p.driver)) {
                 //获取driver表的 driver对象
@@ -276,7 +278,6 @@ public class DriverAction {
                 }
             }
         }
-        //这边需要做批量  优化
         for (Map.Entry<String, Driver> driverEntry : driverMap.entrySet()) {
             FileStorage file = fileStorageApi.getFileStorage(driverEntry.getValue().driver_id);
             if (file != null) {

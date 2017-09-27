@@ -198,7 +198,7 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
         int totalCount = jdbcTemplate.queryForObject(sqlCount, args, Integer.class);
         Page<ViewAccountRoleView> page = new Page<ViewAccountRoleView>(pageIndex, pageSize, totalCount);
         Object[] args1 = new Object[]{data_type, view_id, page.getStartIndex(), page.getPageSize()};
-        String sql = "SELECT a.cfg_id,a.role_type,b.name,b.data_type,b.addr,b.state FROM view_account_role a INNER JOIN real_his_cfg b ON a.cfg_id = b.id WHERE a.cfg_type = '1' AND b.data_type = ? AND b.bind_state=1 AND a.view_id =? LIMIT ?,?";
+        String sql = "SELECT a.cfg_id,a.role_type,b.name,b.data_type,b.addr,b.state,c.name FROM view_account_role a INNER JOIN real_his_cfg b ON a.cfg_id = b.id INNER JOIN device c ON b.device_id=c.device_id WHERE a.cfg_type = '1' AND b.data_type = ? AND b.bind_state=1 AND a.view_id =? LIMIT ?,?";
         List<ViewAccountRoleView> list = new ArrayList<ViewAccountRoleView>();
         list = jdbcTemplate.query(sql, args1, new RowMapper() {
             @Override
@@ -206,10 +206,11 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
                 ViewAccountRoleView model = new ViewAccountRoleView();
                 model.id = resultSet.getInt("cfg_id");
                 model.role_type = resultSet.getInt("role_type");
-                model.name = resultSet.getString("name");
+                model.name = resultSet.getString("b.name");
                 model.addr = resultSet.getString("addr");
                 model.data_type=resultSet.getInt("data_type");
                 model.state = resultSet.getInt("state");
+                model.deviceName=resultSet.getString("c.name");
                 return model;
             }
         });

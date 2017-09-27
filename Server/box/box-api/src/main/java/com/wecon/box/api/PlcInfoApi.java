@@ -125,4 +125,9 @@ public interface PlcInfoApi {
 	* */
 	public PlcInfoDetail getPlcInfoDetail(long plc_id);
 
+	/*
+	* 获取 非(删除配置)state!=3  的plcDetail
+	* */
+	public List<PlcInfoDetail> getActiveListPlcInfoDetail(long device_id);
+
 }

@@ -158,7 +158,7 @@ public class DirFirmAction {
         };
         JSONObject data=new JSONObject();
         data.put("count",count);
-        data.put("driverVerParam",firmVerParams);
+        data.put("firmVerParams",firmVerParams);
         return new Output(data);
     }
 

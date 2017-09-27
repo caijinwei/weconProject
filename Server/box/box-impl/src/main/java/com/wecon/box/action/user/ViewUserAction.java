@@ -10,6 +10,7 @@ import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.Output;
+import com.wecon.restful.core.SessionManager;
 import com.wecon.restful.doc.Label;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
@@ -98,6 +99,8 @@ public class ViewUserAction extends UserBaseAction {
             dbLogUtil.updOperateLog(OpTypeOption.SetUserState, ResTypeOption.Account, accountId, oldAcc, newAcc);
             //</editor-fold>
         }
+        //修改用户密码退出登录
+        SessionManager.deleteUserSession(accountId);
         return new Output();
     }
 

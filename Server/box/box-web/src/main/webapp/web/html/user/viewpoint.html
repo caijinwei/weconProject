@@ -20,7 +20,7 @@
 <body ng-controller="listController" ng-init="onInit()">
 <div class="container">
     <ol class="breadcrumb" style="margin-top: 40px;">
-        <li><a href="overview.html">主页</a></li>
+        <li><a href="../main.html">主页</a></li>
         <li><a href="viewaccountmgr.html">视图账号管理</a></li>
         <li class="active">{{name}}</li>
     </ol>
@@ -35,20 +35,18 @@
             </caption>
             <thead>
             <tr>
-                <th class="col-md-1">序号</th>
+                <th class="col-md-2">序号</th>
                 <th class="col-md-2">名称</th>
-                <th class="col-md-2">地址</th>
-                <th class="col-md-2">状态</th>
+                <th class="col-md-2">所属盒子</th>
                 <th class="col-md-2" ng-if="realpointDatas[0].data_type!=1">权限</th>
-                <th class="col-md-3">操作</th>
+                <th class="col-md-4">操作</th>
             </tr>
             </thead>
             <tbody>
             <tr ng-repeat="x in realpointDatas">
                 <td>{{x.id}}</td>
                 <td>{{x.name}}</td>
-                <td>{{x.addr}}</td>
-                <td>{{x.state==1?'启用':'未启用'}}</td>
+                <td>{{x.deviceName}}</td>
                 <td ng-if="realpointDatas[0].data_type!=1">
                     {{x.role_type==0?'无权限':(x.role_type==1?'只读':(x.role_type==2?'只写':'读写'))}}
                 </td>

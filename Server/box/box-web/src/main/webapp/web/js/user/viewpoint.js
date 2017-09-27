@@ -57,7 +57,6 @@ appModule.controller("listController", function ($scope, $http, $compile) {
         T.common.ajax.request("WeconBox", "Viewpoint/showReal", params, function (data, code, msg) {
             if (code == 200) {
                 $scope.realpointDatas = data.page.list;
-                console.log("获取的list的值是:",data.page.list);
                 $scope.conf.totalItems = data.page.totalRecord;
 
                 $scope.$apply();
