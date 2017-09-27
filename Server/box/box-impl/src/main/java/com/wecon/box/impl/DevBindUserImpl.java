@@ -2,7 +2,9 @@ package com.wecon.box.impl;
 
 import com.wecon.box.api.DevBindUserApi;
 import com.wecon.box.entity.DevBindUser;
+import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.filter.DevBindUserFilter;
+import com.wecon.restful.core.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -92,13 +94,16 @@ public class DevBindUserImpl implements DevBindUserApi {
 	}
 
 	public boolean isRecord(Integer device_id, long account_id) {
-		Object[] args = new Object[] { device_id, account_id };
-		String sql = "SELECT COUNT(*) FROM dev_bind_user WHERE device_id=? AND account_id=?";
-		Integer count = jdbcTemplate.queryForObject(sql, args, Integer.class);
-		if (count == 1) {
+		String sql="SELECT COUNT(1) FROM dev_bind_user  WHERE account_id=? AND device_id=?";
+		Object[] args=new Object[]{account_id,device_id};
+		Integer resultNum=jdbcTemplate.queryForObject(sql,Integer.class,args);
+		if(resultNum>1){
+			throw new BusinessException(ErrorCodeOption.Dev_Bind_User_HaveError_Record.key,ErrorCodeOption.Dev_Bind_User_HaveError_Record.value);
+		}else if(resultNum<=0){
+			throw new BusinessException(ErrorCodeOption.Dev_Bind_User_NotFount_Record.key,ErrorCodeOption.Dev_Bind_User_NotFount_Record.value);
+		}else {
 			return true;
 		}
-		return false;
 	}
 
 }

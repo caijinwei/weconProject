@@ -8,11 +8,7 @@ import com.wecon.box.enums.DataTypeOption;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
-import com.wecon.box.filter.AlarmCfgDataFilter;
-import com.wecon.box.filter.AlarmTriggerFilter;
-import com.wecon.box.filter.DeviceDir;
-import com.wecon.box.filter.RealHisCfgDataFilter;
-import com.wecon.box.filter.RealHisCfgFilter;
+import com.wecon.box.filter.*;
 import com.wecon.box.util.DbLogUtil;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
@@ -79,10 +75,9 @@ public class DeviceAction {
 		Client client = AppContext.getSession().client;
 		long account_id = client.userId;
 		Integer userType = client.userInfo.getUserType();
-		if (devBindUserApi.isRecord(device_id, account_id) == false) {
-			throw new BusinessException(ErrorCodeOption.PiBoxDevice_IsNot_Found.key,
-					ErrorCodeOption.PiBoxDevice_IsNot_Found.value);
-		}
+		//验证是否拥有该盒子
+		devBindUserApi.isRecord(device_id,AppContext.getSession().client.userId);
+
 		Device device = deviceApi.getDevice(device_id);
 		JSONObject data = new JSONObject();
 		data.put("device", device);
@@ -98,6 +93,12 @@ public class DeviceAction {
 	@RequestMapping(value = "deletePIBox")
 	@WebApi(forceAuth = true, master = true, authority = { "1" })
 	public Output deletePIBox(@RequestParam("device_id") Integer device_id) {
+		if(device_id<=0){
+			throw new BusinessException(ErrorCodeOption.DeviceId_Is_Error.key,ErrorCodeOption.DeviceId_Is_Error.value);
+		}
+		//验证是否拥有该盒子
+		devBindUserApi.isRecord(device_id,AppContext.getSession().client.userId);
+
 		long accountId = AppContext.getSession().client.userId;
 		deviceApi.unbindDevice((int) accountId, device_id);
 		// <editor-fold desc="操作日志">
@@ -548,6 +549,10 @@ public class DeviceAction {
 			@RequestParam("map") String map) {
 		Device device = deviceApi.getDevice(deviceId);
 		Device oldDevice = device;
+
+		//验证是否拥有该盒子
+		devBindUserApi.isRecord(deviceId,AppContext.getSession().client.userId);
+
 		if (null == deviceId || null == device) {
 			throw new BusinessException(ErrorCodeOption.Device_NotFound.key, ErrorCodeOption.Device_NotFound.value);
 		}

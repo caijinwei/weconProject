@@ -22,6 +22,7 @@ import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 
 /**
@@ -34,8 +35,6 @@ public class UpdateFileHandler extends AbstractWebSocketHandler {
     ClientMQTT client;
     private static final Logger logger = LogManager.getLogger(DebugInfoHandler.class.getName());
     private Timer timer;
-
-    private int count = 0;
     /*
      * @param session
      * @param message
@@ -44,6 +43,7 @@ public class UpdateFileHandler extends AbstractWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        int count=0;
 
         /*
         *    {
