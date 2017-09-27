@@ -37,7 +37,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 	@Autowired
 	private RealHisCfgApi realHisCfgApi;
 
-	private String params;
+	private Map<String, String> paramMap = new HashMap<>();
 
 	private Set<String> machineCodeSet;
 
@@ -59,12 +59,12 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 	@Override
 	protected void handleTextMessage(WebSocketSession session, TextMessage message) {
 		try {
-			this.params = message.getPayload();
-			logger.debug("Server received message: " + params);
-			if (CommonUtils.isNullOrEmpty(params)) {
+			String param = message.getPayload();
+			logger.debug("Server received message: " + param);
+			if (CommonUtils.isNullOrEmpty(param)) {
 				return;
 			}
-
+			paramMap.put(Thread.currentThread().getName(), param);
 			// 推送消息给移动端
 			logger.debug("WebSocket push begin");
 			session.sendMessage(new TextMessage(getStringRealData()));
@@ -117,7 +117,8 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 
 	private String getStringRealData() {
 		try {
-			Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {
+			String param = paramMap.get(Thread.currentThread().getName());
+			Map<String, Object> bParams = JSON.parseObject(param, new TypeReference<Map<String, Object>>() {
 			});
 			RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
 			Page<RealHisCfgDevice> realHisCfgDevicePage = null;
@@ -231,6 +232,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 			subscribeListener.unsubscribe();
 			subscribeListener = null;
 			machineCodeSet = null;
+			paramMap.remove(Thread.currentThread().getName());
 			logger.debug("Redis取消订阅成功");
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -335,7 +335,6 @@ public class PlcInfoImpl implements PlcInfoApi {
         return null;
     }
 
-
     public static final class DefaultPlcInfoRowMapper implements RowMapper<PlcInfo> {
         @Override
         public PlcInfo mapRow(ResultSet rs, int i) throws SQLException {

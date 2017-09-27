@@ -338,6 +338,7 @@ public class BoxNotifyTask extends Thread {
         AlarmCfgDataApi alarmCfgDataApi = SpringContextHolder.getBean(AlarmCfgDataApi.class);
         RealHisCfgDataApi realHisCfgDataApi = SpringContextHolder.getBean(RealHisCfgDataApi.class);
         ViewAccountRoleApi viewAccountRoleApi = SpringContextHolder.getBean(ViewAccountRoleApi.class);
+        AccountDirRelApi accountDirRelApi = SpringContextHolder.getBean(AccountDirRelApi.class);
 
         try {
             //使用Map泛型主要是为了兼容所有类型反馈，比较灵活
@@ -406,13 +407,15 @@ public class BoxNotifyTask extends Thread {
                     if(null != hisCfgIds){
                         realHisCfgIds.addAll(hisCfgIds);
                     }
-                    //删除监控点配置、数据、权限
+                    //删除监控点配置、数据、相关权限
                     realHisCfgApi.batchDeleteById(realHisCfgIds);
                     realHisCfgDataApi.batchDeleteById(realHisCfgIds);
                     alarmCfgApi.batchDeleteById(alarmCfgIds);
                     alarmCfgDataApi.batchDeleteById(alarmCfgIds);
                     viewAccountRoleApi.batchDeleteViewAccRoleByCfgId(realHisCfgIds, 1);
                     viewAccountRoleApi.batchDeleteViewAccRoleByCfgId(alarmCfgIds, 2);
+                    accountDirRelApi.batchDeleteAccDirRelByCfgId(realHisCfgIds, 1, 2);
+                    accountDirRelApi.batchDeleteAccDirRelByCfgId(alarmCfgIds, 3);
                     break;
                 case ACT_DELETE_PLC_CONFIG : //删除通讯口配置
                     List<Map> delComList = (List<Map>)fbData.get("del_com_list");
@@ -423,6 +426,12 @@ public class BoxNotifyTask extends Thread {
                     realHisCfgApi.batchDeleteByPlcId(plcIds);
                     alarmCfgDataApi.batchDeleteByPlcId(plcIds);
                     realHisCfgDataApi.batchDeleteByPlcId(plcIds);
+                    List<Long> realHisCfgIdList = realHisCfgApi.getRealHisCfgIdsByPlcIds(plcIds);
+                    List<Long> alarmCfgIdList = alarmCfgApi.getAlarmCfgIdsByPlcIds(plcIds);
+                    viewAccountRoleApi.batchDeleteViewAccRoleByCfgId(realHisCfgIdList, 1);
+                    viewAccountRoleApi.batchDeleteViewAccRoleByCfgId(alarmCfgIdList, 2);
+                    accountDirRelApi.batchDeleteAccDirRelByCfgId(realHisCfgIdList, 1, 2);
+                    accountDirRelApi.batchDeleteAccDirRelByCfgId(alarmCfgIdList, 3);
                     break;
                 case ACT_SEND_DRIVER_FILE : //下发驱动文件
                     String upd_state = fbData.get("upd_state").toString();

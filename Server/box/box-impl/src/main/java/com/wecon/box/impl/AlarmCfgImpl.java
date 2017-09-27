@@ -376,6 +376,27 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 		return null;
 	}
 
+	@Override
+	public List<Long> getAlarmCfgIdsByPlcIds(List<Long> plcIds){
+		if (null == plcIds || plcIds.size() == 0) {
+			return null;
+		}
+
+		StringBuilder idSb = new StringBuilder();
+		for (long plcId : plcIds) {
+			idSb.append(",").append(plcId);
+		}
+
+		List<Long> cfgIds = jdbcTemplate.query("select alarmcfg_id from alarm_cfg where plc_id in(" + idSb.substring(1) + ")", new RowMapper() {
+			@Override
+			public Object mapRow(ResultSet resultSet, int i) throws SQLException {
+				return resultSet.getLong("alarmcfg_id");
+			}
+		});
+
+		return cfgIds;
+	}
+
 	public static final class DefaultAlarmTriggerRowMapper implements RowMapper<AlarmTrigger> {
 		@Override
 		public AlarmTrigger mapRow(ResultSet rs, int i) throws SQLException {

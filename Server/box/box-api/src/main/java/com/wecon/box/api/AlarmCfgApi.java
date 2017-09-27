@@ -78,6 +78,14 @@ public interface AlarmCfgApi {
 	 * @return
 	 */
 	List<Long> getDeleteIdsByUpdTime(List<String[]> delArgList);
+
+	/**
+	 * 根据plc获取报警配置id
+	 * @param plcIds
+	 * @return
+     */
+	List<Long> getAlarmCfgIdsByPlcIds(List<Long> plcIds);
+
 	/*
 	 * 根据device_id 设备号ID查询alarmCfgId
 	 */

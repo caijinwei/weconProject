@@ -699,6 +699,27 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		return null;
 	}
 
+	@Override
+	public List<Long> getRealHisCfgIdsByPlcIds(List<Long> plcIds){
+		if (null == plcIds || plcIds.size() == 0) {
+			return null;
+		}
+
+		StringBuilder idSb = new StringBuilder();
+		for (long plcId : plcIds) {
+			idSb.append(",").append(plcId);
+		}
+
+		List<Long> cfgIds = jdbcTemplate.query("select id from real_his_cfg where plc_id in(" + idSb.substring(1) + ")", new RowMapper() {
+			@Override
+			public Object mapRow(ResultSet resultSet, int i) throws SQLException {
+				return resultSet.getLong("plc_id");
+			}
+		});
+
+		return cfgIds;
+	}
+
 	public static final class DefaultRealHisCfgRowMapper implements RowMapper<RealHisCfg> {
 
 		@Override
