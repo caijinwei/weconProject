@@ -43,6 +43,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	@Autowired
 	private DeviceApi deviceApi;
 	private Map<String, Client> clients = new HashMap<String, Client>();
+	private Map<String, SubscribeListener> subscribeListeners = new HashMap<String, SubscribeListener>();
 
 	private static final Logger logger = LogManager.getLogger(ActDataHandler.class.getName());
 
@@ -67,6 +68,8 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 			if ("0".equals(bParams.get("markid").toString())) {
 				logger.debug("WebSocket push begin");
 				session.sendMessage(new TextMessage(getStringRealData(bParams, session)));
+				
+
 				logger.debug("WebSocket push end");
 
 			} else if ("1".equals(bParams.get("markid").toString())) {
@@ -254,21 +257,22 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	/**
 	 * 订阅redis消息
 	 */
-	private void subscribeRealData(WebSocketSession session, Map<String, Object> bParams,
-			final Set<String> machineCodeSet) {
+	private void subscribeRealData(WebSocketSession session, Map<String, Object> bParams,final Set<String> machineCodeSet) {
+		logger.debug("subscribeRealData...................");
 		final SubscribeListener subscribeListener = new SubscribeListener(session, bParams);
+		
+		subscribeListeners.put(session.getId(), subscribeListener);
 		ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
 		cachedThreadPool.execute(new Runnable() {
 			public void run() {
 				logger.debug("Redis begin subscribe realData");
-				if (machineCodeSet != null) {
-					String[] machineCodeArray = new String[machineCodeSet.size()];
-					int i = 0;
-					for (String machineCode : machineCodeSet) {
-						machineCodeArray[i++] = machineCode;
-					}
-					RedisManager.subscribe(ConstKey.REDIS_GROUP_NAME, subscribeListener, machineCodeArray);
+
+				String[] machineCodeArray = new String[machineCodeSet.size()];
+				int i = 0;
+				for (String machineCode : machineCodeSet) {
+					machineCodeArray[i++] = machineCode;
 				}
+				RedisManager.subscribe(ConstKey.REDIS_GROUP_NAME, subscribeListener, machineCodeArray);
 
 			}
 		});
@@ -305,7 +309,6 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 		try {
 
 			JSONObject json = new JSONObject();
-			Set<String> machineCodeSet = null;
 			/** 获取实时数据配置信息 **/
 			RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
 			/** 通过视图获取配置信息 **/
@@ -313,8 +316,9 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 			// Client client = AppContext.getSession().client;
 			// logger.debug("用户client==="+client.userInfo.toString());
 			Client client = clients.get(session.getId());
+			logger.debug("显示client==" + client.userInfo.toString());
+			logger.debug("显示session.getId()==" + session.getId());
 			if (client != null) {
-
 				Page<RealHisCfgDevice> realHisCfgDeviceList = null;
 				if (client.userInfo.getUserType() == 1) {
 					/** 管理 **/
@@ -351,7 +355,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 							Integer.parseInt(bParams.get("pageIndex").toString()),
 							Integer.parseInt(bParams.get("pageSize").toString()));
 				}
-
+				Set<String> machineCodeSet = null;
 				// 如果该账号下无实时数据配置文件直接返回空
 				if (realHisCfgDeviceList != null && realHisCfgDeviceList.getList().size() > 0) {
 					machineCodeSet = new HashSet<>();
@@ -440,7 +444,10 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 						}
 					}
 				}
-				subscribeRealData(session, bParams, machineCodeSet);
+				if (machineCodeSet != null&&subscribeListeners.get(session.getId())==null) {
+					
+					subscribeRealData(session, bParams,machineCodeSet);
+				}
 				json.put("piBoxActDateMode", realHisCfgDeviceList);
 			}
 			logger.debug("Websocket push msg: " + json.toJSONString());
@@ -464,10 +471,10 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 			logger.debug("session====" + session);
 			logger.debug("连接成功");
 			Client client = AppContext.getSession().client;
-			logger.debug("client==" + client);
+			logger.debug("连接成功client==" + client);
+			logger.debug("连接成功session.getId()==" + session.getId());
 			clients.put(session.getId(), client);
 
-			logger.debug("连接成功获取client==" + client.userInfo.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.debug("afterConnectionEstablished，" + e.getMessage());
@@ -486,7 +493,9 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
 		try {
 			logger.debug("关闭连接");
+			subscribeListeners.get(session.getId()).unsubscribe();
 			clients.remove(session.getId());
+			subscribeListeners.remove(session.getId());
 			logger.debug("Redis取消订阅成功");
 		} catch (Exception e) {
 			e.printStackTrace();
