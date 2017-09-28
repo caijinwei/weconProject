@@ -110,6 +110,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             var test = 1;
             if (code == 200) {
                 $scope.infoDatas = data.infoDatas;
+                $(function () { $("[data-toggle='tooltip']").tooltip(); });
                 $scope.$apply();
             }
             else {

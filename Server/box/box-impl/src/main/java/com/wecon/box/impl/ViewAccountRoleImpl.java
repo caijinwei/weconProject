@@ -3,6 +3,8 @@ package com.wecon.box.impl;
 import com.wecon.box.api.ViewAccountRoleApi;
 import com.wecon.box.entity.*;
 import com.wecon.box.enums.ErrorCodeOption;
+import com.wecon.box.filter.AlarmCfgViewFilter;
+import com.wecon.box.filter.RealHisCfgViewFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.restful.core.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,19 +61,19 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
      * 该账户全部余下监控点
 	 */
     @Override
-    public Page<RealHisCfg> getViewRealHisCfgByViewAndAccId(long view_id, long account_id, Integer type,
-                                                            Integer pageIndex, Integer pageSize) {
+    public Page<RealHisCfgViewFilter> getViewRealHisCfgByViewAndAccId(long view_id, long account_id, Integer type,
+                                                                      Integer pageIndex, Integer pageSize) {
         Object[] args0 = new Object[]{account_id, type, view_id,account_id};
         String sqlCount = "select count(*) from real_his_cfg a WHERE account_id=? AND a.data_type=? AND a.bind_state=1  AND id NOT IN(SELECT cfg_id FROM view_account_role where view_id=?) AND device_id  IN(SELECT device_id FROM dev_bind_user WHERE account_id=? );";
         int totalRecord = jdbcTemplate.queryForObject(sqlCount, args0, Integer.class);
-        Page<RealHisCfg> page = new Page<RealHisCfg>(pageIndex, pageSize, totalRecord);
+        Page<RealHisCfgViewFilter> page = new Page<RealHisCfgViewFilter>(pageIndex, pageSize, totalRecord);
 
-        Object[] args = new Object[]{account_id, type, view_id, account_id,page.getStartIndex(), page.getPageSize()};
-        String sql = "select a.id, a.state,a.name , a.digit_count,a.addr , a.addr_type,a.describe from real_his_cfg a WHERE account_id=?  AND a.data_type=? AND a.bind_state=1  AND id NOT IN(SELECT cfg_id FROM view_account_role where view_id=?) AND device_id  IN(SELECT device_id FROM dev_bind_user WHERE account_id=? )  LIMIT ?,?";
-        List<RealHisCfg> list = jdbcTemplate.query(sql, args, new RowMapper() {
+        Object[] args = new Object[]{account_id, type, view_id,page.getStartIndex(), page.getPageSize()};
+        String sql = "select a.id, a.state,a.name , a.digit_count,a.addr , a.addr_type,a.describe,b.name from real_his_cfg a ,device b  WHERE b.device_id=a.device_id AND account_id=?  AND a.data_type=? AND a.bind_state=1  AND id NOT IN(SELECT cfg_id FROM view_account_role where view_id=?) AND a.device_id  IN(SELECT device_id FROM dev_bind_user WHERE account_id=a.account_id )  LIMIT ?,?";
+        List<RealHisCfgViewFilter> list = jdbcTemplate.query(sql, args, new RowMapper() {
             @Override
             public Object mapRow(ResultSet resultSet, int i) throws SQLException {
-                RealHisCfg model = new RealHisCfg();
+                RealHisCfgViewFilter model = new RealHisCfgViewFilter();
                 model.id = resultSet.getLong("id");
                 model.state = resultSet.getInt("state");
                 model.name = resultSet.getString("name");
@@ -79,6 +81,7 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
                 model.addr = resultSet.getString("addr");
                 model.addr_type = resultSet.getInt("addr_type");
                 model.describe = resultSet.getString("describe");
+                model.deviceName=resultSet.getString("b.name");
                 return model;
             }
         });
@@ -93,19 +96,19 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
      * NOT IN ( SELECT cfg_id FROM view_account_role WHERE view_id =
      * '1000021')LIMIT 1, 5;
      */
-    public Page<RealHisCfg> getViewRealHisCfgByViewAndDeivceId(long account_id, long view_id, long device_id,
+    public Page<RealHisCfgViewFilter> getViewRealHisCfgByViewAndDeivceId(long account_id, long view_id, long device_id,
                                                                Integer type, Integer pageIndex, Integer pageSize) {
         Object[] args0 = new Object[]{account_id, type, device_id, view_id};
         String sqlCount = "SELECT COUNT(*) FROM real_his_cfg a WHERE  account_id=?  AND a.data_type = ? AND a.bind_state=1 AND a.device_id =? AND id NOT IN ( SELECT cfg_id FROM view_account_role WHERE view_id = ?)";
         int totalRecord = jdbcTemplate.queryForObject(sqlCount, args0, Integer.class);
-        Page<RealHisCfg> page = new Page<RealHisCfg>(pageIndex, pageSize, totalRecord);
+        Page<RealHisCfgViewFilter> page = new Page<RealHisCfgViewFilter>(pageIndex, pageSize, totalRecord);
 
         Object[] args = new Object[]{account_id, type, device_id, view_id, page.getStartIndex(), page.getPageSize()};
-        String sql = "SELECT  a.id, a.state,a.name ,a.digit_count,a.addr , a.addr_type,a.describe FROM real_his_cfg a WHERE a.account_id =? AND a.data_type = ?  AND a.bind_state=1 AND a.device_id=? AND id NOT IN ( SELECT cfg_id FROM view_account_role WHERE view_id = ?) LIMIT ?,?";
-        List<RealHisCfg> list = jdbcTemplate.query(sql, args, new RowMapper() {
+        String sql = "SELECT  a.id, a.state,a.name ,a.digit_count,a.addr , a.addr_type,a.describe ,b.name FROM real_his_cfg a LEFT JOIN device b ON b.device_id=a.device_id  WHERE a.account_id =? AND a.data_type = ?  AND a.bind_state=1 AND a.device_id=? AND id NOT IN ( SELECT cfg_id FROM view_account_role WHERE view_id = ?) LIMIT ?,?";
+        List<RealHisCfgViewFilter> list = jdbcTemplate.query(sql, args, new RowMapper() {
             @Override
             public Object mapRow(ResultSet resultSet, int i) throws SQLException {
-                RealHisCfg model = new RealHisCfg();
+                RealHisCfgViewFilter model = new RealHisCfgViewFilter();
                 model.id = resultSet.getLong("id");
                 model.state = resultSet.getInt("state");
                 model.name = resultSet.getString("name");
@@ -113,6 +116,7 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
                 model.addr = resultSet.getString("addr");
                 model.addr_type = resultSet.getInt("addr_type");
                 model.describe = resultSet.getString("describe");
+                model.deviceName=resultSet.getString("b.name");
                 return model;
             }
         });
@@ -127,24 +131,25 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
      * a.alarmcfg_id NOT IN ( SELECT cfg_id FROM view_account_role WHERE view_id
      * = 1000021)
      */
-    public Page<AlarmCfg> getViewAlarmCfgByViewAndDeivceId(long account_id, long view_id, Integer device_id,
+    public Page<AlarmCfgViewFilter> getViewAlarmCfgByViewAndDeivceId(long account_id, long view_id, Integer device_id,
                                                            Integer pageIndex, Integer pageSize) {
         Object[] args0 = new Object[]{account_id, device_id, view_id};
         String sqlCount = "SELECT COUNT(*) FROM alarm_cfg a WHERE account_id =?  AND a.bind_state=1 AND a.device_id=? AND a.alarmcfg_id NOT IN (SELECT cfg_id FROM view_account_role WHERE view_id = ?)";
         int totalRecord = jdbcTemplate.queryForObject(sqlCount, args0, Integer.class);
-        Page<AlarmCfg> page = new Page<AlarmCfg>(pageIndex, pageSize, totalRecord);
+        Page<AlarmCfgViewFilter> page = new Page<AlarmCfgViewFilter>(pageIndex, pageSize, totalRecord);
         Object[] args = new Object[]{account_id, device_id, view_id, page.getStartIndex(), page.getPageSize()};
-        String sql = "SELECT  a.alarmcfg_id, a.state,a.name ,a.addr , a.addr_type,a.text FROM alarm_cfg a WHERE account_id =? AND a.bind_state=1 AND a.device_id=? AND a.alarmcfg_id NOT IN (SELECT cfg_id FROM view_account_role WHERE view_id = ?)LIMIT ?,?";
-        List<AlarmCfg> list = jdbcTemplate.query(sql, args, new RowMapper() {
+        String sql = "SELECT  a.alarmcfg_id, a.state,a.name ,a.addr , a.addr_type,a.text ,b.name FROM alarm_cfg a LEFT JOIN device b ON a.device_id=b.device_id  WHERE account_id =? AND a.bind_state=1 AND a.device_id=? AND a.alarmcfg_id NOT IN (SELECT cfg_id FROM view_account_role WHERE view_id = ?)LIMIT ?,?";
+        List<AlarmCfgViewFilter> list = jdbcTemplate.query(sql, args, new RowMapper() {
             @Override
             public Object mapRow(ResultSet resultSet, int i) throws SQLException {
-                AlarmCfg model = new AlarmCfg();
+                AlarmCfgViewFilter model = new AlarmCfgViewFilter();
                 model.alarmcfg_id = resultSet.getLong("alarmcfg_id");
                 model.state = resultSet.getInt("state");
                 model.name = resultSet.getString("name");
                 model.addr = resultSet.getString("addr");
                 model.addr_type = resultSet.getInt("addr_type");
                 model.text = resultSet.getString("text");
+                model.deviceName=resultSet.getString("b.name");
                 return model;
             }
         });
@@ -157,24 +162,25 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
      * a.alarmcfg_id NOT IN(SELECT cfg_id FROM view_account_role where
      * view_id=?)
      */
-    public Page<AlarmCfg> getViewAlarmCfgByView(long account_id, long view_id, Integer pageIndex, Integer pageSize) {
+    public Page<AlarmCfgViewFilter> getViewAlarmCfgByView(long account_id, long view_id, Integer pageIndex, Integer pageSize) {
 
         Object[] args0 = new Object[]{account_id, view_id};
         String sqlCount = "select count(*) from alarm_cfg a WHERE  a.account_id=? AND a.bind_state=1 AND a.alarmcfg_id NOT IN(SELECT cfg_id FROM view_account_role where view_id=?) ";
         int totalRecord = jdbcTemplate.queryForObject(sqlCount, args0, Integer.class);
-        Page<AlarmCfg> page = new Page<AlarmCfg>(pageIndex, pageSize, totalRecord);
+        Page<AlarmCfgViewFilter> page = new Page<AlarmCfgViewFilter>(pageIndex, pageSize, totalRecord);
         Object[] args = new Object[]{account_id, view_id, page.getStartIndex(), page.getPageSize()};
-        String sql = "SELECT  a.alarmcfg_id, a.state,a.name ,a.addr , a.addr_type,a.text FROM alarm_cfg a  WHERE  a.account_id=? AND a.bind_state=1 AND a.alarmcfg_id NOT IN(SELECT cfg_id FROM view_account_role where view_id=?)LIMIT ?,?";
-        List<AlarmCfg> list = jdbcTemplate.query(sql, args, new RowMapper() {
+        String sql = "SELECT  a.alarmcfg_id, a.state,a.name ,a.addr , a.addr_type,a.text ,b.name FROM alarm_cfg a,device b  WHERE a.device_id=b.device_id AND a.account_id=? AND a.bind_state=1 AND a.alarmcfg_id NOT IN(SELECT cfg_id FROM view_account_role where view_id=?) AND  a.device_id IN (SELECT  device_id FROM dev_bind_user WHERE a.device_id=device_id) LIMIT ?,?";
+        List<AlarmCfgViewFilter> list = jdbcTemplate.query(sql, args, new RowMapper() {
             @Override
             public Object mapRow(ResultSet resultSet, int i) throws SQLException {
-                AlarmCfg model = new AlarmCfg();
+                AlarmCfgViewFilter model = new AlarmCfgViewFilter();
                 model.alarmcfg_id = resultSet.getLong("alarmcfg_id");
                 model.state = resultSet.getInt("state");
                 model.name = resultSet.getString("name");
                 model.addr = resultSet.getString("addr");
                 model.addr_type = resultSet.getInt("addr_type");
                 model.text = resultSet.getString("text");
+                model.deviceName=resultSet.getString("b.name");
                 return model;
             }
         });
