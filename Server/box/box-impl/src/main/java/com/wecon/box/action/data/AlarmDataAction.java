@@ -173,8 +173,11 @@ public class AlarmDataAction {
 		if (dirrel != null) {
 			for (AccountDirRel acc : dirrel) {
 				AlarmCfg alarmCfg = alarmCfgApi.getAlarmcfg(acc.ref_id);
-				alarmCfg.state = 3;
-				alarmCfgApi.upAlarmCfg(alarmCfg);// 删除分组下的报警配置
+				if (null != alarmCfg) {
+					alarmCfg.state = 3;
+					alarmCfgApi.upAlarmCfg(alarmCfg);// 删除分组下的报警配置
+				}
+
 			}
 		}
 		if (dir != null && dir.account_id == AppContext.getSession().client.userId) {

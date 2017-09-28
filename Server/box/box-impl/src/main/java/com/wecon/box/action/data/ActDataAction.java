@@ -133,11 +133,17 @@ public class ActDataAction {
 		AccountDir dir = accountDirApi.getAccountDir(id);
 		if (dir.device_id > 0) {
 			List<AccountDirRel> dirrel = accountDirRelApi.getAccountDirRel(dir.id);
-			for (AccountDirRel acc : dirrel) {
-				RealHisCfg realHisCfg =realHisCfgApi.getRealHisCfg(acc.ref_id);
-				realHisCfg.state=3;
-				realHisCfgApi.updateRealHisCfg(realHisCfg);// 删除分组下的监控点
+			if (dirrel != null && dirrel.size() > 0) {
+				for (AccountDirRel acc : dirrel) {
+					RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(acc.ref_id);
+					if (realHisCfg != null) {
+						realHisCfg.state = 3;
+						realHisCfgApi.updateRealHisCfg(realHisCfg);// 删除分组下的监控点
+					}
+
+				}
 			}
+
 		}
 		if (dir != null && dir.account_id == AppContext.getSession().client.userId) {
 			accountDirApi.delAccountDir(id);
@@ -446,19 +452,19 @@ public class ActDataAction {
 			accountDirRelApi.delAccountDir(Long.parseLong(acc_dir_id), Long.parseLong(monitorid));
 		} else {
 			RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(monitorid));
-			DevBindUserFilter devBindUser=new DevBindUserFilter();
-			devBindUser.account_id=client.userId;
-			devBindUser.device_id=realHisCfg.device_id;
-			List<DevBindUser> listDeviceBindUser=devBindUserApi.getDevBindUser(devBindUser);
-			if(listDeviceBindUser.size()!=1){
+			DevBindUserFilter devBindUser = new DevBindUserFilter();
+			devBindUser.account_id = client.userId;
+			devBindUser.device_id = realHisCfg.device_id;
+			List<DevBindUser> listDeviceBindUser = devBindUserApi.getDevBindUser(devBindUser);
+			if (listDeviceBindUser.size() != 1) {
 				throw new BusinessException(ErrorCodeOption.Device_AlreadyBind.key,
 						ErrorCodeOption.Device_AlreadyBind.value);
 			}
-			
+
 			// 1.删除分配给视图账号的配置
 			viewAccountRoleApi.deletePoint(1, Long.parseLong(monitorid));
 			// 2.更改配置状态，等待盒子发送数据把配置物理删除
-		
+
 			realHisCfg.state = 3;// 删除配置状态
 			realHisCfgApi.updateRealHisCfg(realHisCfg);
 			accountDirRelApi.delAccountDir(Long.parseLong(acc_dir_id), Long.parseLong(monitorid));
@@ -754,11 +760,11 @@ public class ActDataAction {
 	public Output addUpdataMonitor(@Valid RealHisCfgParam realHisCfgParam) {
 		JSONObject json = new JSONObject();
 		long account_id = AppContext.getSession().client.userId;
-		DevBindUserFilter devBindUser=new DevBindUserFilter();
-		devBindUser.account_id=account_id;
-		devBindUser.device_id=realHisCfgParam.device_id;
-		List<DevBindUser> listDeviceBindUser=devBindUserApi.getDevBindUser(devBindUser);
-		if(listDeviceBindUser.size()!=1){
+		DevBindUserFilter devBindUser = new DevBindUserFilter();
+		devBindUser.account_id = account_id;
+		devBindUser.device_id = realHisCfgParam.device_id;
+		List<DevBindUser> listDeviceBindUser = devBindUserApi.getDevBindUser(devBindUser);
+		if (listDeviceBindUser.size() != 1) {
 			throw new BusinessException(ErrorCodeOption.Device_AlreadyBind.key,
 					ErrorCodeOption.Device_AlreadyBind.value);
 		}
