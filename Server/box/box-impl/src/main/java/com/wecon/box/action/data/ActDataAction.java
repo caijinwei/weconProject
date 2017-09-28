@@ -613,32 +613,62 @@ public class ActDataAction {
 																// o-八进制 h-十六进制
 						if ("d".equals(mJinzhi.toLowerCase())) {
 							mJinzhi = "十进制";
+							
 						} else if ("o".equals(mJinzhi.toLowerCase())) {
 							mJinzhi = "八进制";
+							String [] ranges=range.split(" ");
+							StringBuffer sb = new StringBuffer();
+							String.valueOf(Long.toOctalString(Long.parseLong(ranges[0])));
+							String.valueOf(Long.toOctalString(Long.parseLong(ranges[1])));
+							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[0]))));
+							sb.append(" ");
+							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[1]))));
+							range=sb.toString();
+							
 						} else if ("h".equals(mJinzhi.toLowerCase())) {
 							mJinzhi = "十六进制";
+							String [] ranges=range.split(" ");
+							StringBuffer sb = new StringBuffer();
+							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[0]))));
+							sb.append(" ");
+							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[1]))));
+							range=sb.toString();
 						}
 						String bitCount = attris.get("BitCount");
-						attr.put("addrvalue", value);
 						attr.put("range", range);
+						attr.put("addrvalue", value);
 						attr.put("mJinzhi", mJinzhi);
 						if (!CommonUtils.isNullOrEmpty(bitCount)) {
 							if (0 != Integer.parseInt(bitCount)) {// 有小数位数
+								String bRange = attris.get("BRange");
 								String bJinzhi = attris.get(
 										"BJinzhi");/**
 													 * 整数位进制 d-十进制 o-八进制 h-十六进制
 													 **/
 								if ("d".equals(bJinzhi.toLowerCase())) {
 									bJinzhi = "十进制";
+									
 								} else if ("o".equals(bJinzhi.toLowerCase())) {
 									bJinzhi = "八进制";
+									String [] ranges=bRange.split(" ");
+									StringBuffer sb = new StringBuffer();
+									sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[0]))));
+									sb.append(" ");
+									sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[1]))));
+									bRange=sb.toString();
 								} else if ("h".equals(bJinzhi.toLowerCase())) {
 									bJinzhi = "十六进制";
+									String [] bRanges=bRange.split(" ");
+									StringBuffer sb = new StringBuffer();
+									sb.append(String.valueOf(Long.toHexString(Long.parseLong(bRanges[0]))));
+									sb.append(" ");
+									sb.append(String.valueOf(Long.toHexString(Long.parseLong(bRanges[1]))));
+									bRange=sb.toString();
 								}
-								String bRange = attris.get("BRange");
+								attr.put("bRange", bRange);
 								attr.put("bitCount", bitCount);
 								attr.put("bJinzhi", bJinzhi);
-								attr.put("bRange", bRange);
+								
 
 							}
 						}
@@ -668,8 +698,22 @@ public class ActDataAction {
 							Jinzhi = "十进制";
 						} else if ("o".equals(Jinzhi.toLowerCase())) {
 							Jinzhi = "八进制";
+							String [] ranges=range.split(" ");
+							StringBuffer sb = new StringBuffer();
+							String.valueOf(Long.toOctalString(Long.parseLong(ranges[0])));
+							String.valueOf(Long.toOctalString(Long.parseLong(ranges[1])));
+							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[0]))));
+							sb.append(" ");
+							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[1]))));
+							range=sb.toString();
 						} else if ("h".equals(Jinzhi.toLowerCase())) {
 							Jinzhi = "十六进制";
+							String [] ranges=range.split(" ");
+							StringBuffer sb = new StringBuffer();
+							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[0]))));
+							sb.append(" ");
+							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[1]))));
+							range=sb.toString();
 						}
 						attr.put("addrvalue", value);
 						attr.put("range", range);
@@ -699,8 +743,22 @@ public class ActDataAction {
 							Jinzhi = "十进制";
 						} else if ("o".equals(Jinzhi.toLowerCase())) {
 							Jinzhi = "八进制";
+							String [] ranges=range.split(" ");
+							StringBuffer sb = new StringBuffer();
+							String.valueOf(Long.toOctalString(Long.parseLong(ranges[0])));
+							String.valueOf(Long.toOctalString(Long.parseLong(ranges[1])));
+							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[0]))));
+							sb.append(" ");
+							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[1]))));
+							range=sb.toString();
 						} else if ("h".equals(Jinzhi.toLowerCase())) {
 							Jinzhi = "十六进制";
+							String [] ranges=range.split(" ");
+							StringBuffer sb = new StringBuffer();
+							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[0]))));
+							sb.append(" ");
+							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[1]))));
+							range=sb.toString();
 						}
 						attr.put("addrvalue", value);
 						attr.put("range", range);
@@ -730,8 +788,22 @@ public class ActDataAction {
 							Jinzhi = "十进制";
 						} else if ("o".equals(Jinzhi.toLowerCase())) {
 							Jinzhi = "八进制";
+							String [] ranges=range.split(" ");
+							StringBuffer sb = new StringBuffer();
+							String.valueOf(Long.toOctalString(Long.parseLong(ranges[0])));
+							String.valueOf(Long.toOctalString(Long.parseLong(ranges[1])));
+							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[0]))));
+							sb.append(" ");
+							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[1]))));
+							range=sb.toString();
 						} else if ("h".equals(Jinzhi.toLowerCase())) {
 							Jinzhi = "十六进制";
+							String [] ranges=range.split(" ");
+							StringBuffer sb = new StringBuffer();
+							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[0]))));
+							sb.append(" ");
+							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[1]))));
+							range=sb.toString();
 						}
 						attr.put("addrvalue", value);
 						attr.put("range", range);
