@@ -43,6 +43,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	private DeviceApi deviceApi;
 	private Map<String, Client> clients = new HashMap<String, Client>();
 	private Map<String, SubscribeListener> subscribeListeners = new HashMap<String, SubscribeListener>();
+	private Map<String, Map<String, Object>> paramMaps = new HashMap<String, Map<String, Object>>();
 
 	private static final Logger logger = LogManager.getLogger(ActDataHandler.class.getName());
 
@@ -64,10 +65,13 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 			}
 			Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {
 			});
+			if (paramMaps.get(session.getId()) != null) {
+				paramMaps.remove(session.getId());
+			}
+			paramMaps.put(session.getId(), bParams);
 			if ("0".equals(bParams.get("markid").toString())) {
 				logger.debug("WebSocket push begin");
-				session.sendMessage(new TextMessage(getStringRealData(bParams, session)));
-				
+				session.sendMessage(new TextMessage(getStringRealData(session)));
 
 				logger.debug("WebSocket push end");
 
@@ -256,8 +260,9 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	/**
 	 * 订阅redis消息
 	 */
-	private void subscribeRealData(WebSocketSession session, Map<String, Object> bParams,final Set<String> machineCodeSet) {
-		final SubscribeListener subscribeListener = new SubscribeListener(session, bParams);
+	private void subscribeRealData(WebSocketSession session, Map<String, Object> bParams,
+			final Set<String> machineCodeSet) {
+		final SubscribeListener subscribeListener = new SubscribeListener(session);
 		subscribeListeners.put(session.getId(), subscribeListener);
 		ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
 		cachedThreadPool.execute(new Runnable() {
@@ -279,20 +284,20 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 		 * 
 		 */
 		private WebSocketSession session;
-		private Map<String, Object> bParams;
 
-		public SubscribeListener(WebSocketSession session, Map<String, Object> bParams) {
+		public SubscribeListener(WebSocketSession session) {
 			this.session = session;
-			this.bParams = bParams;
+
 		}
 
 		@Override
 		public void onMessage(String channel, String message) {
 			logger.debug("Subscribe callback，channel：" + channel + "message:" + message);
-			if (!CommonUtils.isNullOrEmpty(message) && "0".equals(bParams.get("markid").toString())) {
-				try {
 
-					session.sendMessage(new TextMessage(getStringRealData(bParams, session)));
+			if (!CommonUtils.isNullOrEmpty(message)
+					&& "0".equals(paramMaps.get(session.getId()).get("markid").toString())) {
+				try {
+					session.sendMessage(new TextMessage(getStringRealData(session)));
 				} catch (IOException e) {
 					e.printStackTrace();
 					logger.debug("Subscribe callback error，" + e.getMessage());
@@ -301,7 +306,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 		}
 	}
 
-	private String getStringRealData(Map<String, Object> bParams, WebSocketSession session) {
+	private String getStringRealData(WebSocketSession session) {
 		try {
 
 			JSONObject json = new JSONObject();
@@ -310,6 +315,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 			/** 通过视图获取配置信息 **/
 			ViewAccountRoleFilter viewAccountRoleFilter = new ViewAccountRoleFilter();
 			Client client = clients.get(session.getId());
+			Map<String, Object> bParams = paramMaps.get(session.getId());
 			logger.debug("显示client==" + client.userInfo.toString());
 			logger.debug("显示session.getId()==" + session.getId());
 			if (client != null) {
@@ -321,7 +327,6 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 					realHisCfgFilter.his_cycle = -1;
 					realHisCfgFilter.state = 3;
 					realHisCfgFilter.bind_state = 1;
-
 					realHisCfgFilter.account_id = client.userId;
 
 					if (!CommonUtils.isNullOrEmpty(bParams.get("acc_dir_id"))) {
@@ -432,11 +437,12 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 						}
 					}
 				}
-				if (machineCodeSet != null&&subscribeListeners.get(session.getId())==null) {
-					
-					subscribeRealData(session, bParams,machineCodeSet);
+				if (machineCodeSet != null && subscribeListeners.get(session.getId()) == null) {
+
+					subscribeRealData(session, bParams, machineCodeSet);
 				}
 				json.put("piBoxActDateMode", realHisCfgDeviceList);
+
 			}
 			logger.debug("Websocket push msg: " + json.toJSONString());
 			return json.toJSONString();
@@ -456,11 +462,8 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) {
 		try {
-			logger.debug("session====" + session);
 			logger.debug("连接成功");
 			Client client = AppContext.getSession().client;
-			logger.debug("连接成功client==" + client);
-			logger.debug("连接成功session.getId()==" + session.getId());
 			clients.put(session.getId(), client);
 
 		} catch (Exception e) {
@@ -484,7 +487,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 			subscribeListeners.get(session.getId()).unsubscribe();
 			clients.remove(session.getId());
 			subscribeListeners.remove(session.getId());
-			logger.debug("Redis取消订阅成功");
+			paramMaps.remove(session.getId());
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.debug("afterConnectionClosed，" + e.getMessage());

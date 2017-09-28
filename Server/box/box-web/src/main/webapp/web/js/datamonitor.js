@@ -4,8 +4,6 @@ appModule
 				"infoController",
 				function($scope, $http, $compile) {
 					$scope.onInit = function() {
-						console.log("初始化");
-
 						$scope.deviceid = T.common.util
 								.getParameter("device_id");
 						$scope.devicename = T.common.util
@@ -48,7 +46,7 @@ appModule
 												if (data.ActGroup != null
 														&& $scope.type == 0) {
 													var fristGroupId = data.ActGroup[0].id;
-												
+
 													actgroupId = fristGroupId;
 													$scope.createWebSocket();
 												}
@@ -114,20 +112,18 @@ appModule
 							heartCheck.reset().start();
 						};
 						ws.onmessage = function(evt) {
-							console.log("actgroupId===="+actgroupId);
-							if (JSON.parse(evt.data).piBoxActDateMode != null) {
-								
-								$scope.paginationConf.totalItems = JSON
-										.parse(evt.data).piBoxActDateMode.totalRecord;
-								$scope.actDatas = JSON.parse(evt.data).piBoxActDateMode.list;
-								$scope.$apply();
-								angular.forEach($scope.actDatas, function(data,
-										index, array) {
-									$scope.editable_name(data);
-									$scope.editable_value(data);
-								});
-								 $("i[name='act_i_state']").tooltip();
-
+							if (JSON.parse(evt.data).piBoxActDateMode != null) {							
+									$scope.paginationConf.totalItems = JSON
+											.parse(evt.data).piBoxActDateMode.totalRecord;
+									$scope.actDatas = JSON.parse(evt.data).piBoxActDateMode.list;
+									console.log($scope.actDatas);
+									$scope.$apply();
+									angular.forEach($scope.actDatas, function(
+											data, index, array) {
+										$scope.editable_name(data);
+										$scope.editable_value(data);
+									});
+									$("i[name='act_i_state']").tooltip();
 							} else {
 								// 下发数据到盒子反馈
 								$scope.resultData = JSON.parse(evt.data).resultData;

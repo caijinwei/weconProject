@@ -133,11 +133,17 @@ public class ActDataAction {
 		AccountDir dir = accountDirApi.getAccountDir(id);
 		if (dir.device_id > 0) {
 			List<AccountDirRel> dirrel = accountDirRelApi.getAccountDirRel(dir.id);
-			for (AccountDirRel acc : dirrel) {
-				RealHisCfg realHisCfg =realHisCfgApi.getRealHisCfg(acc.ref_id);
-				realHisCfg.state=3;
-				realHisCfgApi.updateRealHisCfg(realHisCfg);// 删除分组下的监控点
+			if (dirrel != null && dirrel.size() > 0) {
+				for (AccountDirRel acc : dirrel) {
+					RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(acc.ref_id);
+					if (realHisCfg != null) {
+						realHisCfg.state = 3;
+						realHisCfgApi.updateRealHisCfg(realHisCfg);// 删除分组下的监控点
+					}
+
+				}
 			}
+
 		}
 		if (dir != null && dir.account_id == AppContext.getSession().client.userId) {
 			accountDirApi.delAccountDir(id);
@@ -446,19 +452,19 @@ public class ActDataAction {
 			accountDirRelApi.delAccountDir(Long.parseLong(acc_dir_id), Long.parseLong(monitorid));
 		} else {
 			RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(monitorid));
-			DevBindUserFilter devBindUser=new DevBindUserFilter();
-			devBindUser.account_id=client.userId;
-			devBindUser.device_id=realHisCfg.device_id;
-			List<DevBindUser> listDeviceBindUser=devBindUserApi.getDevBindUser(devBindUser);
-			if(listDeviceBindUser.size()!=1){
+			DevBindUserFilter devBindUser = new DevBindUserFilter();
+			devBindUser.account_id = client.userId;
+			devBindUser.device_id = realHisCfg.device_id;
+			List<DevBindUser> listDeviceBindUser = devBindUserApi.getDevBindUser(devBindUser);
+			if (listDeviceBindUser.size() != 1) {
 				throw new BusinessException(ErrorCodeOption.Device_AlreadyBind.key,
 						ErrorCodeOption.Device_AlreadyBind.value);
 			}
-			
+
 			// 1.删除分配给视图账号的配置
 			viewAccountRoleApi.deletePoint(1, Long.parseLong(monitorid));
 			// 2.更改配置状态，等待盒子发送数据把配置物理删除
-		
+
 			realHisCfg.state = 3;// 删除配置状态
 			realHisCfgApi.updateRealHisCfg(realHisCfg);
 			accountDirRelApi.delAccountDir(Long.parseLong(acc_dir_id), Long.parseLong(monitorid));
@@ -607,32 +613,62 @@ public class ActDataAction {
 																// o-八进制 h-十六进制
 						if ("d".equals(mJinzhi.toLowerCase())) {
 							mJinzhi = "十进制";
+							
 						} else if ("o".equals(mJinzhi.toLowerCase())) {
 							mJinzhi = "八进制";
+							String [] ranges=range.split(" ");
+							StringBuffer sb = new StringBuffer();
+							String.valueOf(Long.toOctalString(Long.parseLong(ranges[0])));
+							String.valueOf(Long.toOctalString(Long.parseLong(ranges[1])));
+							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[0]))));
+							sb.append(" ");
+							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[1]))));
+							range=sb.toString();
+							
 						} else if ("h".equals(mJinzhi.toLowerCase())) {
 							mJinzhi = "十六进制";
+							String [] ranges=range.split(" ");
+							StringBuffer sb = new StringBuffer();
+							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[0]))));
+							sb.append(" ");
+							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[1]))));
+							range=sb.toString();
 						}
 						String bitCount = attris.get("BitCount");
-						attr.put("addrvalue", value);
 						attr.put("range", range);
+						attr.put("addrvalue", value);
 						attr.put("mJinzhi", mJinzhi);
 						if (!CommonUtils.isNullOrEmpty(bitCount)) {
 							if (0 != Integer.parseInt(bitCount)) {// 有小数位数
+								String bRange = attris.get("BRange");
 								String bJinzhi = attris.get(
 										"BJinzhi");/**
 													 * 整数位进制 d-十进制 o-八进制 h-十六进制
 													 **/
 								if ("d".equals(bJinzhi.toLowerCase())) {
 									bJinzhi = "十进制";
+									
 								} else if ("o".equals(bJinzhi.toLowerCase())) {
 									bJinzhi = "八进制";
+									String [] ranges=bRange.split(" ");
+									StringBuffer sb = new StringBuffer();
+									sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[0]))));
+									sb.append(" ");
+									sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[1]))));
+									bRange=sb.toString();
 								} else if ("h".equals(bJinzhi.toLowerCase())) {
 									bJinzhi = "十六进制";
+									String [] bRanges=bRange.split(" ");
+									StringBuffer sb = new StringBuffer();
+									sb.append(String.valueOf(Long.toHexString(Long.parseLong(bRanges[0]))));
+									sb.append(" ");
+									sb.append(String.valueOf(Long.toHexString(Long.parseLong(bRanges[1]))));
+									bRange=sb.toString();
 								}
-								String bRange = attris.get("BRange");
+								attr.put("bRange", bRange);
 								attr.put("bitCount", bitCount);
 								attr.put("bJinzhi", bJinzhi);
-								attr.put("bRange", bRange);
+								
 
 							}
 						}
@@ -662,8 +698,22 @@ public class ActDataAction {
 							Jinzhi = "十进制";
 						} else if ("o".equals(Jinzhi.toLowerCase())) {
 							Jinzhi = "八进制";
+							String [] ranges=range.split(" ");
+							StringBuffer sb = new StringBuffer();
+							String.valueOf(Long.toOctalString(Long.parseLong(ranges[0])));
+							String.valueOf(Long.toOctalString(Long.parseLong(ranges[1])));
+							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[0]))));
+							sb.append(" ");
+							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[1]))));
+							range=sb.toString();
 						} else if ("h".equals(Jinzhi.toLowerCase())) {
 							Jinzhi = "十六进制";
+							String [] ranges=range.split(" ");
+							StringBuffer sb = new StringBuffer();
+							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[0]))));
+							sb.append(" ");
+							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[1]))));
+							range=sb.toString();
 						}
 						attr.put("addrvalue", value);
 						attr.put("range", range);
@@ -693,8 +743,22 @@ public class ActDataAction {
 							Jinzhi = "十进制";
 						} else if ("o".equals(Jinzhi.toLowerCase())) {
 							Jinzhi = "八进制";
+							String [] ranges=range.split(" ");
+							StringBuffer sb = new StringBuffer();
+							String.valueOf(Long.toOctalString(Long.parseLong(ranges[0])));
+							String.valueOf(Long.toOctalString(Long.parseLong(ranges[1])));
+							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[0]))));
+							sb.append(" ");
+							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[1]))));
+							range=sb.toString();
 						} else if ("h".equals(Jinzhi.toLowerCase())) {
 							Jinzhi = "十六进制";
+							String [] ranges=range.split(" ");
+							StringBuffer sb = new StringBuffer();
+							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[0]))));
+							sb.append(" ");
+							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[1]))));
+							range=sb.toString();
 						}
 						attr.put("addrvalue", value);
 						attr.put("range", range);
@@ -724,8 +788,22 @@ public class ActDataAction {
 							Jinzhi = "十进制";
 						} else if ("o".equals(Jinzhi.toLowerCase())) {
 							Jinzhi = "八进制";
+							String [] ranges=range.split(" ");
+							StringBuffer sb = new StringBuffer();
+							String.valueOf(Long.toOctalString(Long.parseLong(ranges[0])));
+							String.valueOf(Long.toOctalString(Long.parseLong(ranges[1])));
+							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[0]))));
+							sb.append(" ");
+							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[1]))));
+							range=sb.toString();
 						} else if ("h".equals(Jinzhi.toLowerCase())) {
 							Jinzhi = "十六进制";
+							String [] ranges=range.split(" ");
+							StringBuffer sb = new StringBuffer();
+							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[0]))));
+							sb.append(" ");
+							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[1]))));
+							range=sb.toString();
 						}
 						attr.put("addrvalue", value);
 						attr.put("range", range);
@@ -754,11 +832,11 @@ public class ActDataAction {
 	public Output addUpdataMonitor(@Valid RealHisCfgParam realHisCfgParam) {
 		JSONObject json = new JSONObject();
 		long account_id = AppContext.getSession().client.userId;
-		DevBindUserFilter devBindUser=new DevBindUserFilter();
-		devBindUser.account_id=account_id;
-		devBindUser.device_id=realHisCfgParam.device_id;
-		List<DevBindUser> listDeviceBindUser=devBindUserApi.getDevBindUser(devBindUser);
-		if(listDeviceBindUser.size()!=1){
+		DevBindUserFilter devBindUser = new DevBindUserFilter();
+		devBindUser.account_id = account_id;
+		devBindUser.device_id = realHisCfgParam.device_id;
+		List<DevBindUser> listDeviceBindUser = devBindUserApi.getDevBindUser(devBindUser);
+		if (listDeviceBindUser.size() != 1) {
 			throw new BusinessException(ErrorCodeOption.Device_AlreadyBind.key,
 					ErrorCodeOption.Device_AlreadyBind.value);
 		}
