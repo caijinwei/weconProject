@@ -1,6 +1,8 @@
 package com.wecon.box.api;
 
 import com.wecon.box.entity.*;
+import com.wecon.box.filter.AlarmCfgViewFilter;
+import com.wecon.box.filter.RealHisCfgViewFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import org.springframework.stereotype.Component;
 
@@ -32,24 +34,24 @@ public interface ViewAccountRoleApi {
 	 *
 	 * 获取 该视图账户中未有的监控点 需要分页
 	 */
-	public Page<RealHisCfg> getViewRealHisCfgByViewAndAccId(long view_id, long account_id, Integer type,
-			Integer pageIndex, Integer pageSize);
+	public Page<RealHisCfgViewFilter> getViewRealHisCfgByViewAndAccId(long view_id, long account_id, Integer type,
+																	  Integer pageIndex, Integer pageSize);
 
 	/*
 	 * 盒子下的报警监控点
 	 */
-	public Page<AlarmCfg> getViewAlarmCfgByViewAndDeivceId(long account_id, long view_id, Integer device_id,
+	public Page<AlarmCfgViewFilter> getViewAlarmCfgByViewAndDeivceId(long account_id, long view_id, Integer device_id,
 			Integer pageIndex, Integer pageSize);
 
 	/*
 	 * 账户下的报警监控点
 	 */
-	public Page<AlarmCfg> getViewAlarmCfgByView(long account_id, long view_id, Integer pageIndex, Integer pageSize);
+	public Page<AlarmCfgViewFilter> getViewAlarmCfgByView(long account_id, long view_id, Integer pageIndex, Integer pageSize);
 
 	/*
 	 * 盒子下的余下监控点
 	 **/
-	public Page<RealHisCfg> getViewRealHisCfgByViewAndDeivceId(long account_id, long view_id, long device_id,
+	public Page<RealHisCfgViewFilter> getViewRealHisCfgByViewAndDeivceId(long account_id, long view_id, long device_id,
 			Integer type, Integer pageIndex, Integer pageSize);
 
 	/**

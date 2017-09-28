@@ -9,6 +9,8 @@ import com.wecon.box.entity.*;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
+import com.wecon.box.filter.AlarmCfgViewFilter;
+import com.wecon.box.filter.RealHisCfgViewFilter;
 import com.wecon.box.util.DbLogUtil;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
@@ -72,15 +74,15 @@ public class ViewpointAction {
     @RequestMapping(value = "showRealHiss")
     public Output showRealHiss(@RequestParam("view_id") Integer viewId, @RequestParam("device_id") Integer device_id, @RequestParam("type") Integer type, @RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
         long userId = AppContext.getSession().client.userId;
-        Page<RealHisCfg> page = null;
-        if (device_id != 0) {
-            page = viewAccountRoleApi.getViewRealHisCfgByViewAndDeivceId(userId, viewId, device_id, type, pageIndex, pageSize);
-        } else {
-            page = viewAccountRoleApi.getViewRealHisCfgByViewAndAccId(viewId, userId, type, pageIndex, pageSize);
-        }
+
         JSONObject data = new JSONObject();
-        data.put("page", page);
-        System.out.println(page.getList());
+        if (device_id != 0) {
+            Page<RealHisCfgViewFilter> page = viewAccountRoleApi.getViewRealHisCfgByViewAndDeivceId(userId, viewId, device_id, type, pageIndex, pageSize);
+            data.put("page", page);
+        } else {
+            Page<RealHisCfgViewFilter> page = viewAccountRoleApi.getViewRealHisCfgByViewAndAccId(viewId, userId, type, pageIndex, pageSize);
+            data.put("page", page);
+        }
         return new Output(data);
     }
 
@@ -92,14 +94,16 @@ public class ViewpointAction {
     @RequestMapping(value = "showAlarmrestpoint")
     public Output showAlarmrestpoint(@RequestParam("view_id") Integer viewId, @RequestParam("device_id") Integer device_id, @RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
         long account_id = AppContext.getSession().client.userId;
-        Page<AlarmCfg> page = null;
-        if (device_id == 0) {
-            page = viewAccountRoleApi.getViewAlarmCfgByView(account_id, viewId, pageIndex, pageSize);
-        } else {
-            page = viewAccountRoleApi.getViewAlarmCfgByViewAndDeivceId(account_id, viewId, device_id, pageIndex, pageSize);
-        }
         JSONObject data = new JSONObject();
-        data.put("page", page);
+        if (device_id == 0) {
+           Page<AlarmCfgViewFilter> page = viewAccountRoleApi.getViewAlarmCfgByView(account_id, viewId, pageIndex, pageSize);
+            data.put("page", page);
+        } else {
+            Page<AlarmCfgViewFilter> page= page = viewAccountRoleApi.getViewAlarmCfgByViewAndDeivceId(account_id, viewId, device_id, pageIndex, pageSize);
+            data.put("page", page);
+        }
+
+
         return new Output(data);
     }
 
