@@ -29,6 +29,7 @@ import com.wecon.box.entity.AlarmCfgTrigger;
 import com.wecon.box.entity.AlarmTrigger;
 import com.wecon.box.entity.DevBindUser;
 import com.wecon.box.entity.Page;
+import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
@@ -387,6 +388,11 @@ public class AlarmDataAction {
 				oldalarmCfg = alarmCfgApi.getAlarmcfg(alarmCfgParam.alarmcfg_id);
 				alarmCfg = alarmCfgApi.getAlarmcfg(alarmCfgParam.alarmcfg_id);
 				if (alarmCfg != null) {
+					AlarmCfg oldarm = alarmCfgApi.getAlarmcfg(alarmCfgParam.device_id, alarmCfgParam.name);
+					if (oldarm != null && oldarm.alarmcfg_id != alarmCfgParam.alarmcfg_id) {
+						throw new BusinessException(ErrorCodeOption.Name_Repetition.key,
+								ErrorCodeOption.Name_Repetition.value);
+					}
 					alarmCfg.account_id = account_id;
 					alarmCfg.addr = alarmCfgParam.addr;
 					alarmCfg.addr_type = alarmCfgParam.addr_type;
@@ -409,8 +415,8 @@ public class AlarmDataAction {
 								oldalarmCfg, alarmCfg);
 						// 获取分组信息
 						if (alarmCfgParam.group_id > 0) {
-							AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(alarmCfgParam.group_id,
-									alarmCfgParam.alarmcfg_id);
+							AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(-1,
+									alarmCfgParam.alarmcfg_id, 3);
 
 							if (accountDirRel != null) {
 
@@ -447,6 +453,11 @@ public class AlarmDataAction {
 				}
 
 			} else {
+				AlarmCfg newarm = alarmCfgApi.getAlarmcfg(alarmCfgParam.device_id, alarmCfgParam.name);
+				if (newarm != null) {
+					throw new BusinessException(ErrorCodeOption.Name_Repetition.key,
+							ErrorCodeOption.Name_Repetition.value);
+				}
 				alarmCfg = new AlarmCfg();
 				alarmCfg.account_id = account_id;
 				alarmCfg.addr = alarmCfgParam.addr;
