@@ -400,6 +400,11 @@ public class AlarmDataAction {
 					alarmCfg.data_id = alarmCfgParam.data_id;
 					alarmCfg.plc_id = alarmCfgParam.plc_id;
 					alarmCfg.rid = alarmCfgParam.rid;
+					if (alarmCfg.name.length() > 64) {
+						alarmCfg.name = alarmCfgParam.name.substring(0, 64);
+					} else {
+						alarmCfg.name = alarmCfgParam.name;
+					}
 					alarmCfg.name = alarmCfgParam.name;
 					alarmCfg.text = alarmCfgParam.text;
 					alarmCfg.condition_type = alarmCfgParam.condition_type;
@@ -466,7 +471,11 @@ public class AlarmDataAction {
 				alarmCfg.data_id = alarmCfgParam.data_id;
 				alarmCfg.plc_id = alarmCfgParam.plc_id;
 				alarmCfg.rid = alarmCfgParam.rid;
-				alarmCfg.name = alarmCfgParam.name;
+				if (alarmCfg.name.length() > 64) {
+					alarmCfg.name = alarmCfgParam.name.substring(0, 64);
+				} else {
+					alarmCfg.name = alarmCfgParam.name;
+				}
 				alarmCfg.text = alarmCfgParam.text;
 				alarmCfg.condition_type = alarmCfgParam.condition_type;
 				alarmCfg.state = 1;
