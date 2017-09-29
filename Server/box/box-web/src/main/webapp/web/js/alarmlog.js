@@ -1345,6 +1345,10 @@ appModule
 							}
 
 						}
+						if ($("#nameid").val().length > 64) {
+							alert("名称字符长度不能大于64位！");
+							return;
+						}
 						var display = $('#registeraddr').css('display');
 						if (display == 'block') {
 							var rang, reg;

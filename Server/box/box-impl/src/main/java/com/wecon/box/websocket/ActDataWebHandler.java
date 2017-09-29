@@ -65,12 +65,13 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 			}
 			Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {
 			});
-			if (paramMaps.get(session.getId()) != null) {
-				paramMaps.remove(session.getId());
-			}
-			paramMaps.put(session.getId(), bParams);
+			
 			if ("0".equals(bParams.get("markid").toString())) {
 				logger.debug("WebSocket push begin");
+				if (paramMaps.get(session.getId()) != null) {
+					paramMaps.remove(session.getId());
+				}
+				paramMaps.put(session.getId(), bParams);
 				session.sendMessage(new TextMessage(getStringRealData(session)));
 
 				logger.debug("WebSocket push end");
@@ -260,8 +261,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	/**
 	 * 订阅redis消息
 	 */
-	private void subscribeRealData(WebSocketSession session, Map<String, Object> bParams,
-			final Set<String> machineCodeSet) {
+	private void subscribeRealData(WebSocketSession session, final Set<String> machineCodeSet) {
 		final SubscribeListener subscribeListener = new SubscribeListener(session);
 		subscribeListeners.put(session.getId(), subscribeListener);
 		ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
@@ -293,7 +293,6 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 		@Override
 		public void onMessage(String channel, String message) {
 			logger.debug("Subscribe callback，channel：" + channel + "message:" + message);
-
 			if (!CommonUtils.isNullOrEmpty(message)
 					&& "0".equals(paramMaps.get(session.getId()).get("markid").toString())) {
 				try {
@@ -439,7 +438,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 				}
 				if (machineCodeSet != null && subscribeListeners.get(session.getId()) == null) {
 
-					subscribeRealData(session, bParams, machineCodeSet);
+					subscribeRealData(session, machineCodeSet);
 				}
 				json.put("piBoxActDateMode", realHisCfgDeviceList);
 
