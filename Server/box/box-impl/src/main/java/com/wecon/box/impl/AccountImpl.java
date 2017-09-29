@@ -43,34 +43,48 @@ public class AccountImpl implements AccountApi {
 
     @Override
     public Account signupByEmail(final String username, final String email, final String password) {
-        String sql = "select count(1) from account where username = ? or username = ? or email = ?  or email = ?  ";
+        String sql = "select count(1) from account where username = ? or username = ? or email = ?  or email = ? ";
 
         int ret = jdbcTemplate.queryForObject(sql,
                 new Object[]{username, email, username, email},
                 Integer.class);
-        if (ret > 0) {
-            throw new BusinessException(ErrorCodeOption.AccountExisted.key, ErrorCodeOption.AccountExisted.value);
+        if (ret == 0) {
+            KeyHolder key = new GeneratedKeyHolder();
+            jdbcTemplate.update(new PreparedStatementCreator() {
+                @Override
+                public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                    PreparedStatement preState = con.prepareStatement("insert into account(username,`password`,email,secret_key,create_date,`type`,state,update_date) values (?,?,?,?,current_timestamp(),?,?,current_timestamp() );", Statement.RETURN_GENERATED_KEYS);
+                    String secret_key = DigestUtils.md5Hex(UUID.randomUUID().toString());
+                    preState.setString(1, username);
+                    preState.setString(2, DigestUtils.md5Hex(password + secret_key));
+                    preState.setString(3, email);
+                    preState.setString(4, secret_key);
+                    preState.setInt(5, 1);//注册帐号为管理帐号
+                    preState.setInt(6, -1);//未激活
+
+                    return preState;
+                }
+            }, key);
+            //从主键持有者中获得主键值
+            long account_id = key.getKey().longValue();
+            return getAccount(account_id);
+        } else {
+            Account model = getAccount(username);
+            if (!username.equalsIgnoreCase(email) && model != null && !model.email.equalsIgnoreCase(email)) {
+                //用户名和邮箱不一样 且 用户名被占用，不能注册
+                throw new BusinessException(ErrorCodeOption.AccountExisted.key, ErrorCodeOption.AccountExisted.value);
+            }
+            model = getAccount(email);
+            if (model != null && model.state == -1) {
+                //邮箱被占用，且状态为邮箱未激活，可以再注册，在原来帐号上修改用户名
+                sql = "update account set username=?,`password`=?,email=?,secret_key=?,state=?,create_date=current_timestamp(),update_date=current_timestamp()  where account_id=?";
+                String secret_key = DigestUtils.md5Hex(UUID.randomUUID().toString());
+                jdbcTemplate.update(sql, new Object[]{username, DigestUtils.md5Hex(password + secret_key), model.email, secret_key, model.state, model.account_id});
+                return getAccount(model.account_id);
+            }
         }
 
-        KeyHolder key = new GeneratedKeyHolder();
-        jdbcTemplate.update(new PreparedStatementCreator() {
-            @Override
-            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                PreparedStatement preState = con.prepareStatement("insert into account(username,`password`,email,secret_key,create_date,`type`,state,update_date) values (?,?,?,?,current_timestamp(),?,?,current_timestamp() );", Statement.RETURN_GENERATED_KEYS);
-                String secret_key = DigestUtils.md5Hex(UUID.randomUUID().toString());
-                preState.setString(1, username);
-                preState.setString(2, DigestUtils.md5Hex(password + secret_key));
-                preState.setString(3, email);
-                preState.setString(4, secret_key);
-                preState.setInt(5, 1);//注册帐号为管理帐号
-                preState.setInt(6, -1);//未激活
-
-                return preState;
-            }
-        }, key);
-        //从主键持有者中获得主键值
-        long account_id = key.getKey().longValue();
-        return getAccount(account_id);
+        throw new BusinessException(ErrorCodeOption.AccountExisted.key, ErrorCodeOption.AccountExisted.value);
     }
 
     @Override
