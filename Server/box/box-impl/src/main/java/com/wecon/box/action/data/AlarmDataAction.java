@@ -400,7 +400,7 @@ public class AlarmDataAction {
 					alarmCfg.data_id = alarmCfgParam.data_id;
 					alarmCfg.plc_id = alarmCfgParam.plc_id;
 					alarmCfg.rid = alarmCfgParam.rid;
-					if (alarmCfg.name.length() > 64) {
+					if (alarmCfgParam.name.length() > 64) {
 						alarmCfg.name = alarmCfgParam.name.substring(0, 64);
 					} else {
 						alarmCfg.name = alarmCfgParam.name;
@@ -430,7 +430,11 @@ public class AlarmDataAction {
 							AccountDirRel dirRel = new AccountDirRel();
 							dirRel.acc_dir_id = alarmCfgParam.group_id;
 							dirRel.ref_id = alarmCfgParam.alarmcfg_id;
-							dirRel.ref_alais = alarmCfgParam.name;
+							if (alarmCfgParam.name.length() > 64) {
+								accountDirRel.ref_alais = alarmCfgParam.name.substring(0, 64);
+							} else {
+								accountDirRel.ref_alais = alarmCfgParam.name;
+							}
 							accountDirRelApi.saveAccountDirRel(dirRel);
 
 						}
@@ -471,7 +475,7 @@ public class AlarmDataAction {
 				alarmCfg.data_id = alarmCfgParam.data_id;
 				alarmCfg.plc_id = alarmCfgParam.plc_id;
 				alarmCfg.rid = alarmCfgParam.rid;
-				if (alarmCfg.name.length() > 64) {
+				if (alarmCfgParam.name.length() > 64) {
 					alarmCfg.name = alarmCfgParam.name.substring(0, 64);
 				} else {
 					alarmCfg.name = alarmCfgParam.name;
@@ -491,7 +495,11 @@ public class AlarmDataAction {
 					AccountDirRel accountDirRel = new AccountDirRel();
 					accountDirRel.acc_dir_id = alarmCfgParam.group_id;
 					accountDirRel.ref_id = alarm.alarmcfg_id;
-					accountDirRel.ref_alais = alarmCfgParam.name;
+					if (alarmCfgParam.name.length() > 64) {
+						accountDirRel.ref_alais = alarmCfgParam.name.substring(0, 64);
+					} else {
+						accountDirRel.ref_alais = alarmCfgParam.name;
+					}
 					accountDirRelApi.saveAccountDirRel(accountDirRel);
 
 					if (!CommonUtils.isNullOrEmpty(alarmCfgParam.value)
