@@ -48,6 +48,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             }
         }, function () {
             alert("ajax error");
+            $("#loadingModal").modal("hide");
         });
     }
 
@@ -78,16 +79,17 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             params['state'] = "0";
         }
         T.common.ajax.request("WeconBox", "user/addviewuser", params, function (data, code, msg) {
+            $("#loadingModal").modal("hide");
+            $("#addViewAccount").modal("hide");
             if (code == 200) {
                 $scope.getList($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
             }
             else {
                 alert(msg);
             }
-            $("#loadingModal").modal("hide");
-            $("#addViewAccount").modal("hide");
         }, function () {
             alert("ajax error");
+            $("#loadingModal").modal("hide");
         });
     }
 
@@ -109,13 +111,12 @@ appModule.controller("listController", function ($scope, $http, $compile) {
                     params["state"] = "1";
                 }
                 T.common.ajax.request("WeconBox", "user/chgviewuserstate", params, function (data, code, msg) {
+                    $("#loadingModal").modal("hide");
                     if (code == 200) {
                         $scope.getList($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
-                        $("#loadingModal").modal("hide");
                     }
                     else {
                         alert(msg);
-                        $("#loadingModal").modal("hide");
                     }
                 }, function () {
                     alert("ajax error");

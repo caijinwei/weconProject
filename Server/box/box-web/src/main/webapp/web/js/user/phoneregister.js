@@ -50,6 +50,10 @@ $(function () {
     })
 
     $('#signup').bind('click', function () {
+        if (!$('#cbRegister').is(':checked')) {
+            alert("请阅读并接受注册条款");
+            return;
+        }
         $("#loadingModal").modal("show");
         var params =
         {

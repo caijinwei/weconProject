@@ -34,6 +34,9 @@ public class SignupEmailAction extends UserBaseAction {
     @RequestMapping("user/signupemail")
     @WebApi(forceAuth = false, master = true)
     public Output signupByEmail(@Valid SignupEmailParam param) {
+        if (!VerifyUtil.isValidUserName(param.username)) {
+            throw new BusinessException(ErrorCodeOption.UserNameFormatError.key, ErrorCodeOption.UserNameFormatError.value);
+        }
         if (!VerifyUtil.isValidEmail(param.email)) {
             throw new BusinessException(ErrorCodeOption.EmailError.key, ErrorCodeOption.EmailError.value);
         }

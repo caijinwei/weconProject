@@ -27,6 +27,7 @@ public enum ErrorCodeOption {
     AccountPhoneExisted("手机号码已经被使用", 11016),
     PhonenumAndEmailError("手机号码和邮箱格式有错", 11017),
     DelGroupHasDevice("此分组下还有绑定的设备，请先解绑或转移到其他分组", 11018),
+    UserNameFormatError("用户名只能1-20字符且只能由字母数字下划线组成", 11019),
 
     //文件操作相关
     UploadFileError("上传文件异常", 12000),

@@ -247,7 +247,7 @@ public class UserActionTest extends TestBase {
         request.param("phonenum", "123456789101");
         String ret = test(request, true);
         JSONObject jsonObject = JSON.parseObject(ret);
-        Assert.assertEquals(jsonObject.get("code").toString(), "11013");
+        Assert.assertEquals(jsonObject.get("code").toString(), "11017");
 
         /*request.param("phonenum", "13655099598");
         ret = test(request, true);
