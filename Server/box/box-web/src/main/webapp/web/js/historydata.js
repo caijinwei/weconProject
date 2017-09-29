@@ -1002,6 +1002,14 @@ appModule
 							}
 
 						}
+						if($("#nameid").val().length>64){
+							alert("名称字符长度不能大于64位！");
+							return;
+						}
+						if($("#describeid").val().length>64){
+							alert("描述字符长度不能大于64位！");
+							return;
+						}
 						var display = $('#registeraddr').css('display');
 						if (display == 'block') {
 							var rang, reg;
@@ -1445,7 +1453,8 @@ appModule
 												$scope.paginationConf_register.totalItems = data.HisAllotData.totalRecord;
 												$scope.hisConfs = data.HisAllotData.list;
 												$scope.$apply();
-												 $("i[name='his_i_state']").tooltip();
+												$("i[name='his_i_state']")
+														.tooltip();
 
 											} else {
 												alert(code + "-" + msg);

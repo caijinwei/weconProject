@@ -1135,6 +1135,9 @@ public class ActDataAction {
 									realHisCfg.name = realHisCfgParam.name.substring(0, 49) + "_" + i;
 								} else {
 									realHisCfg.name = realHisCfgParam.name + "_" + i;
+									if(realHisCfg.name.length()>64){
+										realHisCfg.name=realHisCfg.name.substring(50, 64);
+									}
 								}
 							} else {
 								if (realHisCfgParam.name.length() > 64) {
