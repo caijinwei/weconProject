@@ -124,7 +124,6 @@ public class BusinessDataAction {
     @WebApi(forceAuth = true, master = true)
     public Output getHistoryData(@Valid BusinessDataParam param) {
         Client client = AppContext.getSession().client;
-        RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
         Page<Map<String, Object>> realHisCfgDataPage = null;
         Map<String, Object> bParams = new HashMap<String, Object>();
         if(param.boxId != 0 && param.boxId != -100 && param.boxId != -200){
@@ -133,8 +132,15 @@ public class BusinessDataAction {
         if(param.monitorId != 0){
             bParams.put("monitorId", param.monitorId);
         }
+        if(!CommonUtils.isNullOrEmpty(param.monitorBeginTime)){
+            bParams.put("monitorBeginTime", param.monitorBeginTime);
+        }
+        if(!CommonUtils.isNullOrEmpty(param.monitorEndTime)){
+            bParams.put("monitorEndTime", param.monitorEndTime);
+        }
         /** 管理者账号 **/
         if (client.userInfo.getUserType() == 1) {
+            RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
             realHisCfgFilter.data_type = 1;
             realHisCfgFilter.account_id = client.userId;
             realHisCfgDataPage = realHisCfgDataApi.getRealHisCfgDataPage(realHisCfgFilter, bParams, param.pageIndex, param.pageSize);

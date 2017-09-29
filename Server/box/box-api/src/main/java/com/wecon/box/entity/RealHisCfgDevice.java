@@ -22,5 +22,6 @@ public class RealHisCfgDevice extends RealHisCfg {
 	public String child_limit;//子编号范围
 	public String main_binary;//主编号进制
 	public String child_binary;//子编号进制
+	public int dstate;
 
 }
