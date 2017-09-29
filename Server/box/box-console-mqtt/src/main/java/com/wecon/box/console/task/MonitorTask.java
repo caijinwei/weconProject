@@ -346,7 +346,7 @@ public class MonitorTask extends Thread {
 								realHisCfgDataApi.saveRealHisCfgData(listInsertRealHisCfgData);
 								System.out.println("realHisCfgData add success !");
 							} catch (Exception e) {
-								logger.info("历史数据批量保存失败");
+								logger.info("历史数据批量保存失败=="+e.getMessage());
 								System.out.println("历史数据批量保存失败");
 								e.printStackTrace();
 							}
