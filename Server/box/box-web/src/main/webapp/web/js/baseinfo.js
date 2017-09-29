@@ -437,7 +437,17 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             alert("地图坐标格式错误");
             return;
         }
-        var map = $("#map_a").val() + "," + $("#map_a").val();
+        var reg_a=/^[\-\+]?(0?\d{1,2}\.\d{1,5}|1[0-7]?\d{1}\.\d{1,5}|180\.0{1,5})$/;
+        if(!reg_a.test(map_a)){
+            alert("经度格式错误,经度： -180.0～+180.0（整数部分为0～180，必须输入1到5位小数）");
+            return;
+        }
+        var reg_o= /^[\-\+]?([0-8]?\d{1}\.\d{1,5}|90\.0{1,5})$/;
+        if(!reg_o.test(map_o)){
+            alert("纬度格式错误,纬度： -90.0～+90.0（整数部分为0～90，必须输入1到5位小数）");
+            return;
+        }
+        var map = $("#map_a").val() + "," + $("#map_o").val();
         var params = {
             deviceId: device_id,
             piBoxName: piBoxName,
@@ -630,6 +640,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 } else {
                     $("#noticeDiv").empty();
                     $("#noticeDiv").prepend('<div>已经是最新版了，不需要更新</div>');
+                    $("#btn-ckgUpd").css('display','none');
                 }
                 if ($scope.firmIsUpdate) {
                     $scope.file_id = data.firmData.file_id;
