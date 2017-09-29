@@ -80,6 +80,31 @@ public class AccountDirRelImpl implements AccountDirRelApi {
         return null;
     }
     @Override
+    public AccountDirRel getAccountDirRel(long acc_dir_id,long ref_id, int type) {
+    	String sql = "select adr.acc_dir_id,adr.ref_id,adr.ref_alais,adr.create_date from account_dir_rel adr,account_dir ad  where 1=1 and adr.`acc_dir_id`=ad.`id`";
+    	StringBuffer condition = new StringBuffer("");
+    	List<Object> params = new ArrayList<Object>();
+    	if (acc_dir_id > 0) {
+    		condition.append("and adr.acc_dir_id=? ");
+    		params.add(acc_dir_id);
+    	}
+    	if (ref_id > 0) {
+    		condition.append(" and adr.ref_id=? ");
+    		params.add(ref_id);
+    	}
+    	if (type > 0) {
+    		condition.append(" and ad.type=? ");
+    		params.add(type);
+    	}
+    	sql=sql+ condition; 
+    	List<AccountDirRel> list = jdbcTemplate.query(sql, params.toArray(),
+    			new DefaultAccountDirRelRowMapper());
+    	if (!list.isEmpty()) {
+    		return list.get(0);
+    	}
+    	return null;
+    }
+    @Override
     public List<AccountDirRel> getAccountDirRel(long acc_dir_id) {
     	  String sql = "select " + SEL_COL + " from account_dir_rel where 1=1  ";
           StringBuffer condition = new StringBuffer("");

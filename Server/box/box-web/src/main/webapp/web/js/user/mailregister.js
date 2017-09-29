@@ -4,6 +4,11 @@
 $(function () {
     T.common.user.checkAuth(2);
     $('#signup').bind('click', function () {
+        if (!$('#cbRegister').is(':checked')) {
+            alert("请阅读并接受注册条款");
+            return;
+        }
+
         $("#loadingModal").modal("show");
         var params =
         {
@@ -28,7 +33,7 @@ $(function () {
                 alert("注册成功,请去邮箱激活帐号");
             }
             else {
-                alert( msg);
+                alert(msg);
             }
         });
     })

@@ -28,7 +28,7 @@ appModule
 
 					// 获取分组
 					$scope.act_group = function(deviceid) {
-
+						inivalize = 0;
 						var params = {
 							device_id : deviceid
 						};
@@ -40,8 +40,6 @@ appModule
 										function(data, code, msg) {
 											if (code == 200) {
 												$scope.dir_list = data.ActGroup;
-												// $scope.accounttype =
-												// data.type;
 												$scope.$apply();
 												if (data.ActGroup != null
 														&& $scope.type == 0) {
@@ -67,6 +65,7 @@ appModule
 					var ws;// websocket实例
 					var actgroupId;// 分组id
 					var lockReconnect = false;// 避免重复连接
+					var inivalize = 0;
 
 					$scope.createWebSocket = function() {
 						try {
@@ -112,18 +111,23 @@ appModule
 							heartCheck.reset().start();
 						};
 						ws.onmessage = function(evt) {
-							if (JSON.parse(evt.data).piBoxActDateMode != null) {							
+							if (JSON.parse(evt.data).piBoxActDateMode != null) {
+								console.log(inivalize);
+								if (inivalize == 0) {
 									$scope.paginationConf.totalItems = JSON
 											.parse(evt.data).piBoxActDateMode.totalRecord;
 									$scope.actDatas = JSON.parse(evt.data).piBoxActDateMode.list;
 									console.log($scope.actDatas);
 									$scope.$apply();
+
 									angular.forEach($scope.actDatas, function(
 											data, index, array) {
-										$scope.editable_name(data);
-										$scope.editable_value(data);
+										$scope.editable_name(data, 0);
+										$scope.editable_value(data, 0);
 									});
 									$("i[name='act_i_state']").tooltip();
+								}
+
 							} else {
 								// 下发数据到盒子反馈
 								$scope.resultData = JSON.parse(evt.data).resultData;
@@ -187,6 +191,7 @@ appModule
 					}
 					$scope.ws_send = function(pageIndex, pageSize, groupId) {
 						actgroupId = groupId;
+						inivalize = 0;
 						if (pageIndex == 0)
 							pageIndex = 1;
 						var params = {
@@ -494,7 +499,6 @@ appModule
 											$scope.type = 1;
 
 											$scope.act_group($scope.deviceid);
-											// $scope.mc_change();
 
 										} else {
 
@@ -508,7 +512,10 @@ appModule
 
 					}
 
-					$scope.editable_name = function(model) {
+					$scope.editable_name = function(model, index) {
+						if (index == 1) {
+							inivalize = 1;
+						}
 
 						$act_name = $('#act_name_' + model.id);
 						$act_name.editable({
@@ -523,10 +530,23 @@ appModule
 								}
 								$scope.upActcfgName(model, value);
 							}
+						}).click(function() {
+							$(".editable-cancel").click(function() {
+								inivalize = 0;
+							});
+						});
+						$act_name.on('hidden.bs.modal', function() {// 点击空白处的时候触发
+							inivalize = 0;
 						});
 					}
-					$scope.editable_value = function(model) {
+
+					$scope.editable_value = function(model, index) {
+
 						$act_value = $('#act_value_' + model.id);
+						if (index == 1) {
+							inivalize = 1;
+						}
+
 						$act_value.editable({
 							type : "text",
 							title : "监控点数值",
@@ -535,9 +555,10 @@ appModule
 							disabled : false,
 							emptytext : "0",
 							mode : "inline",
+
 							validate : function(value) {
 								if (!$.trim(value)) {
-									return '不能为空';
+									return '不能为空!';
 								}
 								if (model.box_state != 1) {
 									return '检查盒子是否在线！';
@@ -552,7 +573,16 @@ appModule
 								$("#loadingModal").modal("show");
 								$scope.putMess(model, value);
 							}
+
+						}).click(function() {
+							$(".editable-cancel").click(function() {
+								inivalize = 0;
+							});
 						});
+						$act_value.on('hidden.bs.modal', function() {// 点击空白处的时候触发
+							inivalize = 0;
+						});
+
 					}
 
 					// 修改监控点名称
@@ -571,7 +601,6 @@ appModule
 										params,
 										function(data, code, msg) {
 											if (code == 200) {
-												// $scope.mc_change();
 												$scope
 														.ws_send(
 																$scope.paginationConf.currentPage,

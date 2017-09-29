@@ -10,6 +10,11 @@ public class VerifyUtil {
     protected static Pattern regexValidEmail = Pattern.compile("^([a-z0-9A-Z]+[-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$");
 
     /**
+     * 用户名，只能由字母数字下划线，1-20个字符
+     */
+    protected static Pattern regexValidUserName = Pattern.compile("^[0-9a-zA-Z_]{1,20}$");
+
+    /**
      * 验证邮箱地址地址是否为有效的
      *
      * @param email 邮箱地址
@@ -17,6 +22,17 @@ public class VerifyUtil {
      */
     public static boolean isValidEmail(String email) {
         Matcher matcher = regexValidEmail.matcher(email);
+        return matcher.matches();
+    }
+
+    /**
+     * 验证用户名是否合法
+     *
+     * @param userName
+     * @return
+     */
+    public static boolean isValidUserName(String userName) {
+        Matcher matcher = regexValidUserName.matcher(userName);
         return matcher.matches();
     }
 
@@ -45,12 +61,12 @@ public class VerifyUtil {
         String result = "";
         //分割 前面的“-”
         Integer index = version.indexOf("-");
-        String tempV=null;
-        if(index!=-1){
+        String tempV = null;
+        if (index != -1) {
             String s = version.substring(0, index);
-            tempV=version.substring(0, index);
-        }else{
-            tempV=version;
+            tempV = version.substring(0, index);
+        } else {
+            tempV = version;
         }
 
 
@@ -62,9 +78,10 @@ public class VerifyUtil {
             result = (m.group());
         }
         System.out.println(result);
-        return  result;
+        return result;
     }
-    public static void main(String[] args){
+
+    public static void main(String[] args) {
         getVersionNum("v5.0.0.0");
     }
 

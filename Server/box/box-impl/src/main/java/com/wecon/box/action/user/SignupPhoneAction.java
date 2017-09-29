@@ -69,6 +69,9 @@ public class SignupPhoneAction extends UserBaseAction {
     @RequestMapping("user/signupphone")
     @WebApi(forceAuth = false, master = true)
     public Output signupPhone(@Valid SignupPhoneParam param) {
+        if (!VerifyUtil.isValidUserName(param.username)) {
+            throw new BusinessException(ErrorCodeOption.UserNameFormatError.key, ErrorCodeOption.UserNameFormatError.value);
+        }
         if (!VerifyUtil.isChinaPhone(param.phonenum)) {
             throw new BusinessException(ErrorCodeOption.PhonenumError.key, ErrorCodeOption.PhonenumError.value);
         }

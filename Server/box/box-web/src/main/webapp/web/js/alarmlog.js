@@ -98,7 +98,7 @@ appModule
 											if (code == 200) {
 												$scope.alarmcurrents = data.alarmHisData.list;
 												$scope.paginationConf_current.totalItems = data.alarmHisData.totalRecord;
-											
+
 												$scope.$apply();
 
 												$("#loadingModal")
@@ -1038,7 +1038,8 @@ appModule
 												$scope.paginationConf_alarmcfg.totalItems = data.listalrmCfgTrigger.totalRecord;
 												$scope.listalrmCfgTrigger = data.listalrmCfgTrigger.list;
 												$scope.$apply();
-											    $("i[name='alarm_i_state']").tooltip();
+												$("i[name='alarm_i_state']")
+														.tooltip();
 
 											} else {
 												alert(code + "-" + msg);
@@ -1781,11 +1782,11 @@ appModule
 										params,
 										function(data, code, msg) {
 											if (code == 200) {
+												alert("报警数据已确认！");
 												$scope
 														.alarm_submit(
 																$scope.paginationConf_current.currentPage,
 																$scope.paginationConf_current.itemsPerPage);
-												alert("报警数据已确认！");
 
 											} else {
 

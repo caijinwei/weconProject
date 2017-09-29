@@ -39,6 +39,13 @@ public interface AlarmCfgApi {
 	 * @return
 	 */
 	public AlarmCfg getAlarmcfg(long alarmcfg_id);
+	/**
+	 * 获取报警配置对象
+	 * 
+	 * @param alarmcfg_id
+	 * @return
+	 */
+	public AlarmCfg getAlarmcfg(long device_id,String name);
 
 	/**
 	 * 根据状态获取报警数据配置

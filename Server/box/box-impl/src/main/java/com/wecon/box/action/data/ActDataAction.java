@@ -613,26 +613,26 @@ public class ActDataAction {
 																// o-八进制 h-十六进制
 						if ("d".equals(mJinzhi.toLowerCase())) {
 							mJinzhi = "十进制";
-							
+
 						} else if ("o".equals(mJinzhi.toLowerCase())) {
 							mJinzhi = "八进制";
-							String [] ranges=range.split(" ");
+							String[] ranges = range.split(" ");
 							StringBuffer sb = new StringBuffer();
 							String.valueOf(Long.toOctalString(Long.parseLong(ranges[0])));
 							String.valueOf(Long.toOctalString(Long.parseLong(ranges[1])));
 							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[0]))));
 							sb.append(" ");
 							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[1]))));
-							range=sb.toString();
-							
+							range = sb.toString();
+
 						} else if ("h".equals(mJinzhi.toLowerCase())) {
 							mJinzhi = "十六进制";
-							String [] ranges=range.split(" ");
+							String[] ranges = range.split(" ");
 							StringBuffer sb = new StringBuffer();
 							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[0]))));
 							sb.append(" ");
 							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[1]))));
-							range=sb.toString();
+							range = sb.toString();
 						}
 						String bitCount = attris.get("BitCount");
 						attr.put("range", range);
@@ -647,28 +647,27 @@ public class ActDataAction {
 													 **/
 								if ("d".equals(bJinzhi.toLowerCase())) {
 									bJinzhi = "十进制";
-									
+
 								} else if ("o".equals(bJinzhi.toLowerCase())) {
 									bJinzhi = "八进制";
-									String [] ranges=bRange.split(" ");
+									String[] ranges = bRange.split(" ");
 									StringBuffer sb = new StringBuffer();
 									sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[0]))));
 									sb.append(" ");
 									sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[1]))));
-									bRange=sb.toString();
+									bRange = sb.toString();
 								} else if ("h".equals(bJinzhi.toLowerCase())) {
 									bJinzhi = "十六进制";
-									String [] bRanges=bRange.split(" ");
+									String[] bRanges = bRange.split(" ");
 									StringBuffer sb = new StringBuffer();
 									sb.append(String.valueOf(Long.toHexString(Long.parseLong(bRanges[0]))));
 									sb.append(" ");
 									sb.append(String.valueOf(Long.toHexString(Long.parseLong(bRanges[1]))));
-									bRange=sb.toString();
+									bRange = sb.toString();
 								}
 								attr.put("bRange", bRange);
 								attr.put("bitCount", bitCount);
 								attr.put("bJinzhi", bJinzhi);
-								
 
 							}
 						}
@@ -698,22 +697,22 @@ public class ActDataAction {
 							Jinzhi = "十进制";
 						} else if ("o".equals(Jinzhi.toLowerCase())) {
 							Jinzhi = "八进制";
-							String [] ranges=range.split(" ");
+							String[] ranges = range.split(" ");
 							StringBuffer sb = new StringBuffer();
 							String.valueOf(Long.toOctalString(Long.parseLong(ranges[0])));
 							String.valueOf(Long.toOctalString(Long.parseLong(ranges[1])));
 							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[0]))));
 							sb.append(" ");
 							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[1]))));
-							range=sb.toString();
+							range = sb.toString();
 						} else if ("h".equals(Jinzhi.toLowerCase())) {
 							Jinzhi = "十六进制";
-							String [] ranges=range.split(" ");
+							String[] ranges = range.split(" ");
 							StringBuffer sb = new StringBuffer();
 							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[0]))));
 							sb.append(" ");
 							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[1]))));
-							range=sb.toString();
+							range = sb.toString();
 						}
 						attr.put("addrvalue", value);
 						attr.put("range", range);
@@ -743,22 +742,22 @@ public class ActDataAction {
 							Jinzhi = "十进制";
 						} else if ("o".equals(Jinzhi.toLowerCase())) {
 							Jinzhi = "八进制";
-							String [] ranges=range.split(" ");
+							String[] ranges = range.split(" ");
 							StringBuffer sb = new StringBuffer();
 							String.valueOf(Long.toOctalString(Long.parseLong(ranges[0])));
 							String.valueOf(Long.toOctalString(Long.parseLong(ranges[1])));
 							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[0]))));
 							sb.append(" ");
 							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[1]))));
-							range=sb.toString();
+							range = sb.toString();
 						} else if ("h".equals(Jinzhi.toLowerCase())) {
 							Jinzhi = "十六进制";
-							String [] ranges=range.split(" ");
+							String[] ranges = range.split(" ");
 							StringBuffer sb = new StringBuffer();
 							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[0]))));
 							sb.append(" ");
 							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[1]))));
-							range=sb.toString();
+							range = sb.toString();
 						}
 						attr.put("addrvalue", value);
 						attr.put("range", range);
@@ -788,22 +787,22 @@ public class ActDataAction {
 							Jinzhi = "十进制";
 						} else if ("o".equals(Jinzhi.toLowerCase())) {
 							Jinzhi = "八进制";
-							String [] ranges=range.split(" ");
+							String[] ranges = range.split(" ");
 							StringBuffer sb = new StringBuffer();
 							String.valueOf(Long.toOctalString(Long.parseLong(ranges[0])));
 							String.valueOf(Long.toOctalString(Long.parseLong(ranges[1])));
 							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[0]))));
 							sb.append(" ");
 							sb.append(String.valueOf(Long.toOctalString(Long.parseLong(ranges[1]))));
-							range=sb.toString();
+							range = sb.toString();
 						} else if ("h".equals(Jinzhi.toLowerCase())) {
 							Jinzhi = "十六进制";
-							String [] ranges=range.split(" ");
+							String[] ranges = range.split(" ");
 							StringBuffer sb = new StringBuffer();
 							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[0]))));
 							sb.append(" ");
 							sb.append(String.valueOf(Long.toHexString(Long.parseLong(ranges[1]))));
-							range=sb.toString();
+							range = sb.toString();
 						}
 						attr.put("addrvalue", value);
 						attr.put("range", range);
@@ -855,7 +854,12 @@ public class ActDataAction {
 				realHisCfg.addr = realHisCfgParam.addr;
 				realHisCfg.addr_type = realHisCfgParam.addr_type;
 				realHisCfg.data_id = realHisCfgParam.data_id;
-				realHisCfg.name = realHisCfgParam.name;
+				if (realHisCfgParam.name.length() > 64) {
+					realHisCfg.name = realHisCfgParam.name.substring(0, 64);
+				} else {
+					realHisCfg.name = realHisCfgParam.name;
+				}
+
 				realHisCfg.plc_id = realHisCfgParam.plc_id;
 				realHisCfg.device_id = realHisCfgParam.device_id;
 				realHisCfg.rid = realHisCfgParam.rid;
@@ -863,7 +867,12 @@ public class ActDataAction {
 				realHisCfg.digit_count = realHisCfgParam.digit_count;
 				realHisCfg.digit_binary = realHisCfgParam.digit_binary;
 				if (!CommonUtils.isNullOrEmpty(realHisCfgParam.describe)) {
-					realHisCfg.describe = realHisCfgParam.describe;
+					if (realHisCfgParam.describe.length() > 64) {
+						realHisCfg.describe = realHisCfgParam.describe.substring(0, 64);
+					} else {
+						realHisCfg.describe = realHisCfgParam.describe;
+					}
+
 				}
 				realHisCfg.plc_id = realHisCfgParam.plc_id;
 				realHisCfg.data_type = realHisCfgParam.data_type;
@@ -929,7 +938,12 @@ public class ActDataAction {
 				realHisCfg.digit_binary = realHisCfgParam.digit_binary;
 				realHisCfg.state = 1;// 0：已同步给盒子1：新增配置2：更新配置3：删除配置，如果同步成功再做物理删除，同时需要删除监控点绑定和权限的分配，和其他相关数据
 				if (!CommonUtils.isNullOrEmpty(realHisCfgParam.describe)) {
-					realHisCfg.describe = realHisCfgParam.describe;
+					if (realHisCfgParam.describe.length() > 64) {
+						realHisCfg.describe = realHisCfgParam.describe.substring(0, 64);
+					} else {
+						realHisCfg.describe = realHisCfgParam.describe;
+					}
+
 				}
 				realHisCfg.plc_id = realHisCfgParam.plc_id;
 				realHisCfg.data_type = realHisCfgParam.data_type;
@@ -1117,9 +1131,17 @@ public class ActDataAction {
 
 							}
 							if (i > 0) {
-								realHisCfg.name = realHisCfgParam.name + "_" + i;
+								if (realHisCfgParam.name.length() > 64) {
+									realHisCfg.name = realHisCfgParam.name.substring(0, 49) + "_" + i;
+								} else {
+									realHisCfg.name = realHisCfgParam.name + "_" + i;
+								}
 							} else {
-								realHisCfg.name = realHisCfgParam.name;
+								if (realHisCfgParam.name.length() > 64) {
+									realHisCfg.name = realHisCfgParam.name.substring(0, 64);
+								} else {
+									realHisCfg.name = realHisCfgParam.name;
+								}
 							}
 
 							RealHisCfg rename = realHisCfgApi.getRealHisCfg(realHisCfgParam.device_id, realHisCfg.name);
@@ -1156,7 +1178,11 @@ public class ActDataAction {
 					}
 
 				} else {
-					realHisCfg.name = realHisCfgParam.name;
+					if (realHisCfgParam.name.length() > 64) {
+						realHisCfg.name = realHisCfgParam.name.substring(0, 64);
+					} else {
+						realHisCfg.name = realHisCfgParam.name;
+					}
 					realHisCfg.addr = realHisCfgParam.addr;
 					long reid = realHisCfgApi.saveRealHisCfg(realHisCfg);
 					if (reid > 0) {

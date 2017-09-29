@@ -29,6 +29,7 @@ import com.wecon.box.entity.AlarmCfgTrigger;
 import com.wecon.box.entity.AlarmTrigger;
 import com.wecon.box.entity.DevBindUser;
 import com.wecon.box.entity.Page;
+import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
@@ -387,6 +388,11 @@ public class AlarmDataAction {
 				oldalarmCfg = alarmCfgApi.getAlarmcfg(alarmCfgParam.alarmcfg_id);
 				alarmCfg = alarmCfgApi.getAlarmcfg(alarmCfgParam.alarmcfg_id);
 				if (alarmCfg != null) {
+					AlarmCfg oldarm = alarmCfgApi.getAlarmcfg(alarmCfgParam.device_id, alarmCfgParam.name);
+					if (oldarm != null && oldarm.alarmcfg_id != alarmCfgParam.alarmcfg_id) {
+						throw new BusinessException(ErrorCodeOption.Name_Repetition.key,
+								ErrorCodeOption.Name_Repetition.value);
+					}
 					alarmCfg.account_id = account_id;
 					alarmCfg.addr = alarmCfgParam.addr;
 					alarmCfg.addr_type = alarmCfgParam.addr_type;
@@ -394,6 +400,11 @@ public class AlarmDataAction {
 					alarmCfg.data_id = alarmCfgParam.data_id;
 					alarmCfg.plc_id = alarmCfgParam.plc_id;
 					alarmCfg.rid = alarmCfgParam.rid;
+					if (alarmCfgParam.name.length() > 64) {
+						alarmCfg.name = alarmCfgParam.name.substring(0, 64);
+					} else {
+						alarmCfg.name = alarmCfgParam.name;
+					}
 					alarmCfg.name = alarmCfgParam.name;
 					alarmCfg.text = alarmCfgParam.text;
 					alarmCfg.condition_type = alarmCfgParam.condition_type;
@@ -409,8 +420,8 @@ public class AlarmDataAction {
 								oldalarmCfg, alarmCfg);
 						// 获取分组信息
 						if (alarmCfgParam.group_id > 0) {
-							AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(alarmCfgParam.group_id,
-									alarmCfgParam.alarmcfg_id);
+							AccountDirRel accountDirRel = accountDirRelApi.getAccountDirRel(-1,
+									alarmCfgParam.alarmcfg_id, 3);
 
 							if (accountDirRel != null) {
 
@@ -419,7 +430,11 @@ public class AlarmDataAction {
 							AccountDirRel dirRel = new AccountDirRel();
 							dirRel.acc_dir_id = alarmCfgParam.group_id;
 							dirRel.ref_id = alarmCfgParam.alarmcfg_id;
-							dirRel.ref_alais = alarmCfgParam.name;
+							if (alarmCfgParam.name.length() > 64) {
+								accountDirRel.ref_alais = alarmCfgParam.name.substring(0, 64);
+							} else {
+								accountDirRel.ref_alais = alarmCfgParam.name;
+							}
 							accountDirRelApi.saveAccountDirRel(dirRel);
 
 						}
@@ -447,6 +462,11 @@ public class AlarmDataAction {
 				}
 
 			} else {
+				AlarmCfg newarm = alarmCfgApi.getAlarmcfg(alarmCfgParam.device_id, alarmCfgParam.name);
+				if (newarm != null) {
+					throw new BusinessException(ErrorCodeOption.Name_Repetition.key,
+							ErrorCodeOption.Name_Repetition.value);
+				}
 				alarmCfg = new AlarmCfg();
 				alarmCfg.account_id = account_id;
 				alarmCfg.addr = alarmCfgParam.addr;
@@ -455,7 +475,11 @@ public class AlarmDataAction {
 				alarmCfg.data_id = alarmCfgParam.data_id;
 				alarmCfg.plc_id = alarmCfgParam.plc_id;
 				alarmCfg.rid = alarmCfgParam.rid;
-				alarmCfg.name = alarmCfgParam.name;
+				if (alarmCfgParam.name.length() > 64) {
+					alarmCfg.name = alarmCfgParam.name.substring(0, 64);
+				} else {
+					alarmCfg.name = alarmCfgParam.name;
+				}
 				alarmCfg.text = alarmCfgParam.text;
 				alarmCfg.condition_type = alarmCfgParam.condition_type;
 				alarmCfg.state = 1;
@@ -471,7 +495,11 @@ public class AlarmDataAction {
 					AccountDirRel accountDirRel = new AccountDirRel();
 					accountDirRel.acc_dir_id = alarmCfgParam.group_id;
 					accountDirRel.ref_id = alarm.alarmcfg_id;
-					accountDirRel.ref_alais = alarmCfgParam.name;
+					if (alarmCfgParam.name.length() > 64) {
+						accountDirRel.ref_alais = alarmCfgParam.name.substring(0, 64);
+					} else {
+						accountDirRel.ref_alais = alarmCfgParam.name;
+					}
 					accountDirRelApi.saveAccountDirRel(accountDirRel);
 
 					if (!CommonUtils.isNullOrEmpty(alarmCfgParam.value)
