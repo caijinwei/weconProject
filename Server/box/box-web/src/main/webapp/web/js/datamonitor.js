@@ -135,14 +135,19 @@ appModule
 								$("#loadingModal").modal("hide");
 								if ($scope.resultData == 0) {
 									alert(JSON.parse(evt.data).resultError);
+									$scope.ws_send(
+											$scope.paginationConf.currentPage,
+											$scope.paginationConf.itemsPerPage,
+											actgroupId);
 								} else {
+									inivalize = 0;
 									alert("数据下发盒子成功！");
 								}
-								inivalize = 0;
-//								$scope.ws_send(
-//										$scope.paginationConf.currentPage,
-//										$scope.paginationConf.itemsPerPage,
-//										actgroupId);
+
+								// $scope.ws_send(
+								// $scope.paginationConf.currentPage,
+								// $scope.paginationConf.itemsPerPage,
+								// actgroupId);
 							}
 							// 如果获取到消息，心跳检测重置
 							// 拿到任何消息都说明当前连接是正常的
@@ -1452,15 +1457,15 @@ appModule
 							}
 
 						}
-						if($("#nameid").val().length>64){
+						if ($("#nameid").val().length > 64) {
 							alert("名称字符长度不能大于64位！");
 							return;
 						}
-						if($("#describeid").val().length>64){
+						if ($("#describeid").val().length > 64) {
 							alert("描述字符长度不能大于64位！");
 							return;
 						}
-						
+
 						var display = $('#registeraddr').css('display');
 						if (display == 'block') {
 							var rang, reg;
