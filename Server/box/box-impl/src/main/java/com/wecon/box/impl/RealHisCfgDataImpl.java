@@ -159,8 +159,8 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<RealHisCfgData> page = new Page<RealHisCfgData>(pageIndex, pageSize, totalRecord);
-		String sort = " order by real_his_cfg_id desc";
-		sql += condition + sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
+//		String sort = " order by real_his_cfg_id desc";
+		sql += condition +  " limit " + page.getStartIndex() + "," + page.getPageSize();
 		List<RealHisCfgData> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgDataRowMapper());
 		page.setList(list);
 		return page;
