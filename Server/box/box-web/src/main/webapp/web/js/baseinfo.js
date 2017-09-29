@@ -839,8 +839,15 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 
                 var jsonResult = $.parseJSON(evt.data);
 
+                //离线判断
+                if(jsonResult.errorMsg!=undefined){
+                    alert("盒子已经离线！");
+                    $("#loadingModal").modal("hide");
+                    wsf.onclose();
+                    return;
+                }
+
                 $scope.wsf_log("----------------" + jsonResult);
-                console.log(jsonResult);
                 $('#upNotice').empty();
                 for (var i in jsonResult) {
                     if (i == "firm") {

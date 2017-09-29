@@ -132,7 +132,16 @@ class UpdateFileCallback implements MqttCallback {
         System.out.println("收到的mqtt信息是    " + JSONObject.parseObject(new String(mqttMessage.getPayload())));
         JSONObject feedBack = JSONObject.parseObject(new String(mqttMessage.getPayload()));
         //如果不是反馈消息  直接忽略
-        if (!String.valueOf(feedBack.get("act")).equals("1")) {
+        //如果是遗言消息直接提示盒子断线
+        if(String.valueOf(feedBack.get("act")).equals("1004")){
+            JSONObject data=new JSONObject();
+            data.put("errorMsg",1);
+            try {
+                sendWSMassage(session, String.valueOf(data));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (!String.valueOf(feedBack.get("act")).equals("1")) {
             return;
         }
         //固件信息升级的反馈

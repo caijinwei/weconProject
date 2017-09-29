@@ -77,6 +77,7 @@ public enum ErrorCodeOption {
     Dev_Bind_User_HaveError_Record("该设备绑定关系异常",300026),
     Dev_Bind_User_NotFount_Record("用户没有绑定该设备",300027),
     DeviceId_Is_Error("deviceId参数错误",300028),
+    Device_IsNot_Online("盒子已经离线",2300029),
 
 
 
