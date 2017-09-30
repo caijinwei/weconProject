@@ -40,6 +40,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
                 $scope.paginationConf.totalItems = data.page.totalRecord;
                 $scope.pushlist = data.page.list;
                 $scope.$apply();
+                $scope.createSwitchState();
                 $("#loadingModal").modal("hide");
             }
             else {
@@ -50,6 +51,36 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             alert("ajax error");
             $("#loadingModal").modal("hide");
         });
+    }
+
+    $scope.createSwitchState = function () {
+        $('[name="switch-state"]').bootstrapSwitch({
+            onText: "启用",
+            offText: "禁用",
+            onColor: "success",
+            offColor: "danger",
+            size: "small",
+            onSwitchChange: function (event, state) {
+                var params = {
+                    user_id: $(this).attr("data-uid")
+                };
+                if (state == true) {
+                    params["state"] = "1";
+                } else {
+                    params["state"] = "0";
+                }
+                T.common.ajax.request("WeconBox", "user/chgviewuserstate", params, function (data, code, msg) {
+                    if (code == 200) {
+                        $scope.getList($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+                    }
+                    else {
+                        alert(msg);
+                    }
+                }, function () {
+                    alert("ajax error");
+                });
+            }
+        })
     }
 
     /**
