@@ -426,7 +426,10 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             $scope.portIfShow = 0;
             $scope.ethernetShow = 0;
         }
-
+    }
+    $scope.clearPlcInput= function () {
+        $scope.pTypeSet=""; $scope.pTypeSet="";
+        $scope.$apply();
     }
     $scope.chgPiboxInFoName = function (device_id) {
         var piBoxName = $('#PIBoxName').val();
@@ -437,12 +440,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             alert("地图坐标格式错误");
             return;
         }
-        var reg_a=/^[\-\+]?(0?\d{1,2}\.\d{1,5}|1[0-7]?\d{1}\.\d{1,5}|180\.0{1,5})$/;
+        var reg_a=/^[\-\+]?(0?\d{1,2}\.\d{1}|1[0-7]?\d{1}\.\d{1}|180\.0{1})$/;
         if(!reg_a.test(map_a)){
             alert("经度输入错误，请输入经度-180.0~180.0的数");
             return;
         }
-        var reg_o= /^[\-\+]?([0-8]?\d{1}\.\d{1,5}|90\.0{1,5})$/;
+        var reg_o= /^[\-\+]?([0-8]?\d{1}\.\d{1}|90\.0{1})$/;
         if(!reg_o.test(map_o)){
             alert("纬度输入错误，请输入纬度-90.0~90.0的数");
             return;
@@ -512,6 +515,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         $("#addConfig").modal("show");
         clearForm($('#addConfig'));
         $("#port").val("COM1");
+        $scope.selectedPort="COM1";
         $scope.chgPort();
     };
     function clearForm(form) {

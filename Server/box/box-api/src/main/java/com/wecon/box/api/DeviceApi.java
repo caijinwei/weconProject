@@ -124,4 +124,9 @@ public interface DeviceApi {
 
     public Page<DeviceDir> getDeviceByUnbound(Integer state, Integer pageNum, Integer pageSize);
 
+    /*
+    * 绑定盒子
+    * */
+    public void boundDevice(final long device_id,final String name,final long acc_dir_id);
+
 }

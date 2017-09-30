@@ -44,7 +44,7 @@
 
                     <div class="col-md-11">
                         <div class="form-group" style="display: inline-block;font-weight: bold;">
-                            <input type="text" class="form-control"
+                            <input type="text" class="form-control" maxlength="15"
                                    id="PIBoxName" name="PIBoxName"
                                    value="{{infoData.name}}">
                         </div>
@@ -84,7 +84,7 @@
                     <span class="col-md-1">备注信息</span>
 
                     <div class="form-group col-md-5" style="display: inline-block;">
-                        <textarea class="form-control" id="remark" rows="4">{{infoData.remark}}</textarea>
+                        <textarea class="form-control" id="remark" rows="4" maxlength="500">{{infoData.remark}}</textarea>
                     </div>
                 </div>
 
@@ -483,7 +483,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-info" ng-click="chgTypeNotice()">确定</button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal" >取消</button>
                         </div>
                     </div>
                 </div>
@@ -686,7 +686,7 @@
 <script src="../lib/bootstrap/select/js/bootstrap-select.js"></script>
 <script src="../lib/angular/angular.min.js" type="text/javascript"></script>
 <script src="../lib/wecon-common.js"></script>
-<script src="../js/baseinfo.js?v=6"></script>
+<script src="../js/baseinfo.js?v=7"></script>
 <script src="../lib/jquery-editable-select.js"></script>
 <script type="text/javascript">
     $('#baudrate').editableSelect({filter: false});

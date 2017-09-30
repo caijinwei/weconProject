@@ -137,35 +137,8 @@ public class DeviceAction {
 		if (acc_dir_id == 0){
 			throw new BusinessException(ErrorCodeOption.Device_Bind_NotDir.key,ErrorCodeOption.Device_Bind_NotDir.value);
 		}
+		deviceApi.boundDevice(device_id,name,acc_dir_id);
 
-		Device modelUpdName = deviceApi.getDevice(device_id);
-		modelUpdName.name = name;
-		deviceApi.updateDevice(modelUpdName);
-
-		DevBindUser model = new DevBindUser();
-		model.account_id = AppContext.getSession().client.userId;
-		model.device_id = device_id;
-		devBindUserApi.saveDevBindUser(model);
-
-
-		/*
-		 * 更新实时历史监控点迁移
-		 */
-		alarmCfgApi.updatePointAccAndState(model.account_id, model.device_id,1);
-		realHisCfgApi.updatePointAccAndState(model.account_id, model.device_id,1);
-
-		/*
-		 * 分组信息添加
-		 *
-		 */
-			AccountDirRel accountDirRel = new AccountDirRel();
-			accountDirRel.ref_id = device_id;
-			accountDirRel.acc_dir_id = acc_dir_id;
-			accountDirRelApi.saveAccountDirRel(accountDirRel);
-		/*
-		 * 更新监控点分组迁移
-		 */
-		accountDirApi.updateAccountBydeviceAndType(AppContext.getSession().client.userId, device_id);
 		// <editor-fold desc="操作日志">
 		dbLogUtil.addOperateLog(OpTypeOption.BindDevice, ResTypeOption.Device, device_id,
 				deviceApi.getDevice(device_id));
