@@ -332,7 +332,6 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 
 		return true;
 	}
-	@SuppressWarnings("unchecked")
 	@Override
 	public int getAlamBxo(long account_id) {
 		String sql="select  count(distinct ac.`device_id`) from `alarm_cfg` ac where ac.`alarmcfg_id`= any(select  distinct  acd.`alarm_cfg_id`  from `alarm_cfg_data` acd,alarm_cfg ac  where  acd.`alarm_cfg_id`=ac.`alarmcfg_id` and ac.account_id=? and acd.`state`=1) and ac.`bind_state`=1";

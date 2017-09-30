@@ -58,7 +58,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 
 		return true;
 	}
-	
+
 	@Override
 	public List<AlarmCfgDataAlarmCfg> getAlarmCfgData(AlarmCfgDataFilter filter) {
 
@@ -145,9 +145,9 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 
 	@Override
 	public Page<AlarmCfgDataAlarmCfg> getRealHisCfgDataList(AlarmCfgDataFilter filter, int pageIndex, int pageSize) {
-		String sqlCount = "select count(0) from alarm_cfg ac ,alarm_cfg_data acd,plc_info pli where 1=1  and  ac.alarmcfg_id=acd.alarm_cfg_id and ac.bind_state=1 and pli.`plc_id`=ac.plc_id";
+		String sqlCount = "select count(0) from alarm_cfg ac ,alarm_cfg_data acd,plc_info pli where 1=1  and  ac.alarmcfg_id=acd.alarm_cfg_id and ac.bind_state=1 and pli.`plc_id`=ac.plc_id and ac.bind_state=1";
 		String sql = " select " + SEL_COL + ",ac.name,ac.text "
-				+ " from alarm_cfg ac ,alarm_cfg_data acd,plc_info pli where 1=1 and  ac.alarmcfg_id=acd.alarm_cfg_id and ac.bind_state=1 and pli.`plc_id`=ac.plc_id";
+				+ " from alarm_cfg ac ,alarm_cfg_data acd,plc_info pli where 1=1 and  ac.alarmcfg_id=acd.alarm_cfg_id and ac.bind_state=1 and pli.`plc_id`=ac.plc_id and ac.bind_state=1";
 
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
@@ -194,12 +194,12 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<AlarmCfgDataAlarmCfg> page = new Page<AlarmCfgDataAlarmCfg>(pageIndex, pageSize, totalRecord);
 		String sort = " order by acd.monitor_time desc";
-		if(pageIndex>0&&pageSize>0){
+		if (pageIndex > 0 && pageSize > 0) {
 			sql += condition + sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
-		}else{
-			sql += condition + sort;//不分页
+		} else {
+			sql += condition + sort;// 不分页
 		}
-		
+
 		List<AlarmCfgDataAlarmCfg> list = jdbcTemplate.query(sql, params.toArray(),
 				new DefaultAlarmCfgDataAlarmCfgRowMapper());
 		page.setList(list);
@@ -210,7 +210,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 	@Override
 	public Page<AlarmCfgDataAlarmCfg> getViewRealHisCfgDataList(AlarmCfgDataFilter filter, int pageIndex,
 			int pageSize) {
-		String sqlCount = "select count(0) from view_account_role var,alarm_cfg ac,alarm_cfg_data  acd,plc_info pli where 1=1 and ac.alarmcfg_id=var.cfg_id and ac.alarmcfg_id=acd.alarm_cfg_id and var.cfg_type=2 and ac.bind_state=1 and pli.`plc_id`=ac.plc_id";
+		String sqlCount = "select count(0) from view_account_role var,alarm_cfg ac,alarm_cfg_data  acd,plc_info pli where 1=1 and ac.alarmcfg_id=var.cfg_id and ac.alarmcfg_id=acd.alarm_cfg_id and var.cfg_type=2 and ac.bind_state=1 and pli.`plc_id`=ac.plc_id ";
 		String sql = " select " + SEL_COL + ",ac.name,ac.text "
 				+ " from view_account_role var,alarm_cfg ac,alarm_cfg_data  acd,plc_info pli where 1=1 and ac.alarmcfg_id=var.cfg_id  and ac.alarmcfg_id=acd.alarm_cfg_id and var.cfg_type=2 and ac.bind_state=1 and pli.`plc_id`=ac.plc_id";
 
@@ -397,7 +397,5 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 			return model;
 		}
 	}
-
-	
 
 }

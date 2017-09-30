@@ -29,7 +29,6 @@ import com.wecon.box.entity.AlarmCfgTrigger;
 import com.wecon.box.entity.AlarmTrigger;
 import com.wecon.box.entity.DevBindUser;
 import com.wecon.box.entity.Page;
-import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
@@ -400,13 +399,16 @@ public class AlarmDataAction {
 					alarmCfg.data_id = alarmCfgParam.data_id;
 					alarmCfg.plc_id = alarmCfgParam.plc_id;
 					alarmCfg.rid = alarmCfgParam.rid;
-					if (alarmCfgParam.name.length() > 64) {
-						alarmCfg.name = alarmCfgParam.name.substring(0, 64);
+					if (alarmCfgParam.name.length() > 50) {
+						alarmCfg.name = alarmCfgParam.name.substring(0, 50);
 					} else {
 						alarmCfg.name = alarmCfgParam.name;
 					}
-					alarmCfg.name = alarmCfgParam.name;
-					alarmCfg.text = alarmCfgParam.text;
+					if (alarmCfgParam.text.length() > 249) {
+						alarmCfg.text = alarmCfgParam.text.substring(0, 249);
+					} else {
+						alarmCfg.text = alarmCfgParam.text;
+					}
 					alarmCfg.condition_type = alarmCfgParam.condition_type;
 					alarmCfg.state = 2;
 					alarmCfg.device_id = alarmCfgParam.device_id;
@@ -475,12 +477,16 @@ public class AlarmDataAction {
 				alarmCfg.data_id = alarmCfgParam.data_id;
 				alarmCfg.plc_id = alarmCfgParam.plc_id;
 				alarmCfg.rid = alarmCfgParam.rid;
-				if (alarmCfgParam.name.length() > 64) {
-					alarmCfg.name = alarmCfgParam.name.substring(0, 64);
+				if (alarmCfgParam.name.length() > 50) {
+					alarmCfg.name = alarmCfgParam.name.substring(0, 50);
 				} else {
 					alarmCfg.name = alarmCfgParam.name;
 				}
-				alarmCfg.text = alarmCfgParam.text;
+				if (alarmCfgParam.text.length() > 249) {
+					alarmCfg.text = alarmCfgParam.text.substring(0, 249);
+				} else {
+					alarmCfg.text = alarmCfgParam.text;
+				}
 				alarmCfg.condition_type = alarmCfgParam.condition_type;
 				alarmCfg.state = 1;
 				alarmCfg.device_id = alarmCfgParam.device_id;
@@ -495,8 +501,8 @@ public class AlarmDataAction {
 					AccountDirRel accountDirRel = new AccountDirRel();
 					accountDirRel.acc_dir_id = alarmCfgParam.group_id;
 					accountDirRel.ref_id = alarm.alarmcfg_id;
-					if (alarmCfgParam.name.length() > 64) {
-						accountDirRel.ref_alais = alarmCfgParam.name.substring(0, 64);
+					if (alarmCfgParam.name.length() > 50) {
+						accountDirRel.ref_alais = alarmCfgParam.name.substring(0, 50);
 					} else {
 						accountDirRel.ref_alais = alarmCfgParam.name;
 					}

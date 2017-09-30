@@ -20,10 +20,6 @@ appModule
 						$scope.getDataType();
 						$scope.act_group($scope.deviceid);
 
-						// 打开模态框
-						function showAddGroup() {
-							$('#identifier').modal('show');
-						}
 					}
 
 					// 获取分组
@@ -1457,12 +1453,12 @@ appModule
 							}
 
 						}
-						if ($("#nameid").val().length > 64) {
-							alert("名称字符长度不能大于64位！");
+						if ($("#nameid").val().length > 50) {
+							alert("名称字符长度不能大于50位！");
 							return;
 						}
 						if ($("#describeid").val().length > 64) {
-							alert("描述字符长度不能大于64位！");
+							alert("描述字符长度不能大于50位！");
 							return;
 						}
 

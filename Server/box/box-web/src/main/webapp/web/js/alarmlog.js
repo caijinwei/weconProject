@@ -1345,8 +1345,12 @@ appModule
 							}
 
 						}
-						if ($("#nameid").val().length > 64) {
-							alert("名称字符长度不能大于64位！");
+						if ($("#nameid").val().length > 50) {
+							alert("名称字符长度不能大于50位！");
+							return;
+						}
+						if ($("#alarmtextid").val().length > 249) {
+							alert("名称字符长度不能大于249位！");
 							return;
 						}
 						var display = $('#registeraddr').css('display');

@@ -183,10 +183,10 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 				}
 
 			} catch (Exception e) {
-				/*JSONObject errorjson = new JSONObject();
+				JSONObject errorjson = new JSONObject();
 				errorjson.put("resultData", 0);
 				errorjson.put("resultError", "下发错误，请重试");
-				sendWSMassage(session, errorjson.toJSONString());*/
+				sendWSMassage(session, errorjson.toJSONString());
 				logger.error(e);
 				String simplename = e.getClass().getSimpleName();
 				if (!"JSONException".equals(simplename)) {
