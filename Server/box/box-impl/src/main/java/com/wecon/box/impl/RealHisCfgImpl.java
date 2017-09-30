@@ -903,10 +903,10 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	/*
 	 * 盒子用户改变 监控点迁移
 	 */
-	public boolean updatePointAccAndState(long accountId, long deviceId) {
+	public boolean updatePointAccAndState(long accountId, long deviceId,int state) {
 
-		String sql = "UPDATE real_his_cfg a SET a.account_id=?,a.bind_state=1 WHERE a.device_id=?;";
-		Object[] args = new Object[] { accountId, deviceId };
+		String sql = "UPDATE real_his_cfg a SET a.account_id=?,a.bind_state=? WHERE a.device_id=?;";
+		Object[] args = new Object[] { accountId, deviceId,state };
 		Integer count = jdbcTemplate.update(sql, args);
 		if (count <= 0) {
 			return false;

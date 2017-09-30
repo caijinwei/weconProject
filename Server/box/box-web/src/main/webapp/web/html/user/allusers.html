@@ -86,13 +86,16 @@
                 <td ng-click="getAccountRelationByManagerAccId(x.account_id,x.type)">
                     {{x.type==1?'管理者帐号':(x.type==2?'视图帐号':((x.type==0?'超管帐号':x.type)))}}
                 </td>
-                <td ng-click="chgState(x.account_id,x.username,x.state)">
+                <td>
                     <div class="{{x.state==1?'glyphicon glyphicon-ok':'glyphicon glyphicon-remove'}}">{{x.state==1?'正常':(x.state==0?'禁用':(x.state==-1?'未激活':'未知'+x.state))}}</div>
                 </td>
                 <td>{{x.create_date|date:'yyyy-MM-dd HH:mm:ss'}}</td>
                 <td>
                     <button  type="button" class="btn btn-info"
                             ng-click="chgPwd(x.account_id,x.username)">修改密码
+                    </button>
+                    <button type="button" class="btn bg-info"
+                            ng-click="chgState(x.account_id,x.username,x.state)">修改状态
                     </button>
                 </td>
             </tr>
@@ -165,9 +168,18 @@
                     <h4 class="modal-title">用户账户修改启用状态</h4>
                 </div>
                 <div class="modal-body">
-                    <span>确定将用户:{{selecetedUsername}}设置为 {{selecetedState==0?'启用':'禁止登入'}}</span>
+                    <form role="form">
+                        <div class="form-group">
+                            <label for="stateInput">设置用户:{{selecetedUsername}}    状态</label>
+                            <select  class="form-control" id="stateInput">
+                                <option value="1">启用</option>
+                                <option value="0">禁止登录</option>
+                                <option value="-1">未激活</option>
+                            </select>
+                        </div>
+                    </form>
+
                 </div>
-                <input id="stateInput" hidden value="{{selecetedState==0?'1':'0'}}">
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-info"

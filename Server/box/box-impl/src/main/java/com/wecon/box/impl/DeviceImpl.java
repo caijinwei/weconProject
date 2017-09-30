@@ -86,10 +86,10 @@ public class DeviceImpl implements DeviceApi {
 
 	@Override
 	public boolean updateDevice(final Device model) {
-		String sql = "select count(1) from device where machine_code = ? and device_id<>? ";
+		String sql = "select count(1) from device where machine_code = ? and device_id=? ";
 
 		int ret = jdbcTemplate.queryForObject(sql, new Object[] { model.machine_code, model.device_id }, Integer.class);
-		if (ret > 0) {
+		if (ret > 1) {
 			throw new BusinessException(ErrorCodeOption.Device_Code_Is_Be_Used.key,
 					ErrorCodeOption.Device_Code_Is_Be_Used.value);
 		}
@@ -367,7 +367,8 @@ public class DeviceImpl implements DeviceApi {
 						/*
 						 * 设置实时历史监控点bound状态为0
 						 */
-						realHisCfgApi.setBind_state(toIntArray(realHisCfgIds), 0);
+//						realHisCfgApi.setBind_state(toIntArray(realHisCfgIds), 0);
+						realHisCfgApi.updatePointAccAndState(accountId,deviceId,0);
 						/*
 						 * 删除视图账户监控点分组
 						 */
@@ -384,7 +385,8 @@ public class DeviceImpl implements DeviceApi {
 						/*
 						 * 设置实时历史监控点bound状态为0
 						 */
-						alarmCfgApi.setBind_state(toIntArray(alarmCfgIds), 0);
+						//alarmCfgApi.setBind_state(deviceId,0);
+						alarmCfgApi.updatePointAccAndState(accountId,deviceId,0);
 						/*
 						 * 删除视图账户监控点分组
 						 */
@@ -551,6 +553,8 @@ public class DeviceImpl implements DeviceApi {
 		}));
 		return page;
 	}
+
+
 
 	public static final class DefaultDeviceDirRowMapper implements RowMapper<DeviceDir> {
 		public DeviceDir mapRow(ResultSet resultSet, int i) throws SQLException {

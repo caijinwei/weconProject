@@ -170,7 +170,7 @@ public interface RealHisCfgApi {
 	/*
 	* 盒子用户改变  监控点迁移
 	* */
-	public boolean updatePointAccAndState(long accountId,long deviceId);
+	public boolean updatePointAccAndState(long accountId,long deviceId,int state);
 
 
 	}

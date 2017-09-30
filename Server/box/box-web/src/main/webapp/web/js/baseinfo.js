@@ -439,12 +439,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         }
         var reg_a=/^[\-\+]?(0?\d{1,2}\.\d{1,5}|1[0-7]?\d{1}\.\d{1,5}|180\.0{1,5})$/;
         if(!reg_a.test(map_a)){
-            alert("经度格式错误,经度： -180.0～+180.0（整数部分为0～180，必须输入1到5位小数）");
+            alert("经度输入错误，请输入经度-180.0~180.0的数");
             return;
         }
         var reg_o= /^[\-\+]?([0-8]?\d{1}\.\d{1,5}|90\.0{1,5})$/;
         if(!reg_o.test(map_o)){
-            alert("纬度格式错误,纬度： -90.0～+90.0（整数部分为0～90，必须输入1到5位小数）");
+            alert("纬度输入错误，请输入纬度-90.0~90.0的数");
             return;
         }
         var map = $("#map_a").val() + "," + $("#map_o").val();

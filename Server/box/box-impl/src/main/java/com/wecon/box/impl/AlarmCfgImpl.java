@@ -495,29 +495,16 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 	/*
 	 * 设置bind_state=0 解绑
 	 */
-	public void setBind_state(final int[] alaramCfgId, final Integer state) {
-		String sql = "UPDATE alarm_cfg SET alarmcfg_id=? where bind_state=?";
-		Object[] args = new Object[] { alaramCfgId, state };
-		if (alaramCfgId.length != 0) {
-			jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
-				@Override
-				public void setValues(PreparedStatement ps, int i) throws SQLException {
-					ps.setInt(1, alaramCfgId[i]);
-					ps.setInt(2, state);
-				}
-
-				@Override
-				public int getBatchSize() {
-					return 0;
-				}
-			});
-		}
+	public void setBind_state(int device_id, Integer state) {
+		String sql = "UPDATE alarm_cfg SET bind_state=? where device_id=?";
+			Object args=new Object[]{state,device_id};
+			jdbcTemplate.update(sql,args);
 	}
 
-	public boolean updatePointAccAndState(long accountId, long deviceId) {
+	public boolean updatePointAccAndState(long accountId, long deviceId, int bind_state) {
 
-		Object[] args = new Object[] { accountId, deviceId };
-		String sql = "UPDATE alarm_cfg a SET a.account_id = ?, a.bind_state = 1 WHERE a.device_id = ?";
+		Object[] args = new Object[] { accountId,bind_state, deviceId };
+		String sql = "UPDATE alarm_cfg a SET a.account_id = ?, a.bind_state = ? WHERE a.device_id = ?";
 		Integer count = jdbcTemplate.update(sql, args);
 		if (count <= 0) {
 			return false;

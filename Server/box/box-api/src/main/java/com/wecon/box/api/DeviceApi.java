@@ -123,4 +123,5 @@ public interface DeviceApi {
     public Page<DeviceDir> getDeviceByBound(Integer state, Integer pageNum, Integer pageSize);
 
     public Page<DeviceDir> getDeviceByUnbound(Integer state, Integer pageNum, Integer pageSize);
+
 }

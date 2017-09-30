@@ -60,7 +60,7 @@ public enum ErrorCodeOption {
     Is_Exist_PlcPort("通讯协议被占用",300012),
     Is_Not_Params_DeviceID("没有输入参数",300013),
     UpdateFalse_DeviceName_Remark("设备别名和备注保存失败",300014),
-    PIBox_Bound_False("设备绑定失败",300015),
+    PIBox_Bound_False("设备解绑失败",300015),
     PIBox_Bound_PointMove_False("设备绑定失败",300016),
     Delete_AccDevice_Rel_False("设备解绑失败",300017),
     DeviceId_Is_Unknown("盒子设备ID非法",300018),
@@ -77,7 +77,8 @@ public enum ErrorCodeOption {
     Dev_Bind_User_HaveError_Record("该设备绑定关系异常",300026),
     Dev_Bind_User_NotFount_Record("用户没有绑定该设备",300027),
     DeviceId_Is_Error("deviceId参数错误",300028),
-    Device_IsNot_Online("盒子已经离线",2300029),
+    Device_IsNot_Online("盒子已经离线",300029),
+    Device_Bind_NotDir("没有选择盒子分组",300030),
 
 
 
