@@ -89,13 +89,12 @@ public class DeviceImpl implements DeviceApi {
         return key.getKey().longValue();
 
     }
-
     @Override
     public boolean updateDevice(final Device model) {
-        String sql = "select count(1) from device where machine_code = ? and device_id=? ";
+        String sql = "select count(1) from device where machine_code = ? and device_id<>? ";
 
         int ret = jdbcTemplate.queryForObject(sql, new Object[]{model.machine_code, model.device_id}, Integer.class);
-        if (ret > 1) {
+        if (ret > 0) {
             throw new BusinessException(ErrorCodeOption.Device_Code_Is_Be_Used.key,
                     ErrorCodeOption.Device_Code_Is_Be_Used.value);
         }

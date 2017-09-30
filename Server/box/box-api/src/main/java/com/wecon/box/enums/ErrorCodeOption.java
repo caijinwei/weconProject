@@ -48,7 +48,7 @@ public enum ErrorCodeOption {
     PiBoxDevice_IsNot_Found("盒子不存在",300009),
     Account_Permissions_No("账户权限不足，无法新增盒子", 30001),
     Device_NotFound("该设备不存在",30002),
-    Device_AlreadyBind("该设备已经被别的用户绑定",300023),
+    Device_AlreadyBind("设备已被绑定",300023),
     Viewpoint_Dlete_False("视图账户监控点解绑失败",300003),
     ViewpointRoleTypePrams_Update_False("视图账号监控点权限分配失败(参数不能为空)",300004),
     Get_DeviceList_Error("获取盒子列表失败",30005),
