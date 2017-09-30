@@ -175,7 +175,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 
 				JSONObject data = new JSONObject();
 				data.put("id", realHisCfgDevice.id);
-				data.put("monitorName", realHisCfgDevice.name);
+				data.put("monitorName", CommonUtils.isNullOrEmpty(realHisCfgDevice.ref_alais) ? realHisCfgDevice.name : realHisCfgDevice.ref_alais);
 				data.put("number", 0);
 				String stateText = null;
 				if(realHisCfgDevice.dstate == Constant.State.STATE_BOX_OFFLINE){
