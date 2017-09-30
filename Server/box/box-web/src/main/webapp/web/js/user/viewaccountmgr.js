@@ -71,7 +71,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
                 }
                 T.common.ajax.request("WeconBox", "user/chgviewuserstate", params, function (data, code, msg) {
                     if (code == 200) {
-                        $scope.getList($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+                        //$scope.getList($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
                     }
                     else {
                         alert(msg);
