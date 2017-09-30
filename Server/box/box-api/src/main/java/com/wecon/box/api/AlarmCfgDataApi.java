@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import com.wecon.box.entity.AlarmCfgData;
 import com.wecon.box.entity.AlarmCfgDataAlarmCfg;
 import com.wecon.box.entity.Page;
-import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.filter.AlarmCfgDataFilter;
 
 /**

@@ -107,7 +107,7 @@ $(function () {
             $("#account").focus();
             return false;
         }
-        if (!$("#account").val().match(/^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/)) {
+        if (!$("#account").val().match(/^([a-z0-9A-Z]+[-|\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\.)+[a-zA-Z]{2,}$/)) {
             //alert("邮箱格式不正确");
             $("#account").focus();
             return false;
@@ -123,7 +123,7 @@ $(function () {
             return false;
         }
 
-        if (!$("#account").val().match(/^(((13[0-9]{1})|159|153)+\d{8})$/)) {
+        if (!$("#account").val().match(/^[1]\d{10}$/)) {
             //alert("手机号码格式不正确！");
             $("#account").focus();
             return false;

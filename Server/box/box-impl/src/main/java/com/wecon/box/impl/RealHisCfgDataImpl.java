@@ -159,8 +159,8 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<RealHisCfgData> page = new Page<RealHisCfgData>(pageIndex, pageSize, totalRecord);
-		String sort = " order by real_his_cfg_id desc";
-		sql += condition + sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
+//		String sort = " order by real_his_cfg_id desc";
+		sql += condition +  " limit " + page.getStartIndex() + "," + page.getPageSize();
 		List<RealHisCfgData> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgDataRowMapper());
 		page.setList(list);
 		return page;
@@ -184,14 +184,14 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 		}
 		// 操作时间起
 		if (!CommonUtils.isNullOrEmpty(bParams.get("monitorBeginTime"))) {
-			condition.append(" and date_format(real_his_cfg_data.monitor_time,'%Y-%m-%d %H:%i') >= ");
+			condition.append(" and date_format(rd.monitor_time,'%Y-%m-%d %H:%i') >= ");
 			condition.append(" date_format(str_to_date(?,'%Y-%m-%d %H:%i'),'%Y-%m-%d %H:%i') ");
 			params.add(CommonUtils.trim(bParams.get("monitorBeginTime").toString()));
 
 		}
 		// 操作时间止
 		if (!CommonUtils.isNullOrEmpty(bParams.get("monitorEndTime"))) {
-			condition.append(" and date_format(real_his_cfg_data.monitor_time,'%Y-%m-%d %H:%i') <=  ");
+			condition.append(" and date_format(rd.monitor_time,'%Y-%m-%d %H:%i') <=  ");
 			condition.append(" date_format(str_to_date(?,'%Y-%m-%d %H:%i'),'%Y-%m-%d %H:%i') ");
 			params.add(CommonUtils.trim(bParams.get("monitorEndTime").toString()));
 		}
@@ -210,7 +210,7 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 		String sql = "select distinct r.id, r.name, rd.value, rd.monitor_time" + "  "+fromStr + whereStr;
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
-		Page<Map<String, Object>> page = new Page<Map<String, Object>>(pageIndex, pageSize, totalRecord);
+		Page<Map<String, Object>> page = new Page<>(pageIndex, pageSize, totalRecord);
 		String sort = " order by r.id desc";
 		sql += condition + sort + " limit " + page.getStartIndex() + "," + page.getPageSize();
 		List<Map<String, Object>> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgMapRowMapper());

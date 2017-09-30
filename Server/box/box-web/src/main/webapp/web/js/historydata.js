@@ -1002,12 +1002,17 @@ appModule
 							}
 
 						}
-						if($("#nameid").val().length>64){
-							alert("名称字符长度不能大于64位！");
+						var hisreg =/^[1-9]\d*$/;
+						if (!hisreg.test($("#hiscycleid").val())) {
+							alert("周期必须大于1的正整数！");
 							return;
 						}
-						if($("#describeid").val().length>64){
-							alert("描述字符长度不能大于64位！");
+						if($("#nameid").val().length>50){
+							alert("名称字符长度不能大于50位！");
+							return;
+						}
+						if($("#describeid").val().length>50){
+							alert("描述字符长度不能大于50位！");
 							return;
 						}
 						var display = $('#registeraddr').css('display');

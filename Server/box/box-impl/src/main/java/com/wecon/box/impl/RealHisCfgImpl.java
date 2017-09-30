@@ -1,6 +1,7 @@
 package com.wecon.box.impl;
 
 import com.wecon.box.api.RealHisCfgApi;
+import com.wecon.box.constant.Constant;
 import com.wecon.box.entity.Page;
 import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.entity.RealHisCfgDevice;
@@ -356,7 +357,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	@Override
 	public Page<RealHisCfgDevice> getRealHisCfgList(RealHisCfgFilter filter, int pageIndex, int pageSize) {
 		String sqlCount = "select count(0) from account_dir ad,account_dir_rel adr ,real_his_cfg  r,plc_info pli,device d where 1=1 and  ad.`id`=adr.`acc_dir_id` and pli.`plc_id`=r.`plc_id` and pli.`device_id`=d.`device_id` and r.`id`=adr.`ref_id` and ad.`account_id`=r.`account_id`";
-		String sql = "select " + SEL_COL + ",d.machine_code,adr.ref_alais"
+		String sql = "select " + SEL_COL + ",d.machine_code,d.state as dstate,adr.ref_alais"
 				+ " from account_dir ad,account_dir_rel adr ,real_his_cfg  r,plc_info pli,device d where 1=1 and  ad.`id`=adr.`acc_dir_id` and pli.`plc_id`=r.`plc_id` and pli.`device_id`=d.`device_id` and r.`id`=adr.`ref_id` and ad.`account_id`=r.`account_id`";
 		StringBuffer condition = new StringBuffer("");
 		List<Object> params = new ArrayList<Object>();
@@ -504,10 +505,10 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			condition.append(" and adr.acc_dir_id = ?");
 			params.add(groupId);
 		}
-		String sqlCount = "select count(distinct r.id) " + fromStr
-				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and r.id=adr.ref_id and r.bind_state=1";
-		String sql = "select distinct " + SEL_COL + ",d.machine_code,adr.ref_alais" + "  " + fromStr
-				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and r.id=adr.ref_id and r.bind_state=1";
+		String sqlCount = "select count(distinct r.id, ad.id) " + fromStr
+				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and r.id=adr.ref_id and r.bind_state=1 and r.state != "+ Constant.State.STATE_DELETE_CONFIG;
+		String sql = "select distinct " + SEL_COL + ",d.machine_code, d.state as dstate, adr.ref_alais" + "  " + fromStr
+				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and r.id=adr.ref_id and r.bind_state=1 and r.state != "+ Constant.State.STATE_DELETE_CONFIG;
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<RealHisCfgDevice> page = new Page<RealHisCfgDevice>(pageIndex, pageSize, totalRecord);
@@ -546,9 +547,9 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			condition.append(" and ad.device_id = ? ");
 			params.add(boxId);
 		}
-		String sqlCount = "select count(distinct r.id) " + fromStr
+		String sqlCount = "select count(distinct r.id, ad.id) " + fromStr
 				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and r.id=adr.ref_id and r.bind_state=1";
-		String sql = "select distinct " + SEL_COL + ",d.machine_code" + "  " + fromStr
+		String sql = "select distinct " + SEL_COL + ",d.machine_code, d.state as dstate, adr.ref_alais" + "  " + fromStr
 				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and r.id=adr.ref_id and r.bind_state=1";
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
@@ -776,6 +777,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.rid = rs.getString("rid");
 			model.device_id = rs.getLong("device_id");
 			model.bind_state = rs.getInt("bind_state");
+			model.dstate = rs.getInt("dstate");
 			return model;
 		}
 	}

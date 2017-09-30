@@ -11,8 +11,9 @@ $(function () {
     T.common.ajax.request("WeconBox", "user/signupemailactive", params, function (data, code, msg) {
         if (code == 200) {
             if (params.type == 1) {
-                T.common.user.setSid(data.sid);
-                location = "../main.html";
+                alert("激活成功");
+                //T.common.user.setSid(data.sid);
+                location = "login.html";
             } else {
                 $("#title").html("激活成功");
             }

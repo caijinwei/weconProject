@@ -5,8 +5,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import javax.validation.Valid;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,22 +15,16 @@ import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.AccountDirApi;
 import com.wecon.box.api.AccountDirRelApi;
 import com.wecon.box.api.DevBindUserApi;
-import com.wecon.box.api.DeviceApi;
 import com.wecon.box.api.PlcInfoApi;
 import com.wecon.box.api.RealHisCfgApi;
-import com.wecon.box.api.RedisPiBoxApi;
 import com.wecon.box.api.ViewAccountRoleApi;
 import com.wecon.box.entity.AccountDir;
 import com.wecon.box.entity.AccountDirRel;
 import com.wecon.box.entity.DevBindUser;
-import com.wecon.box.entity.Device;
 import com.wecon.box.entity.Page;
-import com.wecon.box.entity.PiBoxCom;
-import com.wecon.box.entity.PiBoxComAddr;
 import com.wecon.box.entity.PlcInfo;
 import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.entity.RealHisCfgDevice;
-import com.wecon.box.entity.RedisPiBoxActData;
 import com.wecon.box.entity.plcdom.AddrDom;
 import com.wecon.box.entity.plcdom.Plc;
 import com.wecon.box.entity.plcdom.Res;
@@ -47,7 +39,6 @@ import com.wecon.box.util.DbLogUtil;
 import com.wecon.box.util.OptionUtil;
 import com.wecon.box.util.PlcTypeParser;
 import com.wecon.box.util.PlcTypeQuerier;
-import com.wecon.box.util.ServerMqtt;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
@@ -63,8 +54,6 @@ import com.wecon.restful.core.Output;
 public class ActDataAction {
 
 	@Autowired
-	private RedisPiBoxApi redisPiBoxApi;
-	@Autowired
 	private RealHisCfgApi realHisCfgApi;
 	@Autowired
 	private AccountDirApi accountDirApi;
@@ -76,8 +65,6 @@ public class ActDataAction {
 	private PlcInfoApi plcInfoApi;
 	@Autowired
 	private ViewAccountRoleApi viewAccountRoleApi;
-	@Autowired
-	private DeviceApi deviceApi;
 	@Autowired
 	private DevBindUserApi devBindUserApi;
 	@Autowired
@@ -157,105 +144,6 @@ public class ActDataAction {
 	}
 
 	/**
-	 * 获取实时数据
-	 * 
-	 * @return
-	 */
-
-	@WebApi(forceAuth = true, master = true)
-
-	@Description("根据盒子id和实时分组id获取实时数据")
-
-	@RequestMapping(value = "/getActData")
-
-	public Output getActData(@RequestParam("device_id") String device_id, @RequestParam("acc_dir_id") String acc_dir_id,
-			@RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) {
-		Client client = AppContext.getSession().client;
-		JSONObject json = new JSONObject();
-		/** 获取实时数据配置信息 **/
-		RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
-		/** 通过视图获取配置信息 **/
-		ViewAccountRoleFilter viewAccountRoleFilter = new ViewAccountRoleFilter();
-
-		Page<RealHisCfgDevice> realHisCfgDeviceList = null;
-		if (client.userInfo.getUserType() == 1) {
-			/** 管理 **/
-			realHisCfgFilter.addr_type = -1;
-			realHisCfgFilter.data_type = 0;
-			realHisCfgFilter.his_cycle = -1;
-			realHisCfgFilter.state = -1;
-			realHisCfgFilter.bind_state = 1;
-
-			realHisCfgFilter.account_id = client.userId;
-
-			if (!CommonUtils.isNullOrEmpty(acc_dir_id)) {
-				realHisCfgFilter.dirId = Long.parseLong(acc_dir_id);
-			}
-			if (!CommonUtils.isNullOrEmpty(device_id)) {
-				realHisCfgFilter.device_id = Long.parseLong(device_id);
-			}
-			realHisCfgDeviceList = realHisCfgApi.getRealHisCfgList(realHisCfgFilter, pageIndex, pageSize);
-
-		} else if (client.userInfo.getUserType() == 2) {
-			/** 视图 **/
-
-			viewAccountRoleFilter.view_id = client.userId;
-			viewAccountRoleFilter.cfg_type = 1;
-			viewAccountRoleFilter.data_type = 0;
-			viewAccountRoleFilter.role_type = -1;
-			viewAccountRoleFilter.state = -1;
-			if (!CommonUtils.isNullOrEmpty(acc_dir_id)) {
-				viewAccountRoleFilter.dirId = Long.parseLong(acc_dir_id);
-			}
-			realHisCfgDeviceList = realHisCfgApi.getRealHisCfgList(viewAccountRoleFilter, pageIndex, pageSize);
-		}
-
-		// 如果该账号下无实时数据配置文件直接返回空
-		if (realHisCfgDeviceList != null && realHisCfgDeviceList.getList().size() > 0) {
-			for (int i = 0; i < realHisCfgDeviceList.getList().size(); i++) {
-				RealHisCfgDevice realHisCfgDevice = realHisCfgDeviceList.getList().get(i);
-				String[] numdecs = realHisCfgDevice.digit_count.split(",");
-				System.out.println("ss=" + numdecs);
-				if (numdecs != null && numdecs.length > 0) {
-					System.out.println(numdecs[0]);
-					realHisCfgDevice.num = numdecs[0];
-					realHisCfgDevice.dec = numdecs[1];
-				}
-				String device_machine = realHisCfgDevice.machine_code;
-				// 通过机器码去redis中获取数据
-				RedisPiBoxActData redisPiBoxActData = redisPiBoxApi.getRedisPiBoxActData(device_machine);
-				if (redisPiBoxActData != null) {
-					List<PiBoxCom> act_time_data_list = redisPiBoxActData.act_time_data_list;
-					for (int j = 0; j < act_time_data_list.size(); j++) {
-						PiBoxCom piBoxCom = act_time_data_list.get(j);
-
-						if (realHisCfgDevice.plc_id == Long.parseLong(piBoxCom.com)) {
-
-							List<PiBoxComAddr> addr_list = piBoxCom.addr_list;
-							for (int x = 0; x < addr_list.size(); x++) {
-								PiBoxComAddr piBoxComAddr = addr_list.get(x);
-
-								if (realHisCfgDevice.id == Long.parseLong(piBoxComAddr.addr_id)) {
-									realHisCfgDevice.re_state = piBoxComAddr.state;
-									realHisCfgDevice.re_value = piBoxComAddr.value;
-
-								}
-
-							}
-
-						}
-
-					}
-				}
-			}
-		}
-
-		json.put("piBoxActDateMode", realHisCfgDeviceList);
-		return new Output(json);
-
-	}
-
-	/**
 	 * 更新实时监控点名称
 	 * 
 	 * @return
@@ -280,85 +168,6 @@ public class ActDataAction {
 
 		return new Output();
 
-	}
-
-	@WebApi(forceAuth = true, master = true)
-	@Description("mosquito消息的推送测试")
-	@RequestMapping(value = "/putMess")
-	public Output putMQTTMess(@RequestParam("value") String value, @RequestParam("addr_id") String addr_id)
-			throws MqttException {
-		JSONObject json = new JSONObject();
-		ServerMqtt server = new ServerMqtt();
-		server.message = new MqttMessage();
-		server.message.setQos(1);
-		server.message.setRetained(true);
-		if (!CommonUtils.isNullOrEmpty(addr_id)) {
-			RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(addr_id));
-			if (realHisCfg != null) {
-				Device device = deviceApi.getDevice(realHisCfg.device_id);
-				if (device.state == 0) {// 盒子离线，不进行下发
-					json.put("resultData", 0);
-					return new Output(json);
-				}
-
-				if (device != null) {
-					PiBoxComAddr addr1 = new PiBoxComAddr();
-					addr1.addr_id = addr_id;
-					addr1.value = value;
-					List<PiBoxCom> operate_data_list = new ArrayList<PiBoxCom>();
-					PiBoxCom piBoxCom = new PiBoxCom();
-					List<PiBoxComAddr> piBoxComAddrs = new ArrayList<PiBoxComAddr>();
-					piBoxCom.com = String.valueOf(realHisCfg.plc_id);
-					piBoxComAddrs.add(addr1);
-					piBoxCom.addr_list = piBoxComAddrs;
-					operate_data_list.add(piBoxCom);
-
-					JSONObject jsonObject = new JSONObject();
-					jsonObject.put("act", 2000);
-					jsonObject.put("machine_code", device.machine_code);
-					JSONObject oplistObject = new JSONObject();
-					oplistObject.put("operate_data_list", operate_data_list);
-					jsonObject.put("data", oplistObject);
-					jsonObject.put("feedback", 0);
-					String message = jsonObject.toJSONString();
-					System.out.println(message);
-					server.message.setPayload((message).getBytes());
-					server.topic11 = server.client.getTopic("pibox/stc/" + device.machine_code);
-					server.publish(server.topic11, server.message);
-					// 通过机器码去redis中获取数据
-					RedisPiBoxActData redisPiBoxActData = redisPiBoxApi.getRedisPiBoxActData(device.machine_code);
-					if (redisPiBoxActData != null) {
-						List<PiBoxCom> act_time_data_list = redisPiBoxActData.act_time_data_list;
-						for (int j = 0; j < act_time_data_list.size(); j++) {
-							PiBoxCom Com = act_time_data_list.get(j);
-
-							if (realHisCfg.plc_id == Long.parseLong(Com.com)) {
-
-								List<PiBoxComAddr> addr_list = Com.addr_list;
-								for (int x = 0; x < addr_list.size(); x++) {
-									PiBoxComAddr piBoxComAddr = addr_list.get(x);
-
-									if (realHisCfg.id == Long.parseLong(piBoxComAddr.addr_id)) {
-										dbLogUtil.updOperateLog(OpTypeOption.WriteAct, ResTypeOption.Write,
-												realHisCfg.id, piBoxComAddr.value, value);
-
-									}
-
-								}
-
-							}
-
-						}
-					}
-
-					server.client.disconnect();
-
-				}
-			}
-
-		}
-		json.put("resultData", 1);
-		return new Output(json);
 	}
 
 	/**
@@ -1131,17 +940,14 @@ public class ActDataAction {
 
 							}
 							if (i > 0) {
-								if (realHisCfgParam.name.length() > 64) {
-									realHisCfg.name = realHisCfgParam.name.substring(0, 49) + "_" + i;
+								if (realHisCfgParam.name.length() > 50) {
+									realHisCfg.name = realHisCfgParam.name.substring(0, 46) + "_" + i;
 								} else {
 									realHisCfg.name = realHisCfgParam.name + "_" + i;
-									if(realHisCfg.name.length()>64){
-										realHisCfg.name=realHisCfg.name.substring(50, 64);
-									}
 								}
 							} else {
-								if (realHisCfgParam.name.length() > 64) {
-									realHisCfg.name = realHisCfgParam.name.substring(0, 64);
+								if (realHisCfgParam.name.length() > 50) {
+									realHisCfg.name = realHisCfgParam.name.substring(0, 50);
 								} else {
 									realHisCfg.name = realHisCfgParam.name;
 								}
@@ -1181,8 +987,8 @@ public class ActDataAction {
 					}
 
 				} else {
-					if (realHisCfgParam.name.length() > 64) {
-						realHisCfg.name = realHisCfgParam.name.substring(0, 64);
+					if (realHisCfgParam.name.length() > 50) {
+						realHisCfg.name = realHisCfgParam.name.substring(0, 50);
 					} else {
 						realHisCfg.name = realHisCfgParam.name;
 					}

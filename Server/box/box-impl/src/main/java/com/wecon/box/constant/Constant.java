@@ -31,6 +31,31 @@ public class Constant {
          * 更新配置，有修改驱动
          */
         public static final int STATE_UPDATE_CONFIG_PD = 4;
+
+        /**
+         * 盒子在线状态
+         */
+        public static final int STATE_BOX_ONLINE = 1;
+
+        /**
+         * 盒子离线状态
+         */
+        public static final int STATE_BOX_OFFLINE = 1;
+
+        /**
+         * 监控点离线状态
+         */
+        public static final int STATE_MONITOR_OFFLINE = 0;
+
+        /**
+         * 监控点在线状态
+         */
+        public static final int STATE_MONITOR_ONLINE = 1;
+
+        /**
+         * 监控点超时状态
+         */
+        public static final int STATE_MONITOR_TIMEOUT = 2;
     }
 
     public class DataType{
