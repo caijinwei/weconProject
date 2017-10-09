@@ -28,6 +28,7 @@ public enum ErrorCodeOption {
     PhonenumAndEmailError("手机号码和邮箱格式有错", 11017),
     DelGroupHasDevice("此分组下还有绑定的设备，请先解绑或转移到其他分组", 11018),
     UserNameFormatError("用户名只能1-20字符且只能由字母数字下划线组成", 11019),
+    Login_Error_Many_Times("登录失败次数过多，请半小时后重试", 11020),
 
     //文件操作相关
     UploadFileError("上传文件异常", 12000),
