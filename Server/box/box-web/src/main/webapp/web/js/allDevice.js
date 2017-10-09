@@ -41,6 +41,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
     $scope.showAllDeviceDir = function (accountId, pageNum, pageSize) {
         var bind_state = $("#bind_state").val();
         var machine_code = $("#machine_code").val();
+        var device_id=$("#device_id").val();
         var state = $("#state").val();
         if (pageNum <= 0) {
             pageNum = 1;
@@ -48,8 +49,14 @@ appModule.controller("listController", function ($scope, $http, $compile) {
         if (machine_code == "") {
             machine_code = -1;
         }
-        if (state == "") {
-            state = -1;
+        if(bind_state==""){
+            bind_state=="-1";
+        }
+        if(device_id==""){
+            device_id=-1;
+        }
+        if(accountId==""){
+            accountId=-1;
         }
         var params =
         {
@@ -57,9 +64,11 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             bind_state: bind_state,
             state: state,
             accountId: accountId,
+            device_id: device_id,
             pageNum: pageNum,
             pageSize: pageSize
         }
+            console.log(params);
         T.common.ajax.request("WeconBox", "baseInfoAction/showAllDeviceDir", params, function (data, code, msg) {
             if (code == 200) {
                 $scope.paginationConf.totalItems = data.page.totalRecord;

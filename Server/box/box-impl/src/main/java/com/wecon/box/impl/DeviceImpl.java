@@ -1,13 +1,11 @@
 package com.wecon.box.impl;
 
 import com.wecon.box.api.*;
-import com.wecon.box.entity.AccountDirRel;
-import com.wecon.box.entity.DevBindUser;
-import com.wecon.box.entity.Device;
-import com.wecon.box.entity.Page;
+import com.wecon.box.entity.*;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.filter.DeviceDir;
 import com.wecon.box.filter.DeviceFilter;
+import com.wecon.box.filter.DeviceSearchFilter;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.BusinessException;
@@ -564,6 +562,81 @@ public class DeviceImpl implements DeviceApi {
         page.setList(jdbcTemplate.query(sql, args, new DefaultDeviceDirRowMapper()));
         return page;
     }
+
+
+    @Override
+    public Page<DeviceDir> getAllDeviceByFilter(DeviceSearchFilter filter, Integer pageNum, Integer pageSize) {
+        String condition=new String("");
+        String sqlCount = "SELECT  "
+                + " count(0) "
+                + "FROM  " + "device a  " + "LEFT JOIN dev_bind_user b ON a.device_id = b.device_id  "
+                + "LEFT JOIN account c ON b.account_id=c.account_id   "
+                + "LEFT JOIN dev_firm d ON a.device_id=d.device_id  WHERE 1=1 ";
+        String sql = "SELECT  "
+                + "a.device_id,a.`name`,a.machine_code,a.`password`,a.dev_model,a.state,a.remark,a.create_date,c.username,c.account_id,d.f_id,d.f_name,d.f_ver "
+                + "FROM  " + "device a  " + "LEFT JOIN dev_bind_user b ON a.device_id = b.device_id  "
+                + "LEFT JOIN account c ON b.account_id=c.account_id   "
+                + "LEFT JOIN dev_firm d ON a.device_id=d.device_id  WHERE 1=1";
+//                + condition
+//                + " order by a.device_id desc  LIMIT ?,?  ";
+        List<Object> params = new ArrayList<Object>();
+        if(filter.accountId!=null&&filter.accountId>0){
+            condition+=" and b.account_id=?  ";
+            params.add(filter.accountId);
+        }
+        if(filter.device_id!=null&&filter.device_id>0){
+            condition+=" and a.device_id=? ";
+            params.add(filter.device_id);
+        }
+        if(filter.machine_code!=null &&!filter.machine_code.equals("-1")){
+            condition+=" and a.machine_code=?  ";
+            params.add(filter.machine_code);
+        }
+        if(filter.bind_state!=null&&filter.bind_state!=-1){
+            if(filter.bind_state==0)
+            {
+                condition+=" AND  NOT EXISTS(SELECT device_id FROM dev_bind_user b  WHERE b.device_id=a.device_id) ";
+            }else{
+                condition+=" AND  EXISTS(SELECT device_id FROM dev_bind_user b  WHERE b.device_id=a.device_id) ";
+            }
+        }
+        if(filter.state!=-1){
+            condition+=" and a.state=? ";
+            params.add(filter.state);
+        }
+        sqlCount +=condition.toString();
+        int totalRecord = jdbcTemplate.queryForObject(sqlCount,
+                params.toArray(),
+                Integer.class);
+        Page<DeviceDir> page = new Page<DeviceDir>(pageNum, pageSize, totalRecord);
+        params.add(page.getStartIndex());
+        params.add(page.getPageSize());
+        List<DeviceDir> list=jdbcTemplate.query(sql+condition+" limit ?,? ",
+                params.toArray(),
+                new RowMapper<DeviceDir>() {
+                    @Override
+                    public DeviceDir mapRow(ResultSet resultSet, int i) throws SQLException {
+                        DeviceDir model = new DeviceDir();
+                        model.create_date = resultSet.getTimestamp("create_date");
+                        model.dev_model = resultSet.getString("dev_model");
+                        model.device_id = resultSet.getLong("device_id");
+                        model.machine_code = resultSet.getString("machine_code");
+                        model.name = resultSet.getString("name");
+                        model.remark = resultSet.getString("remark");
+                        model.password = resultSet.getString("password");
+                        model.state = resultSet.getInt("state");
+                        model.accountId = resultSet.getLong("account_id");
+                        model.username = resultSet.getString("username");
+                        model.fId = resultSet.getLong("f_id");
+                        model.fName = resultSet.getString("f_name");
+                        model.fVer = resultSet.getString("f_ver");
+                        return model;
+                    }});
+        page.setList(list);
+        return page;
+    }
+
+
 
     @Override
     public Page<DeviceDir> getDeviceByUnbound(Integer state, Integer pageNum, Integer pageSize) {

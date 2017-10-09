@@ -4,6 +4,7 @@ import com.wecon.box.entity.Device;
 import com.wecon.box.entity.Page;
 import com.wecon.box.filter.DeviceDir;
 import com.wecon.box.filter.DeviceFilter;
+import com.wecon.box.filter.DeviceSearchFilter;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -129,4 +130,8 @@ public interface DeviceApi {
     * */
     public void boundDevice(final long device_id,final String name,final long acc_dir_id);
 
+    /*
+    * 超管用户搜索
+    * */
+    public Page<DeviceDir> getAllDeviceByFilter(DeviceSearchFilter filter, Integer pageNum, Integer pageSize);
 }

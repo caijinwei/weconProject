@@ -109,16 +109,19 @@
                     <td>{{y.username}}</td>
                     <td>{{y.phonenum}}</td>
                     <td>{{y.email}}</td>
-                    <td ng-click="getAccountRelationByManagerAccId(x.account_id,x.type)">
+                    <td>
                         {{y.type==1?'管理者帐号':(y.type==2?'视图帐号':((y.type==0?'超管帐号':y.type)))}}
                     </td>
                     <td ng-click="chgState(y.account_id,y.username,y.state)">
-                        <div class="{{y.state?'glyphicon glyphicon-ok':'glyphicon glyphicon-remove'}}">{{x.state==1?'正常':(x.state==0?'禁用':(x.state==-1?'未激活':'未知'+x.state))}}</div>
+                        <div class="{{y.state?'glyphicon glyphicon-ok':'glyphicon glyphicon-remove'}}">{{y.state==1?'正常':(y.state==0?'禁用':(y.state==-1?'未激活':'未知'+y.state))}}</div>
                     </td>
                     <td>{{y.create_date|date:'yyyy-MM-dd HH:mm:ss'}}</td>
                     <td>
                         <button  type="button" class="btn btn-info"
-                                 ng-click="chgPwd(x.account_id,x.username)">修改密码
+                                 ng-click="chgPwd(y.account_id,y.username)">修改密码
+                        </button>
+                        <button type="button" class="btn bg-info"
+                                ng-click="chgState(y.account_id,y.username,y.state)">修改状态
                         </button>
                     </td>
                 </tr>
