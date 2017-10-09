@@ -1,13 +1,16 @@
 package com.wecon.box.impl;
 
 import com.wecon.box.api.ViewAccountRoleApi;
-import com.wecon.box.entity.*;
+import com.wecon.box.entity.Page;
+import com.wecon.box.entity.ViewAccountRole;
+import com.wecon.box.entity.ViewAccountRoleView;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.filter.AlarmCfgViewFilter;
 import com.wecon.box.filter.RealHisCfgViewFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.restful.core.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -16,10 +19,10 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -63,12 +66,12 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
     @Override
     public Page<RealHisCfgViewFilter> getViewRealHisCfgByViewAndAccId(long view_id, long account_id, Integer type,
                                                                       Integer pageIndex, Integer pageSize) {
-        Object[] args0 = new Object[]{account_id, type, view_id,account_id};
+        Object[] args0 = new Object[]{account_id, type, view_id, account_id};
         String sqlCount = "select count(*) from real_his_cfg a WHERE account_id=? AND a.data_type=? AND a.bind_state=1  AND id NOT IN(SELECT cfg_id FROM view_account_role where view_id=?) AND device_id  IN(SELECT device_id FROM dev_bind_user WHERE account_id=? );";
         int totalRecord = jdbcTemplate.queryForObject(sqlCount, args0, Integer.class);
         Page<RealHisCfgViewFilter> page = new Page<RealHisCfgViewFilter>(pageIndex, pageSize, totalRecord);
 
-        Object[] args = new Object[]{account_id, type, view_id,page.getStartIndex(), page.getPageSize()};
+        Object[] args = new Object[]{account_id, type, view_id, page.getStartIndex(), page.getPageSize()};
         String sql = "select a.id, a.state,a.name , a.digit_count,a.addr , a.addr_type,a.describe,b.name from real_his_cfg a ,device b  WHERE b.device_id=a.device_id AND account_id=?  AND a.data_type=? AND a.bind_state=1  AND id NOT IN(SELECT cfg_id FROM view_account_role where view_id=?) AND a.device_id  IN(SELECT device_id FROM dev_bind_user WHERE account_id=a.account_id )  LIMIT ?,?";
         List<RealHisCfgViewFilter> list = jdbcTemplate.query(sql, args, new RowMapper() {
             @Override
@@ -81,7 +84,7 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
                 model.addr = resultSet.getString("addr");
                 model.addr_type = resultSet.getInt("addr_type");
                 model.describe = resultSet.getString("describe");
-                model.deviceName=resultSet.getString("b.name");
+                model.deviceName = resultSet.getString("b.name");
                 return model;
             }
         });
@@ -97,7 +100,7 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
      * '1000021')LIMIT 1, 5;
      */
     public Page<RealHisCfgViewFilter> getViewRealHisCfgByViewAndDeivceId(long account_id, long view_id, long device_id,
-                                                               Integer type, Integer pageIndex, Integer pageSize) {
+                                                                         Integer type, Integer pageIndex, Integer pageSize) {
         Object[] args0 = new Object[]{account_id, type, device_id, view_id};
         String sqlCount = "SELECT COUNT(*) FROM real_his_cfg a WHERE  account_id=?  AND a.data_type = ? AND a.bind_state=1 AND a.device_id =? AND id NOT IN ( SELECT cfg_id FROM view_account_role WHERE view_id = ?)";
         int totalRecord = jdbcTemplate.queryForObject(sqlCount, args0, Integer.class);
@@ -116,7 +119,7 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
                 model.addr = resultSet.getString("addr");
                 model.addr_type = resultSet.getInt("addr_type");
                 model.describe = resultSet.getString("describe");
-                model.deviceName=resultSet.getString("b.name");
+                model.deviceName = resultSet.getString("b.name");
                 return model;
             }
         });
@@ -132,7 +135,7 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
      * = 1000021)
      */
     public Page<AlarmCfgViewFilter> getViewAlarmCfgByViewAndDeivceId(long account_id, long view_id, Integer device_id,
-                                                           Integer pageIndex, Integer pageSize) {
+                                                                     Integer pageIndex, Integer pageSize) {
         Object[] args0 = new Object[]{account_id, device_id, view_id};
         String sqlCount = "SELECT COUNT(*) FROM alarm_cfg a WHERE account_id =?  AND a.bind_state=1 AND a.device_id=? AND a.alarmcfg_id NOT IN (SELECT cfg_id FROM view_account_role WHERE view_id = ?)";
         int totalRecord = jdbcTemplate.queryForObject(sqlCount, args0, Integer.class);
@@ -149,7 +152,7 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
                 model.addr = resultSet.getString("addr");
                 model.addr_type = resultSet.getInt("addr_type");
                 model.text = resultSet.getString("text");
-                model.deviceName=resultSet.getString("b.name");
+                model.deviceName = resultSet.getString("b.name");
                 return model;
             }
         });
@@ -180,7 +183,7 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
                 model.addr = resultSet.getString("addr");
                 model.addr_type = resultSet.getInt("addr_type");
                 model.text = resultSet.getString("text");
-                model.deviceName=resultSet.getString("b.name");
+                model.deviceName = resultSet.getString("b.name");
                 return model;
             }
         });
@@ -214,9 +217,9 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
                 model.role_type = resultSet.getInt("role_type");
                 model.name = resultSet.getString("b.name");
                 model.addr = resultSet.getString("addr");
-                model.data_type=resultSet.getInt("data_type");
+                model.data_type = resultSet.getInt("data_type");
                 model.state = resultSet.getInt("state");
-                model.deviceName=resultSet.getString("c.name");
+                model.deviceName = resultSet.getString("c.name");
                 return model;
             }
         });
@@ -254,33 +257,87 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
         return page;
     }
 
+    public List<Integer> getviewAccountRoleByviewId(Integer viewId) {
+        String sql = "select cfg_id from view_account_role where view_id =? and cfg_type=1";
+        Object[] args = new Object[]{viewId};
+        return jdbcTemplate.query(sql, args, new RowMapper<Integer>() {
+            public Integer mapRow(ResultSet resultSet, int i) throws SQLException {
+                return resultSet.getInt("cfg_id");
+            }
+        });
+    }
+
     /*
      * 为视图账号分配监控监控点
      *
      * @Param cgf_id 1)实时历史监控点 2）报警监控点
      */
-    public void setViewPoint(Integer viewId, String[] ids, String[] rights, Integer cgf_type) {
+    public void setViewPoint(final Integer viewId, final String[] ids, final String[] rights, final Integer cgf_type) {
+        final List<String> resultIds = new ArrayList<String>();
         if (ids.length <= 0) {
             return;
         }
-        if ( rights!=null) {
+        if (rights != null) {
             //实时监控点分配
-            String[] sqls = new String[ids.length];
+            final Map map = new HashMap<Integer, String>();
             for (int i = 0; i < ids.length; i++) {
-                sqls[i] = "INSERT into view_account_role  (view_id,cfg_type,cfg_id,role_type,create_date,update_date) VALUES("
-                        + viewId + "," + cgf_type + "," + ids[i] + " , " + rights[i] + ",current_timestamp(),current_timestamp())";
-                jdbcTemplate.update(sqls[i]);
+                map.put(ids[i], rights[i]);
             }
+            List<Integer> oldIds = getviewAccountRoleByviewId(viewId);
+            if (oldIds != null) {
+                for (Integer vId : oldIds) {
+                    if (map.containsKey(vId)) {
+                        map.remove(vId);
+                    }
+                }
+            } else {
+                for (String id : ids) {
+                    resultIds.add(id);
+                }
+            }
+            final List<String> resultRights = new ArrayList<String>();
+            for (Object in : map.keySet()) {
+                resultIds.add(in + "");
+            }
+            String sql = "INSERT into view_account_role  (view_id,cfg_type,cfg_id,role_type,create_date,update_date) VALUES(" +
+                    "?,? ,? ,?,current_timestamp(),current_timestamp())";
+            jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    ps.setLong(1, viewId);
+                    ps.setInt(2, cgf_type);
+                    ps.setString(3, String.valueOf(resultIds.get(i)));
+                    ps.setString(4, (String) map.get(resultIds.get(i)));
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return resultIds.size();
+                }
+            });
+
+
         } else {
             /*
-		    * 历史 报警监控点分配 （没有权限）
+            * 历史 报警监控点分配 （没有权限）
 		    */
-            String[] sqls = new String[ids.length];
-            for (int i = 0; i < ids.length; i++) {
-                sqls[i] = "INSERT into view_account_role  (view_id,cfg_type,cfg_id,role_type,create_date,update_date) VALUES("
-                        + viewId + "," + cgf_type + "," + ids[i] + " , " + "0,current_timestamp(),current_timestamp())";
-                jdbcTemplate.update(sqls[i]);
-            }
+            String sql = "INSERT into view_account_role  (view_id,cfg_type,cfg_id,role_type,create_date,update_date) VALUES("
+                    + "?,? ,? ,0,current_timestamp(),current_timestamp())";
+            jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    ps.setLong(1, viewId);
+                    ps.setInt(2, cgf_type);
+                    ps.setString(3, ids[i]);
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return ids.length;
+                }
+            });
+
+
         }
 
     }
@@ -336,7 +393,7 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
     }
 
 	/*
-	 * (non-Javadoc)
+     * (non-Javadoc)
 	 *
 	 * @see com.wecon.box.api.ViewAccountRoleApi#deletePoint(java.lang.Integer,
 	 * java.lang.Integer)
@@ -354,35 +411,39 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
     }
 
     @Override
-    public boolean batchDeleteViewAccRoleByCfgId(final List<Long> cfgIds, int type){
-        if(null == cfgIds || cfgIds.size() == 0){
+    public boolean batchDeleteViewAccRoleByCfgId(final List<Long> cfgIds, int type) {
+        if (null == cfgIds || cfgIds.size() == 0) {
             return false;
         }
         StringBuilder idSb = new StringBuilder();
-        for(long id : cfgIds){
+        for (long id : cfgIds) {
             idSb.append(",").append(id);
         }
-        String sql = "delete from view_account_role where cfg_id in("+idSb.substring(1)+") and cfg_type=?";
+        String sql = "delete from view_account_role where cfg_id in(" + idSb.substring(1) + ") and cfg_type=?";
         jdbcTemplate.update(sql, new Object[]{type});
 
         return true;
     }
 
     @Override
-    public ViewAccountRole findViewAccountRoleById(long accId,  Integer cgfId) {
-        String sql="SELECT * FROM view_account_role a WHERE a.cfg_id=? AND a.view_id=? ";
-        Object[] args=new Object[]{cgfId,accId};
-         return jdbcTemplate.queryForObject(sql, args, new RowMapper<ViewAccountRole>() {
+    public ViewAccountRole findViewAccountRoleById(long accId, Integer cgfId) {
+        String sql = "SELECT * FROM view_account_role a WHERE a.cfg_id=? AND a.view_id=? limit 1";
+        Object[] args = new Object[]{cgfId, accId};
+        List<ViewAccountRole> results=jdbcTemplate.query(sql, args, new RowMapper<ViewAccountRole>() {
             @Override
             public ViewAccountRole mapRow(ResultSet resultSet, int i) throws SQLException {
-                ViewAccountRole model=new ViewAccountRole();
-                model.cfg_id=resultSet.getLong("cfg_id");
-                model.cfg_type=resultSet.getInt("cfg_type");
-                model.role_type=resultSet.getInt("role_type");
-                model.view_id=resultSet.getLong("view_id");
+                ViewAccountRole model = new ViewAccountRole();
+                model.cfg_id = resultSet.getLong("cfg_id");
+                model.cfg_type = resultSet.getInt("cfg_type");
+                model.role_type = resultSet.getInt("role_type");
+                model.view_id = resultSet.getLong("view_id");
                 return model;
             }
         });
-
+        if(results!=null){
+            return results.get(0);
+        }else{
+            throw new BusinessException(ErrorCodeOption.ViewPoint_Is_NotFount.key,ErrorCodeOption.ViewPoint_Is_NotFount.value);
+        }
     }
 }

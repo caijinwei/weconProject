@@ -102,10 +102,14 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             $("#showRestOpint").modal("hide");
             return;
         }
+        $("#btn_setViewOpint").attr("disabled","true");
+        $("#btn_cancelSetOption").attr("disabled","true");
         var params = {viewId: viewid.toString(), selectedId: ids, rights: rights};
         T.common.ajax.request("WeconBox", "Viewpoint/setViewPoint", params, function (data, code, msg) {
             if (code == 200) {
                 $("#showRestOpint").modal("hide");
+                $("#btn_setViewOpint").removeAttr("disabled");
+                $("#btn_cancelSetOption").removeAttr("disabled");
                 alert("添加成功");
                 var type = T.common.util.getParameter("type").toString();
                 $scope.showAlreadPoint(type.toString(), viewid.toString());

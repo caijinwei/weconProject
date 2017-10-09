@@ -51,11 +51,15 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             $("#showRestOpint").modal("hide");
             return;
         }
+        $("#btn_setViewOpint").attr("disabled","true");
+        $("#btn_cancelSetOption").attr("disabled","true");
         var params = {viewId: viewid,selectedId: ids,cfg_type:"2"};
         console.log("ids:",params.selectedId);
         T.common.ajax.request("WeconBox", "Viewpoint/setViewHisAlarmPoint", params, function (data, code, msg) {
             if (code == 200) {
                 $("#showRestOpint").modal("hide");
+                $("#btn_setViewOpint").removeAttr("disabled");
+                $("#btn_cancelSetOption").removeAttr("disabled");
                 alert("添加成功");
                 $scope.showViewAlarmpoint(viewid, "1",$scope.paginationConf.pagesLength);
             }
