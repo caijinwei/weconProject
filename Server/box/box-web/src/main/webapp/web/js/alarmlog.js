@@ -118,9 +118,18 @@ appModule
 					 * 提交历史报警接口请求
 					 */
 					$scope.hisalarm_submit = function(pageIndex, pageSize) {
+					
+						var regnum = /^0|[1-9]\d*$/;
+						if ($("#alarmcfgid").val()!="") {
+							if (!regnum.test($("#alarmcfgid").val())) {
+								alert("编码只能是正整数");
+								return;
+							}
+						}
 						$("#loadingModal").modal("show");
 						if (pageIndex == 0)
 							pageIndex = 1;
+
 						var params = {
 							alarm_cfg_id : $("#alarmcfgid").val(),
 							state : 2,

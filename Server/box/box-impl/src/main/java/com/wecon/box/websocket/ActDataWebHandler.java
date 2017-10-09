@@ -243,8 +243,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 						logger.debug("put mqtt : " + message);
 						String topic = "pibox/stc/" + device.machine_code;
 
-						SendvalueCallback sendvalueCallback = new SendvalueCallback(session, addr_id);
-						ClientMQTT reclient = new ClientMQTT(topic, "send" + session.getId(), sendvalueCallback);
+						ClientMQTT reclient = new ClientMQTT(topic, "send" + session.getId());
 						reclient.start();
 
 						reclient.publish(topic, message);
