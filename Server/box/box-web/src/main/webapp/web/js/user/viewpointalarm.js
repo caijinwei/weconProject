@@ -88,10 +88,12 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             pointId: $scope.pointIdParam,
             viewId: viewid
         }
+        $("#btn_deleteOption").attr("disabled","true");
         T.common.ajax.request("WeconBox", "Viewpoint/deletePoint", params, function (data, code, msg) {
             if (code == 200) {
                 var type = T.common.util.getParameter("type");
                 $("#delectOpint").modal("hide");
+                $("#btn_deleteOption").removeAttr("disabled");
                 alert("解除关联操作成功！");
                 $scope.showViewAlarmpoint(viewid, $scope.paginationConf.currentPage, $scope.paginationConf.pagesLength);
             }
