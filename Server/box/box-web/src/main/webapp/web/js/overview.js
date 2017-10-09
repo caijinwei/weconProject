@@ -30,7 +30,7 @@ appModule
 												alert(code + " " + msg);
 											}
 										}, function() {
-											alert("ajax error");
+											console.log("ajax error");
 										});
 					}
 				});

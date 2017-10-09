@@ -114,7 +114,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $btn.removeAttribute("disabled");
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
             $btn.removeAttribute("disabled");
         });
     }
@@ -136,7 +136,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 alert(msg);
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
 

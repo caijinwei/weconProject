@@ -86,7 +86,7 @@ appModule
 														.modal("hide");
 											}
 										}, function() {
-											alert("ajax error");
+											console.log("ajax error");
 										});
 					}
 				});

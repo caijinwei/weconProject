@@ -111,7 +111,7 @@ appModule
 											}
 										}, function() {
 											$("#loadingModal").modal("hide");
-											alert("ajax error");
+											console.log("ajax error");
 										});
 					}
 					/**
@@ -153,7 +153,7 @@ appModule
 											}
 										}, function() {
 											$("#loadingModal").modal("hide");
-											alert("ajax error");
+											console.log("ajax error");
 										});
 					}
 
@@ -215,7 +215,7 @@ appModule
 												alert(code + "-" + msg);
 											}
 										}, function() {
-											alert("ajax error");
+											console.log("ajax error");
 										});
 					}
 
@@ -245,7 +245,7 @@ appModule
 										alert(code + "-" + msg);
 									}
 								}, function() {
-									alert("ajax error");
+									console.log("ajax error");
 								});
 					}
 
@@ -284,7 +284,7 @@ appModule
 										alert(code + "-" + msg);
 									}
 								}, function() {
-									alert("ajax error");
+									console.log("ajax error");
 								});
 					}
 					// 获取删除分组名称
@@ -316,7 +316,7 @@ appModule
 										alert(code + "-" + msg);
 									}
 								}, function() {
-									alert("ajax error");
+									console.log("ajax error");
 								});
 					}
 
@@ -405,7 +405,7 @@ appModule
 												alert(code + "-" + msg);
 											}
 										}, function() {
-											alert("ajax error");
+											console.log("ajax error");
 										});
 					}
 					/**
@@ -423,7 +423,7 @@ appModule
 										alert(code + "-" + msg);
 									}
 								}, function() {
-									alert("ajax error");
+									console.log("ajax error");
 								});
 
 					}
@@ -889,7 +889,7 @@ appModule
 												alert(code + "-" + msg);
 											}
 										}, function() {
-											alert("ajax error");
+											console.log("ajax error");
 										});
 
 					}
@@ -1045,7 +1045,7 @@ appModule
 												alert(code + "-" + msg);
 											}
 										}, function() {
-											alert("ajax error");
+											console.log("ajax error");
 										});
 
 					}
@@ -1311,7 +1311,7 @@ appModule
 												alert(code + "-" + msg);
 											}
 										}, function() {
-											alert("ajax error");
+											console.log("ajax error");
 										});
 					}
 					/**
@@ -1773,7 +1773,7 @@ appModule
 												alert(code + "-" + msg);
 											}
 										}, function() {
-											alert("ajax error");
+											console.log("ajax error");
 										});
 
 					}
@@ -1801,7 +1801,7 @@ appModule
 												alert(code + "-" + msg);
 											}
 										}, function() {
-											alert("ajax error");
+											console.log("ajax error");
 										});
 
 					}

@@ -23,7 +23,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
                 $("#loadingModal").modal("hide");
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
     /**
@@ -62,7 +62,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
                         $("#addGroup").modal("hide");
                     }
                 }, function () {
-                    alert("ajax error");
+                    console.log("ajax error");
                 });
             }
         }
@@ -97,7 +97,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
                 $("#addGroup").modal("hide");
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
 })

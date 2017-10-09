@@ -55,7 +55,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
                 $("#loadingModal").modal("hide");
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
 
@@ -91,7 +91,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             $("#loadingModal").modal("hide");
             $("#addViewAccount").modal("hide");
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
 
@@ -122,7 +122,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
                         $("#loadingModal").modal("hide");
                     }
                 }, function () {
-                    alert("ajax error");
+                    console.log("ajax error");
                 });
             }
         },
@@ -170,7 +170,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
                 $("#loadingModal").modal("hide");
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
     /*
@@ -204,7 +204,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
                 $("#chgAccountState").modal("hide");
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
     /*
@@ -251,7 +251,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
                 $("#chgAccountState").modal("hide");
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     };
 });
