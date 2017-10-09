@@ -72,7 +72,7 @@ appModule
 											}
 										}, function() {
 											$("#loadingModal").modal("hide");
-											alert("ajax error");
+											console.log("ajax error");
 										});
 					}
 

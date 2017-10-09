@@ -81,7 +81,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 alert(code + "-" + msg);
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
 

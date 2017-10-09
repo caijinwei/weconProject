@@ -48,4 +48,9 @@ public class ConstKey {
      * mqtt服务端下发给盒子的主题
      */
     public final static String MQTT_SERVER_TOPICE = "pibox/stc/%s";
+
+    /**
+     * 保存帐号登陆失败次数，过期时间设置为30分钟，默认失败5次后，需要等待30分钟才能登陆
+     */
+    public final static String REDIS_SIGNIN_ERROR_TIMES = "pibox:signinerror:%s";
 }

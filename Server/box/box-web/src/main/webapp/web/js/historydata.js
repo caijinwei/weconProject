@@ -95,7 +95,7 @@ appModule
 								}, function() {
 									$("#loadingModal").modal("hide");
 
-									alert("ajax error");
+									console.log("ajax error");
 								});
 					}
 					$scope.paginationConf = {
@@ -209,7 +209,7 @@ appModule
 														.modal("hide");
 											}
 										}, function() {
-											alert("ajax error");
+											console.log("ajax error");
 										});
 					}
 					// 原始数据界面，列表视图、曲线视图
@@ -321,7 +321,7 @@ appModule
 												alert(code + "-" + msg);
 											}
 										}, function() {
-											alert("ajax error");
+											console.log("ajax error");
 										});
 					}
 					/**
@@ -339,7 +339,7 @@ appModule
 										alert(code + "-" + msg);
 									}
 								}, function() {
-									alert("ajax error");
+									console.log("ajax error");
 								});
 
 					}
@@ -635,7 +635,7 @@ appModule
 												alert(code + "-" + msg);
 											}
 										}, function() {
-											alert("ajax error");
+											console.log("ajax error");
 										});
 
 					}
@@ -1396,7 +1396,7 @@ appModule
 												alert(code + "-" + msg);
 											}
 										}, function() {
-											alert("ajax error");
+											console.log("ajax error");
 										});
 
 					}
@@ -1432,7 +1432,7 @@ appModule
 												alert(code + "-" + msg);
 											}
 										}, function() {
-											alert("ajax error");
+											console.log("ajax error");
 										});
 					}
 
@@ -1465,7 +1465,7 @@ appModule
 												alert(code + "-" + msg);
 											}
 										}, function() {
-											alert("ajax error");
+											console.log("ajax error");
 										});
 
 					}

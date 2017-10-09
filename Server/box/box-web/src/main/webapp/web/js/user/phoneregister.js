@@ -44,7 +44,7 @@ $(function () {
                 $btn.removeAttribute("disabled");
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
             $btn.removeAttribute("disabled");
         });
     })

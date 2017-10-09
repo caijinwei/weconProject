@@ -6,6 +6,7 @@ import com.wecon.box.entity.Account;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
+import com.wecon.common.redis.RedisManager;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.BusinessException;
@@ -31,6 +32,22 @@ public class SigninAction extends UserBaseAction {
     @WebApi(forceAuth = false, master = true)
     public Output signin(@Valid SigninParam param) {
         Client client = AppContext.getSession().client;
+
+        //<editor-fold desc="记录登录次数，如果登录成功就删除记录">
+        String redisKey = String.format(ConstKey.REDIS_SIGNIN_ERROR_TIMES, param.alias);
+        String times = RedisManager.get(ConstKey.REDIS_GROUP_NAME, redisKey);
+        if (times != null) {
+            if (Integer.valueOf(times) > 5) {
+                throw new BusinessException(ErrorCodeOption.Login_Error_Many_Times.key, ErrorCodeOption.Login_Error_Many_Times.value);
+            } else {
+                times = String.valueOf(Integer.valueOf(times) + 1);
+            }
+        } else {
+            times = "1";
+        }
+        RedisManager.set(ConstKey.REDIS_GROUP_NAME, redisKey, times, 1800);//保存半小时
+
+        //</editor-fold>
 
         Account user = accountApi.getAccount(param.alias);
         if (user == null) {
@@ -58,6 +75,7 @@ public class SigninAction extends UserBaseAction {
         //<editor-fold desc="操作日志">
         dbLogUtil.addOperateLog(OpTypeOption.Signin, ResTypeOption.Account, user.account_id, null);
         //</editor-fold>
+        RedisManager.del(ConstKey.REDIS_GROUP_NAME, redisKey);
 
         return new Output(data);
     }

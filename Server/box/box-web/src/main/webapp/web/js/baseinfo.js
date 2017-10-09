@@ -42,7 +42,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 alert(code + "-" + msg);
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
     /*
@@ -61,7 +61,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 alert(code + "-" + msg);
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
 
@@ -86,7 +86,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 alert(code + "-" + msg);
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
     /*
@@ -117,7 +117,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 alert(code + "-" + msg);
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
     /*
@@ -195,7 +195,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 alert(code + "-" + msg);
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
 
@@ -307,7 +307,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 alert(code + "-" + msg);
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
     /*
@@ -343,7 +343,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 alert(code + "-" + msg);
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
     /*
@@ -466,7 +466,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 alert(code + "-" + msg);
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     };
     /*
@@ -489,7 +489,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 alert(code + "-" + msg);
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
     /*
@@ -604,7 +604,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 alert(code + "-" + msg);
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
 
@@ -655,7 +655,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 alert(code + "-" + msg);
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
     //更新操作
@@ -705,7 +705,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 alert(code + "-" + msg);
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
 
@@ -735,7 +735,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 alert(code + "-" + msg);
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
     //更新 plc全部驱动
@@ -757,7 +757,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 alert(code + "-" + msg);
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
 
@@ -795,7 +795,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 alert(code + "-" + msg);
             }
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
     $scope.updateFirFile = function (device_id) {
@@ -817,7 +817,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             $("#checkUpdateFir").modal("hide");
             alert("指令已下发盒子成功！");
         }, function () {
-            alert("ajax error");
+            console.log("ajax error");
         });
     }
 
