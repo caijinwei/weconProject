@@ -305,10 +305,10 @@ public class DeviceImpl implements DeviceApi {
         // 获取管理员下的分组列表
         List<String[]> groupLst = jdbcTemplate.query(
                 "SELECT ad.id, ad.`name` FROM account_dir ad WHERE ad.type=0 and ad.account_id=?",
-                new Object[]{acc_id}, new RowMapper() {
+                new Object[] { acc_id }, new RowMapper() {
                     @Override
                     public Object mapRow(ResultSet rs, int i) throws SQLException {
-                        return new String[]{rs.getLong("id") + "", rs.getString("name")};
+                        return new String[] { rs.getLong("id") + "", rs.getString("name") };
                     }
                 });
         if (null == groupLst) {
@@ -316,14 +316,14 @@ public class DeviceImpl implements DeviceApi {
         }
         // 获取管理员下盒子列表
         List<String[]> deviceLst = jdbcTemplate.query(
-                "SELECT d.device_id, d.`name`, d.map, adr.acc_dir_id "
+                "SELECT d.device_id, d.`name`, d.map, d.state, adr.acc_dir_id "
                         + "FROM dev_bind_user dbu, device d, account_dir_rel adr "
                         + "WHERE adr.ref_id=d.device_id and dbu.device_id=d.device_id and dbu.account_id=?",
-                new Object[]{acc_id}, new RowMapper() {
+                new Object[] { acc_id }, new RowMapper() {
                     @Override
                     public Object mapRow(ResultSet rs, int i) throws SQLException {
-                        return new String[]{rs.getLong("device_id") + "", rs.getString("name"), rs.getString("map"),
-                                rs.getLong("acc_dir_id") + ""};
+                        return new String[] { rs.getLong("device_id") + "", rs.getString("name"), rs.getString("map"),
+                                rs.getLong("acc_dir_id") + "", rs.getInt("state")+"" };
                     }
                 });
         if (null == deviceLst) {
@@ -340,6 +340,7 @@ public class DeviceImpl implements DeviceApi {
                     dm.put("boxId", device[0]);
                     dm.put("boxName", device[1]);
                     dm.put("map", device[2]);
+                    dm.put("state", device[4]);
                     l.add(dm);
                 }
             }
