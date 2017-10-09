@@ -93,7 +93,9 @@
 					<div class="row">
 						<span class="col-md-1" style="height: 30px; line-height: 30px;">编码</span>
 						<input id="alarmcfgid" class="col-md-3" type="text"
-							style="padding-left: 5px; height: 35px;" /> <span
+							style="padding-left: 5px; height: 35px;"
+							onkeyup="this.value=this.value.replace(/\D/g,'')"
+							onafterpaste="this.value=this.value.replace(/\D/g,'')" /> <span
 							class="col-md-1"
 							style="height: 30px; line-height: 30px; margin-left: 30px">名称</span>
 						<input id="alarmcfgname" class="col-md-3" type="text"
@@ -339,7 +341,8 @@
 								<div class="container-fluid">
 									<div class="form-group">
 										<input id="editid" type="text" class="form-control"
-											placeholder="请输入少于15位字符的名称" style="padding-left: 5px;" maxlength="15">
+											placeholder="请输入少于15位字符的名称" style="padding-left: 5px;"
+											maxlength="15">
 									</div>
 
 								</div>
@@ -367,7 +370,8 @@
 								<div class="container-fluid">
 									<div class="form-group">
 										<input id="newGroupName" type="text" class="form-control"
-											placeholder="请输入少于15位字符的名称"  style="padding-left: 5px;" maxlength="15">
+											placeholder="请输入少于15位字符的名称" style="padding-left: 5px;"
+											maxlength="15">
 									</div>
 								</div>
 							</div>
@@ -399,7 +403,8 @@
 										style="margin: 10px 0;">
 										<span class="col-md-3">名称</span> <input id="nameid"
 											type="text" class="col-md-9"
-											style="height: 30px; padding-left: 5px;" placeholder="请输入少于50位的字符"  maxlength="50"/>
+											style="height: 30px; padding-left: 5px;"
+											placeholder="请输入少于50位的字符" maxlength="50" />
 									</div>
 									<div class="row col-md-11 col-md-offset-1"
 										style="margin: 10px 0;">
@@ -513,7 +518,8 @@
 										style="margin: 10px 0;">
 										<span class="col-md-3">报警内容</span> <input type="text"
 											id="alarmtextid" class="col-md-9"
-											style="height: 30px; padding-left: 5px;" placeholder="请输入少于249位的字符"  maxlength="249" />
+											style="height: 30px; padding-left: 5px;"
+											placeholder="请输入少于249位的字符" maxlength="249" />
 									</div>
 								</div>
 							</div>
