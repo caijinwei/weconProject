@@ -223,7 +223,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         var params = {
             plc_id: $("#plc_id").val(),
             device_id: $("#device_id").val(),
-            type: $("#type").val(),
+            type:$("#type").val(),
             driver: $("#driver").val(),
             box_stat_no: $("#box_stat_no").val(),
             plc_stat_no: $("#plc_stat_no").val(),
@@ -248,7 +248,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             driver: $('#driver').val()
         };
         var selectport = $("#port").val();
-        if (params.device_id == "" || params.type == "" || params.driver == "" || params.box_stat_no == "" || params.plc_stat_no == "" || params.port == "" || params.retry_times == ""
+        if (params.device_id == "" || params.type == ""|| $scope.selectedType==""|| $scope.selectedPtype=="" || $("#ptype").val()=="" || params.driver == "" || params.box_stat_no == "" || params.plc_stat_no == "" || params.port == "" || params.retry_times == ""
             || params.wait_timeout == "" || params.rev_timeout == "" || params.com_stepinterval == "" || params.com_iodelaytime == "" || params.retry_timeout == "") {
             alert("配置参数填未填写");
             return;

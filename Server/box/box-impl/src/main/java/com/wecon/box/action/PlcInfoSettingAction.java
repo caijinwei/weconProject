@@ -238,7 +238,7 @@ public class PlcInfoSettingAction {
                 plcInfoApi.updatePlcInfo(plcInfo);
             }
             // <editor - fold desc = "操作日志" >
-            dbLogUtil.updOperateLog(OpTypeOption.UpdatePlc,ResTypeOption.Plc,oldPlc.plc_id,plcInfo,oldPlc);
+            dbLogUtil.updOperateLog(OpTypeOption.UpdatePlc,ResTypeOption.Plc,oldPlc.plc_id,oldPlc,plcInfo);
             //</editor-fold>
         } else {
             plcInfo.state = 1;
