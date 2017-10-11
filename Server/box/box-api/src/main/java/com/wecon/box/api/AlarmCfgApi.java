@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lanpenghui 2017年8月1日
@@ -134,4 +135,6 @@ public interface AlarmCfgApi {
     * 根据通讯口plcId查找监控点
     * */
     public List<AlarmCfg> getAlarmByPlcId(long plc_id);
+
+    List<Map> getAlarmCfgByIds(List<Long> ids);
 }

@@ -366,6 +366,8 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 
 	}
 
+
+
 	public static final class DefaultAlarmCfgDataRowMapper implements RowMapper<AlarmCfgData> {
 
 		@Override

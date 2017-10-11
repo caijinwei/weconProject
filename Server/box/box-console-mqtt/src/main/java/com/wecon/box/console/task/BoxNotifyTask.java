@@ -367,7 +367,7 @@ public class BoxNotifyTask extends Thread {
                         plcInfoApi.batchUpdateFileMd5(fUpdArgs);
 
                         //状态为4的删除监控点下的配置
-                        List<Long> plcIds = plcInfoApi.getDeleteIdsByUpdTime(getFeedbackDelArgs(updComList, "com", null));
+                        /*List<Long> plcIds = plcInfoApi.getDeleteIdsByUpdTime(getFeedbackDelArgs(updComList, "com", null));
                         if(null != plcIds){
                             for(Long id : plcIds){
                                 for(Map.Entry<Long, PlcExtend> entry : plcCfgCache.entrySet()){
@@ -381,7 +381,7 @@ public class BoxNotifyTask extends Thread {
                             realHisCfgApi.batchDeleteByPlcId(plcIds);
                             alarmCfgDataApi.batchDeleteByPlcId(plcIds);
                             realHisCfgDataApi.batchDeleteByPlcId(plcIds);
-                        }
+                        }*/
 
                         //删除缓存数据
                         removePlcCache(fUpdArgs);
