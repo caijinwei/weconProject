@@ -1,7 +1,9 @@
 package com.wecon.box.util;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.wecon.box.entity.AlarmCfgData;
 import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.Client;
 import org.apache.http.HttpResponse;
@@ -14,12 +16,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import sun.misc.BASE64Encoder;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by whp on 2017/9/18.
  */
 public class JPushServer {
-    private String masterSecret = "d2239ac3149b0c456681afa0";
-    private String appKey = "b963df28b70c3291c1657aeb";
+    private String masterSecret = "c4cc5cbbebcb20541c983cc6";
+    private String appKey = "952963faa8710180979ac5c5";
     private String pushUrl = "https://api.jpush.cn/v3/push";
     private boolean apns_production = true;
     private int time_to_live = 86400;
@@ -29,9 +35,10 @@ public class JPushServer {
      * 推送操作
      */
     public void push(String alert){
-        Client client = AppContext.getSession().client;
-        String alias = client.userId+"";//声明别名
+        String alias = null;
         try{
+            Client client = AppContext.getSession().client;
+            alias = client.account;//声明别名
             String result = push(pushUrl, alias, alert, appKey, masterSecret, apns_production, time_to_live);
             System.out.print(result);
             JSONObject resData = JSONObject.parseObject(result);
@@ -66,18 +73,18 @@ public class JPushServer {
 
         JSONObject notification = new JSONObject();//通知内容
         JSONObject android = new JSONObject();//android通知内容
-        android.put("alert", alert);
+        android.put("alert", "有新的报警数据");
         android.put("builder_id", 1);
         JSONObject android_extras = new JSONObject();//android额外参数
-        android_extras.put("type", "infomation");
+        android_extras.put("type", "alias");
         android.put("extras", android_extras);
 
         JSONObject ios = new JSONObject();//ios通知内容
-        ios.put("alert", alert);
+        ios.put("alert", "有新的报警数据");
         ios.put("sound", "default");
         ios.put("badge", "+1");
         JSONObject ios_extras = new JSONObject();//ios额外参数
-        ios_extras.put("type", "infomation");
+        ios_extras.put("type", "alias");
         ios.put("extras", ios_extras);
         notification.put("android", android);
         notification.put("ios", ios);
@@ -86,9 +93,14 @@ public class JPushServer {
         options.put("time_to_live", Integer.valueOf(time_to_live));
         options.put("apns_production", apns_production);
 
+        JSONObject message = new JSONObject();
+        message.put("title", alert);
+        message.put("msg_content", alert);
+
         json.put("platform", platform);
         json.put("audience", audience);
         json.put("notification", notification);
+        json.put("message", message);
         json.put("options", options);
         return json;
 
@@ -143,5 +155,18 @@ public class JPushServer {
         BASE64Encoder base64Encoder = new BASE64Encoder();
         String strs = base64Encoder.encodeBuffer(key);
         return strs;
+    }
+
+    public static void main(String[] arg){
+        List<AlarmCfgData> listInsertAlarmCfgData = new ArrayList<AlarmCfgData>();
+        for(int i=0;i<5;i++){
+            AlarmCfgData alarmCfgData = new AlarmCfgData();
+            alarmCfgData.alarm_cfg_id = i;
+            alarmCfgData.value = "5"+i;
+            alarmCfgData.monitor_time = Timestamp.valueOf("2015-02-15 20:25:30");
+            alarmCfgData.state = 1;
+            listInsertAlarmCfgData.add(alarmCfgData);
+        }
+        new JPushServer().push(JSON.toJSONString(listInsertAlarmCfgData));
     }
 }

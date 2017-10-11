@@ -182,7 +182,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 					stateText = "离线";
 				}else{
 					if(realHisCfgDevice.state != Constant.State.STATE_SYNCED_BOX){
-						stateText = "未同步";
+						stateText = "未下发";
 					}
 				}
 				if (null != actTimeDataList) {

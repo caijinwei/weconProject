@@ -40,7 +40,7 @@ public class Constant {
         /**
          * 盒子离线状态
          */
-        public static final int STATE_BOX_OFFLINE = 1;
+        public static final int STATE_BOX_OFFLINE = 0;
 
         /**
          * 监控点离线状态
