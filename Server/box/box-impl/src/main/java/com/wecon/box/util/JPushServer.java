@@ -24,8 +24,8 @@ import java.util.List;
  * Created by whp on 2017/9/18.
  */
 public class JPushServer {
-    private String masterSecret = "d2239ac3149b0c456681afa0";
-    private String appKey = "b963df28b70c3291c1657aeb";
+    private String masterSecret = "c4cc5cbbebcb20541c983cc6";
+    private String appKey = "952963faa8710180979ac5c5";
     private String pushUrl = "https://api.jpush.cn/v3/push";
     private boolean apns_production = true;
     private int time_to_live = 86400;
@@ -35,10 +35,10 @@ public class JPushServer {
      * 推送操作
      */
     public void push(String alert){
-        String alias = "zzp";
+        String alias = null;
         try{
-            /*Client client = AppContext.getSession().client;
-            alias = client.account;//声明别名*/
+            Client client = AppContext.getSession().client;
+            alias = client.account;//声明别名
             String result = push(pushUrl, alias, alert, appKey, masterSecret, apns_production, time_to_live);
             System.out.print(result);
             JSONObject resData = JSONObject.parseObject(result);
