@@ -3,7 +3,9 @@ package com.wecon.box.console.task;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import com.wecon.box.api.*;
 import com.wecon.box.util.JPushServer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,12 +21,6 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
-import com.wecon.box.api.AlarmCfgDataApi;
-import com.wecon.box.api.DevFirmApi;
-import com.wecon.box.api.DeviceApi;
-import com.wecon.box.api.RealHisCfgApi;
-import com.wecon.box.api.RealHisCfgDataApi;
-import com.wecon.box.api.RedisPiBoxApi;
 import com.wecon.box.console.config.ConnectOptions;
 import com.wecon.box.console.util.MqttConfigContext;
 import com.wecon.box.console.util.SpringContextHolder;
@@ -378,6 +374,7 @@ public class MonitorTask extends Thread {
 				if (null == listPiBoxCom || listPiBoxCom.size() < 1) {
 					return;
 				}
+				List<Long> alarmCfgIds = new ArrayList<Long>();
 				for (int j = 0; j < listPiBoxCom.size(); j++) {
 					List<PiBoxComAddr> listPiBoxComAddr = listPiBoxCom.get(j).addr_list;
 					if (null == listPiBoxComAddr || listPiBoxComAddr.size() < 1) {
@@ -404,6 +401,7 @@ public class MonitorTask extends Thread {
 						alarmCfgData.monitor_time = Timestamp.valueOf(jsonAlarm.getString("time"));
 						alarmCfgData.state = Integer.valueOf(piBoxComAddr.state);
 						listInsertAlarmCfgData.add(alarmCfgData);
+						alarmCfgIds.add(alarmCfgData.alarm_cfg_id);
 					}
 					if (listInsertAlarmCfgData.size() > 0) {
 
@@ -411,8 +409,6 @@ public class MonitorTask extends Thread {
 							// 批量保存报警数据成功
 							alarmCfgDataApi.saveAlarmCfgData(listInsertAlarmCfgData);
 							System.out.println("alarmCfgData add success !");
-							//极光推送给客户端
-							new JPushServer().push(JSON.toJSONString(listInsertAlarmCfgData));
 							if (jsonObject.getInteger("feedback") == 1) {
 								SendMessage(machineCode, ALARM_DATA);
 							}
@@ -425,6 +421,11 @@ public class MonitorTask extends Thread {
 					}
 
 				}
+
+				AlarmCfgApi alarmCfgApi = SpringContextHolder.getBean(AlarmCfgApi.class);
+				List<Map> alarmCfgLst = alarmCfgApi.getAlarmCfgByIds(alarmCfgIds);
+				//极光推送给客户端
+				new JPushServer().push(JSON.toJSONString(alarmCfgLst));
 
 				break;
 			case WILL_DATA:

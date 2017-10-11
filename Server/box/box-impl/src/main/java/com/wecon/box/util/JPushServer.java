@@ -18,7 +18,9 @@ import sun.misc.BASE64Encoder;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by whp on 2017/9/18.
@@ -35,10 +37,10 @@ public class JPushServer {
      * 推送操作
      */
     public void push(String alert){
-        String alias = null;
+        String alias = "zzp";
         try{
-            Client client = AppContext.getSession().client;
-            alias = client.account;//声明别名
+            /*Client client = AppContext.getSession().client;
+            alias = client.account;//声明别名*/
             String result = push(pushUrl, alias, alert, appKey, masterSecret, apns_production, time_to_live);
             System.out.print(result);
             JSONObject resData = JSONObject.parseObject(result);
@@ -158,15 +160,17 @@ public class JPushServer {
     }
 
     public static void main(String[] arg){
-        List<AlarmCfgData> listInsertAlarmCfgData = new ArrayList<AlarmCfgData>();
+        List<Map> list = new ArrayList<>();
         for(int i=0;i<5;i++){
-            AlarmCfgData alarmCfgData = new AlarmCfgData();
-            alarmCfgData.alarm_cfg_id = i;
-            alarmCfgData.value = "5"+i;
-            alarmCfgData.monitor_time = Timestamp.valueOf("2015-02-15 20:25:30");
-            alarmCfgData.state = 1;
-            listInsertAlarmCfgData.add(alarmCfgData);
+            Map data = new HashMap();
+            data.put("boxId", 120+i);
+            data.put("monitorId", i);
+            data.put("monitorName", "test"+i);
+            data.put("monitorTime", Timestamp.valueOf("2015-02-15 20:25:30"));
+            data.put("state", 1);
+            data.put("number", "5"+i);
+            list.add(data);
         }
-        new JPushServer().push(JSON.toJSONString(listInsertAlarmCfgData));
+        new JPushServer().push(JSON.toJSONString(list));
     }
 }

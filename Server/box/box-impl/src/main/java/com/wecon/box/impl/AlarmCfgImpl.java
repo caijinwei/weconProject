@@ -19,7 +19,9 @@ import org.springframework.stereotype.Component;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lanpenghui 2017年8月9日下午2:20:05
@@ -533,4 +535,32 @@ public class AlarmCfgImpl implements AlarmCfgApi {
         return null;
     }
 
+	public List<Map> getAlarmCfgByIds(List<Long> ids) {
+		if (null == ids || ids.size() == 0) {
+			return null;
+		}
+
+		StringBuilder idSb = new StringBuilder();
+		for (long id : ids) {
+			idSb.append(",").append(id);
+		}
+		String sql = "select ac.device_id, ac.name, acd.alarm_cfg_id, acd.monitor_time, acd.value, acd.state from alarm_cfg ac, alarm_cfg_data acd where ac.alarmcfg_id = acd.alarm_cfg_id and ac.alarmcfg_id in("+idSb.substring(1)+")";
+		List<Map> list = jdbcTemplate.query(sql, new RowMapper() {
+			@Override
+			public Object mapRow(ResultSet rs, int i) throws SQLException {
+				Map data = new HashMap();
+				data.put("boxId", rs.getLong("device_id"));
+				data.put("monitorId", rs.getLong("alarm_cfg_id"));
+				data.put("monitorName", rs.getString("name"));
+				data.put("monitorTime", rs.getTimestamp("monitor_time"));
+				data.put("state", rs.getInt("state"));
+				data.put("number", rs.getString("value"));
+				return data;
+			}
+		});
+		if (!list.isEmpty()) {
+			return list;
+		}
+		return null;
+	}
 }
