@@ -126,10 +126,14 @@ public class LogAccountImpl implements LogAccountApi {
         Date now = new Date();
         log.account_id = AppContext.getSession().client.userId;
         log.username = AppContext.getSession().client.account;
-        log.url = AppContext.getSession().request.getRequestURL().toString();
-        log.client_platform = AppContext.getSession().client.platform.value;
         log.client_ip = IpAddrHelper.convertLongToIP(AppContext.getSession().client.ip);
         log.op_date = Integer.valueOf(dateFormat.format(now));
+        log.client_platform = AppContext.getSession().client.platform.value;
+        try {
+            log.url = AppContext.getSession().request.getRequestURL().toString();
+        } catch (Exception ex) {
+            log.url = "websockect request";
+        }
         //</editor-fold>
         return log;
     }
