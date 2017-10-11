@@ -325,7 +325,7 @@ public class MonitorTask extends Thread {
 							if (historyData != null) {
 								logger.info("mqtt代理服务器发的缓存数据，直接忽略！");
 								System.out.println("mqtt代理服务器发的缓存数据，直接忽略！");
-								return;
+								continue;
 							}
 							realHisCfgData = new RealHisCfgData();
 							realHisCfgData.monitor_time = Timestamp.valueOf(piBoxHisComAddr.time);
@@ -392,7 +392,7 @@ public class MonitorTask extends Thread {
 						if (alarmData != null) {
 							logger.info("mqtt代理服务器发的缓存数据，直接忽略！");
 							System.out.println("mqtt代理服务器发的缓存数据，直接忽略！");
-							return;
+							continue;
 
 						}
 						alarmCfgData = new AlarmCfgData();
