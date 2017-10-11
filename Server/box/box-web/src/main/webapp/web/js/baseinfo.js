@@ -695,7 +695,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                         count = parseInt(data.frimUpcount.count) + parseInt(count);
                     }
                     $scope.wsf_connect(data.machine_code.toString(), count.toString(), data.resultData);
-                    console.log("获取到准备下发的数值", data.resultData);
                     //$("#loadingModal").modal("show");
                 } else {
                     $("#checkUpdateFir").modal("hide");

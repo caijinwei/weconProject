@@ -60,7 +60,6 @@ appModule.controller("listController", function ($scope, $http, $compile) {
             if (code == 200) {
                 $scope.conf.totalItems = data.page.totalRecord;
                 $scope.resrPointDatas = data.page.list;
-                console.log("获取到的list:",data.page.list);
                 $scope.$apply();
             }
             else {

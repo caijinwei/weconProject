@@ -139,25 +139,25 @@
 			</div>
 
 			<ul id="side_nav" ng-cloak ng-if="type==1">
-				<li><a id="customid" ng-click="custom()"
+				<li><a id="customid" ng-click="custom()" target="content_frame"
 					href="datamonitor.html?device_id=-100&device_name=自定义监控点"
 					target="content_frame">
 					<span
 						class="glyphicon glyphicon-eye-open " id="customspanid"> 自定义监控点</span>
 				</a></li>
 
-				<li ng-repeat="x in allDatas"><a href="#"
+				<li ng-repeat="x in allDatas" class="boxDir"><a href="#"
 					ng-click="sideclick(x);" ondrop="drop(event)"
 					ondragover="allowDrop(event)"> <span
 						class="glyphicon glyphicon-folder-close "
 						id="spanid_{{x.accountdirId}}"> {{x.accountdirName}} </span>
 				</a>
 					<ul id="dir_ul_{{x.accountdirId}}" sid="{{x.accountdirId}}">
-						<a id="box_{{y.deviceId}}"
+						<a id="box_{{y.deviceId}}" target="box-map"
 							href="datamonitor.html?device_id={{y.deviceId}}&device_name={{y.deviceName}}"
 							data_devid="{{y.deviceId}}" draggable="true" ondragstart="drag(event)"
 							ng-click="selectbox(y.deviceId)" class="list-group-item"
-							target="content_frame" ng-repeat="y in x.deviceList"><i name="i_box" class="fa  fa-circle" ng-class="{true:'onlineIcon',false:'offlineIcon'}[y.deviceState==1]" data-toggle="tooltip" title="{{y.deviceState==1?'在线':'离线'}}"></i>{{y.deviceName}}</a>
+							 ng-repeat="y in x.deviceList"><i name="i_box" class="fa  fa-circle" ng-class="{true:'onlineIcon',false:'offlineIcon'}[y.deviceState==1]" data-toggle="tooltip" title="{{y.deviceState==1?'在线':'离线'}}"></i>{{y.deviceName}}</a>
 					</ul></li>
 
 			</ul>
@@ -214,5 +214,23 @@
 	<script src="../lib/angular/angular.min.js" type="text/javascript"></script>
 	<script src="../lib/wecon-common.js" type="text/javascript"></script>
 	<script src="../js/main.js" type="text/javascript"></script>
+	<script src="../lib/jquery/context/js/context.js"></script>
+	<script type="text/javascript">
+		$(function() {
+			//            右键菜单初始化
+			context.init({
+				fadeSpeed: 100,
+				filter: function ($obj) {
+				},
+				above: 'auto',
+				preventDoubleContext: true,
+				compress: false
+			});
+			//            绑定对象，更多用法：http://www.jq22.com/yanshi322
+			context.attach('#side_nav li :gt(1) a', [
+				{text: '定位', href: 'box-map.html', target: "content_frame"}
+			])
+		});
+	</script>
 </body>
 </html>

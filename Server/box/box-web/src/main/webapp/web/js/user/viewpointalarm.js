@@ -54,7 +54,6 @@ appModule.controller("listController", function ($scope, $http, $compile) {
         $("#btn_setViewOpint").attr("disabled","true");
         $("#btn_cancelSetOption").attr("disabled","true");
         var params = {viewId: viewid,selectedId: ids,cfg_type:"2"};
-        console.log("ids:",params.selectedId);
         T.common.ajax.request("WeconBox", "Viewpoint/setViewHisAlarmPoint", params, function (data, code, msg) {
             if (code == 200) {
                 $("#showRestOpint").modal("hide");

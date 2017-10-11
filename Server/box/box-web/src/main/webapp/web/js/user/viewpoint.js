@@ -187,7 +187,6 @@ appModule.controller("listController", function ($scope, $http, $compile) {
      * 展示剩余监控点设置iframe的url属性
      * */
     $scope.showRestList = function () {
-        console.log();
         var path = "../user/viewpointTable.html?type=" + $scope.type + "&viewid=" + $scope.viewid;
         $("#myiframe").attr('src', path);
     }
