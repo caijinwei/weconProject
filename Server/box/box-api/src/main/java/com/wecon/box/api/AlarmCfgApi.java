@@ -43,7 +43,7 @@ public interface AlarmCfgApi {
     /**
      * 获取报警配置对象
      *
-     * @param alarmcfg_id
+     * @param device_id name
      * @return
      */
     public AlarmCfg getAlarmcfg(long device_id, String name);
@@ -126,7 +126,12 @@ public interface AlarmCfgApi {
     public int getAlamBxo(long account_id);
 
     /*
-    * 删除通讯口下的实时监控点
+    * 修改通讯口下的实时监控点的state
     * */
-    public void deleteAlarmCfg(long plc_id);
+    public void updateAlarmCfgState(long plc_id,int state);
+
+    /*
+    * 根据通讯口plcId查找监控点
+    * */
+    public List<AlarmCfg> getAlarmByPlcId(long plc_id);
 }

@@ -41,6 +41,8 @@ public enum OpTypeOption implements EnumVal {
     AddPlc("添加通讯口", 501),
     UpdatePlc("更新通讯口配置", 502),
     DelPlc("删除通讯口配置", 503),
+    DelRealHis("删除通讯口下的实时历史监控点",504),
+    DelAlram1("删除通讯口下的报警监控点",505),
     //实时监控点操作
     AddAct("新增实时数据配置", 600),
     UpdAct("修改实时数据配置", 601),

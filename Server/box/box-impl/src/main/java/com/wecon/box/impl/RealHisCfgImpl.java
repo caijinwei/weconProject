@@ -917,4 +917,25 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 	}
 
+	@Override
+	public void updateRealHisState(long plc_id,int state) {
+		if(plc_id>0) {
+			String sql = "UPDATE real_his_cfg a SET a.state=? WHERE a.plc_id=?";
+			jdbcTemplate.update(sql, new Object[]{state,plc_id});
+		}
+	}
+
+	@Override
+	public List<RealHisCfg> findRealHisCfgsByPlcId(long plc_id){
+		if(plc_id<0){
+			return null;
+		}
+		String sql = "select " + SEL_COL + " from real_his_cfg r where r.plc_id=?";
+		List<RealHisCfg> list = jdbcTemplate.query(sql,new Object[]{plc_id}, new DefaultRealHisCfgRowMapper());
+		if (!list.isEmpty()) {
+			return list;
+		}
+		return null;
+	}
+
 }

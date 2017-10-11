@@ -222,19 +222,26 @@ public class PlcInfoSettingAction {
         if (plcInfo.plc_id > 0) {
             PlcInfo oldPlc=plcInfoApi.findPlcInfoByPlcId(plcInfo.plc_id);
             //修改驱动名称
-            //设置state为4  且  将通讯口下的监控点全部删除掉
+            //设置state为3  且  将通讯口下的监控点全部删除掉
+            plcInfo.state=2;
             if(!oldPlc.type.equals(plcInfo.type)){
-                plcInfo.state=4;
                 plcInfoApi.updatePlcInfo(plcInfo);
 
-                ArrayList<Long> plc_ids=new ArrayList<Long>();
-                plc_ids.add(plcInfo.plc_id);
-                realHisCfgApi.batchDeleteById(plc_ids);
-                alarmCfgApi.deleteAlarmCfg(plcInfo.plc_id);
+//                List<RealHisCfg> oldRealHisCfgs=realHisCfgApi.findRealHisCfgsByPlcId(plcInfo.plc_id);
+//                List<AlarmCfg> oldAlarmCfgs=alarmCfgApi.getAlarmByPlcId(plcInfo.plc_id);
 
+                realHisCfgApi.updateRealHisState(plcInfo.plc_id,3);
+                alarmCfgApi.updateAlarmCfgState(plcInfo.plc_id,3);
+
+                // <editor - fold desc = "操作日志" >
+//                List<RealHisCfg> newRealHisCfgs=realHisCfgApi.findRealHisCfgsByPlcId(plcInfo.plc_id);
+//                dbLogUtil.updOperateLog(OpTypeOption.DelRealHis,ResTypeOption.Plc,plcInfo.plc_id,oldRealHisCfgs,newRealHisCfgs);
+//
+//                List<AlarmCfg> alarmCfgs=alarmCfgApi.getAlarmByPlcId(plcInfo.plc_id);
+//                dbLogUtil.updOperateLog(OpTypeOption.DelRealHis,ResTypeOption.Plc,plcInfo.plc_id,oldAlarmCfgs,newRealHisCfgs);
+                //</editor-fold>
             }else {
                 //没有修改驱动名称
-                plcInfo.state = 2;
                 plcInfoApi.updatePlcInfo(plcInfo);
             }
             // <editor - fold desc = "操作日志" >

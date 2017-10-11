@@ -173,4 +173,13 @@ public interface RealHisCfgApi {
 	public boolean updatePointAccAndState(long accountId,long deviceId,int state);
 
 
+	/*
+	* 删除 plc_id下的监控点
+	* */
+	public void updateRealHisState(long plc_id,int state);
+
+	/*
+	* 根据plc_id找realHis
+	* */
+	public List<RealHisCfg> findRealHisCfgsByPlcId(long plc_id);
 	}
