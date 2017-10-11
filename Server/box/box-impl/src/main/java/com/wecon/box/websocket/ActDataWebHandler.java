@@ -8,9 +8,12 @@ import com.wecon.box.api.RealHisCfgApi;
 import com.wecon.box.api.RedisPiBoxApi;
 import com.wecon.box.constant.ConstKey;
 import com.wecon.box.entity.*;
+import com.wecon.box.enums.OpTypeOption;
+import com.wecon.box.enums.ResTypeOption;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.box.util.ClientMQTT;
+import com.wecon.box.util.DbLogUtil;
 import com.wecon.common.redis.RedisManager;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.core.AppContext;
@@ -26,6 +29,7 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -35,460 +39,492 @@ import java.util.concurrent.Executors;
  * Created by lanph on 2017/9/13.
  */
 public class ActDataWebHandler extends AbstractWebSocketHandler {
-	@Autowired
-	private RedisPiBoxApi redisPiBoxApi;
-	@Autowired
-	private RealHisCfgApi realHisCfgApi;
-	@Autowired
-	private DeviceApi deviceApi;
-	private Map<String, Client> clients = new HashMap<String, Client>();
-	private Map<String, SubscribeListener> subscribeListeners = new HashMap<String, SubscribeListener>();
-	private Map<String, Map<String, Object>> paramMaps = new HashMap<String, Map<String, Object>>();
+    @Autowired
+    private RedisPiBoxApi redisPiBoxApi;
+    @Autowired
+    private RealHisCfgApi realHisCfgApi;
+    @Autowired
+    private DeviceApi deviceApi;
+    private Map<String, Client> clients = new HashMap<String, Client>();
+    private Map<String, SubscribeListener> subscribeListeners = new HashMap<String, SubscribeListener>();
+    private Map<String, Map<String, Object>> paramMaps = new HashMap<String, Map<String, Object>>();
 
-	private static final Logger logger = LogManager.getLogger(ActDataHandler.class.getName());
+    @Autowired
+    protected DbLogUtil dbLogUtil;
 
-	/**
-	 * 收到消息
-	 *
-	 * @param session
-	 * @param message
-	 * @throws Exception
-	 */
-	@Override
-	protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+    private static final Logger logger = LogManager.getLogger(ActDataHandler.class.getName());
 
-		try {
-			String params = message.getPayload();
-			logger.debug("Server received message: " + params);
-			if (CommonUtils.isNullOrEmpty(params)) {
-				return;
-			}
-			Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {
-			});
-			
-			if ("0".equals(bParams.get("markid").toString())) {
-				logger.debug("WebSocket push begin");
-				if (paramMaps.get(session.getId()) != null) {
-					paramMaps.remove(session.getId());
-				}
-				paramMaps.put(session.getId(), bParams);
-				session.sendMessage(new TextMessage(getStringRealData(session)));
+    /**
+     * 收到消息
+     *
+     * @param session
+     * @param message
+     * @throws Exception
+     */
+    @Override
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
 
-				logger.debug("WebSocket push end");
+        try {
+            String params = message.getPayload();
+            logger.debug("Server received message: " + params);
+            if (CommonUtils.isNullOrEmpty(params)) {
+                return;
+            }
+            Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {
+            });
 
-			} else if ("1".equals(bParams.get("markid").toString())) {
-				String value = bParams.get("value").toString();
-				String addr_id = bParams.get("addr_id").toString();
-				// 订阅消息
-				if (!CommonUtils.isNullOrEmpty(addr_id)) {
-					RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(addr_id));
-					Device device = deviceApi.getDevice(realHisCfg.device_id);
-					String subscribeTopic = "pibox/cts/" + device.machine_code;
+            if ("0".equals(bParams.get("markid").toString())) {
+                logger.debug("WebSocket push begin");
+                if (paramMaps.get(session.getId()) != null) {
+                    paramMaps.remove(session.getId());
+                }
+                paramMaps.put(session.getId(), bParams);
+                session.sendMessage(new TextMessage(getStringRealData(session)));
 
-					SendvalueCallback sendvalueCallback = new SendvalueCallback(session, addr_id);
-					ClientMQTT reclient = new ClientMQTT(subscribeTopic, "send" + session.getId(), sendvalueCallback);
-					reclient.start();
+                logger.debug("WebSocket push end");
 
-					if (!reclient.topicPort.contains(subscribeTopic)) {
-						reclient.subscribe(subscribeTopic);
-					}
-				}
-				// 发送数据
-				putMQTTMess(value, session, addr_id);
-			}
-		} catch (Exception ex) {
-			logger.error(ex);
-		}
-	}
+            } else if ("1".equals(bParams.get("markid").toString())) {
+                String value = bParams.get("value").toString();
+                String addr_id = bParams.get("addr_id").toString();
+                // 订阅消息
+                if (!CommonUtils.isNullOrEmpty(addr_id)) {
+                    RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(addr_id));
+                    Device device = deviceApi.getDevice(realHisCfg.device_id);
+                    String subscribeTopic = "pibox/cts/" + device.machine_code;
 
-	class SendvalueCallback implements MqttCallback {
-		private WebSocketSession session;
-		private String addr_id;
+                    SendvalueCallback sendvalueCallback = new SendvalueCallback(session, addr_id);
+                    ClientMQTT reclient = new ClientMQTT(subscribeTopic, "send" + session.getId(), sendvalueCallback);
+                    reclient.start();
 
-		public SendvalueCallback(WebSocketSession session, String addr_id) {
-			this.session = session;
-			this.addr_id = addr_id;
-		}
+                    if (!reclient.topicPort.contains(subscribeTopic)) {
+                        reclient.subscribe(subscribeTopic);
+                    }
+                }
+                // 发送数据
+                putMQTTMess(value, session, addr_id);
+            }
+        } catch (Exception ex) {
+            logger.error(ex);
+        }
+    }
 
-		@Override
-		public void connectionLost(Throwable arg0) {
+    class SendvalueCallback implements MqttCallback {
+        private WebSocketSession session;
+        private String addr_id;
 
-		}
+        public SendvalueCallback(WebSocketSession session, String addr_id) {
+            this.session = session;
+            this.addr_id = addr_id;
+        }
 
-		@Override
-		public void deliveryComplete(IMqttDeliveryToken arg0) {
+        @Override
+        public void connectionLost(Throwable arg0) {
 
-		}
+        }
 
-		@Override
-		public void messageArrived(String arg0, MqttMessage arg1) {
+        @Override
+        public void deliveryComplete(IMqttDeliveryToken arg0) {
 
-			try {
-				String[] idexs = arg0.split("/");
-				String reMessage = new String(arg1.getPayload(), "UTF-8").trim();
-				logger.debug("mqtt消息：" + reMessage);
+        }
 
-				JSONObject json = new JSONObject();
-				JSONObject jsonObject = JSONObject.parseObject(reMessage);
-				String machineCode = jsonObject.getString("machine_code");
-				// 机器码为空消息直接忽略
-				if (CommonUtils.isNullOrEmpty(jsonObject.getString("machine_code"))) {
-					return;
-				}
-				// 如果消息的机器码和主题中的机器码不匹配直接忽略消息
-				if (!idexs[2].equals(machineCode)) {
-					logger.info("主题中的机器码和消息的机器码不匹配！");
-					return;
-				}
-				// act为空
-				if (CommonUtils.isNullOrEmpty(jsonObject.getInteger("act"))) {
+        @Override
+        public void messageArrived(String arg0, MqttMessage arg1) {
 
-					logger.info("act为空！");
-					return;
-				}
-				if (1 != jsonObject.getInteger("act")) {
-					logger.info("act不为1！");
-					return;
-				}
-				if (CommonUtils.isNullOrEmpty(jsonObject.getInteger("feedback_act"))) {
-					logger.info("feedback_act为空！");
-					return;
-				}
-				if (2000 != jsonObject.getInteger("feedback_act")) {
-					logger.info("feedback_act不为2000！");
-					return;
-				}
-				// 数据为空
-				if (CommonUtils.isNullOrEmpty(jsonObject.getString("data"))) {
-					logger.info("data为空！");
-					return;
-				}
-				System.out.println("选中的addrid==" + addr_id);
-				System.out.println("接收的消息==" + reMessage);
-				JSONObject jsonBase = jsonObject.getJSONObject("data");
-				if (!CommonUtils.isNullOrEmpty(addr_id) && !CommonUtils.isNullOrEmpty(jsonBase.getInteger("addr_id"))) {
-					if (Integer.parseInt(addr_id) == jsonBase.getInteger("addr_id")) {
+            try {
+                String[] idexs = arg0.split("/");
+                String reMessage = new String(arg1.getPayload(), "UTF-8").trim();
+                logger.debug("mqtt消息：" + reMessage);
 
-						int upd_state = jsonBase.getInteger("upd_state");
-						if (1 == upd_state) {
-							json.put("resultData", 1);// 反馈成功信息
+                JSONObject json = new JSONObject();
+                JSONObject jsonObject = JSONObject.parseObject(reMessage);
+                String machineCode = jsonObject.getString("machine_code");
+                // 机器码为空消息直接忽略
+                if (CommonUtils.isNullOrEmpty(jsonObject.getString("machine_code"))) {
+                    return;
+                }
+                // 如果消息的机器码和主题中的机器码不匹配直接忽略消息
+                if (!idexs[2].equals(machineCode)) {
+                    logger.info("主题中的机器码和消息的机器码不匹配！");
+                    return;
+                }
+                // act为空
+                if (CommonUtils.isNullOrEmpty(jsonObject.getInteger("act"))) {
 
-						} else {
-							json.put("resultData", 0);
-							json.put("resultError", jsonBase.getString("upd_error"));
-						}
-						sendWSMassage(session, json.toJSONString());
-						addr_id = "-1";
-					}
-				}
+                    logger.info("act为空！");
+                    return;
+                }
+                if (1 != jsonObject.getInteger("act")) {
+                    logger.info("act不为1！");
+                    return;
+                }
+                if (CommonUtils.isNullOrEmpty(jsonObject.getInteger("feedback_act"))) {
+                    logger.info("feedback_act为空！");
+                    return;
+                }
+                if (2000 != jsonObject.getInteger("feedback_act")) {
+                    logger.info("feedback_act不为2000！");
+                    return;
+                }
+                // 数据为空
+                if (CommonUtils.isNullOrEmpty(jsonObject.getString("data"))) {
+                    logger.info("data为空！");
+                    return;
+                }
+                System.out.println("选中的addrid==" + addr_id);
+                System.out.println("接收的消息==" + reMessage);
+                JSONObject jsonBase = jsonObject.getJSONObject("data");
+                if (!CommonUtils.isNullOrEmpty(addr_id) && !CommonUtils.isNullOrEmpty(jsonBase.getInteger("addr_id"))) {
+                    if (Integer.parseInt(addr_id) == jsonBase.getInteger("addr_id")) {
 
-			} catch (Exception e) {
-				JSONObject errorjson = new JSONObject();
-				errorjson.put("resultData", 0);
-				errorjson.put("resultError", "下发错误，请重试");
-				sendWSMassage(session, errorjson.toJSONString());
-				logger.error(e);
-				String simplename = e.getClass().getSimpleName();
-				if (!"JSONException".equals(simplename)) {
-					e.printStackTrace();
-				}
-			}
+                        int upd_state = jsonBase.getInteger("upd_state");
+                        if (1 == upd_state) {
+                            json.put("resultData", 1);// 反馈成功信息
 
-		}
+                        } else {
+                            json.put("resultData", 0);
+                            json.put("resultError", jsonBase.getString("upd_error"));
+                        }
+                        sendWSMassage(session, json.toJSONString());
+                        addr_id = "-1";
+                    }
+                }
 
-		// wbsock发送数据
-		public void sendWSMassage(WebSocketSession session, String message) {
-			try {
-				if (session != null && session.isOpen()) {
-					session.sendMessage(new TextMessage(message));
-				} else {
-					logger.debug(session != null);
-					logger.debug(session.isOpen());
-					logger.debug("----websockect 断开连接----");
-				}
-			} catch (Exception e) {
-				logger.error(e);
-			}
+            } catch (Exception e) {
+                JSONObject errorjson = new JSONObject();
+                errorjson.put("resultData", 0);
+                errorjson.put("resultError", "下发错误，请重试");
+                sendWSMassage(session, errorjson.toJSONString());
+                logger.error(e);
+                String simplename = e.getClass().getSimpleName();
+                if (!"JSONException".equals(simplename)) {
+                    e.printStackTrace();
+                }
+            }
 
-		}
+        }
 
-	}
+        // wbsock发送数据
+        public void sendWSMassage(WebSocketSession session, String message) {
+            try {
+                if (session != null && session.isOpen()) {
+                    session.sendMessage(new TextMessage(message));
+                } else {
+                    logger.debug(session != null);
+                    logger.debug(session.isOpen());
+                    logger.debug("----websockect 断开连接----");
+                }
+            } catch (Exception e) {
+                logger.error(e);
+            }
 
-	public void putMQTTMess(String value, WebSocketSession session, String addr_id) {
-		try {
-			if (!CommonUtils.isNullOrEmpty(addr_id)) {
-				RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(addr_id));
-				if (realHisCfg != null) {
-					Device device = deviceApi.getDevice(realHisCfg.device_id);
-					if (device != null) {
-						PiBoxComAddr addr1 = new PiBoxComAddr();
-						addr1.addr_id = addr_id;
-						addr1.value = value;
-						List<PiBoxCom> operate_data_list = new ArrayList<PiBoxCom>();
-						PiBoxCom piBoxCom = new PiBoxCom();
-						List<PiBoxComAddr> piBoxComAddrs = new ArrayList<PiBoxComAddr>();
-						piBoxCom.com = String.valueOf(realHisCfg.plc_id);
-						piBoxComAddrs.add(addr1);
-						piBoxCom.addr_list = piBoxComAddrs;
-						operate_data_list.add(piBoxCom);
+        }
 
-						JSONObject jsonObject = new JSONObject();
-						jsonObject.put("act", 2000);
-						jsonObject.put("machine_code", device.machine_code);
-						JSONObject oplistObject = new JSONObject();
-						oplistObject.put("operate_data_list", operate_data_list);
-						jsonObject.put("data", oplistObject);
-						jsonObject.put("feedback", 1);
-						String message = jsonObject.toJSONString();
-						logger.debug("put mqtt : " + message);
-						String topic = "pibox/stc/" + device.machine_code;
+    }
 
-						ClientMQTT reclient = new ClientMQTT(topic, "send" + session.getId());
-						reclient.start();
+    public void putMQTTMess(String value, WebSocketSession session, String addr_id) {
+        try {
+            if (!CommonUtils.isNullOrEmpty(addr_id)) {
+                RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(addr_id));
+                if (realHisCfg != null) {
+                    Device device = deviceApi.getDevice(realHisCfg.device_id);
+                    if (device != null) {
 
-						reclient.publish(topic, message);
-					}
-				}
+                        PiBoxComAddr addr1 = new PiBoxComAddr();
+                        addr1.addr_id = addr_id;
+                        addr1.value = value;
+                        List<PiBoxCom> operate_data_list = new ArrayList<PiBoxCom>();
+                        PiBoxCom piBoxCom = new PiBoxCom();
+                        List<PiBoxComAddr> piBoxComAddrs = new ArrayList<PiBoxComAddr>();
+                        piBoxCom.com = String.valueOf(realHisCfg.plc_id);
+                        piBoxComAddrs.add(addr1);
+                        piBoxCom.addr_list = piBoxComAddrs;
+                        operate_data_list.add(piBoxCom);
 
-			}
-		} catch (Exception e) {
-			logger.error(e);
-		}
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("act", 2000);
+                        jsonObject.put("machine_code", device.machine_code);
+                        JSONObject oplistObject = new JSONObject();
+                        oplistObject.put("operate_data_list", operate_data_list);
+                        jsonObject.put("data", oplistObject);
+                        jsonObject.put("feedback", 1);
+                        String message = jsonObject.toJSONString();
+                        logger.debug("put mqtt : " + message);
+                        String topic = "pibox/stc/" + device.machine_code;
 
-	}
+                        ClientMQTT reclient = new ClientMQTT(topic, "send" + session.getId());
+                        reclient.start();
 
-	/**
-	 * 订阅redis消息
-	 */
-	private void subscribeRealData(WebSocketSession session, final Set<String> machineCodeSet) {
-		final SubscribeListener subscribeListener = new SubscribeListener(session);
-		subscribeListeners.put(session.getId(), subscribeListener);
-		ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
-		cachedThreadPool.execute(new Runnable() {
-			public void run() {
-				logger.debug("Redis begin subscribe realData");
-				String[] machineCodeArray = new String[machineCodeSet.size()];
-				int i = 0;
-				for (String machineCode : machineCodeSet) {
-					machineCodeArray[i++] = machineCode;
-				}
-				RedisManager.subscribe(ConstKey.REDIS_GROUP_NAME, subscribeListener, machineCodeArray);
+                        //<editor-fold desc="获取旧实时数据，操作日志">
+                        try {
+                            PiBoxComAddr addr1old = new PiBoxComAddr();
+                            RedisPiBoxActData actData = redisPiBoxApi.getRedisPiBoxActData(device.machine_code);
+                            if (actData != null && actData.act_time_data_list != null) {
+                                for (PiBoxCom com : actData.act_time_data_list) {
+                                    if (com.com != null && com.com.equals(piBoxCom.com) && com.addr_list != null) {
+                                        for (PiBoxComAddr addr : com.addr_list) {
+                                            if (addr.addr_id != null && addr.addr_id.equals(addr_id)) {
+                                                addr1old.addr_id = addr_id;
+                                                addr1old.value = addr.value;
+                                                addr1old.state = addr.state;
+                                                break;
+                                            }
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                            System.out.println(1);
+                            System.out.println(addr1old==null);
+                            System.out.println(addr1==null);
+                            dbLogUtil.updOperateLog(OpTypeOption.WriteAct, ResTypeOption.Act, Long.valueOf(addr_id), addr1old, addr1);
+                        } catch (Exception exLog) {
+                            logger.error(exLog);
+                        }
+                        //</editor-fold>
 
-			}
-		});
-	}
+                        reclient.publish(topic, message);
+                    }
+                }
 
-	class SubscribeListener extends JedisPubSub {
-		/**
-		 * 
-		 */
-		private WebSocketSession session;
+            }
+        } catch (Exception e) {
+            logger.error(e);
+        }
 
-		public SubscribeListener(WebSocketSession session) {
-			this.session = session;
+    }
 
-		}
+    /**
+     * 订阅redis消息
+     */
+    private void subscribeRealData(WebSocketSession session, final Set<String> machineCodeSet) {
+        final SubscribeListener subscribeListener = new SubscribeListener(session);
+        subscribeListeners.put(session.getId(), subscribeListener);
+        ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+        cachedThreadPool.execute(new Runnable() {
+            public void run() {
+                logger.debug("Redis begin subscribe realData");
+                String[] machineCodeArray = new String[machineCodeSet.size()];
+                int i = 0;
+                for (String machineCode : machineCodeSet) {
+                    machineCodeArray[i++] = machineCode;
+                }
+                RedisManager.subscribe(ConstKey.REDIS_GROUP_NAME, subscribeListener, machineCodeArray);
 
-		@Override
-		public void onMessage(String channel, String message) {
-			logger.debug("Subscribe callback，channel：" + channel + "message:" + message);
-			if (!CommonUtils.isNullOrEmpty(message)
-					&& "0".equals(paramMaps.get(session.getId()).get("markid").toString())) {
-				try {
-					session.sendMessage(new TextMessage(getStringRealData(session)));
-				} catch (IOException e) {
-					e.printStackTrace();
-					logger.debug("Subscribe callback error，" + e.getMessage());
-				}
-			}
-		}
-	}
+            }
+        });
+    }
 
-	private String getStringRealData(WebSocketSession session) {
-		try {
+    class SubscribeListener extends JedisPubSub {
+        /**
+         *
+         */
+        private WebSocketSession session;
 
-			JSONObject json = new JSONObject();
-			/** 获取实时数据配置信息 **/
-			RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
-			/** 通过视图获取配置信息 **/
-			ViewAccountRoleFilter viewAccountRoleFilter = new ViewAccountRoleFilter();
-			Client client = clients.get(session.getId());
-			Map<String, Object> bParams = paramMaps.get(session.getId());
-			logger.debug("显示client==" + client.userInfo.toString());
-			logger.debug("显示session.getId()==" + session.getId());
-			if (client != null) {
-				Page<RealHisCfgDevice> realHisCfgDeviceList = null;
-				if (client.userInfo.getUserType() == 1) {
-					/** 管理 **/
-					realHisCfgFilter.addr_type = -1;
-					realHisCfgFilter.data_type = 0;
-					realHisCfgFilter.his_cycle = -1;
-					realHisCfgFilter.state = 3;
-					realHisCfgFilter.bind_state = 1;
-					realHisCfgFilter.account_id = client.userId;
+        public SubscribeListener(WebSocketSession session) {
+            this.session = session;
 
-					if (!CommonUtils.isNullOrEmpty(bParams.get("acc_dir_id"))) {
-						realHisCfgFilter.dirId = Long.parseLong(bParams.get("acc_dir_id").toString());
-					}
-					if (!CommonUtils.isNullOrEmpty(bParams.get("device_id"))) {
-						realHisCfgFilter.device_id = Long.parseLong(bParams.get("device_id").toString());
-					}
-					realHisCfgDeviceList = realHisCfgApi.getRealHisCfgList(realHisCfgFilter,
-							Integer.parseInt(bParams.get("pageIndex").toString()),
-							Integer.parseInt(bParams.get("pageSize").toString()));
+        }
 
-				} else if (client.userInfo.getUserType() == 2) {
-					/** 视图 **/
+        @Override
+        public void onMessage(String channel, String message) {
+            logger.debug("Subscribe callback，channel：" + channel + "message:" + message);
+            if (!CommonUtils.isNullOrEmpty(message)
+                    && "0".equals(paramMaps.get(session.getId()).get("markid").toString())) {
+                try {
+                    session.sendMessage(new TextMessage(getStringRealData(session)));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    logger.debug("Subscribe callback error，" + e.getMessage());
+                }
+            }
+        }
+    }
 
-					viewAccountRoleFilter.view_id = client.userId;
-					viewAccountRoleFilter.cfg_type = 1;
-					viewAccountRoleFilter.data_type = 0;
-					viewAccountRoleFilter.role_type = -1;
-					viewAccountRoleFilter.state = 3;
-					if (!CommonUtils.isNullOrEmpty(bParams.get("acc_dir_id"))) {
-						viewAccountRoleFilter.dirId = Long.parseLong(bParams.get("acc_dir_id").toString());
-					}
-					realHisCfgDeviceList = realHisCfgApi.getRealHisCfgList(viewAccountRoleFilter,
-							Integer.parseInt(bParams.get("pageIndex").toString()),
-							Integer.parseInt(bParams.get("pageSize").toString()));
-				}
-				Set<String> machineCodeSet = null;
-				// 如果该账号下无实时数据配置文件直接返回空
-				if (realHisCfgDeviceList != null && realHisCfgDeviceList.getList().size() > 0) {
-					machineCodeSet = new HashSet<>();
-					for (int i = 0; i < realHisCfgDeviceList.getList().size(); i++) {
-						RealHisCfgDevice realHisCfgDevice = realHisCfgDeviceList.getList().get(i);
-						// 整数位 小数位分割
-						if (realHisCfgDevice.digit_count != null) {
-							String[] numdecs = realHisCfgDevice.digit_count.split(",");
-							if (numdecs != null) {
-								if (numdecs.length == 1) {
-									realHisCfgDevice.num = numdecs[0];
-								} else if (numdecs.length == 2) {
-									realHisCfgDevice.num = numdecs[0];
-									realHisCfgDevice.dec = numdecs[1];
-								}
-							}
-						}
-						// 主子编号范围分割
-						if (realHisCfgDevice.data_limit != null) {
-							String[] numdecs = realHisCfgDevice.data_limit.split(",");
-							if (numdecs != null) {
-								if (numdecs.length == 1) {
-									realHisCfgDevice.main_limit = numdecs[0];
-								} else if (numdecs.length == 2) {
-									realHisCfgDevice.main_limit = numdecs[0];
-									realHisCfgDevice.child_limit = numdecs[1];
-								}
-							}
-						}
-						// 主子编号进制分割
-						if (realHisCfgDevice.digit_binary != null) {
-							String[] numdecs = realHisCfgDevice.digit_binary.split(",");
-							if (numdecs != null) {
-								if (numdecs.length == 1) {
-									realHisCfgDevice.main_binary = numdecs[0];
-								} else if (numdecs.length == 2) {
-									realHisCfgDevice.main_binary = numdecs[0];
-									realHisCfgDevice.child_binary = numdecs[1];
-								}
-							}
-						}
-						// 主子地址分割
-						String[] addrs = realHisCfgDevice.addr.split(",");
-						if (addrs != null) {
-							if (addrs.length == 1) {
-								realHisCfgDevice.main_addr = addrs[0];
-							} else if (addrs.length == 2) {
-								realHisCfgDevice.main_addr = addrs[0];
-								realHisCfgDevice.child_addr = addrs[1];
-							}
-						}
-						String device_machine = realHisCfgDevice.machine_code;
-						machineCodeSet.add(device_machine);
-						Device device = deviceApi.getDevice(device_machine);
-						realHisCfgDevice.box_state = device.state;
-						// 通过机器码去redis中获取数据
-						RedisPiBoxActData redisPiBoxActData = redisPiBoxApi.getRedisPiBoxActData(device_machine);
-						if (redisPiBoxActData != null) {
-							List<PiBoxCom> act_time_data_list = redisPiBoxActData.act_time_data_list;
-							for (int j = 0; j < act_time_data_list.size(); j++) {
-								PiBoxCom piBoxCom = act_time_data_list.get(j);
+    private String getStringRealData(WebSocketSession session) {
+        try {
 
-								if (realHisCfgDevice.plc_id == Long.parseLong(piBoxCom.com)) {
+            JSONObject json = new JSONObject();
+            /** 获取实时数据配置信息 **/
+            RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
+            /** 通过视图获取配置信息 **/
+            ViewAccountRoleFilter viewAccountRoleFilter = new ViewAccountRoleFilter();
+            Client client = clients.get(session.getId());
+            Map<String, Object> bParams = paramMaps.get(session.getId());
+            logger.debug("显示client==" + client.userInfo.toString());
+            logger.debug("显示session.getId()==" + session.getId());
+            if (client != null) {
+                Page<RealHisCfgDevice> realHisCfgDeviceList = null;
+                if (client.userInfo.getUserType() == 1) {
+                    /** 管理 **/
+                    realHisCfgFilter.addr_type = -1;
+                    realHisCfgFilter.data_type = 0;
+                    realHisCfgFilter.his_cycle = -1;
+                    realHisCfgFilter.state = 3;
+                    realHisCfgFilter.bind_state = 1;
+                    realHisCfgFilter.account_id = client.userId;
 
-									List<PiBoxComAddr> addr_list = piBoxCom.addr_list;
-									for (int x = 0; x < addr_list.size(); x++) {
-										PiBoxComAddr piBoxComAddr = addr_list.get(x);
+                    if (!CommonUtils.isNullOrEmpty(bParams.get("acc_dir_id"))) {
+                        realHisCfgFilter.dirId = Long.parseLong(bParams.get("acc_dir_id").toString());
+                    }
+                    if (!CommonUtils.isNullOrEmpty(bParams.get("device_id"))) {
+                        realHisCfgFilter.device_id = Long.parseLong(bParams.get("device_id").toString());
+                    }
+                    realHisCfgDeviceList = realHisCfgApi.getRealHisCfgList(realHisCfgFilter,
+                            Integer.parseInt(bParams.get("pageIndex").toString()),
+                            Integer.parseInt(bParams.get("pageSize").toString()));
 
-										if (realHisCfgDevice.id == Long.parseLong(piBoxComAddr.addr_id)) {
-											realHisCfgDevice.re_state = piBoxComAddr.state;
-											realHisCfgDevice.re_value = piBoxComAddr.value;
+                } else if (client.userInfo.getUserType() == 2) {
+                    /** 视图 **/
 
-										}
+                    viewAccountRoleFilter.view_id = client.userId;
+                    viewAccountRoleFilter.cfg_type = 1;
+                    viewAccountRoleFilter.data_type = 0;
+                    viewAccountRoleFilter.role_type = -1;
+                    viewAccountRoleFilter.state = 3;
+                    if (!CommonUtils.isNullOrEmpty(bParams.get("acc_dir_id"))) {
+                        viewAccountRoleFilter.dirId = Long.parseLong(bParams.get("acc_dir_id").toString());
+                    }
+                    realHisCfgDeviceList = realHisCfgApi.getRealHisCfgList(viewAccountRoleFilter,
+                            Integer.parseInt(bParams.get("pageIndex").toString()),
+                            Integer.parseInt(bParams.get("pageSize").toString()));
+                }
+                Set<String> machineCodeSet = null;
+                // 如果该账号下无实时数据配置文件直接返回空
+                if (realHisCfgDeviceList != null && realHisCfgDeviceList.getList().size() > 0) {
+                    machineCodeSet = new HashSet<>();
+                    for (int i = 0; i < realHisCfgDeviceList.getList().size(); i++) {
+                        RealHisCfgDevice realHisCfgDevice = realHisCfgDeviceList.getList().get(i);
+                        // 整数位 小数位分割
+                        if (realHisCfgDevice.digit_count != null) {
+                            String[] numdecs = realHisCfgDevice.digit_count.split(",");
+                            if (numdecs != null) {
+                                if (numdecs.length == 1) {
+                                    realHisCfgDevice.num = numdecs[0];
+                                } else if (numdecs.length == 2) {
+                                    realHisCfgDevice.num = numdecs[0];
+                                    realHisCfgDevice.dec = numdecs[1];
+                                }
+                            }
+                        }
+                        // 主子编号范围分割
+                        if (realHisCfgDevice.data_limit != null) {
+                            String[] numdecs = realHisCfgDevice.data_limit.split(",");
+                            if (numdecs != null) {
+                                if (numdecs.length == 1) {
+                                    realHisCfgDevice.main_limit = numdecs[0];
+                                } else if (numdecs.length == 2) {
+                                    realHisCfgDevice.main_limit = numdecs[0];
+                                    realHisCfgDevice.child_limit = numdecs[1];
+                                }
+                            }
+                        }
+                        // 主子编号进制分割
+                        if (realHisCfgDevice.digit_binary != null) {
+                            String[] numdecs = realHisCfgDevice.digit_binary.split(",");
+                            if (numdecs != null) {
+                                if (numdecs.length == 1) {
+                                    realHisCfgDevice.main_binary = numdecs[0];
+                                } else if (numdecs.length == 2) {
+                                    realHisCfgDevice.main_binary = numdecs[0];
+                                    realHisCfgDevice.child_binary = numdecs[1];
+                                }
+                            }
+                        }
+                        // 主子地址分割
+                        String[] addrs = realHisCfgDevice.addr.split(",");
+                        if (addrs != null) {
+                            if (addrs.length == 1) {
+                                realHisCfgDevice.main_addr = addrs[0];
+                            } else if (addrs.length == 2) {
+                                realHisCfgDevice.main_addr = addrs[0];
+                                realHisCfgDevice.child_addr = addrs[1];
+                            }
+                        }
+                        String device_machine = realHisCfgDevice.machine_code;
+                        machineCodeSet.add(device_machine);
+                        Device device = deviceApi.getDevice(device_machine);
+                        realHisCfgDevice.box_state = device.state;
+                        // 通过机器码去redis中获取数据
+                        RedisPiBoxActData redisPiBoxActData = redisPiBoxApi.getRedisPiBoxActData(device_machine);
+                        if (redisPiBoxActData != null) {
+                            List<PiBoxCom> act_time_data_list = redisPiBoxActData.act_time_data_list;
+                            for (int j = 0; j < act_time_data_list.size(); j++) {
+                                PiBoxCom piBoxCom = act_time_data_list.get(j);
 
-									}
+                                if (realHisCfgDevice.plc_id == Long.parseLong(piBoxCom.com)) {
 
-								}
+                                    List<PiBoxComAddr> addr_list = piBoxCom.addr_list;
+                                    for (int x = 0; x < addr_list.size(); x++) {
+                                        PiBoxComAddr piBoxComAddr = addr_list.get(x);
 
-							}
-						}
-					}
-				}
-				if (machineCodeSet != null && subscribeListeners.get(session.getId()) == null) {
+                                        if (realHisCfgDevice.id == Long.parseLong(piBoxComAddr.addr_id)) {
+                                            realHisCfgDevice.re_state = piBoxComAddr.state;
+                                            realHisCfgDevice.re_value = piBoxComAddr.value;
 
-					subscribeRealData(session, machineCodeSet);
-				}
-				json.put("piBoxActDateMode", realHisCfgDeviceList);
+                                        }
 
-			}
-			logger.debug("Websocket push msg: " + json.toJSONString());
-			return json.toJSONString();
-		} catch (Exception e) {
-			logger.debug("Server error，" + e.getMessage());
-			e.printStackTrace();
-			return "服务器错误";
-		}
-	}
+                                    }
 
-	/**
-	 * 连接成功后
-	 *
-	 * @param session
-	 * @throws Exception
-	 */
-	@Override
-	public void afterConnectionEstablished(WebSocketSession session) {
-		try {
-			logger.debug("连接成功");
-			Client client = AppContext.getSession().client;
-			clients.put(session.getId(), client);
+                                }
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			logger.debug("afterConnectionEstablished，" + e.getMessage());
-		}
+                            }
+                        }
+                    }
+                }
+                if (machineCodeSet != null && subscribeListeners.get(session.getId()) == null) {
 
-	}
+                    subscribeRealData(session, machineCodeSet);
+                }
+                json.put("piBoxActDateMode", realHisCfgDeviceList);
 
-	/**
-	 * 关闭连接后
-	 *
-	 * @param session
-	 * @param status
-	 * @throws Exception
-	 */
-	@Override
-	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-		try {
-			logger.debug("关闭连接");
-			subscribeListeners.get(session.getId()).unsubscribe();
-			clients.remove(session.getId());
-			subscribeListeners.remove(session.getId());
-			paramMaps.remove(session.getId());
-		} catch (Exception e) {
-			e.printStackTrace();
-			logger.debug("afterConnectionClosed，" + e.getMessage());
-		}
-	}
+            }
+            logger.debug("Websocket push msg: " + json.toJSONString());
+            return json.toJSONString();
+        } catch (Exception e) {
+            logger.debug("Server error，" + e.getMessage());
+            e.printStackTrace();
+            return "服务器错误";
+        }
+    }
+
+    /**
+     * 连接成功后
+     *
+     * @param session
+     * @throws Exception
+     */
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) {
+        try {
+            logger.debug("连接成功");
+            Client client = AppContext.getSession().client;
+            clients.put(session.getId(), client);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.debug("afterConnectionEstablished，" + e.getMessage());
+        }
+
+    }
+
+    /**
+     * 关闭连接后
+     *
+     * @param session
+     * @param status
+     * @throws Exception
+     */
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+        try {
+            logger.debug("关闭连接");
+            subscribeListeners.get(session.getId()).unsubscribe();
+            clients.remove(session.getId());
+            subscribeListeners.remove(session.getId());
+            paramMaps.remove(session.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.debug("afterConnectionClosed，" + e.getMessage());
+        }
+    }
 }

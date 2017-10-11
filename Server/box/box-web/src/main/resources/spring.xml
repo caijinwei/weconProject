@@ -42,10 +42,12 @@
     <bean id="pibox-redis" class="com.wecon.common.redis.RedisConfig">
         <property name="host" value="${redisconnect.host}"/>
         <property name="port" value="${redisconnect.port}"/>
+        <property name="password" value="${redisconnect.password}"/>
     </bean>
     <bean id="session-redis" class="com.wecon.common.redis.RedisConfig">
         <property name="host" value="${redisconnect.host}"/>
         <property name="port" value="${redisconnect.port}"/>
+        <property name="password" value="${redisconnect.password}"/>
     </bean>
     <bean id="redis-cluster" class="com.wecon.common.redis.RedisManager">
         <property name="redisConfig">

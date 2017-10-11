@@ -60,8 +60,12 @@ public class DbLogUtil {
             JSONObject oldJsonObject = JSONObject.parseObject(JSON.toJSONString(oldObject));
             JSONObject newsJsonObject = JSONObject.parseObject(JSON.toJSONString(newObject));
             for (Map.Entry<String, Object> entry : oldJsonObject.entrySet()) {
-                if (newsJsonObject.containsKey(entry.getKey()) && !newsJsonObject.get(entry.getKey()).equals(entry.getValue())) {
-                    object.put(entry.getKey(), entry.getValue() + " ::: " + newsJsonObject.get(entry.getKey()));
+                if (newsJsonObject.containsKey(entry.getKey())) {
+                    if (newsJsonObject.get(entry.getKey()) == null || entry.getValue() == null) {
+//                        object.put(entry.getKey(), entry.getValue() + " ::: " + newsJsonObject.get(entry.getKey()));
+                    }else if(!newsJsonObject.get(entry.getKey()).equals(entry.getValue())) {
+                        object.put(entry.getKey(), entry.getValue() + " ::: " + newsJsonObject.get(entry.getKey()));
+                    }
                 }
             }
             addOperateLog(op_type, res_type, res_id, object);
@@ -83,7 +87,7 @@ public class DbLogUtil {
         JSONObject newsJsonObject = JSONObject.parseObject(JSON.toJSONString(newuser));
         for (Map.Entry<String, Object> entry : oldJsonObject.entrySet()) {
             System.out.println(entry.getKey() + ":" + entry.getValue());
-            System.out.println(entry.getKey() + ":" +newsJsonObject.get(entry.getKey()));
+            System.out.println(entry.getKey() + ":" + newsJsonObject.get(entry.getKey()));
             if (!newsJsonObject.get(entry.getKey()).equals(entry.getValue())) {
                 object.put(entry.getKey(), entry.getValue() + ":::" + newsJsonObject.get(entry.getKey()));
             }

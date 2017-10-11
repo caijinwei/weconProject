@@ -93,7 +93,15 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                     $('#searchinput').bind('input propertychange', function searchPIBox() {
                         var keyWord = $('#searchinput').val();
                         if (keyWord == "") {
-                            $scope.searchbox();
+                            T.common.ajax.request("WeconBox", "baseInfoAction/getBoxGroup",
+                                new Object(), function (data, code, msg) {
+                                    if (code == 200) {
+                                        $scope.allDatas = data.allData;
+                                        $scope.deviceDatas = data.allData.deviceList;
+                                        $scope.$apply();
+                                        $("i[name='i_box']").tooltip();
+                                    }
+                                });
                             return;
                         }
                         var boxList = $scope.getBoxList();
