@@ -33,7 +33,8 @@ public class VerifyUtil {
      */
     public static boolean isValidUserName(String userName) {
         Matcher matcher = regexValidUserName.matcher(userName);
-        return matcher.matches();
+        Matcher matcherEmail = regexValidEmail.matcher(userName);
+        return matcher.matches() || matcherEmail.matches();
     }
 
     /**
