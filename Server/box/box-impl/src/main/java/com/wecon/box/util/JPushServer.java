@@ -37,10 +37,10 @@ public class JPushServer {
      * 推送操作
      */
     public void push(String alert){
-        String alias = "zzp";
+        String alias = null;
         try{
-            /*Client client = AppContext.getSession().client;
-            alias = client.account;//声明别名*/
+            Client client = AppContext.getSession().client;
+            alias = client.account;//声明别名
             String result = push(pushUrl, alias, alert, appKey, masterSecret, apns_production, time_to_live);
             System.out.print(result);
             JSONObject resData = JSONObject.parseObject(result);

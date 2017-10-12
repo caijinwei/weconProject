@@ -57,11 +57,14 @@ public class AppVersionAction {
         Client client = AppContext.getSession().client;
         MobileOption platform = client.platform;
         JSONObject data = new JSONObject();
-        if(MobileOption.ANDROID.value == platform.value){
-            data.put("version", 1);
-            data.put("apkUrl", "http://192.168.23.31:8080/box-web/web/apk/V-Box.apk");
-        }else if(MobileOption.IPHONE.value == platform.value){
-            data.put("version", 1);
+        String[] versions = appVersionApi.getVersions();
+        if(null != versions && versions.length > 0){
+            if(MobileOption.ANDROID.value == platform.value){
+                data.put("version", versions[0]);
+                data.put("apkUrl", "http://192.168.23.31:8080/box-web/web/apk/V-Box.apk");
+            }else if(MobileOption.IPHONE.value == platform.value){
+                data.put("version", versions[1]);
+            }
         }
         return new Output(data);
     }
