@@ -163,7 +163,7 @@ public class JPushServer {
         List<Map> list = new ArrayList<>();
         for(int i=0;i<5;i++){
             Map data = new HashMap();
-            data.put("boxId", 120+i);
+            data.put("boxId", -100);
             data.put("monitorId", i);
             data.put("monitorName", "test"+i);
             data.put("monitorTime", Timestamp.valueOf("2015-02-15 20:25:30"));
