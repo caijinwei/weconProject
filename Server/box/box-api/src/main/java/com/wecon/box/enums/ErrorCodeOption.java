@@ -81,6 +81,7 @@ public enum ErrorCodeOption {
     Device_IsNot_Online("盒子已经离线",300029),
     Device_Bind_NotDir("没有选择盒子分组",300030),
     ViewPoint_Is_NotFount("视图没有该监控点",30031),
+    Act_add_Beyond("实时配置只能添加200条",30032),
 
 
 

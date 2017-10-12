@@ -18,6 +18,7 @@ import com.wecon.box.api.DevBindUserApi;
 import com.wecon.box.api.PlcInfoApi;
 import com.wecon.box.api.RealHisCfgApi;
 import com.wecon.box.api.ViewAccountRoleApi;
+import com.wecon.box.constant.Constant;
 import com.wecon.box.entity.AccountDir;
 import com.wecon.box.entity.AccountDirRel;
 import com.wecon.box.entity.DevBindUser;
@@ -768,11 +769,30 @@ public class ActDataAction {
 					}
 
 				}
+				RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
+				/** 管理 **/
+				realHisCfgFilter.addr_type = -1;
+				realHisCfgFilter.data_type = 0;
+				realHisCfgFilter.his_cycle = -1;
+				realHisCfgFilter.state = 3;
+				realHisCfgFilter.bind_state = 1;
+				realHisCfgFilter.account_id = account_id;
+				List<RealHisCfgDevice> realHisCfgDeviceList=new ArrayList<RealHisCfgDevice>() ;
+			    realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(realHisCfgFilter);
+				if(realHisCfgDeviceList.size()>=Constant.AddNum.ACT_SET_NUM){
+					throw new BusinessException(ErrorCodeOption.Act_add_Beyond.key,
+							ErrorCodeOption.Act_add_Beyond.value);
+				}
 				if (realHisCfgParam.batch > 0) {
+
 					if (!CommonUtils.isNullOrEmpty(realHisCfgParam.digit_binary)
 							&& !CommonUtils.isNullOrEmpty(realHisCfgParam.rang)
 							&& !CommonUtils.isNullOrEmpty(realHisCfgParam.addr)) {
 						for (int i = 0; i < realHisCfgParam.batch; i++) {
+							realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(realHisCfgFilter);
+							 if(realHisCfgDeviceList.size()>=Constant.AddNum.ACT_SET_NUM){
+								 break;
+							 }
 							String binarys[] = realHisCfgParam.digit_binary.split(",");
 							String rangs[] = realHisCfgParam.rang.split(",");
 							String addrs[] = realHisCfgParam.addr.split(",");
@@ -957,8 +977,9 @@ public class ActDataAction {
 							if (rename != null) {
 								realHisCfg.name = realHisCfgParam.name + "_" + new Date().getTime();
 							}
-
+							 
 							long id = realHisCfgApi.saveRealHisCfg(realHisCfg);
+							
 							if (id > 0) {
 								if (realHisCfg.data_type == 0) {// 实时数据配置
 									dbLogUtil.addOperateLog(OpTypeOption.AddAct, ResTypeOption.Act, realHisCfg.id,
@@ -987,6 +1008,7 @@ public class ActDataAction {
 					}
 
 				} else {
+
 					if (realHisCfgParam.name.length() > 50) {
 						realHisCfg.name = realHisCfgParam.name.substring(0, 50);
 					} else {
