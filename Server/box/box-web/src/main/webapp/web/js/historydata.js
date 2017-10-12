@@ -1004,7 +1004,11 @@ appModule
 						}
 						var hisreg =/^[1-9]\d*$/;
 						if (!hisreg.test($("#hiscycleid").val())) {
-							alert("周期必须大于1的正整数！");
+							alert("周期必须是正整数！");
+							return;
+						}
+						if ($("#hiscycleid").val()<1||$("#hiscycleid").val()>86400) {
+							alert("周期必须大于等于1或者小于等于86400的正整数！");
 							return;
 						}
 						if($("#nameid").val().length>50){
