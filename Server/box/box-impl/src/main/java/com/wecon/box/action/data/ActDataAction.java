@@ -757,11 +757,27 @@ public class ActDataAction {
 				}
 				realHisCfg.plc_id = realHisCfgParam.plc_id;
 				realHisCfg.data_type = realHisCfgParam.data_type;
+				List<RealHisCfgDevice> realHisCfgDeviceList = new ArrayList<RealHisCfgDevice>();
+				RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
 				if (realHisCfgParam.data_type == 0) {
 					if (realHisCfgParam.group_id < 1) {
 
 						throw new BusinessException(ErrorCodeOption.Get_Groupid_Error.key,
 								ErrorCodeOption.Get_Groupid_Error.value);
+					}
+					/** 管理 **/
+					realHisCfgFilter.addr_type = -1;
+					realHisCfgFilter.data_type = 0;
+					realHisCfgFilter.his_cycle = -1;
+					realHisCfgFilter.state = 3;
+					realHisCfgFilter.bind_state = 1;
+					realHisCfgFilter.account_id = account_id;
+					realHisCfgFilter.device_id = realHisCfgParam.device_id;
+
+					realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(realHisCfgFilter);
+					if (realHisCfgDeviceList.size() >= Constant.AddNum.ACT_SET_NUM) {
+						throw new BusinessException(ErrorCodeOption.Act_add_Beyond.key,
+								ErrorCodeOption.Act_add_Beyond.value);
 					}
 				} else {
 					if (realHisCfgParam.his_cycle > 0) {
@@ -769,31 +785,19 @@ public class ActDataAction {
 					}
 
 				}
-				RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
-				/** 管理 **/
-				realHisCfgFilter.addr_type = -1;
-				realHisCfgFilter.data_type = 0;
-				realHisCfgFilter.his_cycle = -1;
-				realHisCfgFilter.state = 3;
-				realHisCfgFilter.bind_state = 1;
-				realHisCfgFilter.account_id = account_id;
-				realHisCfgFilter.device_id=realHisCfgParam.device_id;
-				List<RealHisCfgDevice> realHisCfgDeviceList=new ArrayList<RealHisCfgDevice>() ;
-			    realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(realHisCfgFilter);
-				if(realHisCfgDeviceList.size()>=Constant.AddNum.ACT_SET_NUM){
-					throw new BusinessException(ErrorCodeOption.Act_add_Beyond.key,
-							ErrorCodeOption.Act_add_Beyond.value);
-				}
+
 				if (realHisCfgParam.batch > 0) {
 
 					if (!CommonUtils.isNullOrEmpty(realHisCfgParam.digit_binary)
 							&& !CommonUtils.isNullOrEmpty(realHisCfgParam.rang)
 							&& !CommonUtils.isNullOrEmpty(realHisCfgParam.addr)) {
 						for (int i = 0; i < realHisCfgParam.batch; i++) {
-							realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(realHisCfgFilter);
-							 if(realHisCfgDeviceList.size()>=Constant.AddNum.ACT_SET_NUM){
-								 break;
-							 }
+							if (realHisCfgParam.data_type == 0) {
+								realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(realHisCfgFilter);
+								if (realHisCfgDeviceList.size() >= Constant.AddNum.ACT_SET_NUM) {
+									break;
+								}
+							}
 							String binarys[] = realHisCfgParam.digit_binary.split(",");
 							String rangs[] = realHisCfgParam.rang.split(",");
 							String addrs[] = realHisCfgParam.addr.split(",");
@@ -978,9 +982,9 @@ public class ActDataAction {
 							if (rename != null) {
 								realHisCfg.name = realHisCfgParam.name + "_" + new Date().getTime();
 							}
-							 
+
 							long id = realHisCfgApi.saveRealHisCfg(realHisCfg);
-							
+
 							if (id > 0) {
 								if (realHisCfg.data_type == 0) {// 实时数据配置
 									dbLogUtil.addOperateLog(OpTypeOption.AddAct, ResTypeOption.Act, realHisCfg.id,
