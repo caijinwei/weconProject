@@ -777,6 +777,7 @@ public class ActDataAction {
 				realHisCfgFilter.state = 3;
 				realHisCfgFilter.bind_state = 1;
 				realHisCfgFilter.account_id = account_id;
+				realHisCfgFilter.device_id=realHisCfgParam.device_id;
 				List<RealHisCfgDevice> realHisCfgDeviceList=new ArrayList<RealHisCfgDevice>() ;
 			    realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(realHisCfgFilter);
 				if(realHisCfgDeviceList.size()>=Constant.AddNum.ACT_SET_NUM){
