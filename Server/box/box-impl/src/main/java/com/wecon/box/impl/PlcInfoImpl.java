@@ -444,8 +444,8 @@ public class PlcInfoImpl implements PlcInfoApi {
             tt.execute(new TransactionCallback() {
                            @Override
                            public Object doInTransaction(TransactionStatus ts) {
-                               jdbcTemplate.update(" UPDATE alarm_cfg a set   a.bind_state=0 WHERE a.plc_id=?", new Object[]{plcId});
-                               jdbcTemplate.update("  UPDATE real_his_cfg a set a.bind_state=0 WHERE  a.plc_id=?", new Object[]{plcId});
+                               jdbcTemplate.update(" UPDATE alarm_cfg a set   a.bind_state=0 ,a.state=3 WHERE a.plc_id=?", new Object[]{plcId});
+                               jdbcTemplate.update("  UPDATE real_his_cfg a set a.bind_state=0 ,a.state=3 WHERE  a.plc_id=?", new Object[]{plcId});
                                jdbcTemplate.update("UPDATE plc_info a set a.state=3 WHERE a.plc_id=?", new Object[]{plcId});
                                return true;
                            }
