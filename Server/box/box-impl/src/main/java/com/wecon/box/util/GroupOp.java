@@ -41,12 +41,25 @@ public class GroupOp {
         return groupCfgByKey("machine_code", cfgList, filterKeys);
     }
 
+    /**
+     * 根据用户名分组
+     * @param cfgList
+     * @return
+     */
+    public static Map<String, List<Map>> groupCfgByUserName(List<Map> cfgList){
+        if(null == cfgList || cfgList.size() == 0){
+            return null;
+        }
+
+        return groupCfgByKey("username", cfgList);
+    }
+
     private static Map<String, List<Map>> groupCfgByKey(String byKey, List<Map> cfgList , String... filterKeys){
         Map<String, List<Map>> gCfgMap = new HashMap<String, List<Map>>();
         for(Map m : cfgList){
-            Object machineCode = m.get(byKey);
-            if(CommonUtils.isNullOrEmpty(machineCode)) continue;
-            List<Map> mCfgLst = gCfgMap.get(machineCode);
+            Object byKeyOj = m.get(byKey);
+            if(CommonUtils.isNullOrEmpty(byKeyOj)) continue;
+            List<Map> mCfgLst = gCfgMap.get(byKeyOj);
             if(null == mCfgLst){
                 mCfgLst = new ArrayList<>();
             }
@@ -59,7 +72,7 @@ public class GroupOp {
             }else{
                 mCfgLst.add(m);
             }
-            gCfgMap.put(machineCode.toString(), mCfgLst);
+            gCfgMap.put(byKeyOj.toString(), mCfgLst);
         }
 
         return gCfgMap;
