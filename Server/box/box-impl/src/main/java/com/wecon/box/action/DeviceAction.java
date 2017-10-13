@@ -122,7 +122,7 @@ public class DeviceAction {
         if (device == null) {
             throw new BusinessException(ErrorCodeOption.Device_NotFound.key, ErrorCodeOption.Device_NotFound.value);
         } else if (!device.password.equals(password)) {
-            throw new BusinessException(ErrorCodeOption.Device_NotFound.key, ErrorCodeOption.Device_NotFound.value);
+            throw new BusinessException(ErrorCodeOption.Device_Pwd_Error.key, ErrorCodeOption.Device_Pwd_Error.value);
         }
         long device_id = device.device_id;
 		/*
