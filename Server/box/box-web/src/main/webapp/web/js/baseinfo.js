@@ -69,6 +69,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      * 盒子与账户解除关联
      * */
     $scope.deletePIBoxBtn = function (device_id) {
+        $("#btn-delete-PiBoxCancel").attr("disabled", "disabled");
         var parmas =
         {
             device_id: device_id
@@ -645,6 +646,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                     $("#noticeDiv").empty();
                     $("#noticeDiv").prepend('<div>已经是最新版了，不需要更新</div>');
                     $("#btn-ckgUpd").css('display','none');
+                    $("#btn-ckgUpd-cancel").text("确定");
                 }
                 if ($scope.firmIsUpdate) {
                     $scope.file_id = data.firmData.file_id;
