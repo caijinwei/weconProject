@@ -78,7 +78,7 @@ $(function () {
             if (code == 200) {
                 alert("注册成功");
                 T.common.user.setSid(data.sid);
-                location = "../main.html";
+                location = "../../../main.html";
             }
             else {
                 alert(msg);

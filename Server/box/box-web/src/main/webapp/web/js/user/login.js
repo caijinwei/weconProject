@@ -25,7 +25,7 @@ $(function () {
             $("#loadingModal").modal("hide");
             if (code == 200) {
                 T.common.user.setSid(data.sid);
-                location = "../main.html";
+                location = "../../../main.html";
             }
             else {
                 alert( msg);

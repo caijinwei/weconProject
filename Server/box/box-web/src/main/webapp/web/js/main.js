@@ -42,7 +42,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         T.common.user.checkAuth();
         T.common.ajax.request('WeconBox', "user/signout", new Object(),
             function (data, code, msg) {
-                location = "user/login.html";
+                location = "web/html/user/login.html";
             });
     }
 
