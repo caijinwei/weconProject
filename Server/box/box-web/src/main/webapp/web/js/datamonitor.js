@@ -212,6 +212,7 @@ appModule
 					}
 					// 下发数据到盒子
 					$scope.putMess = function(model, value) {
+						
 						var params = {
 							markid : 1,
 							value : value,
@@ -570,6 +571,9 @@ appModule
 								}
 								if (model.re_state != 1) {
 									return '检查盒子是否在线！';
+								}
+								if(value.length>256){
+									return '数值长度超出范围！';
 								}
 
 								$("#loadingModal").modal("show");
