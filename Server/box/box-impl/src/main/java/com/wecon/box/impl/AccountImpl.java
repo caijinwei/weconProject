@@ -43,10 +43,10 @@ public class AccountImpl implements AccountApi {
 
     @Override
     public Account signupByEmail(final String username, final String email, final String password) {
-        String sql = "select count(1) from account where username = ? or username = ? or email = ?  or email = ? ";
+        String sql = "select count(1) from account where username = ? or username = ? or email = ?  or email = ? or phonenum = ?  or phonenum = ? ";
 
         int ret = jdbcTemplate.queryForObject(sql,
-                new Object[]{username, email, username, email},
+                new Object[]{username, email, username, email, username, email},
                 Integer.class);
         if (ret == 0) {
             KeyHolder key = new GeneratedKeyHolder();
@@ -89,10 +89,10 @@ public class AccountImpl implements AccountApi {
 
     @Override
     public Account signupByPhone(final String username, final String phonenum, final String password) {
-        String sql = "select count(1) from account where username = ? or username = ? or phonenum = ?  or phonenum = ?  ";
+        String sql = "select count(1) from account where username = ? or username = ? or email = ?  or email = ? or phonenum = ?  or phonenum = ?  ";
 
         int ret = jdbcTemplate.queryForObject(sql,
-                new Object[]{username, phonenum, username, phonenum},
+                new Object[]{username, phonenum, username, phonenum, username, phonenum},
                 Integer.class);
         if (ret > 0) {
             throw new BusinessException(ErrorCodeOption.AccountExisted.key, ErrorCodeOption.AccountExisted.value);

@@ -74,7 +74,11 @@ public class FileAction {
 
         FileStorage model = new FileStorage();
         model.file_name = getFileName(partFile);
-        model.file_type = model.file_name.substring(model.file_name.lastIndexOf(".") + 1);
+        if (model.file_name.lastIndexOf(".") > -1) {
+            model.file_type = model.file_name.substring(model.file_name.lastIndexOf(".") + 1);
+        } else {
+            model.file_type = "";
+        }
         model.file_data = IOUtils.toByteArray(partFile.getInputStream());
         model.file_md5 = DigestUtils.md5Hex(model.file_data);
         model.file_size = Long.valueOf(model.file_data.length);
@@ -99,7 +103,11 @@ public class FileAction {
                 throw new BusinessException(ErrorCodeOption.FileGetVerError.key, ErrorCodeOption.FileGetVerError.value);
             }
             dataOut.put("version_code", verStr);
-            dataOut.put("version_name", model.file_name.substring(0, model.file_name.lastIndexOf(".") - 1));
+            String versionNameStr = model.file_name;
+            if (model.file_name.indexOf(".") > 1) {
+                versionNameStr = model.file_name.substring(0, model.file_name.lastIndexOf(".") - 1);
+            }
+            dataOut.put("version_name", versionNameStr);
             //</editor-fold>
         } else if (act.equals("driver")) {
             //<editor-fold desc="对驱动文件特殊处理,获取最后修改时间--文件原始的最后修改没有获取到-后面使用md5">
@@ -110,7 +118,11 @@ public class FileAction {
             dataOut.put("file_lasttime", model.file_lasttime);*/
             //</editor-fold>
             //驱动名
-            dataOut.put("driver_name", model.file_name.substring(0, model.file_name.lastIndexOf(".")));
+            String driverNameStr = model.file_name;
+            if (model.file_name.indexOf(".") > 0) {
+                driverNameStr = model.file_name.substring(0, model.file_name.lastIndexOf("."));
+            }
+            dataOut.put("driver_name", driverNameStr);
         }
 
         fileStorageApi.addFileStorage(model);
