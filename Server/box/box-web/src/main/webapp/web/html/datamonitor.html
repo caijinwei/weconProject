@@ -15,7 +15,7 @@
 </head>
 <body ng-controller="infoController" ng-init="onInit()"
 	style="margin-top: 20px; display: none;">
-	<ol class="breadcrumb">
+	<ol class="breadcrumb" ng-if="accounttype==1">
 		<li><a href="overview.html">主页</a></li>
 		<li class="active">{{devicename}}</li>
 	</ol>

@@ -190,15 +190,16 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
                 }
 
             } catch (Exception e) {
-                JSONObject errorjson = new JSONObject();
-                errorjson.put("resultData", 0);
-                errorjson.put("resultError", "下发错误，请重试");
-                sendWSMassage(session, errorjson.toJSONString());
-                logger.error(e);
                 String simplename = e.getClass().getSimpleName();
                 if (!"JSONException".equals(simplename)) {
+                	  JSONObject errorjson = new JSONObject();
+                      errorjson.put("resultData", 0);
+                      errorjson.put("resultError", "下发错误，请重试");
+                      sendWSMassage(session, errorjson.toJSONString());
+                      logger.error(e);
                     e.printStackTrace();
                 }
+              
             }
 
         }
@@ -253,6 +254,9 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 
                         ClientMQTT reclient = new ClientMQTT(topic, "send" + session.getId());
                         reclient.start();
+//                        SendvalueCallback sendvalueCallback = new SendvalueCallback(session, addr_id);
+//						ClientMQTT reclient = new ClientMQTT(topic, "send" + session.getId(), sendvalueCallback);
+//						reclient.start();
 
                         //<editor-fold desc="获取旧实时数据，操作日志">
                         try {

@@ -286,7 +286,7 @@ public class BusinessDataAction {
             realHisCfgFilter.addr_type = -1;
             realHisCfgFilter.data_type = 1;
             realHisCfgFilter.his_cycle = -1;
-            realHisCfgFilter.state =-1;
+            realHisCfgFilter.state =3;
             realHisCfgFilter.account_id = client.userId;
             realHisCfgFilter.dirId = -1;
             if (param.boxId != 0 && param.boxId != -100 && param.boxId != -200) {

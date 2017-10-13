@@ -200,7 +200,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			params.add(filter.data_type);
 		}
 		if (filter.state > -1) {
-			condition.append(" and r.state = ? ");
+			condition.append(" and r.state != ? ");
 			params.add(filter.state);
 
 		}

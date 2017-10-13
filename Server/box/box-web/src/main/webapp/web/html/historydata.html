@@ -18,7 +18,7 @@
 </head>
 <body ng-controller="infoController" ng-init="onInit()"
 	style="margin-top: 20px; display: none;">
-	<ol class="breadcrumb">
+	<ol class="breadcrumb" ng-if="accounttype==1">
 		<li><a href="overview.html">主页</a></li>
 		<li class="active">{{devicename}}</li>
 	</ol>
@@ -366,7 +366,7 @@
 							</div>
 							<div class="row col-md-11 col-md-offset-1"
 								style="margin: 10px 0;">
-								<span class="col-md-3">历史数据采集周期（秒）</span> <input type="number" min="1"
+								<span class="col-md-3">历史数据采集周期（秒）</span> <input type="number" min="1" max="86400"
 									class="col-md-9" style="height: 30px; padding-left: 5px;"
 									value="1" id="hiscycleid" />
 							</div>

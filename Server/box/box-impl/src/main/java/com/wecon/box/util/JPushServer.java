@@ -37,10 +37,10 @@ public class JPushServer {
      * 推送操作
      */
     public void push(String alert){
-        String alias = "zzp";
+        String alias = null;
         try{
-            /*Client client = AppContext.getSession().client;
-            alias = client.account;//声明别名*/
+            Client client = AppContext.getSession().client;
+            alias = client.account;//声明别名
             String result = push(pushUrl, alias, alert, appKey, masterSecret, apns_production, time_to_live);
             System.out.print(result);
             JSONObject resData = JSONObject.parseObject(result);
@@ -163,7 +163,7 @@ public class JPushServer {
         List<Map> list = new ArrayList<>();
         for(int i=0;i<5;i++){
             Map data = new HashMap();
-            data.put("boxId", 120+i);
+            data.put("boxId", -100);
             data.put("monitorId", i);
             data.put("monitorName", "test"+i);
             data.put("monitorTime", Timestamp.valueOf("2015-02-15 20:25:30"));

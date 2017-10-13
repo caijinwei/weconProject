@@ -141,6 +141,9 @@
     </mvc:annotation-driven>
 
     <!-- 环境配置 -->
+    <beans profile="product">
+        <context:property-placeholder location="classpath*:spring-product.properties"/>
+    </beans>
     <!-- 内测 -->
     <beans profile="server">
         <context:property-placeholder location="classpath*:spring-server.properties"/>
