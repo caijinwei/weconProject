@@ -101,8 +101,13 @@ appModule.controller("listController", function ($scope, $http, $compile) {
         }
         var params = {
             username: $("#username").val().trim(),
-            password: T.common.util.md5($("#password").val().trim())
+            password: $("#password").val().trim()
         };
+        if (params.password.length < 6) {
+            alert("密码长度至少6个字符");
+            return;
+        }
+        params.password = T.common.util.md5(params.password);
         if ($('#state').prop("checked")) {
             params['state'] = "1";
         } else {

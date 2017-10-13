@@ -29,6 +29,7 @@
 	<bean id="pibox-redis" class="com.wecon.common.redis.RedisConfig">
 		<property name="host" value="${redisconnect.host}" />
 		<property name="port" value="${redisconnect.port}" />
+		<property name="password" value="${redisconnect.password}"/>
 	</bean>
 	<bean id="redis-cluster" class="com.wecon.common.redis.RedisManager">
 		<property name="redisConfig">
@@ -113,6 +114,9 @@
 	</mvc:annotation-driven>
 
 	<!-- 环境配置 -->
+	<beans profile="product">
+		<context:property-placeholder location="classpath*:spring-product.properties"/>
+	</beans>
 	<!-- 内测 -->
 	<beans profile="server">
 		<context:property-placeholder location="classpath*:spring-server.properties" />

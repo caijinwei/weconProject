@@ -67,6 +67,11 @@ $(function () {
             $("#loadingModal").modal("hide");
             return;
         }
+        if (params.password.length < 6) {
+            alert("密码长度至少6个字符");
+            $("#loadingModal").modal("hide");
+            return;
+        }
         if (params.password != $('#confirmpwd').val().trim()) {
             alert("输入两次的密码不一致");
             $("#loadingModal").modal("hide");
