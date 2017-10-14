@@ -52,7 +52,7 @@ public class AppVersionAction {
 
     @Description("获取app版本号及更新包下载地址")
     @RequestMapping(value = "/checkupdate")
-    @WebApi(forceAuth = true, master = true)
+    @WebApi(master = true)
     public Output checkUpdate() {
         Client client = AppContext.getSession().client;
         MobileOption platform = client.platform;

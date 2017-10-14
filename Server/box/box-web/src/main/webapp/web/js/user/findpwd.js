@@ -53,7 +53,7 @@ $(function () {
                             console.log("ajax error");
                             $btn.removeAttribute("disabled");
                         });
-                    }else {
+                    } else {
                         alert("帐号不存在");
                         $btn.removeAttribute("disabled");
                     }
@@ -80,6 +80,10 @@ $(function () {
         };
         if (params.account == '' || params.vercode == '' || params.oldpwd == '' || params.newpwd == '') {
             alert("请填写完整");
+            return;
+        }
+        if (params.newpwd.length < 6) {
+            alert("密码长度至少6个字符");
             return;
         }
         if (params.newpwd != $('#confirmpwd').val().trim()) {

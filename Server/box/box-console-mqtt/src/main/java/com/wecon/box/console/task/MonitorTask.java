@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.wecon.box.api.*;
+import com.wecon.box.util.GroupOp;
 import com.wecon.box.util.JPushServer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -374,7 +375,7 @@ public class MonitorTask extends Thread {
 				if (null == listPiBoxCom || listPiBoxCom.size() < 1) {
 					return;
 				}
-				List<Long> alarmCfgIds = new ArrayList<Long>();
+				List<Object[]> params = new ArrayList<Object[]>();
 				for (int j = 0; j < listPiBoxCom.size(); j++) {
 					List<PiBoxComAddr> listPiBoxComAddr = listPiBoxCom.get(j).addr_list;
 					if (null == listPiBoxComAddr || listPiBoxComAddr.size() < 1) {
@@ -401,7 +402,7 @@ public class MonitorTask extends Thread {
 						alarmCfgData.monitor_time = Timestamp.valueOf(jsonAlarm.getString("time"));
 						alarmCfgData.state = Integer.valueOf(piBoxComAddr.state);
 						listInsertAlarmCfgData.add(alarmCfgData);
-						alarmCfgIds.add(alarmCfgData.alarm_cfg_id);
+						params.add(new Object[]{alarmCfgData.alarm_cfg_id, jsonAlarm.getString("time")});
 					}
 					if (listInsertAlarmCfgData.size() > 0) {
 
@@ -423,9 +424,14 @@ public class MonitorTask extends Thread {
 				}
 
 				AlarmCfgApi alarmCfgApi = SpringContextHolder.getBean(AlarmCfgApi.class);
-				List<Map> alarmCfgLst = alarmCfgApi.getAlarmCfgByIds(alarmCfgIds);
+				List<Map> alarmCfgLst = alarmCfgApi.getPushAlarmCfg(params);
 				//极光推送给客户端
-				new JPushServer().push(JSON.toJSONString(alarmCfgLst));
+				if(null != alarmCfgLst && alarmCfgLst.size() > 0){
+					Map<String, List<Map>> gpMap = GroupOp.groupCfgByUserName(alarmCfgLst);
+					for(Map.Entry entry : gpMap.entrySet()){
+						new JPushServer().push(entry.getKey().toString(), JSON.toJSONString(entry.getValue()));
+					}
+				}
 
 				break;
 			case WILL_DATA:

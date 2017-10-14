@@ -535,32 +535,47 @@ public class AlarmCfgImpl implements AlarmCfgApi {
         return null;
     }
 
-	public List<Map> getAlarmCfgByIds(List<Long> ids) {
-		if (null == ids || ids.size() == 0) {
+	public List<Map> getPushAlarmCfg(List<Object[]> params) {
+		if (null == params || params.size() == 0) {
 			return null;
 		}
 
-		StringBuilder idSb = new StringBuilder();
-		for (long id : ids) {
-			idSb.append(",").append(id);
-		}
-		String sql = "select ac.device_id, ac.name, acd.alarm_cfg_id, acd.monitor_time, acd.value, acd.state from alarm_cfg ac, alarm_cfg_data acd where ac.alarmcfg_id = acd.alarm_cfg_id and ac.alarmcfg_id in("+idSb.substring(1)+")";
-		List<Map> list = jdbcTemplate.query(sql, new RowMapper() {
-			@Override
-			public Object mapRow(ResultSet rs, int i) throws SQLException {
-				Map data = new HashMap();
-				data.put("boxId", rs.getLong("device_id"));
-				data.put("monitorId", rs.getLong("alarm_cfg_id"));
-				data.put("monitorName", rs.getString("name"));
-				data.put("monitorTime", rs.getTimestamp("monitor_time"));
-				data.put("state", rs.getInt("state"));
-				data.put("number", rs.getString("value"));
-				return data;
-			}
-		});
-		if (!list.isEmpty()) {
-			return list;
-		}
-		return null;
+        List<Map> result = new ArrayList<>();
+        for(Object[] oj : params){
+            //管理员账号
+            String sql = "select at.username, ac.device_id, ac.name, acd.alarm_cfg_id, acd.monitor_time, acd.value, acd.state " +
+                    "from alarm_cfg ac, alarm_cfg_data acd, account at " +
+                    "where ac.account_id = at.account_id and ac.alarmcfg_id = acd.alarm_cfg_id and acd.alarm_cfg_id = ? and acd.monitor_time = ?";
+            List<Map> list = jdbcTemplate.query(sql, oj, new DefaultPushAlarmCfgRowMapper());
+            if (!list.isEmpty()) {
+                result.add(list.get(0));
+            }
+
+            //视图账号
+            String vsql = "select at.username, ac.device_id, ac.name, acd.alarm_cfg_id, acd.monitor_time, acd.value, acd.state " +
+                    "from alarm_cfg ac, alarm_cfg_data acd, account at, view_account_role var " +
+                    "where ac.alarmcfg_id = var.cfg_id and at.account_id = var.view_id and var.cfg_type=2 and ac.alarmcfg_id = acd.alarm_cfg_id and acd.alarm_cfg_id = ? and acd.monitor_time = ?";
+            List<Map> vlist = jdbcTemplate.query(vsql, oj, new DefaultPushAlarmCfgRowMapper());
+            if (!vlist.isEmpty()) {
+                result.add(vlist.get(0));
+            }
+        }
+
+		return result;
 	}
+
+    public static final class DefaultPushAlarmCfgRowMapper implements RowMapper<Map> {
+        @Override
+        public Map mapRow(ResultSet rs, int i) throws SQLException {
+            Map data = new HashMap();
+            data.put("username", rs.getString("username"));
+            data.put("boxId", rs.getLong("device_id"));
+            data.put("monitorId", rs.getLong("alarm_cfg_id"));
+            data.put("monitorName", rs.getString("name"));
+            data.put("monitorTime", rs.getTimestamp("monitor_time"));
+            data.put("state", rs.getInt("state"));
+            data.put("number", rs.getString("value"));
+            return data;
+        }
+    }
 }

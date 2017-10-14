@@ -36,11 +36,8 @@ public class JPushServer {
     /**
      * 推送操作
      */
-    public void push(String alert){
-        String alias = null;
+    public void push(String alias, String alert){
         try{
-            Client client = AppContext.getSession().client;
-            alias = client.account;//声明别名
             String result = push(pushUrl, alias, alert, appKey, masterSecret, apns_production, time_to_live);
             System.out.print(result);
             JSONObject resData = JSONObject.parseObject(result);
@@ -171,6 +168,6 @@ public class JPushServer {
             data.put("number", "5"+i);
             list.add(data);
         }
-        new JPushServer().push(JSON.toJSONString(list));
+        new JPushServer().push("zzp", JSON.toJSONString(list));
     }
 }

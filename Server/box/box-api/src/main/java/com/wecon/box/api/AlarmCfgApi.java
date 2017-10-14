@@ -136,5 +136,5 @@ public interface AlarmCfgApi {
     * */
     public List<AlarmCfg> getAlarmByPlcId(long plc_id);
 
-    List<Map> getAlarmCfgByIds(List<Long> ids);
+    List<Map> getPushAlarmCfg(List<Object[]> params);
 }

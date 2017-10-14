@@ -570,7 +570,7 @@ appModule
 									return '条目未下发！';
 								}
 								if (model.re_state != 1) {
-									return '检查盒子是否在线！';
+									return '检查监控点是否在线！';
 								}
 								if(value.length>256){
 									return '数值长度超出范围！';
