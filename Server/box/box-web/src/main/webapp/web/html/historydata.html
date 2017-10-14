@@ -232,9 +232,21 @@
 						</thead>
 						<tbody>
 							<tr ng-repeat="x in hisConfs">
-								<td><span ng-if="x.state!=0"><i name="his_i_state"
+								<td><span ng-if="x.state==1"><i name="his_i_state"
 										class="fa  fa-circle" style="color: orange;"
-										data-toggle="tooltip" title="条目未下发"></i></span> {{x.id}}</td>
+										data-toggle="tooltip" title="条目未下发"></i></span> <span
+									ng-if="x.state==2"><i name="his_i_state"
+										class="fa  fa-circle" style="color: orange;"
+										data-toggle="tooltip" title="条目未下发"></i></span> <span
+									ng-if="x.state==-1"><i name="his_i_state"
+										class="fa  fa-circle" style="color: black;"
+										data-toggle="tooltip" title="编译失败"></i></span> <span
+									ng-if="x.state==-2"><i name="his_i_state"
+										class="fa  fa-circle" style="color: black;"
+										data-toggle="tooltip" title="地址转义失败"></i></span> <span
+									ng-if="x.state==-3"><i name="his_i_state"
+										class="fa  fa-circle" style="color: black;"
+										data-toggle="tooltip" title="地址绑定失败"></i></span> {{x.id}}</td>
 								<td>{{x.name}}</td>
 								<td>{{x.his_cycle}}</td>
 								<td>{{x.condevice}}</td>
@@ -302,7 +314,8 @@
 							<div class="row col-md-11 col-md-offset-1"
 								style="margin: 10px 0;">
 								<span class="col-md-3">名称</span> <input id="nameid" type="text"
-									class="col-md-9" style="height: 30px; padding-left: 5px;" placeholder="请输入少于50位的字符" maxlength="50"/>
+									class="col-md-9" style="height: 30px; padding-left: 5px;"
+									placeholder="请输入少于50位的字符" maxlength="50" />
 							</div>
 							<div class="row col-md-11 col-md-offset-1"
 								style="margin: 10px 0;">
@@ -366,15 +379,17 @@
 							</div>
 							<div class="row col-md-11 col-md-offset-1"
 								style="margin: 10px 0;">
-								<span class="col-md-3">历史数据采集周期（秒）</span> <input type="number" min="1" max="86400"
-									class="col-md-9" style="height: 30px; padding-left: 5px;"
-									value="1" id="hiscycleid" />
+								<span class="col-md-3">历史数据采集周期（秒）</span> <input type="number"
+									min="1" max="86400" class="col-md-9"
+									style="height: 30px; padding-left: 5px;" value="1"
+									id="hiscycleid" />
 							</div>
 							<div class="row col-md-11 col-md-offset-1"
 								style="margin: 10px 0;">
 								<span class="col-md-3">描述</span> <input type="text"
 									id="describeid" class="col-md-9"
-									style="height: 30px; padding-left: 5px;" placeholder="请输入少于50位的字符" maxlength="50"/>
+									style="height: 30px; padding-left: 5px;"
+									placeholder="请输入少于50位的字符" maxlength="50" />
 							</div>
 						</div>
 					</div>
