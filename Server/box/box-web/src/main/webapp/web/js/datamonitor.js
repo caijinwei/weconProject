@@ -212,7 +212,7 @@ appModule
 					}
 					// 下发数据到盒子
 					$scope.putMess = function(model, value) {
-						
+
 						var params = {
 							markid : 1,
 							value : value,
@@ -572,7 +572,7 @@ appModule
 								if (model.re_state != 1) {
 									return '检查监控点是否在线！';
 								}
-								if(value.length>256){
+								if (value.length > 256) {
 									return '数值长度超出范围！';
 								}
 
@@ -1439,7 +1439,15 @@ appModule
 						var addrs = [];
 						var scaliedata, child_scaliedata;
 						var scalies = [];
-						if ($("#nameid").val() == "") {
+						if ( plcId == undefined
+								|| $("addrtypeid").val() == undefined
+								|| $("registerid").val() == undefined) {
+							alert("检查是否配置好通讯口配置！");
+							return;
+						}
+						if ($("#nameid").val() == "" || plcId == ""
+							|| $("addrtypeid").val() == ""
+								|| $("registerid").val() == "") {
 							alert("参数未配置完整！");
 							return;
 						}

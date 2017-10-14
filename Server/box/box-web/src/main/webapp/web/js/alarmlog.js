@@ -118,9 +118,9 @@ appModule
 					 * 提交历史报警接口请求
 					 */
 					$scope.hisalarm_submit = function(pageIndex, pageSize) {
-					
+
 						var regnum = /^0|[1-9]\d*$/;
-						if ($("#alarmcfgid").val()!="") {
+						if ($("#alarmcfgid").val() != "") {
 							if (!regnum.test($("#alarmcfgid").val())) {
 								alert("编码只能是正整数");
 								return;
@@ -1336,6 +1336,12 @@ appModule
 						var addrs = [];
 						var scaliedata, child_scaliedata;
 						var scalies = [];
+						if (plcId == undefined
+								|| $("addrtypeid").val() == undefined
+								|| $("registerid").val() == undefined) {
+							alert("检查是否配置好通讯口配置！");
+							return;
+						}
 						if ($("#nameid").val() == "") {
 							alert("参数未配置完整！");
 							return;
