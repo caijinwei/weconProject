@@ -45,6 +45,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	private Map<String, Client> clients = new HashMap<String, Client>();
 	private Map<String, SubscribeListener> subscribeListeners = new HashMap<String, SubscribeListener>();
 	private Map<String, Map<String, Object>> paramMaps = new HashMap<String, Map<String, Object>>();
+	private Map<String, ClientMQTT> clientMQTTs = new HashMap<String, ClientMQTT>();
 
 	@Autowired
 	protected DbLogUtil dbLogUtil;
@@ -73,13 +74,14 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 			});
 
 			if ("0".equals(bParams.get("markid").toString())) {
+
 				logger.debug("WebSocket push begin");
 				if (paramMaps.get(session.getId()) != null) {
 					paramMaps.remove(session.getId());
 				}
 				paramMaps.put(session.getId(), bParams);
 				session.sendMessage(new TextMessage(getStringRealData(session)));
-
+				
 				logger.debug("WebSocket push end");
 
 			} else if ("1".equals(bParams.get("markid").toString())) {
@@ -90,17 +92,12 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 					RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(addr_id));
 					Device device = deviceApi.getDevice(realHisCfg.device_id);
 					String subscribeTopic = "pibox/cts/" + device.machine_code;
-
 					SendvalueCallback sendvalueCallback = new SendvalueCallback(session, addr_id);
 					ClientMQTT reclient = new ClientMQTT(subscribeTopic, "send" + session.getId(), sendvalueCallback);
 					reclient.start();
-
-					/*if (!reclient.topicPort.contains(subscribeTopic)) {
-						reclient.subscribe(subscribeTopic);
-					}*/
+					clientMQTTs.put(session.getId(), reclient);
+					sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteAct, reclient);
 				}
-				// 发送数据
-				sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteAct);
 			}
 		} catch (Exception ex) {
 			logger.error(ex);
@@ -146,7 +143,12 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 					&& "0".equals(paramMaps.get(session.getId()).get("markid").toString())) {
 				try {
 					session.sendMessage(new TextMessage(getStringRealData(session)));
-				} catch (IOException e) {
+					if (null != clientMQTTs.get(session.getId())) {
+						clientMQTTs.get(session.getId()).close();
+						clientMQTTs.remove(session.getId());
+					}
+					
+				} catch (Exception e) {
 					e.printStackTrace();
 					logger.debug("Subscribe callback error，" + e.getMessage());
 				}
@@ -336,6 +338,8 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 			clients.remove(session.getId());
 			subscribeListeners.remove(session.getId());
 			paramMaps.remove(session.getId());
+			clientMQTTs.get(session.getId()).close();
+			clientMQTTs.remove(session.getId());
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.debug("afterConnectionClosed，" + e.getMessage());

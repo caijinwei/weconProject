@@ -87,10 +87,11 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 					if (!reclient.topicPort.contains(subscribeTopic)) {
 						reclient.subscribe(subscribeTopic);
 					}
+					// 发送数据
+					sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteActPhone,reclient);
+					session.sendMessage(new TextMessage("提交成功"));
 				}
-				// 发送数据
-				sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteActPhone);
-				session.sendMessage(new TextMessage("提交成功"));
+				
 			}else {
 				// 推送消息给移动端
 				logger.debug("WebSocket push begin");

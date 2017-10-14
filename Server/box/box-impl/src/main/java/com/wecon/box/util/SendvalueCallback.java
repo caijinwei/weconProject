@@ -38,6 +38,7 @@ public class SendvalueCallback implements MqttCallback {
 	public void messageArrived(String arg0, MqttMessage arg1) {
 
 		try {
+			
 			String[] idexs = arg0.split("/");
 			String reMessage = new String(arg1.getPayload(), "UTF-8").trim();
 			logger.debug("mqtt消息：" + reMessage);
@@ -93,6 +94,7 @@ public class SendvalueCallback implements MqttCallback {
 					}
 					sendWSMassage(session, json.toJSONString());
 					addr_id = "-1";
+					
 				}
 			}
 

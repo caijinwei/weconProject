@@ -37,7 +37,7 @@ public class SendValue {
 	protected DbLogUtil dbLogUtil;
 	private static final Logger logger = LogManager.getLogger(SendValue.class.getName());
 
-	public  void putMQTTMess(String value, WebSocketSession session, String addr_id,OpTypeOption op_type) {
+	public  void putMQTTMess(String value, WebSocketSession session, String addr_id,OpTypeOption op_type,ClientMQTT  reclient) {
 		try {
 			if (!CommonUtils.isNullOrEmpty(addr_id)) {
 				RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(addr_id));
@@ -67,8 +67,8 @@ public class SendValue {
 						logger.debug("put mqtt : " + message);
 						String topic = "pibox/stc/" + device.machine_code;
 
-						ClientMQTT reclient = new ClientMQTT(topic, "send" + session.getId());
-						reclient.start();
+//						ClientMQTT reclient = new ClientMQTT(topic, "send" + session.getId());
+//						reclient.start();
 						// <editor-fold desc="获取旧实时数据，操作日志">
 						try {
 							PiBoxComAddr addr1old = new PiBoxComAddr();
@@ -99,6 +99,7 @@ public class SendValue {
 						// </editor-fold>
 
 						reclient.publish(topic, message);
+						
 					}
 				}
 

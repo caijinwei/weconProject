@@ -88,14 +88,14 @@ public class ClientMQTT {
 
 			client.connect(options);
 
-            // 订阅消息
-            if (callback != null) {
-                int[] Qos = { 1 };
-                String[] topics = new String[topicPort.size()];
-                topicPort.toArray(topics);
-                client.subscribe(topics, Qos);
-                client.setCallback(callback);
-            }
+			// 订阅消息
+			if (callback != null) {
+				int[] Qos = { 1 };
+				String[] topics = new String[topicPort.size()];
+				topicPort.toArray(topics);
+				client.subscribe(topics, Qos);
+				client.setCallback(callback);
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -128,8 +128,10 @@ public class ClientMQTT {
 	}
 
 	public void close() throws MqttException {
-		if (client != null)
+		if (client != null) {
+			client.disconnect();
 			client.close();
+		}
 	}
 
 	public static void main(String[] args) throws MqttException {
