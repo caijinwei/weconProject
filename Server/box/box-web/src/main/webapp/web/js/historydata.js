@@ -984,6 +984,12 @@ appModule
 						var addrs = [];
 						var scaliedata, child_scaliedata;
 						var scalies = [];
+						if (plcId == undefined
+								|| $("addrtypeid").val() == undefined
+								|| $("registerid").val() == undefined) {
+							alert("检查是否配置好通讯口配置！");
+							return;
+						}
 						if ($("#nameid").val() == "") {
 							alert("参数未配置完整！");
 							return;
@@ -1002,20 +1008,21 @@ appModule
 							}
 
 						}
-						var hisreg =/^[1-9]\d*$/;
+						var hisreg = /^[1-9]\d*$/;
 						if (!hisreg.test($("#hiscycleid").val())) {
 							alert("周期必须是正整数！");
 							return;
 						}
-						if ($("#hiscycleid").val()<1||$("#hiscycleid").val()>86400) {
+						if ($("#hiscycleid").val() < 1
+								|| $("#hiscycleid").val() > 86400) {
 							alert("周期必须大于等于1或者小于等于86400的正整数！");
 							return;
 						}
-						if($("#nameid").val().length>50){
+						if ($("#nameid").val().length > 50) {
 							alert("名称字符长度不能大于50位！");
 							return;
 						}
-						if($("#describeid").val().length>50){
+						if ($("#describeid").val().length > 50) {
 							alert("描述字符长度不能大于50位！");
 							return;
 						}

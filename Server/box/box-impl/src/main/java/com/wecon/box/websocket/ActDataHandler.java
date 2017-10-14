@@ -179,10 +179,10 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 				data.put("number", 0);
 				String stateText = null;
 				if(realHisCfgDevice.dstate == Constant.State.STATE_BOX_OFFLINE){
-					stateText = "离线";
+					stateText = "0";
 				}else{
 					if(realHisCfgDevice.state != Constant.State.STATE_SYNCED_BOX){
-						stateText = "未下发";
+						stateText = "3";
 					}
 				}
 				if (null != actTimeDataList) {
@@ -197,11 +197,11 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 									if(CommonUtils.isNullOrEmpty(stateText)){
 										try {
 											if(Integer.parseInt(piBoxComAddr.state) == Constant.State.STATE_MONITOR_ONLINE){
-												stateText = "在线";
+												stateText = "1";
 											}else if(Integer.parseInt(piBoxComAddr.state) == Constant.State.STATE_MONITOR_OFFLINE){
-												stateText = "离线";
+												stateText = "0";
 											}else if(Integer.parseInt(piBoxComAddr.state) == Constant.State.STATE_MONITOR_TIMEOUT){
-												stateText = "超时";
+												stateText = "2";
 											}
 										}catch (Exception e){
 											e.printStackTrace();

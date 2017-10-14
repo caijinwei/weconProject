@@ -29,7 +29,7 @@ public class JPushServer {
     private String masterSecret = "c4cc5cbbebcb20541c983cc6";
     private String appKey = "952963faa8710180979ac5c5";
     private String pushUrl = "https://api.jpush.cn/v3/push";
-    private boolean apns_production = true;
+    private boolean apns_production = false;
     private int time_to_live = 86400;
     private static final Logger logger = LogManager.getLogger(JPushServer.class);
 
@@ -168,6 +168,6 @@ public class JPushServer {
             data.put("number", "5"+i);
             list.add(data);
         }
-        new JPushServer().push("zzp", JSON.toJSONString(list));
+        new JPushServer().push("lph", JSON.toJSONString(list));
     }
 }
