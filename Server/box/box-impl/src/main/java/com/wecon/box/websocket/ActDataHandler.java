@@ -4,13 +4,18 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.wecon.box.api.DeviceApi;
 import com.wecon.box.api.RealHisCfgApi;
 import com.wecon.box.api.RedisPiBoxApi;
 import com.wecon.box.constant.ConstKey;
 import com.wecon.box.constant.Constant;
 import com.wecon.box.entity.*;
+import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
+import com.wecon.box.util.ClientMQTT;
+import com.wecon.box.util.SendValue;
+import com.wecon.box.util.SendvalueCallback;
 import com.wecon.common.redis.RedisManager;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.core.AppContext;
@@ -37,6 +42,10 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 	private RedisPiBoxApi redisPiBoxApi;
 	@Autowired
 	private RealHisCfgApi realHisCfgApi;
+	@Autowired
+	private DeviceApi deviceApi;
+	@Autowired
+	private SendValue sendValue;
 
 	private Map<String, Client> clientMap = new HashMap<>();
 
@@ -60,18 +69,42 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 			if (CommonUtils.isNullOrEmpty(params)) {
 				return;
 			}
+			Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {});
 
-			// 推送消息给移动端
-			logger.debug("WebSocket push begin");
-			Object[] oj = getRealData(params, session);
-			session.sendMessage(new TextMessage(oj[0].toString()));
-			logger.debug("WebSocket push end");
+			if(null != bParams.get("markid") && "1".equals(bParams.get("markid").toString())){
+				String value = bParams.get("value").toString();
+				String addr_id = bParams.get("addr_id").toString();
+				// 订阅消息
+				if (!CommonUtils.isNullOrEmpty(addr_id)) {
+					RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(addr_id));
+					Device device = deviceApi.getDevice(realHisCfg.device_id);
+					String subscribeTopic = "pibox/cts/" + device.machine_code;
 
-			// 订阅redis消息
-			SubscribeListener subscribeListener = subListenerMap.get(session.getId());
-			if (null != oj[1] && null == subscribeListener) {
-				subscribeRealData(params, session, (Set<String>)oj[1]);
+					SendvalueCallback sendvalueCallback = new SendvalueCallback(session, addr_id);
+					ClientMQTT reclient = new ClientMQTT(subscribeTopic, "send" + session.getId(), sendvalueCallback);
+					reclient.start();
+
+					if (!reclient.topicPort.contains(subscribeTopic)) {
+						reclient.subscribe(subscribeTopic);
+					}
+				}
+				// 发送数据
+				sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteActPhone);
+				session.sendMessage(new TextMessage("提交成功"));
+			}else {
+				// 推送消息给移动端
+				logger.debug("WebSocket push begin");
+				Object[] oj = getRealData(params, session);
+				session.sendMessage(new TextMessage(oj[0].toString()));
+				logger.debug("WebSocket push end");
+
+				// 订阅redis消息
+				SubscribeListener subscribeListener = subListenerMap.get(session.getId());
+				if (null != oj[1] && null == subscribeListener) {
+					subscribeRealData(params, session, (Set<String>)oj[1]);
+				}
 			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("handleTextMessage，" + e.getMessage());
@@ -181,7 +214,9 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 				if(realHisCfgDevice.dstate == Constant.State.STATE_BOX_OFFLINE){
 					stateText = "0";
 				}else{
-					if(realHisCfgDevice.state != Constant.State.STATE_SYNCED_BOX){
+					if(realHisCfgDevice.state < 0){
+						stateText = realHisCfgDevice.state+"";
+					}else if(realHisCfgDevice.state != Constant.State.STATE_SYNCED_BOX){
 						stateText = "3";
 					}
 				}
