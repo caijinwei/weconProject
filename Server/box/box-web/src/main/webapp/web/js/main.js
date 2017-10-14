@@ -54,6 +54,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         context.attach(selector, [{
             text: "地图定位",
             href: 'web/html/box-map.html?map='+map,
+            target:'content_frame',
             action: function () {
             }
         }
