@@ -36,11 +36,17 @@
     <font color="#666666">服务器内部错误 ，我们建议你返回主页进行浏览，谢谢！</font><br /><br />
     </div>
     <div class="button">
-        <a href="http://49.4.4.75/" title="返回主页" target="_blank">返回主页</a>
+        <a onclick="btn_location()" title="返回主页" target="_blank">返回主页</a>
     </div>
 </div>
 
-
-
+<script type="text/javascript">
+    function btn_location(){
+        location = "/main.html";
+        if (location.href.indexOf("/box-web/") > 0) {
+            location = "/box-web/main.html";
+        }
+    }
+</script>
 </body>
 </html>
