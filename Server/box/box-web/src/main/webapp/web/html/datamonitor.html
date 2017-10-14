@@ -103,7 +103,16 @@
 											data-toggle="tooltip" title="条目未下发"></i></span> <span
 										ng-switch-when="2"><i name="act_i_state"
 											class="fa  fa-circle" style="color: orange;"
-											data-toggle="tooltip" title="条目未下发"></i></span>
+											data-toggle="tooltip" title="条目未下发"></i></span> <span
+										ng-switch-when="-1"><i name="act_i_state"
+											class="fa  fa-circle" style="color: black;"
+											data-toggle="tooltip" title="编译失败"></i></span> <span
+										ng-switch-when="-2"><i name="act_i_state"
+											class="fa  fa-circle" style="color: black;"
+											data-toggle="tooltip" title="地址转义失败"></i></span> <span
+										ng-switch-when="-3"><i name="act_i_state"
+											class="fa  fa-circle" style="color: black;"
+											data-toggle="tooltip" title="地址绑定失败"></i></span>
 
 								</span> <span ng-if="x.box_state==0"><i name="act_i_state"
 										class="fa  fa-circle" style="color: gray;"

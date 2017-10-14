@@ -985,8 +985,8 @@ appModule
 						var scaliedata, child_scaliedata;
 						var scalies = [];
 						if (plcId == undefined
-								|| $("addrtypeid").val() == undefined
-								|| $("registerid").val() == undefined) {
+								|| $("#addrtypeid").val() == undefined
+								|| $("#registerid").val() == undefined) {
 							alert("检查是否配置好通讯口配置！");
 							return;
 						}

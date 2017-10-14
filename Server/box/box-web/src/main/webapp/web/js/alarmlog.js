@@ -1336,9 +1336,12 @@ appModule
 						var addrs = [];
 						var scaliedata, child_scaliedata;
 						var scalies = [];
+						console.log("1=="+plcId);
+						console.log("2=="+$("#addrtypeid").val());
+						console.log("3=="+$("#registerid").val());
 						if (plcId == undefined
-								|| $("addrtypeid").val() == undefined
-								|| $("registerid").val() == undefined) {
+								|| $("#addrtypeid").val() == undefined
+								|| $("#registerid").val() == undefined) {
 							alert("检查是否配置好通讯口配置！");
 							return;
 						}
