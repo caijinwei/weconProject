@@ -81,7 +81,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 				}
 				paramMaps.put(session.getId(), bParams);
 				session.sendMessage(new TextMessage(getStringRealData(session)));
-				
+
 				logger.debug("WebSocket push end");
 
 			} else if ("1".equals(bParams.get("markid").toString())) {
@@ -147,7 +147,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 						clientMQTTs.get(session.getId()).close();
 						clientMQTTs.remove(session.getId());
 					}
-					
+
 				} catch (Exception e) {
 					e.printStackTrace();
 					logger.debug("Subscribe callback error，" + e.getMessage());
@@ -334,12 +334,22 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
 		try {
 			logger.debug("关闭连接");
-			subscribeListeners.get(session.getId()).unsubscribe();
-			clients.remove(session.getId());
-			subscribeListeners.remove(session.getId());
-			paramMaps.remove(session.getId());
-			clientMQTTs.get(session.getId()).close();
-			clientMQTTs.remove(session.getId());
+			if (null != clients.get(session.getId())) {
+				clients.remove(session.getId());
+			}
+
+			if (null != subscribeListeners.get(session.getId())) {
+				subscribeListeners.get(session.getId()).unsubscribe();
+				subscribeListeners.remove(session.getId());
+			}
+
+			if (null != paramMaps.get(session.getId())) {
+				paramMaps.remove(session.getId());
+			}
+			if (null != clientMQTTs.get(session.getId())) {
+				clientMQTTs.get(session.getId()).close();
+				clientMQTTs.remove(session.getId());
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.debug("afterConnectionClosed，" + e.getMessage());

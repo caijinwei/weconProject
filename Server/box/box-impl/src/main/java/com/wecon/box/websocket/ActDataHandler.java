@@ -51,6 +51,8 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 
 	private Map<String, SubscribeListener> subListenerMap = new HashMap<>();
 
+	private Map<String, ClientMQTT> clientMQTTs = new HashMap<String, ClientMQTT>();
+
 	private static final Logger logger = LogManager.getLogger(ActDataHandler.class.getName());
 
 	/**
@@ -69,9 +71,10 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 			if (CommonUtils.isNullOrEmpty(params)) {
 				return;
 			}
-			Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {});
+			Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {
+			});
 
-			if(null != bParams.get("markid") && "1".equals(bParams.get("markid").toString())){
+			if (null != bParams.get("markid") && "1".equals(bParams.get("markid").toString())) {
 				String value = bParams.get("value").toString();
 				String addr_id = bParams.get("addr_id").toString();
 				// 订阅消息
@@ -83,16 +86,16 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 					SendvalueCallback sendvalueCallback = new SendvalueCallback(session, addr_id);
 					ClientMQTT reclient = new ClientMQTT(subscribeTopic, "send" + session.getId(), sendvalueCallback);
 					reclient.start();
-
-					if (!reclient.topicPort.contains(subscribeTopic)) {
-						reclient.subscribe(subscribeTopic);
-					}
+					clientMQTTs.put(session.getId(), reclient);
+					// if (!reclient.topicPort.contains(subscribeTopic)) {
+					// reclient.subscribe(subscribeTopic);
+					// }
 					// 发送数据
-					sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteActPhone,reclient);
+					sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteActPhone, reclient);
 					session.sendMessage(new TextMessage("提交成功"));
 				}
-				
-			}else {
+
+			} else {
 				// 推送消息给移动端
 				logger.debug("WebSocket push begin");
 				Object[] oj = getRealData(params, session);
@@ -102,7 +105,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 				// 订阅redis消息
 				SubscribeListener subscribeListener = subListenerMap.get(session.getId());
 				if (null != oj[1] && null == subscribeListener) {
-					subscribeRealData(params, session, (Set<String>)oj[1]);
+					subscribeRealData(params, session, (Set<String>) oj[1]);
 				}
 			}
 
@@ -137,22 +140,28 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 		String params;
 		WebSocketSession session;
 		String[] machineCodeArray;
-		public SubscribeListener(String params, WebSocketSession session, String[] machineCodeArray){
+
+		public SubscribeListener(String params, WebSocketSession session, String[] machineCodeArray) {
 			this.params = params;
 			this.session = session;
 			this.machineCodeArray = machineCodeArray;
 		}
+
 		@Override
 		public void onMessage(String channel, String message) {
 			logger.debug("Subscribe callback，channel：" + channel + "message:" + message);
 			if (!CommonUtils.isNullOrEmpty(message)) {
 				try {
 					Object[] oj = getRealData(params, session);
-					if(null != oj[0]){
+					if (null != oj[0]) {
 						session.sendMessage(new TextMessage(oj[0].toString()));
 					}
+					if (null != clientMQTTs.get(session.getId())) {
+						clientMQTTs.get(session.getId()).close();
+						clientMQTTs.remove(session.getId());
+					}
 
-				} catch (IOException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 					logger.debug("Subscribe callback error，" + e.getMessage());
 				}
@@ -195,7 +204,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 			JSONArray arr = new JSONArray();
 
 			if (realHisCfgDeviceList == null || realHisCfgDeviceList.size() < 1) {
-				return new Object[]{json.toJSONString(), null};
+				return new Object[] { json.toJSONString(), null };
 			}
 			Set<String> machineCodeSet = new HashSet<>();
 			for (int i = 0; i < realHisCfgDeviceList.size(); i++) {
@@ -209,37 +218,40 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 
 				JSONObject data = new JSONObject();
 				data.put("id", realHisCfgDevice.id);
-				data.put("monitorName", CommonUtils.isNullOrEmpty(realHisCfgDevice.ref_alais) ? realHisCfgDevice.name : realHisCfgDevice.ref_alais);
+				data.put("monitorName", CommonUtils.isNullOrEmpty(realHisCfgDevice.ref_alais) ? realHisCfgDevice.name
+						: realHisCfgDevice.ref_alais);
 				data.put("number", 0);
 				String stateText = null;
-				if(realHisCfgDevice.dstate == Constant.State.STATE_BOX_OFFLINE){
+				if (realHisCfgDevice.dstate == Constant.State.STATE_BOX_OFFLINE) {
 					stateText = "0";
-				}else{
-					if(realHisCfgDevice.state < 0){
-						stateText = realHisCfgDevice.state+"";
-					}else if(realHisCfgDevice.state != Constant.State.STATE_SYNCED_BOX){
+				} else {
+					if (realHisCfgDevice.state < 0) {
+						stateText = realHisCfgDevice.state + "";
+					} else if (realHisCfgDevice.state != Constant.State.STATE_SYNCED_BOX) {
 						stateText = "3";
 					}
 				}
 				if (null != actTimeDataList) {
-					outer :
-					for (int j = 0; j < actTimeDataList.size(); j++) {
+					outer: for (int j = 0; j < actTimeDataList.size(); j++) {
 						PiBoxCom piBoxCom = actTimeDataList.get(j);
 						if (Long.parseLong(piBoxCom.com) == realHisCfgDevice.plc_id) {
 							List<PiBoxComAddr> addrList = piBoxCom.addr_list;
 							for (int k = 0; k < addrList.size(); k++) {
 								PiBoxComAddr piBoxComAddr = addrList.get(k);
 								if (Long.parseLong(piBoxComAddr.addr_id) == realHisCfgDevice.id) {
-									if(CommonUtils.isNullOrEmpty(stateText)){
+									if (CommonUtils.isNullOrEmpty(stateText)) {
 										try {
-											if(Integer.parseInt(piBoxComAddr.state) == Constant.State.STATE_MONITOR_ONLINE){
+											if (Integer.parseInt(
+													piBoxComAddr.state) == Constant.State.STATE_MONITOR_ONLINE) {
 												stateText = "1";
-											}else if(Integer.parseInt(piBoxComAddr.state) == Constant.State.STATE_MONITOR_OFFLINE){
+											} else if (Integer.parseInt(
+													piBoxComAddr.state) == Constant.State.STATE_MONITOR_OFFLINE) {
 												stateText = "0";
-											}else if(Integer.parseInt(piBoxComAddr.state) == Constant.State.STATE_MONITOR_TIMEOUT){
+											} else if (Integer.parseInt(
+													piBoxComAddr.state) == Constant.State.STATE_MONITOR_TIMEOUT) {
 												stateText = "2";
 											}
-										}catch (Exception e){
+										} catch (Exception e) {
 											e.printStackTrace();
 										}
 									}
@@ -256,11 +268,11 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 			json.put("list", arr);
 			json.put("totalPage", realHisCfgDevicePage.getTotalPage());
 			logger.debug("Websocket push msg: " + json.toJSONString());
-			return new Object[]{json.toJSONString(), machineCodeSet};
+			return new Object[] { json.toJSONString(), machineCodeSet };
 		} catch (Exception e) {
 			logger.debug("Server error，" + e.getMessage());
 			e.printStackTrace();
-			return new Object[]{"服务器错误", null};
+			return new Object[] { "服务器错误", null };
 		}
 	}
 
@@ -298,10 +310,15 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 			logger.debug("关闭连接");
 			// 取消订阅
 			SubscribeListener subscribeListener = subListenerMap.get(session.getId());
-			if(null != subscribeListener){
+			if (null != subscribeListener) {
 				subscribeListener.unsubscribe();
 				subListenerMap.remove(session.getId());
 			}
+			if (null != clientMQTTs.get(session.getId())) {
+				clientMQTTs.get(session.getId()).close();
+				clientMQTTs.remove(session.getId());
+			}
+
 			logger.debug("Redis取消订阅成功");
 		} catch (Exception e) {
 			e.printStackTrace();
