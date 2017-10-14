@@ -14,6 +14,7 @@ import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.box.util.ClientMQTT;
 import com.wecon.box.util.DbLogUtil;
 import com.wecon.box.util.SendValue;
+import com.wecon.box.util.SendvalueCallback;
 import com.wecon.common.redis.RedisManager;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.core.AppContext;
@@ -21,9 +22,6 @@ import com.wecon.restful.core.Client;
 import redis.clients.jedis.JedisPubSub;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -109,7 +107,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 		}
 	}
 
-	class SendvalueCallback implements MqttCallback {
+	/*class SendvalueCallback implements MqttCallback {
 		private WebSocketSession session;
 		private String addr_id;
 
@@ -221,7 +219,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 
 		}
 
-	}
+	}*/
 
 	/**
 	 * 订阅redis消息
