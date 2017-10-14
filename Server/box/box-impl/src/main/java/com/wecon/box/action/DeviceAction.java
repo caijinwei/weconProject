@@ -189,6 +189,7 @@ public class DeviceAction {
 
                     Device device = deviceList.get(j);
                     devicedata.put("deviceId", device.device_id);
+                    devicedata.put("deviceMap",device.map);
                     devicedata.put("deviceName", device.name);
                     devicedata.put("deviceState", device.state);
                     devicearr.add(devicedata);

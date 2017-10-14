@@ -6,7 +6,18 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     $scope.onInit = function () {
         T.common.user.checkAuth();
 
+        //拖拽方法
         $("[data-toggle='tooltip']").tooltip();
+
+        //            右键菜单初始化
+        context.init({
+            fadeSpeed: 100,
+            filter: function ($obj) {
+            },
+            above: 'auto',
+            preventDoubleContext: true,
+            compress: false
+        });
 
         T.common.ajax.request('WeconBox', "user/userinfo", new Object(),
             function (data, code, msg) {
@@ -32,11 +43,23 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                             $(this).find('span').css('color', 'white');
                         });
                     }
+
                 } else {
                     alert(code + " " + msg);
                 }
             });
     }
+    //右键添加菜单
+    function attachContext(selector,map) {
+        context.attach(selector, [{
+            text: "地图定位",
+            href: 'web/html/box-map.html?map='+map,
+            action: function () {
+                alert("menu for " + map);
+            }
+        }
+        ])
+    };
 
     $scope.logout = function () {
         T.common.user.checkAuth();
@@ -109,6 +132,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                         var searchBoxIds = $scope.searchByRegExp(keyWord, boxList, boxIds);
                         $scope.showSearchItems(searchBoxIds);
                     });
+                    $("#side_nav li :gt(1) a").each(
+                        function (){
+                            var id=$(this).prop("id");
+                            var map=$(this).attr("map");
+                            attachContext("#"+id,map);
+                        });
 
                 } else {
 
@@ -316,3 +345,4 @@ function reloadBoxList() {
     var $scope = angular.element(appElement).scope();
     $scope.searchbox();
 }
+
