@@ -873,6 +873,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                     } else {
                         $('#upNotice').prepend('<p>驱动' + i + (jsonResult[i] == 1 ? '成功' : (jsonResult[i] == -1 ? '文件写入失败' : (jsonResult[i] == -2 ? 'md5不匹配' : (jsonResult[i] == -3 ? '文件拷贝失败' : (jsonResult[i] == -4 ? '服务器下发版本较低，不更新' : '未知错误'))))) + '</p>');
                     }
+                    wsf.onclose();
                 }
                 $("#noticeModal").modal("show");
                 $("#loadingModal").modal("hide");

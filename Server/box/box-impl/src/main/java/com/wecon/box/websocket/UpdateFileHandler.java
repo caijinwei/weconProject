@@ -94,6 +94,11 @@ public class UpdateFileHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         logger.debug("服务的连接关闭");
+        ClientMQTT mqttclient=clientMQTTMap.get(session.getId());
+        if(null!=mqttclient){
+            clientMQTTMap.remove(mqttclient);
+            mqttclient.close();
+        }
         super.afterConnectionClosed(session, status);
     }
 }
