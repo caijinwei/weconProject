@@ -3,6 +3,7 @@ package com.wecon.box.action.user;
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.AccountRelationApi;
 import com.wecon.box.entity.Account;
+import com.wecon.box.entity.AccountExt;
 import com.wecon.box.entity.AccountRelation;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
@@ -47,8 +48,10 @@ public class UserInfoAction extends UserBaseAction {
     @WebApi(forceAuth = true, master = true)
     public Output getUserInfoDetail() {
         Account userInfo = accountApi.getAccount(AppContext.getSession().client.userId);
+        AccountExt userExt = accountApi.getAccountExt(AppContext.getSession().client.userId);
         JSONObject data = new JSONObject();
         data.put("userInfo", userInfo);
+        data.put("userExt", userExt);
         return new Output(data);
     }
 
@@ -58,12 +61,12 @@ public class UserInfoAction extends UserBaseAction {
     * */
     @RequestMapping("user/getViewIdsByManagerId")
     public Output getViewIdsByManagerId(@RequestParam("manager_id") long managerId) {
-        List<AccountRelation> list=accountRelationApi.getAccountRelationByManagerAccId(managerId);
-        JSONObject data=new JSONObject();
+        List<AccountRelation> list = accountRelationApi.getAccountRelationByManagerAccId(managerId);
+        JSONObject data = new JSONObject();
 
-        List<Account> allList=accountApi.getAllAccounts();
-        data.put("allList",allList);
-        data.put("list",list);
+        List<Account> allList = accountApi.getAllAccounts();
+        data.put("allList", allList);
+        data.put("list", list);
         return new Output(data);
     }
 }

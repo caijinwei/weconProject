@@ -28,7 +28,7 @@
                             <li><a href="#" data-toggle="modal" data-target="#updatePwd">修改密码</a></li>
                         </ul>
                     </div>
-                    <h4>个人资料</h4>
+                    <h4>个人信息</h4>
                 </div>
                 <div class="panel-body">
                     <table class="table table-striped">
@@ -47,6 +47,40 @@
                         <tr>
                             <td>密码：</td>
                             <td>********</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="panel panel-info" ng-if="userInfo.type==1">
+                <div class="panel-heading">
+                    <div class="btn-group" style="float: right;">
+                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                            <span class="glyphicon glyphicon-cog"></span> 操作
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#" data-toggle="modal" data-target="#updateCompany">编辑公司信息</a></li>
+                        </ul>
+                    </div>
+                    <h4>公司信息</h4>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-striped">
+                        <tr>
+                            <td width="30%">公司名：</td>
+                            <td>{{userExt.company}}</td>
+                        </tr>
+                        <tr>
+                            <td>公司主业：</td>
+                            <td>{{userExt.company_business}}</td>
+                        </tr>
+                        <tr>
+                            <td>联系人：</td>
+                            <td>{{userExt.company_contact}}</td>
+                        </tr>
+                        <tr>
+                            <td>联系电话：</td>
+                            <td>{{userExt.company_phone}}</td>
                         </tr>
                     </table>
                 </div>
@@ -100,7 +134,8 @@
                                     <!--<span class="input-group-addon"><i class="fa fa-mobile fa-lg vercode"></i></span>-->
                                     <input type="text" class="form-control" placeholder="验证码" id="vercode"/>
                             <span class="input-group-btn">
-                                <button type="button" class="btn btn-info" id="sendsms" ng-click="sendsms();">点击发送</button>
+                                <button type="button" class="btn btn-info" id="sendsms" ng-click="sendsms();">点击发送
+                                </button>
                             </span>
                                 </div>
                             </div>
@@ -146,6 +181,51 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-info" ng-click="chgpwd();">确认</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--修改公司信息-->
+    <div class="modal" id="updateCompany" tabindex="-1" data-backdrop="false">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    <h4 class="modal-title">编辑公司信息</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="公司名" value="{{userExt.company}}" id="company" maxlength="32" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="公司主业" value="{{userExt.company_business}}" id="company_business" maxlength="32" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="联系人" value="{{userExt.company_contact}}" id="company_contact" maxlength="16" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="联系电话" value="{{userExt.company_phone}}" id="company_phone" maxlength="16" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" ng-click="chgcompany();">确认</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                 </div>
             </div>

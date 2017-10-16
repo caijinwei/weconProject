@@ -71,19 +71,19 @@ public class SignupEmailAction extends UserBaseAction {
             String token = RedisManager.get(ConstKey.REDIS_GROUP_NAME, redisKey);
             if (token != null && token.equals(param.token)) {
                 //验证成功，修改db状态，直接登录
-                Client client = AppContext.getSession().client;
+//                Client client = AppContext.getSession().client;
                 Account user = accountApi.getAccount(param.uid);
                 Account oldUser = accountApi.getAccount(param.uid);
                 user.state = 1;
                 accountApi.updateAccountEmail(user);
 
-                String sid = accountApi.createSession(user, client.appid, client.fuid, client.ip, client.timestamp, ConstKey.SESSION_EXPIRE_TIME);
-                JSONObject data = new JSONObject();
-                data.put("sid", sid);
+//                String sid = accountApi.createSession(user, client.appid, client.fuid, client.ip, client.timestamp, ConstKey.SESSION_EXPIRE_TIME);
+//                JSONObject data = new JSONObject();
+//                data.put("sid", sid);
                 //<editor-fold desc="操作日志">
                 dbLogUtil.updOperateLog(OpTypeOption.EmailActive, ResTypeOption.Account, user.account_id, oldUser, user);
                 //</editor-fold>
-                return new Output(data);
+                return new Output();
             }
         } else if (param.type == 2) {
             //修改邮箱验证

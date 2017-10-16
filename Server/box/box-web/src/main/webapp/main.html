@@ -2,7 +2,7 @@
 <html lang="en" style="height: 100%;" ng-app="weconweb">
 <head>
     <meta charset="UTF-8">
-    <title>维控PIBox</title>
+    <title>慧网物联系统 - V-BOX</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="web/css/style.css"/>
     <link rel="stylesheet"
@@ -156,7 +156,7 @@
                  </a>
                 <ul id="dir_ul_{{x.accountdirId}}" sid="{{x.accountdirId}}">
                     <a id="box_{{y.deviceId}}" target="content_frame" map="{{y.deviceMap}}"
-                       href="web/html/datamonitor.html?device_id={{y.deviceId}}&device_name={{y.deviceName}}"
+                       href="web/html/baseinfo.html?device_id={{y.deviceId}}&device_name={{y.deviceName}}"
                        data_devid="{{y.deviceId}}" draggable="true" ondragstart="drag(event)"
                        ng-click="selectbox(y.deviceId)" class="list-group-item"
                        ng-repeat="y in x.deviceList"><i name="i_box" class="fa  fa-circle" ng-class="{true:'onlineIcon',false:'offlineIcon'}[y.deviceState==1]"

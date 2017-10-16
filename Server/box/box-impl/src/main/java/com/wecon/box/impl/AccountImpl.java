@@ -2,6 +2,7 @@ package com.wecon.box.impl;
 
 import com.wecon.box.api.AccountApi;
 import com.wecon.box.entity.Account;
+import com.wecon.box.entity.AccountExt;
 import com.wecon.box.entity.Page;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.filter.AccountFilter;
@@ -183,6 +184,16 @@ public class AccountImpl implements AccountApi {
     }
 
     @Override
+    public boolean saveAccountExt(AccountExt model) {
+        String sql = "update account_ext set company=?,company_business=?,company_contact=?,company_phone=?,update_date=current_timestamp()  where account_id=?";
+        if (jdbcTemplate.update(sql, new Object[]{model.company, model.company_business, model.company_contact, model.company_phone, model.account_id}) == 0) {
+            sql = "insert into account_ext(account_id,company,company_business,company_contact,company_phone,create_date,update_date) values (?,?,?,?,?,current_timestamp(),current_timestamp() );";
+            jdbcTemplate.update(sql, new Object[]{model.account_id, model.company, model.company_business, model.company_contact, model.company_phone});
+        }
+        return true;
+    }
+
+    @Override
     public boolean updateAccountPwd(long account_id, String oldpwd, String newpwd) {
         Account model = getAccount(account_id);
         if (model == null) {
@@ -217,6 +228,18 @@ public class AccountImpl implements AccountApi {
         List<Account> list = jdbcTemplate.query(sql,
                 new Object[]{alias, alias, alias},
                 new DefaultAccountRowMapper());
+        if (!list.isEmpty()) {
+            return list.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public AccountExt getAccountExt(long account_id) {
+        String sql = "select account_id,company,company_business,company_contact,company_phone,create_date,update_date from account_ext where account_id=?";
+        List<AccountExt> list = jdbcTemplate.query(sql,
+                new Object[]{account_id},
+                new DefaultAccountExtRowMapper());
         if (!list.isEmpty()) {
             return list.get(0);
         }
@@ -385,6 +408,22 @@ public class AccountImpl implements AccountApi {
             model.create_date = rs.getTimestamp("create_date");
             model.update_date = rs.getTimestamp("update_date");
             model.secret_key = rs.getString("secret_key");
+
+            return model;
+        }
+    }
+
+    public static final class DefaultAccountExtRowMapper implements RowMapper<AccountExt> {
+        @Override
+        public AccountExt mapRow(ResultSet rs, int i) throws SQLException {
+            AccountExt model = new AccountExt();
+            model.account_id = rs.getLong("account_id");
+            model.company = rs.getString("company");
+            model.company_business = rs.getString("company_business");
+            model.company_contact = rs.getString("company_contact");
+            model.company_phone = rs.getString("company_phone");
+            model.create_date = rs.getTimestamp("create_date");
+            model.update_date = rs.getTimestamp("update_date");
 
             return model;
         }

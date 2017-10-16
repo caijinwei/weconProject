@@ -8,6 +8,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         T.common.ajax.request('WeconBox', "user/userinfod", new Object(), function (data, code, msg) {
             if (code == 200) {
                 $scope.userInfo = data.userInfo;
+                $scope.userExt = data.userExt;
                 $scope.$apply();
             }
             else {
@@ -36,7 +37,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         T.common.ajax.request('WeconBox', "user/chgpwd", params, function (data, code, msg) {
             if (code == 200) {
                 alert("修改成功");
-                $("#updatePwd").hide();
+                $("#updatePwd").modal("hide");
             }
             else {
                 alert(msg);
@@ -59,7 +60,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         T.common.ajax.request('WeconBox', "user/chgemail", params, function (data, code, msg) {
             if (code == 200) {
                 alert("修改成功,请到新邮箱激活");
-                $("#updateEmail").hide();
+                $("#updateEmail").modal("hide");
             }
             else {
                 alert(msg);
@@ -128,9 +129,31 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         T.common.ajax.request("WeconBox", "user/chgphonenum", params, function (data, code, msg) {
             if (code == 200) {
                 alert("修改成功");
-                $("#updatePhoneNum").hide();
+                $("#updatePhoneNum").modal("hide");
                 $scope.userInfo.phonenum = data.phonenum;
                 $scope.$apply();
+            }
+            else {
+                alert(msg);
+            }
+        }, function () {
+            console.log("ajax error");
+        });
+    }
+
+    $scope.chgcompany = function (){
+        var params =
+        {
+            company: $("#company").val().trim(),
+            company_business: $("#company_business").val().trim(),
+            company_contact: $("#company_contact").val().trim(),
+            company_phone: $("#company_phone").val().trim()
+        };
+        T.common.ajax.request("WeconBox", "user/chgcompany", params, function (data, code, msg) {
+            if (code == 200) {
+                alert("修改成功");
+                $("#updateCompany").modal("hide");
+                $scope.onInit();
             }
             else {
                 alert(msg);

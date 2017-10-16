@@ -1,6 +1,7 @@
 package com.wecon.box.api;
 
 import com.wecon.box.entity.Account;
+import com.wecon.box.entity.AccountExt;
 import com.wecon.box.entity.Page;
 import com.wecon.box.filter.AccountFilter;
 import org.springframework.stereotype.Component;
@@ -79,6 +80,14 @@ public interface AccountApi {
     boolean updateAccountState(Account model);
 
     /**
+     * 保存信息扩展信息
+     *
+     * @param model
+     * @return
+     */
+    boolean saveAccountExt(AccountExt model);
+
+    /**
      * 更新密码
      *
      * @param account_id
@@ -103,6 +112,14 @@ public interface AccountApi {
      * @return
      */
     Account getAccount(String alias);
+
+    /**
+     * 获取用户扩展信息
+     *
+     * @param account_id
+     * @return
+     */
+    AccountExt getAccountExt(long account_id);
 
     /**
      * 获取用户的分页列表

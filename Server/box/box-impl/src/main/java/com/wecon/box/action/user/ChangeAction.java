@@ -3,6 +3,7 @@ package com.wecon.box.action.user;
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.constant.ConstKey;
 import com.wecon.box.entity.Account;
+import com.wecon.box.entity.AccountExt;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
@@ -51,7 +52,7 @@ public class ChangeAction extends UserBaseAction {
             throw new BusinessException(ErrorCodeOption.PhonenumAndEmailError.key, ErrorCodeOption.PhonenumAndEmailError.value);
         }
         //验证码是否有效
-        checkVercode(param.vercode,param.account);
+        checkVercode(param.vercode, param.account);
         Account model = accountApi.getAccount(param.account);
 
         accountApi.updateAccountPwd(model.account_id, "", param.newpwd);
@@ -98,7 +99,7 @@ public class ChangeAction extends UserBaseAction {
             throw new BusinessException(ErrorCodeOption.PhonenumError.key, ErrorCodeOption.PhonenumError.value);
         }
         //验证码是否有效
-        checkVercode(param.vercode,param.phonenum);
+        checkVercode(param.vercode, param.phonenum);
         Client client = AppContext.getSession().client;
         Account user = accountApi.getAccount(client.userId);
         Account oldUser = accountApi.getAccount(client.userId);
@@ -111,6 +112,24 @@ public class ChangeAction extends UserBaseAction {
         //</editor-fold>
         return new Output(data);
     }
+
+    @Label("更换公司信息")
+    @RequestMapping("user/chgcompany")
+    @WebApi(forceAuth = true, master = true, authority = {"1"})
+    public Output changeCompany(@Valid ChgCompanyParam param) {
+        AccountExt model = new AccountExt();
+        model.account_id = AppContext.getSession().client.userId;
+        model.company = param.company;
+        model.company_business = param.company_business;
+        model.company_contact = param.company_contact;
+        model.company_phone = param.company_phone;
+        accountApi.saveAccountExt(model);
+        //<editor-fold desc="操作日志">
+        dbLogUtil.addOperateLog(OpTypeOption.SaveAccountExt, ResTypeOption.Account, model.account_id, model);
+        //</editor-fold>
+        return new Output();
+    }
+
 
     /**
      * 验证码是否有效
@@ -204,6 +223,40 @@ class ChgPhoneParam {
 
     public void setPhonenum(String phonenum) {
         this.phonenum = phonenum;
+    }
+}
+
+class ChgCompanyParam {
+    @Label("公司名称")
+    @Length(max = 32, min = 0)
+    public String company;
+
+    @Label("公司主业")
+    @Length(max = 32, min = 0)
+    public String company_business;
+
+    @Label("联系人")
+    @Length(max = 16, min = 0)
+    public String company_contact;
+
+    @Label("联系电话")
+    @Length(max = 16, min = 0)
+    public String company_phone;
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    public void setCompany_business(String company_business) {
+        this.company_business = company_business;
+    }
+
+    public void setCompany_contact(String company_contact) {
+        this.company_contact = company_contact;
+    }
+
+    public void setCompany_phone(String company_phone) {
+        this.company_phone = company_phone;
     }
 }
 
