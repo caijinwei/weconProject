@@ -21,12 +21,20 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 
 	//初始化地图
 	$scope.initMap = function() {
+		var mapStr = T.common.util.getParameter("map");
 		//初始化地图
 		var geolocation = new BMap.Geolocation();
 		geolocation.getCurrentPosition(function(r) {
 			if(this.getStatus() == BMAP_STATUS_SUCCESS) {
 				var mk = new BMap.Marker(r.point);
-				map.centerAndZoom(r.point, 10) //标注当前位置
+				if(mapStr != null && mapStr !="") {
+					$scope.mapArray = mapStr.split(",");
+					var mPoint = new BMap.Point($scope.mapArray[0],$scope.mapArray[1]);
+					map.centerAndZoom(mPoint, 10) //标注当前位置
+				}else{
+					map.centerAndZoom(r.point, 10) //标注当前位置
+				}
+
 			} else {
 				alert('failed' + this.getStatus());
 			}

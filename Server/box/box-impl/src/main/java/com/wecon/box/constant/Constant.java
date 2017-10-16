@@ -56,6 +56,21 @@ public class Constant {
 		 * 监控点超时状态
 		 */
 		public static final int STATE_MONITOR_TIMEOUT = 2;
+
+		/**
+		 * 编译失败
+		 */
+		public static final int STATE_COMPILE_FAILED = -1;
+
+		/**
+		 * 地址转换失败
+		 */
+		public static final int STATE_ADDR_TRANS_FAILED = -2;
+
+		/**
+		 * 地址绑定失败
+		 */
+		public static final int STATE_ADDR_BIND_FAILED = -3;
 	}
 
 	public class DataType {

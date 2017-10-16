@@ -366,6 +366,10 @@ public class BoxNotifyTask extends Thread {
                         plcInfoApi.batchUpdateState(fUpdArgs);
                         plcInfoApi.batchUpdateFileMd5(fUpdArgs);
 
+                        //更新失败的状态
+                        List<String[]> fFailArgs = getFeedbackFailArgs(updComList, "com", null);
+                        plcInfoApi.batchUpdateState(fFailArgs);
+
                         //状态为4的删除监控点下的配置
                         /*List<Long> plcIds = plcInfoApi.getDeleteIdsByUpdTime(getFeedbackDelArgs(updComList, "com", null));
                         if(null != plcIds){
@@ -390,10 +394,12 @@ public class BoxNotifyTask extends Thread {
                 case ACT_UPDATE_REAL_HISTORY_CONFIG : //更新实时和历史监控点配置
                     List<Map> updRealHisCfgList = (List<Map>)fbData.get("upd_real_his_cfg_list");
                     realHisCfgApi.batchUpdateState(getFeedbackUpdArgs(updRealHisCfgList, "addr_id"));
+                    realHisCfgApi.batchUpdateState(getFeedbackFailArgs(updRealHisCfgList, "addr_id", null));
                     break;
                 case ACT_UPDATE_ALARM_DATA_CONFIG : //更新报警数据配置
                     List<Map> updAlarmCfgList = (List<Map>)fbData.get("upd_alarm_cfg_list");
                     alarmCfgApi.batchUpdateState(getFeedbackUpdArgs(updAlarmCfgList, "addr_id"));
+                    alarmCfgApi.batchUpdateState(getFeedbackFailArgs(updAlarmCfgList, "addr_id", null));
                     break;
                 case ACT_DELETE_MONITOR_CONFIG : //删除监控点配置
                     List<Map> delCfgList = (List<Map>)fbData.get("del_cfg_list");
@@ -416,6 +422,10 @@ public class BoxNotifyTask extends Thread {
                     viewAccountRoleApi.batchDeleteViewAccRoleByCfgId(alarmCfgIds, 2);
                     accountDirRelApi.batchDeleteAccDirRelByCfgId(realHisCfgIds, 1, 2);
                     accountDirRelApi.batchDeleteAccDirRelByCfgId(alarmCfgIds, 3);
+                    //更新失败的状态
+                    realHisCfgApi.batchUpdateState(getFeedbackFailArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_REAL));
+                    realHisCfgApi.batchUpdateState(getFeedbackFailArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_HISTORY));
+                    alarmCfgApi.batchUpdateState(getFeedbackFailArgs(delCfgList, "addr_id", Constant.DataType.DATA_TYPE_ALARM));
                     break;
                 case ACT_DELETE_PLC_CONFIG : //删除通讯口配置
                     List<Map> delComList = (List<Map>)fbData.get("del_com_list");
@@ -432,16 +442,22 @@ public class BoxNotifyTask extends Thread {
                     viewAccountRoleApi.batchDeleteViewAccRoleByCfgId(alarmCfgIdList, 2);
                     accountDirRelApi.batchDeleteAccDirRelByCfgId(realHisCfgIdList, 1, 2);
                     accountDirRelApi.batchDeleteAccDirRelByCfgId(alarmCfgIdList, 3);
+                    //更新失败的状态
+                    List<String[]> fFailArgs = getFeedbackFailArgs(delComList, "com", null);
+                    plcInfoApi.batchUpdateState(fFailArgs);
                     break;
                 case ACT_SEND_DRIVER_FILE : //下发驱动文件
                     String upd_state = fbData.get("upd_state").toString();
                     String upd_time = fbData.get("upd_time").toString();
                     String com = fbData.get("com").toString();
+                    List<String[]> fUpdArgs = new ArrayList<String[]>();
                     if(UPD_STATE_SUCCESS == Integer.parseInt(upd_state)){
-                        List<String[]> fUpdArgs = new ArrayList<String[]>();
                         fUpdArgs.add(new String[]{Constant.State.STATE_SYNCED_BOX+"", com, upd_time});
                         plcInfoApi.batchUpdateState(fUpdArgs);
                         plcInfoApi.batchUpdateFileMd5(fUpdArgs);
+                    }else if(0 > Integer.parseInt(upd_state)){
+                        fUpdArgs.add(new String[]{upd_state, com, upd_time});
+                        plcInfoApi.batchUpdateState(fUpdArgs);
                     }
                     break;
             }
@@ -452,6 +468,33 @@ public class BoxNotifyTask extends Thread {
         }catch (JSONException e){
             //e.printStackTrace();
         }
+    }
+
+    private List<String[]> getFeedbackFailArgs(List<Map> cfgList, String idKey, Integer delType){
+        if(null != cfgList){
+            List<String[]> updArgList = new ArrayList<String[]>();
+            for(Map m : cfgList){
+                try {
+                    int state = Integer.parseInt(m.get("upd_state").toString());
+                    if(0 > state){
+                        Object delTypeOj = m.get("del_type");
+                        String id = m.get(idKey).toString();
+                        String updTime = m.get("upd_time").toString();
+                        if(null != delTypeOj && null != delType){
+                            if(Integer.parseInt(delTypeOj.toString()) == delType){
+                                updArgList.add(new String[]{state+"", id, updTime});
+                            }
+                        }else{
+                            updArgList.add(new String[]{state+"", id, updTime});
+                        }
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+            return updArgList;
+        }
+        return null;
     }
 
     private List<String[]> getFeedbackUpdArgs(List<Map> updCfgList, String idKey){

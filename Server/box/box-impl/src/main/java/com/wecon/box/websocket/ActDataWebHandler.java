@@ -45,6 +45,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	private Map<String, Client> clients = new HashMap<String, Client>();
 	private Map<String, SubscribeListener> subscribeListeners = new HashMap<String, SubscribeListener>();
 	private Map<String, Map<String, Object>> paramMaps = new HashMap<String, Map<String, Object>>();
+	private Map<String, ClientMQTT> clientMQTTs = new HashMap<String, ClientMQTT>();
 
 	@Autowired
 	protected DbLogUtil dbLogUtil;
@@ -73,6 +74,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 			});
 
 			if ("0".equals(bParams.get("markid").toString())) {
+
 				logger.debug("WebSocket push begin");
 				if (paramMaps.get(session.getId()) != null) {
 					paramMaps.remove(session.getId());
@@ -90,136 +92,17 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 					RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(addr_id));
 					Device device = deviceApi.getDevice(realHisCfg.device_id);
 					String subscribeTopic = "pibox/cts/" + device.machine_code;
-
 					SendvalueCallback sendvalueCallback = new SendvalueCallback(session, addr_id);
 					ClientMQTT reclient = new ClientMQTT(subscribeTopic, "send" + session.getId(), sendvalueCallback);
 					reclient.start();
-
-					if (!reclient.topicPort.contains(subscribeTopic)) {
-						reclient.subscribe(subscribeTopic);
-					}
+					clientMQTTs.put(session.getId(), reclient);
+					sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteAct, reclient);
 				}
-				// 发送数据
-				sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteAct);
 			}
 		} catch (Exception ex) {
 			logger.error(ex);
 		}
 	}
-
-	/*class SendvalueCallback implements MqttCallback {
-		private WebSocketSession session;
-		private String addr_id;
-
-		public SendvalueCallback(WebSocketSession session, String addr_id) {
-			this.session = session;
-			this.addr_id = addr_id;
-		}
-
-		@Override
-		public void connectionLost(Throwable arg0) {
-
-		}
-
-		@Override
-		public void deliveryComplete(IMqttDeliveryToken arg0) {
-
-		}
-
-		@Override
-		public void messageArrived(String arg0, MqttMessage arg1) {
-
-			try {
-				String[] idexs = arg0.split("/");
-				String reMessage = new String(arg1.getPayload(), "UTF-8").trim();
-				logger.debug("mqtt消息：" + reMessage);
-
-				JSONObject json = new JSONObject();
-				JSONObject jsonObject = JSONObject.parseObject(reMessage);
-				String machineCode = jsonObject.getString("machine_code");
-				// 机器码为空消息直接忽略
-				if (CommonUtils.isNullOrEmpty(jsonObject.getString("machine_code"))) {
-					return;
-				}
-				// 如果消息的机器码和主题中的机器码不匹配直接忽略消息
-				if (!idexs[2].equals(machineCode)) {
-					logger.info("主题中的机器码和消息的机器码不匹配！");
-					return;
-				}
-				// act为空
-				if (CommonUtils.isNullOrEmpty(jsonObject.getInteger("act"))) {
-
-					logger.info("act为空！");
-					return;
-				}
-				if (1 != jsonObject.getInteger("act")) {
-					logger.info("act不为1！");
-					return;
-				}
-				if (CommonUtils.isNullOrEmpty(jsonObject.getInteger("feedback_act"))) {
-					logger.info("feedback_act为空！");
-					return;
-				}
-				if (2000 != jsonObject.getInteger("feedback_act")) {
-					logger.info("feedback_act不为2000！");
-					return;
-				}
-				// 数据为空
-				if (CommonUtils.isNullOrEmpty(jsonObject.getString("data"))) {
-					logger.info("data为空！");
-					return;
-				}
-				System.out.println("选中的addrid==" + addr_id);
-				System.out.println("接收的消息==" + reMessage);
-				JSONObject jsonBase = jsonObject.getJSONObject("data");
-				if (!CommonUtils.isNullOrEmpty(addr_id) && !CommonUtils.isNullOrEmpty(jsonBase.getInteger("addr_id"))) {
-					if (Integer.parseInt(addr_id) == jsonBase.getInteger("addr_id")) {
-
-						int upd_state = jsonBase.getInteger("upd_state");
-						if (1 == upd_state) {
-							json.put("resultData", 1);// 反馈成功信息
-
-						} else {
-							json.put("resultData", 0);
-							json.put("resultError", jsonBase.getString("upd_error"));
-						}
-						sendWSMassage(session, json.toJSONString());
-						addr_id = "-1";
-					}
-				}
-
-			} catch (Exception e) {
-				String simplename = e.getClass().getSimpleName();
-				if (!"JSONException".equals(simplename)) {
-					JSONObject errorjson = new JSONObject();
-					errorjson.put("resultData", 0);
-					errorjson.put("resultError", "下发错误，请重试");
-					sendWSMassage(session, errorjson.toJSONString());
-					logger.error(e);
-					e.printStackTrace();
-				}
-
-			}
-
-		}
-
-		// wbsock发送数据
-		public void sendWSMassage(WebSocketSession session, String message) {
-			try {
-				if (session != null && session.isOpen()) {
-					session.sendMessage(new TextMessage(message));
-				} else {
-					logger.debug(session != null);
-					logger.debug(session.isOpen());
-					logger.debug("----websockect 断开连接----");
-				}
-			} catch (Exception e) {
-				logger.error(e);
-			}
-
-		}
-
-	}*/
 
 	/**
 	 * 订阅redis消息
@@ -260,7 +143,12 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 					&& "0".equals(paramMaps.get(session.getId()).get("markid").toString())) {
 				try {
 					session.sendMessage(new TextMessage(getStringRealData(session)));
-				} catch (IOException e) {
+					if (null != clientMQTTs.get(session.getId())) {
+						clientMQTTs.get(session.getId()).close();
+						clientMQTTs.remove(session.getId());
+					}
+
+				} catch (Exception e) {
 					e.printStackTrace();
 					logger.debug("Subscribe callback error，" + e.getMessage());
 				}
@@ -446,10 +334,22 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
 		try {
 			logger.debug("关闭连接");
-			subscribeListeners.get(session.getId()).unsubscribe();
-			clients.remove(session.getId());
-			subscribeListeners.remove(session.getId());
-			paramMaps.remove(session.getId());
+			if (null != clients.get(session.getId())) {
+				clients.remove(session.getId());
+			}
+
+			if (null != subscribeListeners.get(session.getId())) {
+				subscribeListeners.get(session.getId()).unsubscribe();
+				subscribeListeners.remove(session.getId());
+			}
+
+			if (null != paramMaps.get(session.getId())) {
+				paramMaps.remove(session.getId());
+			}
+			if (null != clientMQTTs.get(session.getId())) {
+				clientMQTTs.get(session.getId()).close();
+				clientMQTTs.remove(session.getId());
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.debug("afterConnectionClosed，" + e.getMessage());
