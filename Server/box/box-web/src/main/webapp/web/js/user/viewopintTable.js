@@ -18,6 +18,9 @@ appModule.controller("listController", function ($scope, $http, $compile) {
                 if (this.currentPage != 0) {
                     $scope.getRestList(this.currentPage, this.itemsPerPage);
                 }
+                //全选按钮
+                $scope.isChecked = 0;
+                $scope.allCheck = 0;
             }
         }
         $scope.showDeviceList();
@@ -119,7 +122,7 @@ appModule.controller("listController", function ($scope, $http, $compile) {
      * 全选功能实现
      * */
     //默认没有选中全选
-    $scope.isChecked = 0;
+
     $scope.selectAll = function () {
         if ($scope.isChecked == 0) {
             $scope.isChecked = 1;
