@@ -42,7 +42,7 @@
         <form class="bs-example bs-example-form" role="form" ng-if="type==1">
             <div class="input-group">
                 <input id="searchinput" type="text" class="form-control"
-                       placeholder="搜索：PIBox名称"/> <span class="input-group-btn">
+                       placeholder="搜索：V-BOX名称"/> <span class="input-group-btn">
 						<button class="btn btn-info" type="button">
                             <span class="glyphicon glyphicon-search"></span>
                         </button>
@@ -100,7 +100,7 @@
                         <button type="button" class="close" data-dismiss="modal">
                             <span>&times;</span>
                         </button>
-                        <h4 class="modal-title">添加PIBox</h4>
+                        <h4 class="modal-title">添加V-BOX</h4>
                     </div>
                     <div class="modal-body">
                         <div class="container-fluid">
@@ -108,21 +108,21 @@
                                 <div class="form-group">
                                     <i class="fa fa-code icon"></i> <input type="text"
                                                                            class="form-control" id="machine_code"
-                                                                           placeholder="PIBox机器码"/>
+                                                                           placeholder="V-BOX机器码"/>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group">
                                     <i class="fa fa-lock fa-lg icon"></i> <input type="text"
                                                                                  class="form-control" id="dev_password"
-                                                                                 placeholder="PIBox密码"/>
+                                                                                 placeholder="V-BOX密码"/>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="form-group">
                                     <i class="fa fa-user fa-lg icon"></i> <input type="text" MAXLENGTH="15"
                                                                                  class="form-control" id="dev_name"
-                                                                                 placeholder="PIBox别名"/>
+                                                                                 placeholder="V-BOX别名"/>
                                 </div>
                             </div>
                             <div class="row" style="margin-top: 20px; margin-bottom: 20px;">
@@ -168,7 +168,7 @@
 
         <ul class=" nav nav-pills nav-stacked" role="tablist"
             id="overviewtab" style="margin-top: 40px;" ng-cloak ng-if="type==2">
-            <li class="active"><a href="web/html/datamonitor.html?device_id=-200&device_name=数据监控"
+            <li class="active"><a href="web/html/datamonitor.html?device_id=-200&device_name=实时数据"
                                   target="content_frame"> <span
                     class="glyphicon glyphicon-eye-open" style="color: white;"> 自定义监控点</span>
             </a></li>
@@ -217,7 +217,7 @@
     <div id="right" class="col-xs-9 col-sm-9 col-md-10 col-lg-10">
         <iframe name="content_frame" frameborder="0" ng-if="type==0"></iframe>
         <iframe src="web/html/overview.html" name="content_frame" frameborder="0" ng-if="type==1"></iframe>
-        <iframe src="web/html/datamonitor.html?device_id=-200&device_name=数据监控" name="content_frame" frameborder="0"
+        <iframe src="web/html/datamonitor.html?device_id=-200&device_name=实时数据" name="content_frame" frameborder="0"
                 ng-if="type==2"></iframe>
     </div>
 </div>

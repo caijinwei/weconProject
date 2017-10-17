@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -507,7 +508,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		}
 		String sqlCount = "select count(distinct r.id, ad.id) " + fromStr
 				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and r.id=adr.ref_id and r.bind_state=1 and r.state != "+ Constant.State.STATE_DELETE_CONFIG;
-		String sql = "select distinct " + SEL_COL + ",d.machine_code, d.state as dstate, adr.ref_alais" + "  " + fromStr
+		String sql = "select distinct " + SEL_COL + ",d.machine_code, d.state as dstate, adr.ref_alais,adr.acc_dir_id" + "  " + fromStr
 				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and r.id=adr.ref_id and r.bind_state=1 and r.state != "+ Constant.State.STATE_DELETE_CONFIG;
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
@@ -549,7 +550,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		}
 		String sqlCount = "select count(distinct r.id, ad.id) " + fromStr
 				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and r.id=adr.ref_id and r.bind_state=1";
-		String sql = "select distinct " + SEL_COL + ",d.machine_code, d.state as dstate, adr.ref_alais" + "  " + fromStr
+		String sql = "select distinct " + SEL_COL + ",d.machine_code, d.state as dstate, adr.ref_alais,adr.acc_dir_id" + "  " + fromStr
 				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and r.id=adr.ref_id and r.bind_state=1";
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
@@ -563,21 +564,24 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	}
 
 	@Override
-	public RealHisCfgDevice getRealHisCfgDevice(long id) {
-		String sql = "select " + SEL_COL + ",d.machine_code from real_his_cfg r ,device d"
-				+ " where  r.device_id=d.device_id and r.id = ?";
-		List<RealHisCfgDevice> list = jdbcTemplate.query(sql, new Object[] { id }, new RowMapper<RealHisCfgDevice>() {
+	public Map getRealCfgDetail(long id) {
+		String sql = "select " + SEL_COL + ",d.machine_code, p.port from real_his_cfg r ,device d, plc_info p"
+				+ " where  r.device_id=d.device_id and r.id = ? and p.device_id=r.device_id";
+		List<Map> list = jdbcTemplate.query(sql, new Object[] { id }, new RowMapper<Map>() {
 			@Override
-			public RealHisCfgDevice mapRow(ResultSet rs, int i) throws SQLException {
-				RealHisCfgDevice model = new RealHisCfgDevice();
-				model.id = rs.getLong("id");
-				model.plc_id = rs.getLong("plc_id");
-				model.name = rs.getString("name");
-				model.data_type = rs.getInt("data_type");
-				model.state = rs.getInt("state");
-				model.create_date = rs.getTimestamp("create_date");
-				model.update_date = rs.getTimestamp("update_date");
-				model.machine_code = rs.getString("machine_code");
+			public Map mapRow(ResultSet rs, int i) throws SQLException {
+				Map model = new HashMap();
+				model.put("id", rs.getLong("id"));
+				model.put("plc_id", rs.getLong("plc_id"));
+				model.put("machine_code", rs.getString("machine_code"));
+				model.put("name", rs.getString("name"));
+				model.put("port", rs.getString("port"));
+				model.put("addr_type", rs.getInt("addr_type"));
+				model.put("rid", rs.getString("rid"));
+				model.put("addr", rs.getString("addr"));
+				model.put("data_id", rs.getLong("data_id"));
+				model.put("digit_count", rs.getString("digit_count"));
+				model.put("describe", rs.getString("describe"));
 				return model;
 			}
 		});
@@ -778,6 +782,9 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.device_id = rs.getLong("device_id");
 			model.bind_state = rs.getInt("bind_state");
 			model.dstate = rs.getInt("dstate");
+			try {
+				model.dir_id = rs.getLong("acc_dir_id");
+			}catch (Exception e){}
 			return model;
 		}
 	}

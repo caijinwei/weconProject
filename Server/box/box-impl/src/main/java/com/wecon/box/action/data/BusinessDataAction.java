@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.*;
 import com.wecon.box.entity.*;
+import com.wecon.box.enums.DataTypeOption;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.filter.AlarmCfgDataFilter;
 import com.wecon.box.filter.RealHisCfgFilter;
@@ -330,27 +331,47 @@ public class BusinessDataAction {
     @WebApi(forceAuth = true, master = true)
     public Output getRealDetail(BusinessDataParam param) {
         JSONObject json = new JSONObject();
-        RealHisCfgDevice realHisCfgDevice = realHisCfgApi.getRealHisCfgDevice(param.monitorId);
-        if(null != realHisCfgDevice){
-            String device_machine = realHisCfgDevice.machine_code;
+        Map realCfgMap = realHisCfgApi.getRealCfgDetail(param.monitorId);
+        if(null != realCfgMap){
+            String device_machine = realCfgMap.get("machine_code").toString();
             // 通过机器码去redis中获取数据
             RedisPiBoxActData redisPiBoxActData = redisPiBoxApi.getRedisPiBoxActData(device_machine);
             List<PiBoxCom> actTimeDataList = null == redisPiBoxActData ? null : redisPiBoxActData.act_time_data_list;
             JSONObject data = new JSONObject();
-            data.put("monitorName", realHisCfgDevice.name);
-            data.put("dataType", realHisCfgDevice.data_type);
-            data.put("machine_code", realHisCfgDevice.machine_code);
-            data.put("com", realHisCfgDevice.plc_id);
-            data.put("addr_id", realHisCfgDevice.id);
-            data.put("number", 0);
+            data.put("monitorName", realCfgMap.get("name"));
+            data.put("connectDevice", realCfgMap.get("port"));
+            int addrType = Integer.parseInt(realCfgMap.get("addr_type").toString());
+            data.put("addrType", addrType==0?"位地址":addrType==1?"字节地址":addrType==2?"字地址":"双字");
+            data.put("registerType", realCfgMap.get("rid"));
+            // 主子地址分割
+            String[] addrs = realCfgMap.get("addr").toString().split(",");
+            if (addrs != null) {
+                data.put("registerAddr", addrs[0]);
+            }
+            String dataType = DataTypeOption.getDataTypeValue(Long.parseLong(realCfgMap.get("data_id").toString()));
+            data.put("dataType", dataType);
+            // 整数位 小数位分割
+            if (realCfgMap.get("digit_count") != null) {
+                String[] numdecs = realCfgMap.get("digit_count").toString().split(",");
+                if (numdecs != null) {
+                    if (numdecs.length == 1) {
+                        data.put("integerDigit", numdecs[0]);
+                        data.put("decimalDigit", "");
+                    } else if (numdecs.length == 2) {
+                        data.put("integerDigit", numdecs[0]);
+                        data.put("decimalDigit", numdecs[1]);
+                    }
+                }
+            }
+            data.put("describe", realCfgMap.get("describe"));
             if(null != actTimeDataList){
                 for (int j = 0; j < actTimeDataList.size(); j++) {
                     PiBoxCom piBoxCom = actTimeDataList.get(j);
-                    if (Long.parseLong(piBoxCom.com) == realHisCfgDevice.plc_id) {
+                    if (piBoxCom.com.equals(realCfgMap.get("plc_id").toString())) {
                         List<PiBoxComAddr> addrList = piBoxCom.addr_list;
                         for (int k = 0; k < addrList.size(); k++) {
                             PiBoxComAddr piBoxComAddr = addrList.get(k);
-                            if (Long.parseLong(piBoxComAddr.addr_id) == realHisCfgDevice.id) {
+                            if (piBoxComAddr.addr_id.equals(realCfgMap.get("id").toString())) {
                                 data.put("state", piBoxComAddr.state);
                                 data.put("number", piBoxComAddr.value);
                             }

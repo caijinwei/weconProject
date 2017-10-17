@@ -206,7 +206,7 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 			condition.append(" and rd.real_his_cfg_id = ?");
 			params.add(monitorId);
 		}
-		String sqlCount = "select count(distinct r.id) " + fromStr + whereStr;
+		String sqlCount = "select count(distinct rd.real_his_cfg_id, rd.monitor_time) " + fromStr + whereStr;
 		String sql = "select distinct r.id, r.name, rd.value, rd.monitor_time" + "  "+fromStr + whereStr;
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
@@ -261,7 +261,7 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 			condition.append(" and rd.real_his_cfg_id = ?");
 			params.add(monitorId);
 		}
-		String sqlCount = "select count(distinct r.id) " + fromStr + whereStr;
+		String sqlCount = "select count(distinct rd.real_his_cfg_id, rd.monitor_time) " + fromStr + whereStr;
 		String sql = "select distinct r.id, r.name, rd.value, rd.monitor_time" + fromStr+ whereStr;
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
