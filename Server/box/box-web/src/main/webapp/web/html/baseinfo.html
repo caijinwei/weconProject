@@ -7,6 +7,7 @@
     <link rel="stylesheet" type="text/css" href="../css/style.css"/>
     <link rel="stylesheet" href="../lib/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="../lib/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../lib/bootstrap/bootstrap-switch/css/bootstrap-switch.min.css">
     <link href="../lib/jquery-editable-select.css" rel="stylesheet">
 </head>
 <body style="margin-top: 20px;" ng-controller="infoController" ng-init="onInit()">
@@ -39,7 +40,7 @@
             <!-- 基本信息展示-->
             <div class="container-fluid" style="margin-top: 12px;font-size: 15px;">
                 <div class="row" style="margin-top: 20px;">
-                    <span class="col-md-1">PIBox名称</span>
+                    <span class="col-md-1">V-BOX名称</span>
 
                     <div class="col-md-11">
                         <div class="form-group" style="display: inline-block;font-weight: bold;">
@@ -84,7 +85,8 @@
                     <span class="col-md-1">备注信息</span>
 
                     <div class="form-group col-md-5" style="display: inline-block;">
-                        <textarea class="form-control" id="remark" rows="4" maxlength="500">{{infoData.remark}}</textarea>
+                        <textarea class="form-control" id="remark" rows="4"
+                                  maxlength="500">{{infoData.remark}}</textarea>
                     </div>
                 </div>
 
@@ -92,7 +94,7 @@
                     <span class="col-md-1">高级功能</span>
                     <!--<div class="btn-group" style="margin-left: 10px;">-->
                     <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deletePIBox">
-                        删除PIBox
+                        删除V-BOX
                     </button>
                     <button type="button" class="btn btn-info" ng-click="chgPiboxInFoName(infoData.device_id)">保存修改
                     </button>
@@ -172,13 +174,13 @@
                                     <i name="act_i_state" ng-switch-when="0">
                                     </i>
                                     <i name="act_i_state" ng-switch-when="1" class="fa  fa-circle"
-                                         style="color: orange;" data-toggle="tooltip" title="条目未下发">
-                                     </i>
+                                       style="color: orange;" data-toggle="tooltip" title="条目未下发">
+                                    </i>
                                     <i name="act_i_state" ng-switch-when="2" class="fa  fa-circle"
-                                        style="color: orange;" data-toggle="tooltip" title="条目未下发">
+                                       style="color: orange;" data-toggle="tooltip" title="条目未下发">
                                     </i>
                                     <i name="act_i_state" ng-switch-when="3" class="fa  fa-circle"
-                                        style="color: orange;" data-toggle="tooltip" title="条目未下发">
+                                       style="color: orange;" data-toggle="tooltip" title="条目未下发">
                                     </i>
                                      <i name="act_i_state" ng-switch-when="4" class="fa  fa-circle"
                                         style="color: orange;" data-toggle="tooltip" title="条目未下发">
@@ -200,12 +202,12 @@
                             <td>{{x.comtype==0?'RS232':(x.comtype==1?'RS485':'RS422')}}</td>
                             <td>{{x.type}}</td>
                             <!--<td>-->
-                                <!--{{x.state==0?'已同步给盒子':(x.state==1?'新增配置':(x.state==2?'更新配置':(x.state==3?'删除配置':(x.state==4?'更改驱动':'未知状态'))))}}-->
+                            <!--{{x.state==0?'已同步给盒子':(x.state==1?'新增配置':(x.state==2?'更新配置':(x.state==3?'删除配置':(x.state==4?'更改驱动':'未知状态'))))}}-->
                             <!--</td>-->
                             <td>
                                 <a href="#" data-toggle="modal" data-target="#addConfig" ng-if="x.state!=3"
                                    ng-click="setplc_id(x.plcId)"><span
-                                        class="glyphicon glyphicon-edit" title="编辑"
+                                        class="glyphicon glyphicon-edit" title="通讯口编辑"
                                         style="color:#2889d0;margin:10px;"></span></a>
                                 <a href="#" ng-click="deletePlc(x.plcId)"><span class="glyphicon glyphicon-trash"
                                                                                 data-toggle="modal"
@@ -265,97 +267,109 @@
 
                                 <div class="container-fluid">
                                     <div class="row">
-                                        <div class="col-md-6 " style="margin: 10px 0;">
-                                            <span class="col-md-5">设备ID</span>
+                                        <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px;">
+                                            <span class="col-md-4">设备ID</span>
                                             <input class="col-md-7" name="device_id" id="device_id"
                                                    style="height: 30px; cursor: not-allowed;" disabled/>
+                                            <span class="col-md-1" style="padding: 0px"></span>
                                         </div>
-                                        <div class="col-md-6 " style="margin: 10px 0;">
-
-                                            <span class="col-md-5"><span style="color: red">*</span>通讯协议</span>
+                                        <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
+                                            <span class="col-md-4"><span style="color: red">*</span>通讯协议</span>
                                             <select class="col-md-7" name="port" style="height: 30px;" id="port"
                                                     ng-change="chgPort()" ng-model="selectedPort">
                                                 <option value="COM1">COM1</option>
                                                 <option value="COM2">COM2</option>
                                                 <option value="Ethernet">Ethernet</option>
                                             </select>
+                                            <span class="col-md-1" style="padding: 0px"></span>
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-6 " style="margin: 10px 0;">
-                                            <span class="col-md-5"><span style="color: red">*</span>设备类型</span>
+                                        <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
+                                            <span class="col-md-4"><span style="color: red">*</span>设备类型</span>
                                             <select class="col-md-7" style="height: 30px;" ng-model="selectedPtype"
                                                     id="ptype"
                                                     ng-change="chgPtype()">
                                                 <option ng-repeat="x in pTypeSet" value="{{x}}">{{x}}</option>
                                             </select>
+                                            <span class="col-md-1" style="padding: 0px"></span>
                                         </div>
 
-                                        <div class=" col-md-6 " style="margin: 10px 0;">
-                                            <span class="col-md-5"><span style="color: red">*</span>驱动名称</span>
+                                        <div class=" col-md-6 " style="margin: 10px 0;padding-right: 0px">
+                                            <span class="col-md-4"><span style="color: red">*</span>驱动名称</span>
                                             <select class="col-md-7" style="height: 30px;" id="type" name="type"
                                                     ng-model="selectedType" ng-change="chgType()">
                                                 <option ng-repeat="x in pType" value="{{x.type}}">{{x.type}}</option>
                                             </select>
+                                            <span class="col-md-1" style="padding: 0px"></span>
                                         </div>
                                     </div>
 
 
                                     <div class="row">
-                                        <div class="col-md-6 " style="margin: 10px 0;">
-                                            <span class="col-md-5"><span style="color: red">*</span>盒子站号</span>
+                                        <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
+                                            <span class="col-md-4"><span style="color: red">*</span>盒子站号</span>
                                             <input class="col-md-7" style="height: 30px;" type="number"
                                                    name="box_stat_no"
                                                    id="box_stat_no"/>
+                                            <span class="col-md-1" style="padding: 0px"></span>
                                         </div>
-                                        <div class="col-md-6 " style="margin: 10px 0;">
-                                            <span class="col-md-5"><span style="color: red">*</span>PLC站号</span>
+                                        <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
+                                            <span class="col-md-4"><span style="color: red">*</span>PLC站号</span>
                                             <input class="col-md-7" style="height: 30px;" name="plc_stat_no"
                                                    type="number"
                                                    id="plc_stat_no"/>
+                                            <span class="col-md-1" style="padding: 0px"></span>
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-6 " style="margin: 10px 0;">
-                                            <span class="col-md-5"><span style="color: red">*</span>重试次数</span>
+                                        <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
+                                            <span class="col-md-4"><span style="color: red">*</span>重试次数</span>
                                             <input class="col-md-7" style="height: 30px;" type="number"
                                                    name="retry_times"
                                                    id="retry_times"/>
+                                            <span class="col-md-1" style="padding: 0px"></span>
                                         </div>
-                                        <div class="col-md-6 " style="margin: 10px 0;">
-                                            <span class="col-md-5"><span style="color: red">*</span>等待超时 ms</span>
+                                        <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
+                                            <span class="col-md-4"><span style="color: red">*</span>等待超时</span>
                                             <input class="col-md-7" style="height: 30px;" type="number"
                                                    name="wait_timeout"
                                                    id="wait_timeout"/>
+                                            <span class="col-md-1" style="padding: 0px">ms</span>
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-6 " style="margin: 10px 0;">
-                                            <span class="col-md-5"><span style="color: red">*</span>接收超时 ms</span>
-                                            <input class="col-md-7" style="height: 30px;" type="number"
-                                                   name="rev_timeout"
-                                                   id="rev_timeout"/>
+                                        <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
+                                            <span class="col-md-4"><span style="color: red">*</span>接收超时</span>
+
+                                                <input  class="col-md-7" style="height: 30px" type="number"
+                                                       name="rev_timeout"
+                                                       id="rev_timeout"/>
+                                                <span class="col-md-1" style="padding: 0px">ms</span>
                                         </div>
-                                        <div class="col-md-6 " style="margin: 10px 0;">
-                                            <span class="col-md-5"><span style="color: red">*</span>连续长度</span>
+                                        <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
+                                            <span class="col-md-4"><span style="color: red">*</span>连续长度</span>
                                             <input class="col-md-7" style="height: 30px;" type="number"
                                                    name="com_stepinterval"
                                                    id="com_stepinterval"/>
+                                            <span class="col-md-1" style="padding: 0px"></span>
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-md-6 " style="margin: 10px 0;">
-                                            <span class="col-md-5"><span style="color: red">*</span>通讯延迟时间 ms</span>
+                                        <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
+                                            <span class="col-md-4" style="padding-right: 0px"><span style="color: red">*</span>通讯延迟时间</span>
                                             <input class="col-md-7" style="height: 30px;" type="number"
                                                    name="com_iodelaytime"
                                                    id="com_iodelaytime"/>
+                                            <span class="col-md-1" style="padding: 0px">ms</span>
                                         </div>
-                                        <div class="col-md-6 " style="margin: 10px 0;">
-                                            <span class="col-md-5"><span style="color: red">*</span>重试超时 s</span>
+                                        <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
+                                            <span class="col-md-4"><span style="color: red">*</span>重试超时</span>
                                             <input class="col-md-7" style="height: 30px;" type="number"
                                                    name="retry_timeout"
                                                    id="retry_timeout"/>
                                         </div>
+                                        <span class="col-md-1" style="padding: 0px"></span>
                                     </div>
 
                                     <!--串口参数设置-->
@@ -366,9 +380,9 @@
                                                 <!--<input class="col-md-10" style="height: 30px;" type="number"-->
                                                 <!--name="baudrate"-->
                                                 <!--id="baudrate"/>-->
-                                                <span class="col-md-10" style="padding: 0%;padding-left: 20px">
+                                                <span class="col-md-10" style="padding: 0%;padding-left: 0px;padding-right: 12px">
                                                 <select style="height: 30px; width: 100%;"
-                                                        name="baudrate" id="baudrate" >
+                                                        name="baudrate" id="baudrate">
                                                     <option>187500</option>
                                                     <option>115200</option>
                                                     <option>57600</option>
@@ -382,36 +396,38 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-6 " style="margin: 10px 0;">
-                                                <span class="col-md-5"><span style="color: red">*</span>串口协议</span>
+                                            <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
+                                                <span class="col-md-4"><span style="color: red">*</span>串口协议</span>
                                                 <select class="col-md-7" style="height: 30px;" name="comtype"
                                                         id="comtype">
                                                     <option value="0">RS232</option>
                                                     <option value="1">RS485</option>
                                                     <option value="2">RS422</option>
                                                 </select>
-
+                                                <span class="col-md-1" style="padding: 0px"></span>
                                             </div>
-                                            <div class="col-md-6 " style="margin: 10px 0;">
-                                                <span class="col-md-5"><span style="color: red">*</span>停止位</span>
+                                            <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
+                                                <span class="col-md-4"><span style="color: red">*</span>停止位</span>
                                                 <select class="col-md-7" style="height: 30px;" name="stop_bit"
                                                         id="stop_bit">
                                                     <option value="1">1</option>
                                                     <option value="2">2</option>
                                                 </select>
+                                                <span class="col-md-1" style="padding: 0px"></span>
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-6 " style="margin: 10px 0;">
-                                                <span class="col-md-5"><span style="color: red">*</span>数据位</span>
+                                            <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
+                                                <span class="col-md-4"><span style="color: red">*</span>数据位</span>
                                                 <select class="col-md-7" style="height: 30px;" name="data_length"
                                                         id="data_length">
                                                     <option value="7">7</option>
                                                     <option value="8">8</option>
                                                 </select>
+                                                <span class="col-md-1" style="padding: 0px"></span>
                                             </div>
-                                            <div class="col-md-6 " style="margin: 10px 0;">
-                                                <span class="col-md-5"><span style="color: red">*</span>校验位</span>
+                                            <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
+                                                <span class="col-md-4"><span style="color: red">*</span>校验位</span>
                                                 <select class="col-md-7" style="height: 30px;" name="check_bit"
                                                         id="check_bit">
                                                     <option value="EVEN">EVEN</option>
@@ -419,6 +435,7 @@
                                                     <option value="ODD">ODD</option>
                                                     <option value="SPACE">SPACE</option>
                                                 </select>
+                                                <span class="col-md-1" style="padding: 0px"></span>
                                             </div>
                                         </div>
                                     </div>
@@ -426,14 +443,15 @@
                                     <div ng-show="ethernetShow==1">
 
                                         <div class="row">
-                                            <div class="col-md-6 " style="margin: 10px 0;">
-                                                <span class="col-md-5"><span style="color: red">*</span>端口</span>
+                                            <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
+                                                <span class="col-md-4"><span style="color: red">*</span>端口</span>
                                                 <input class="col-md-7" style="height: 30px;" type="number"
                                                        name="net_port"
                                                        id="net_port"/>
+                                                <span class="col-md-1" style="padding: 0px"></span>
                                             </div>
-                                            <div class="col-md-6 " style="margin: 10px 0;">
-                                                <span class="col-md-5"><span style="color: red">*</span>网络类型</span>
+                                            <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
+                                                <span class="col-md-4"><span style="color: red">*</span>网络类型</span>
                                                 <select class="col-md-7" style="height: 30px;" name="net_type"
                                                         id="net_type">
                                                     <option value="0">tcp_client</option>
@@ -443,19 +461,18 @@
                                                     <option value="4">tcp_server</option>
                                                     <option value="5">udp_server</option>
                                                 </select>
+                                                <span class="col-md-1" style="padding: 0px"></span>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6 " style="margin: 10px 0;">
-                                             <span class="col-md-7">
-                                            <span style="color: red">*</span>
-                                            使用广播地址</span>
-                                             <span class="col-md-5">
-                                                 <input type="checkbox"
-                                                        ng-click="isBroadcast()"
-                                                        name="net_isbroadcast"
-                                                        id="net_isbroadcast"/>
-                                                 </span>
+                                             <span class="col-md-7"><span style="color: red">*</span>使用广播地址</span>
+                                                 <!--<input type="checkbox"-->
+                                                        <!--ng-click="isBroadcast()"-->
+                                                        <!--name="net_isbroadcast"-->
+                                                        <!--id="net_isbroadcast"/>-->
+                                                 <!--</span>-->
+                                                <input class="col-md-5" id="net_isbroadcast" name="switch-state" ng-click="isBroadcast()" type="checkbox" ng-checked="x.state==1">
 
                                                 <!--<span class="col-md-8"><span style="color: red">*</span>使用广播地址</span>-->
                                                 <!--<input class="col-md-4" style="height: 30px; margin-left: 0px" type="checkbox"-->
@@ -463,19 +480,21 @@
                                                 <!--name="net_isbroadcast"-->
                                                 <!--id="net_isbroadcast"/>-->
                                             </div>
-                                            <div class="col-md-6 " style="margin: 10px 0;">
-                                                <span class="col-md-5"><span style="color: red">*</span>广播地址站号</span>
+                                            <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
+                                                <span class="col-md-4"><span style="color: red">*</span>广播地址站号</span>
                                                 <input class="col-md-7" style="height: 30px;cursor: default"
                                                        type="number"
                                                        name="net_broadcastaddr"
                                                        id="net_broadcastaddr"/>
+                                                <span class="col-md-1" style="padding: 0px"></span>
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-6 " style="margin: 10px 0;">
-                                                <span class="col-md-5"><span style="color: red">*</span>IP地址</span>
+                                            <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
+                                                <span class="col-md-4"><span style="color: red">*</span>IP地址</span>
                                                 <input class="col-md-7" style="height: 30px;" name="net_ipaddr"
                                                        id="net_ipaddr"/>
+                                                <span class="col-md-1" style="padding: 0px"></span>
                                             </div>
                                             <!--<div class="col-md-6 " style="margin: 10px 0;">-->
                                             <!--<span class="col-md-5"><span style="color: red">*</span>state</span>-->
@@ -490,7 +509,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-info" ng-click="chgTypeNotice()">确定</button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal" >取消</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                         </div>
                     </div>
                 </div>
@@ -655,7 +674,7 @@
                                     ng-click="update()">更新
                             </button>
                             <button type="button" class="btn btn-default" id="btn-ckgUpd-cancel"
-                                    data-dismiss="modal" >取消
+                                    data-dismiss="modal">取消
                             </button>
                         </div>
                     </div>
@@ -690,6 +709,9 @@
 
 <script src="../lib/jquery/jquery-3.2.1.min.js"></script>
 <script src="../lib/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<script src="../lib/bootstrap/bootstrap-switch/js/highlight.js"></script>
+<script src="../lib/bootstrap/bootstrap-switch/js/bootstrap-switch.min.js"></script>
 <script src="../lib/bootstrap/select/js/bootstrap-select.js"></script>
 <script src="../lib/angular/angular.min.js" type="text/javascript"></script>
 <script src="../lib/wecon-common.js"></script>

@@ -188,7 +188,16 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $("#retry_timeout").val($scope.plcInfoById.retry_timeout);
                 $('#box_stat_no').val($scope.plcInfoById.box_stat_no);
                 $('#plc_stat_no').val($scope.plcInfoById.plc_stat_no);
-                //$('#retry_times').val($scope.plcInfoById.retry_times);
+                $scope.createSwitchState();
+                if($scope.plcInfoById.net_isbroadcast==1){
+                    $("#net_isbroadcast").attr("checked","true");
+                    $('[name="switch-state"]').bootstrapSwitch('state', true, true);
+                    $('#net_broadcastaddr').removeAttr('disabled');
+                }else{
+                    $("#net_isbroadcast").attr("checked","false");
+                    $('[name="switch-state"]').bootstrapSwitch('state', false, true);
+                    $('#net_broadcastaddr').attr("disabled", "disabled");
+                }
                 $scope.selectedType = temType;
                 $scope.$apply();
             }
@@ -415,7 +424,13 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             $('#net_type').val(type[0].net_type);
             $('#net_port').val(type[0].net_port);
             $('#net_isbroadcast').val(type[0].net_isbroadcast);
+            $('#net_broadcastaddr').attr("disabled", "disabled");
             $('#net_broadcastaddr').val(type[0].net_broadcastaddr);
+            //默认设置
+            $scope.createSwitchState();
+            $('[name="switch-state"]').bootstrapSwitch('state', false, true);
+            $('#net_broadcastaddr').attr("disabled", "disabled");
+
         } else if ($('#port').val() == 'COM1' || $('#port').val() == "COM2") {
             $scope.portIfShow = 1;
             $scope.ethernetShow = 0;
@@ -501,17 +516,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         return reg.test(ip);
     }
 
-    /*
-     * 是否使用广播地址
-     * */
-    $scope.isBroadcast = function () {
-        if ($('#net_isbroadcast').is(':checked')) {
-            $('#net_broadcastaddr').attr("disabled", "disabled");
-            //$('#net_broadcastaddr').css('','');
-        } else {
-            $('#net_broadcastaddr').removeAttr('disabled');
-        }
-    }
     $scope.cleanInput = function () {
         $("#addConfig").modal("show");
         clearForm($('#addConfig'));
@@ -820,6 +824,38 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         }, function () {
             console.log("ajax error");
         });
+    }
+
+
+    /*
+     * 是否使用广播地址
+     * */
+    //$scope.isBroadcast = function () {
+    //    if ($('#net_isbroadcast').is(':checked')) {
+    //        $('#net_broadcastaddr').attr("disabled", "disabled");
+    //        //$('#net_broadcastaddr').css('','');
+    //    } else {
+    //        $('#net_broadcastaddr').removeAttr('disabled');
+    //    }
+    //}
+    //使用广播地址  js方法
+    $scope.createSwitchState = function () {
+        $('[name="switch-state"]').bootstrapSwitch({
+            onText: "启用",
+            offText: "禁用",
+            onColor: "success",
+            offColor: "danger",
+            size: "small",
+            onSwitchChange: function (event, state) {
+                if(state==false){
+                    $('#net_broadcastaddr').attr("disabled", "disabled");
+                    $('#net_isbroadcast').val(0);
+                }else{
+                    $('#net_broadcastaddr').removeAttr('disabled');
+                    $('#net_isbroadcast').val(1);
+                }
+            }
+        })
     }
 
 //-----------------------------------------------------更新 等待反馈------------------------------------------------------------------
