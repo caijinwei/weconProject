@@ -1336,9 +1336,6 @@ appModule
 						var addrs = [];
 						var scaliedata, child_scaliedata;
 						var scalies = [];
-						console.log("1=="+plcId);
-						console.log("2=="+$("#addrtypeid").val());
-						console.log("3=="+$("#registerid").val());
 						if (plcId == undefined
 								|| $("#addrtypeid").val() == undefined
 								|| $("#registerid").val() == undefined) {
@@ -1728,10 +1725,18 @@ appModule
 								alert("触发值不能为空");
 								return;
 							}
+							if ($("#onenumid").val().length > 60) {
+								alert("触发值字符长度不能大于50位！");
+								return;
+							}
 							values.push($("#onenumid").val());
 							if ($("#selectWith").val() != 0) {
 								if ($("#twonumid").val() == "") {
 									alert("触发值不能为空");
+									return;
+								}
+								if ($("#twonumid").val().length > 60) {
+									alert("触发值字符长度不能大于50位！");
 									return;
 								}
 								types.push($("#conditiontwoid").val());
