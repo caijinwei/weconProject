@@ -168,7 +168,7 @@
 
         <ul class=" nav nav-pills nav-stacked" role="tablist"
             id="overviewtab" style="margin-top: 40px;" ng-cloak ng-if="type==2">
-            <li class="active"><a href="web/html/datamonitor.html?device_id=-200&device_name=数据监控"
+            <li class="active"><a href="web/html/datamonitor.html?device_id=-200&device_name=实时数据"
                                   target="content_frame"> <span
                     class="glyphicon glyphicon-eye-open" style="color: white;"> 自定义监控点</span>
             </a></li>
@@ -217,7 +217,7 @@
     <div id="right" class="col-xs-9 col-sm-9 col-md-10 col-lg-10">
         <iframe name="content_frame" frameborder="0" ng-if="type==0"></iframe>
         <iframe src="web/html/overview.html" name="content_frame" frameborder="0" ng-if="type==1"></iframe>
-        <iframe src="web/html/datamonitor.html?device_id=-200&device_name=数据监控" name="content_frame" frameborder="0"
+        <iframe src="web/html/datamonitor.html?device_id=-200&device_name=实时数据" name="content_frame" frameborder="0"
                 ng-if="type==2"></iframe>
     </div>
 </div>
