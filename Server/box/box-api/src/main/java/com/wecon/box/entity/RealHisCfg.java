@@ -29,6 +29,7 @@ public class RealHisCfg {
 	public long account_id;
 	public long device_id;
 	public long plc_id;
+	public long dir_id;
 	public String name;//名称
 	public String addr;//地址
 	public int addr_type;//0：位地址 1：字地址 2：双字

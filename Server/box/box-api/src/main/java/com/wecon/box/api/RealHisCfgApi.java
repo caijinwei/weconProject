@@ -114,7 +114,7 @@ public interface RealHisCfgApi {
 	 * @param id
 	 * @return
      */
-	RealHisCfgDevice getRealHisCfgDevice(long id);
+	Map getRealCfgDetail(long id);
 
 	/**
 	 * 根据状态获取历史（实时）数据配置信息列表

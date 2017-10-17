@@ -263,6 +263,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 					}
 				}
 				data.put("state", stateText);
+				data.put("groupId", realHisCfgDevice.dir_id);
 				arr.add(data);
 			}
 			json.put("list", arr);
