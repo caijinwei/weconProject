@@ -61,9 +61,13 @@ public class AppVersionAction {
         if(null != versions && versions.length > 0){
             if(MobileOption.ANDROID.value == platform.value){
                 data.put("version", versions[0]);
-                data.put("apkUrl", "http://192.168.23.31:8080/box-web/web/apk/V-Box.apk");
+                data.put("apkUrl", "web/apk/V-Box.apk");
+                data.put("updateContent", "解决相关bug");
+                data.put("updateFlag", 1);
             }else if(MobileOption.IPHONE.value == platform.value){
                 data.put("version", versions[1]);
+                data.put("updateContent", "解决相关bug");
+                data.put("updateFlag", 1);
             }
         }
         return new Output(data);

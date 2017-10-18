@@ -46,6 +46,8 @@ public class BoxNotifyTask extends Thread {
     private static int sleepTime = 1000 * 30;
     private static int publishSleepTime = 100;
 
+    private static int publishPageSize = 50;
+
     private Map<Long, PlcExtend> plcCfgCache = new ConcurrentHashMap<Long, PlcExtend>();
 
     private static final Logger logger = LogManager.getLogger(BoxNotifyTask.class);
@@ -93,18 +95,22 @@ public class BoxNotifyTask extends Thread {
                 Map<String, List<Map>> groupPlcExtends = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(plcExtendLst), PlcExtend.UPDATE_PLC_FIELD_FILTER);
                 if(null != groupPlcExtends){
                     for(Map.Entry<String, List<Map>> entry : groupPlcExtends.entrySet()){
-                        BaseMsgResp<Map<String, List<Map>>> baseMsgResp = new BaseMsgResp<Map<String, List<Map>>>();
-                        baseMsgResp.setAct(ACT_UPDATE_PLC_CONFIG);
-                        baseMsgResp.setFeedback(BaseMsgResp.TYPE_FEEDBACK_NEED);
-                        baseMsgResp.setMachine_code(entry.getKey());
-                        Map<String, List<Map>> plcExtendResp = new HashMap<String, List<Map>>();
-                        plcExtendResp.put("upd_com_list", entry.getValue());
-                        baseMsgResp.setData(plcExtendResp);
-                        //发布数据给盒子
-                        publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
-                        logger.info("updatePlcCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
-                        //防止发布过于频繁
-                        Thread.sleep(publishSleepTime);
+                        //每个机器码分页进行下发，一页50条
+                        List<List<Map>> cfgPage = getCfgListByPage(entry.getValue());
+                        for(List<Map> cfgList : cfgPage){
+                            BaseMsgResp<Map<String, List<Map>>> baseMsgResp = new BaseMsgResp<Map<String, List<Map>>>();
+                            baseMsgResp.setAct(ACT_UPDATE_PLC_CONFIG);
+                            baseMsgResp.setFeedback(BaseMsgResp.TYPE_FEEDBACK_NEED);
+                            baseMsgResp.setMachine_code(entry.getKey());
+                            Map<String, List<Map>> plcExtendResp = new HashMap<String, List<Map>>();
+                            plcExtendResp.put("upd_com_list", cfgList);
+                            baseMsgResp.setData(plcExtendResp);
+                            //发布数据给盒子
+                            publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
+                            logger.info("updatePlcCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
+                            //防止发布过于频繁
+                            Thread.sleep(publishSleepTime);
+                        }
                     }
                 }
             }
@@ -127,26 +133,30 @@ public class BoxNotifyTask extends Thread {
                 Map<String, List<Map>> groupRealHisCfg = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(realHisCfgList), RealHisCfgExtend.UPDATE_REAL_HIS_FIELD_FILTER);
                 if(null != groupRealHisCfg){
                     for(Map.Entry<String, List<Map>> entry : groupRealHisCfg.entrySet()){
-                        BaseMsgResp<Map<String, List<BaseCfgCom<Map>>>> baseMsgResp = new BaseMsgResp<Map<String, List<BaseCfgCom<Map>>>>();
-                        baseMsgResp.setAct(ACT_UPDATE_REAL_HISTORY_CONFIG);
-                        baseMsgResp.setFeedback(BaseMsgResp.TYPE_FEEDBACK_NEED);
-                        baseMsgResp.setMachine_code(entry.getKey());
-                        Map<String, List<Map>> cfgComMap = GroupOp.groupCfgFilterByCom(entry.getValue());
-                        List<BaseCfgCom<Map>> cfgComList = new ArrayList<BaseCfgCom<Map>>();
-                        for(Map.Entry<String, List<Map>> cfgEntry : cfgComMap.entrySet()){
-                            BaseCfgCom<Map> cfgCom = new BaseCfgCom<Map>();
-                            cfgCom.setCom(cfgEntry.getKey());
-                            cfgCom.setCfg_list(cfgEntry.getValue());
-                            cfgComList.add(cfgCom);
+                        //每个机器码分页进行下发，一页50条
+                        List<List<Map>> cfgPage = getCfgListByPage(entry.getValue());
+                        for(List<Map> cfgList : cfgPage){
+                            BaseMsgResp<Map<String, List<BaseCfgCom<Map>>>> baseMsgResp = new BaseMsgResp<Map<String, List<BaseCfgCom<Map>>>>();
+                            baseMsgResp.setAct(ACT_UPDATE_REAL_HISTORY_CONFIG);
+                            baseMsgResp.setFeedback(BaseMsgResp.TYPE_FEEDBACK_NEED);
+                            baseMsgResp.setMachine_code(entry.getKey());
+                            Map<String, List<Map>> cfgComMap = GroupOp.groupCfgFilterByCom(cfgList);
+                            List<BaseCfgCom<Map>> cfgComList = new ArrayList<BaseCfgCom<Map>>();
+                            for(Map.Entry<String, List<Map>> cfgEntry : cfgComMap.entrySet()){
+                                BaseCfgCom<Map> cfgCom = new BaseCfgCom<Map>();
+                                cfgCom.setCom(cfgEntry.getKey());
+                                cfgCom.setCfg_list(cfgEntry.getValue());
+                                cfgComList.add(cfgCom);
+                            }
+                            Map<String, List<BaseCfgCom<Map>>> realHisCfgResp = new HashMap<String, List<BaseCfgCom<Map>>>();
+                            realHisCfgResp.put("upd_real_his_cfg_list", cfgComList);
+                            baseMsgResp.setData(realHisCfgResp);
+                            //发布数据给盒子
+                            publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
+                            logger.info("updateRealHisCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
+                            //防止发布过于频繁
+                            Thread.sleep(publishSleepTime);
                         }
-                        Map<String, List<BaseCfgCom<Map>>> realHisCfgResp = new HashMap<String, List<BaseCfgCom<Map>>>();
-                        realHisCfgResp.put("upd_real_his_cfg_list", cfgComList);
-                        baseMsgResp.setData(realHisCfgResp);
-                        //发布数据给盒子
-                        publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
-                        logger.info("updateRealHisCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
-                        //防止发布过于频繁
-                        Thread.sleep(publishSleepTime);
                     }
                 }
             }
@@ -168,26 +178,30 @@ public class BoxNotifyTask extends Thread {
                 Map<String, List<Map>> groupAlarmCfg = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(alarmCfgExtendList), AlarmCfgExtend.UPDATE_ALARM_FIELD_FILTER);
                 if(null != groupAlarmCfg){
                     for(Map.Entry<String, List<Map>> entry : groupAlarmCfg.entrySet()){
-                        BaseMsgResp<Map<String, List<BaseCfgCom<Map>>>> baseMsgResp = new BaseMsgResp<Map<String, List<BaseCfgCom<Map>>>>();
-                        baseMsgResp.setAct(ACT_UPDATE_ALARM_DATA_CONFIG);
-                        baseMsgResp.setFeedback(BaseMsgResp.TYPE_FEEDBACK_NEED);
-                        baseMsgResp.setMachine_code(entry.getKey());
-                        Map<String, List<Map>> cfgComMap = GroupOp.groupCfgFilterByCom(entry.getValue());
-                        List<BaseCfgCom<Map>> cfgComList = new ArrayList<BaseCfgCom<Map>>();
-                        for(Map.Entry<String, List<Map>> cfgEntry : cfgComMap.entrySet()){
-                            BaseCfgCom<Map> cfgCom = new BaseCfgCom<Map>();
-                            cfgCom.setCom(cfgEntry.getKey());
-                            cfgCom.setCfg_list(cfgEntry.getValue());
-                            cfgComList.add(cfgCom);
+                        //每个机器码分页进行下发，一页50条
+                        List<List<Map>> cfgPage = getCfgListByPage(entry.getValue());
+                        for(List<Map> cfgList : cfgPage){
+                            BaseMsgResp<Map<String, List<BaseCfgCom<Map>>>> baseMsgResp = new BaseMsgResp<Map<String, List<BaseCfgCom<Map>>>>();
+                            baseMsgResp.setAct(ACT_UPDATE_ALARM_DATA_CONFIG);
+                            baseMsgResp.setFeedback(BaseMsgResp.TYPE_FEEDBACK_NEED);
+                            baseMsgResp.setMachine_code(entry.getKey());
+                            Map<String, List<Map>> cfgComMap = GroupOp.groupCfgFilterByCom(cfgList);
+                            List<BaseCfgCom<Map>> cfgComList = new ArrayList<BaseCfgCom<Map>>();
+                            for(Map.Entry<String, List<Map>> cfgEntry : cfgComMap.entrySet()){
+                                BaseCfgCom<Map> cfgCom = new BaseCfgCom<Map>();
+                                cfgCom.setCom(cfgEntry.getKey());
+                                cfgCom.setCfg_list(cfgEntry.getValue());
+                                cfgComList.add(cfgCom);
+                            }
+                            Map<String, List<BaseCfgCom<Map>>> realHisCfgResp = new HashMap<String, List<BaseCfgCom<Map>>>();
+                            realHisCfgResp.put("upd_alarm_cfg_list", cfgComList);
+                            baseMsgResp.setData(realHisCfgResp);
+                            //发布数据给盒子
+                            publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
+                            logger.info("updateAlarmCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
+                            //防止发布过于频繁
+                            Thread.sleep(publishSleepTime);
                         }
-                        Map<String, List<BaseCfgCom<Map>>> realHisCfgResp = new HashMap<String, List<BaseCfgCom<Map>>>();
-                        realHisCfgResp.put("upd_alarm_cfg_list", cfgComList);
-                        baseMsgResp.setData(realHisCfgResp);
-                        //发布数据给盒子
-                        publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
-                        logger.info("updateAlarmCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
-                        //防止发布过于频繁
-                        Thread.sleep(publishSleepTime);
                     }
                 }
             }
@@ -234,27 +248,31 @@ public class BoxNotifyTask extends Thread {
             Map<String, List<Map>> groupCfgMap = GroupOp.groupCfgByMachineCode(cfgList);
             if(null != groupCfgMap){
                 for(Map.Entry<String, List<Map>> entry : groupCfgMap.entrySet()){
-                    BaseMsgResp<Map<String, List<Map>>> baseMsgResp = new BaseMsgResp<Map<String, List<Map>>>();
-                    baseMsgResp.setAct(ACT_DELETE_MONITOR_CONFIG);
-                    baseMsgResp.setFeedback(BaseMsgResp.TYPE_FEEDBACK_NEED);
-                    baseMsgResp.setMachine_code(entry.getKey());
-                    Map<String, List<Map>> cfgComMap = GroupOp.groupCfgFilterByCom(entry.getValue(), "addr_id", "upd_time");
-                    List<Map> cfgComList = new ArrayList<Map>();
-                    for(Map.Entry<String, List<Map>> cfgEntry : cfgComMap.entrySet()){
-                        Map m = new HashMap();
-                        m.put("com", cfgEntry.getKey());
-                        m.put("del_type", delType);
-                        m.put("cfg_id_list", cfgEntry.getValue());
-                        cfgComList.add(m);
+                    //每个机器码分页进行下发，一页50条
+                    List<List<Map>> cfgPage = getCfgListByPage(entry.getValue());
+                    for(List<Map> cList : cfgPage){
+                        BaseMsgResp<Map<String, List<Map>>> baseMsgResp = new BaseMsgResp<Map<String, List<Map>>>();
+                        baseMsgResp.setAct(ACT_DELETE_MONITOR_CONFIG);
+                        baseMsgResp.setFeedback(BaseMsgResp.TYPE_FEEDBACK_NEED);
+                        baseMsgResp.setMachine_code(entry.getKey());
+                        Map<String, List<Map>> cfgComMap = GroupOp.groupCfgFilterByCom(cList, "addr_id", "upd_time");
+                        List<Map> cfgComList = new ArrayList<Map>();
+                        for(Map.Entry<String, List<Map>> cfgEntry : cfgComMap.entrySet()){
+                            Map m = new HashMap();
+                            m.put("com", cfgEntry.getKey());
+                            m.put("del_type", delType);
+                            m.put("cfg_id_list", cfgEntry.getValue());
+                            cfgComList.add(m);
+                        }
+                        Map<String, List<Map>> realHisCfgResp = new HashMap<String, List<Map>>();
+                        realHisCfgResp.put("del_cfg_list", cfgComList);
+                        baseMsgResp.setData(realHisCfgResp);
+                        //发布数据给盒子
+                        publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
+                        logger.info("deleteAllCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
+                        //防止发布过于频繁
+                        Thread.sleep(publishSleepTime);
                     }
-                    Map<String, List<Map>> realHisCfgResp = new HashMap<String, List<Map>>();
-                    realHisCfgResp.put("del_cfg_list", cfgComList);
-                    baseMsgResp.setData(realHisCfgResp);
-                    //发布数据给盒子
-                    publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
-                    logger.info("deleteAllCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
-                    //防止发布过于频繁
-                    Thread.sleep(publishSleepTime);
                 }
             }
         }catch (Exception e){
@@ -276,18 +294,22 @@ public class BoxNotifyTask extends Thread {
                 Map<String, List<Map>> groupPlcExtends = GroupOp.groupCfgByMachineCode(Converter.convertListOjToMap(plcExtendLst), "com", "upd_time");
                 if(null != groupPlcExtends){
                     for(Map.Entry<String, List<Map>> entry : groupPlcExtends.entrySet()){
-                        BaseMsgResp<Map<String, List<Map>>> baseMsgResp = new BaseMsgResp<Map<String, List<Map>>>();
-                        baseMsgResp.setAct(ACT_DELETE_PLC_CONFIG);
-                        baseMsgResp.setFeedback(BaseMsgResp.TYPE_FEEDBACK_NEED);
-                        baseMsgResp.setMachine_code(entry.getKey());
-                        Map<String, List<Map>> plcExtendResp = new HashMap<String, List<Map>>();
-                        plcExtendResp.put("del_com_list", entry.getValue());
-                        baseMsgResp.setData(plcExtendResp);
-                        //发布数据给盒子
-                        publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
-                        logger.info("deletePlcCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
-                        //防止发布过于频繁
-                        Thread.sleep(publishSleepTime);
+                        //每个机器码分页进行下发，一页50条
+                        List<List<Map>> cfgPage = getCfgListByPage(entry.getValue());
+                        for(List<Map> cList : cfgPage){
+                            BaseMsgResp<Map<String, List<Map>>> baseMsgResp = new BaseMsgResp<Map<String, List<Map>>>();
+                            baseMsgResp.setAct(ACT_DELETE_PLC_CONFIG);
+                            baseMsgResp.setFeedback(BaseMsgResp.TYPE_FEEDBACK_NEED);
+                            baseMsgResp.setMachine_code(entry.getKey());
+                            Map<String, List<Map>> plcExtendResp = new HashMap<String, List<Map>>();
+                            plcExtendResp.put("del_com_list", cList);
+                            baseMsgResp.setData(plcExtendResp);
+                            //发布数据给盒子
+                            publish(JSON.toJSONString(baseMsgResp), serverTopicPrefix+entry.getKey());
+                            logger.info("deletePlcCfgHandle，通知盒子成功。"+JSON.toJSONString(baseMsgResp));
+                            //防止发布过于频繁
+                            Thread.sleep(publishSleepTime);
+                        }
                     }
                 }
             }
@@ -539,6 +561,23 @@ public class BoxNotifyTask extends Thread {
             return delArgList;
         }
         return null;
+    }
+
+    private  List<List<Map>> getCfgListByPage(List<Map> cfgList){
+        if(null == cfgList){
+            return null;
+        }
+        List<List<Map>> result = new ArrayList<List<Map>>();
+        int size = cfgList.size();
+        int startIndex = 0;
+        while (startIndex + publishPageSize <= size){
+            result.add(cfgList.subList(startIndex, startIndex + publishPageSize));
+            startIndex = startIndex + publishPageSize;
+        }
+        if(startIndex < cfgList.size()){
+            result.add(cfgList.subList(startIndex, cfgList.size()));
+        }
+        return result;
     }
 
     private void putPlcCache(List<PlcExtend> plcExtendLst){
