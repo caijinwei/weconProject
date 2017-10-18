@@ -268,6 +268,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 			}
 			json.put("list", arr);
 			json.put("totalPage", realHisCfgDevicePage.getTotalPage());
+			json.put("currentPage", realHisCfgDevicePage.getCurrentPage());
 			logger.debug("Websocket push msg: " + json.toJSONString());
 			return new Object[] { json.toJSONString(), machineCodeSet };
 		} catch (Exception e) {
