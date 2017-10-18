@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="../lib/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="../lib/bootstrap/bootstrap-switch/css/bootstrap-switch.min.css">
     <link href="../lib/jquery-editable-select.css" rel="stylesheet">
+    <style type="text/css">
+    </style>
 </head>
 <body style="margin-top: 20px;" ng-controller="infoController" ng-init="onInit()">
 <ol class="breadcrumb">
@@ -43,7 +45,7 @@
                     <span class="col-md-1">V-BOX名称</span>
 
                     <div class="col-md-11">
-                        <div class="form-group" style="display: inline-block;font-weight: bold;">
+                        <div class="form-group" style="display: inline-block;">
                             <input type="text" class="form-control" maxlength="15"
                                    id="PIBoxName" name="PIBoxName"
                                    value="{{infoData.name}}">
@@ -206,13 +208,16 @@
                             <!--</td>-->
                             <td>
                                 <a href="#" data-toggle="modal" data-target="#addConfig" ng-if="x.state!=3"
-                                   ng-click="setplc_id(x.plcId)"><span
-                                        class="glyphicon glyphicon-edit" title="通讯口编辑"
-                                        style="color:#2889d0;margin:10px;"></span></a>
-                                <a href="#" ng-click="deletePlc(x.plcId)"><span class="glyphicon glyphicon-trash"
-                                                                                data-toggle="modal"
-                                                                                data-target="#deletePlc" title="删除此配置"
-                                                                                style="color:#2889d0;margin:10px;"></span></a>
+                                   ng-click="setplc_id(x.plcId)">
+                                    <span class="glyphicon glyphicon-edit" title="通讯口编辑" data-toggle="tooltip"
+                                          style="color:#2889d0;margin:10px;">
+                                    </span>
+                                </a>
+                                <a href="#" ng-click="deletePlc(x.plcId)" data-toggle="tooltip" title="删除此配置">
+                                    <span class="glyphicon glyphicon-trash" data-toggle="modal" data-target="#deletePlc"
+                                          style="color:#2889d0;margin:10px;">
+                                    </span>
+                                </a>
                             </td>
                         </tr>
                         </tbody>
@@ -267,12 +272,13 @@
 
                                 <div class="container-fluid">
                                     <div class="row">
-                                        <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px;">
-                                            <span class="col-md-4">设备ID</span>
-                                            <input class="col-md-7" name="device_id" id="device_id"
-                                                   style="height: 30px; cursor: not-allowed;" disabled/>
-                                            <span class="col-md-1" style="padding: 0px"></span>
-                                        </div>
+                                        <!--<div class="col-md-6 " style="margin: 10px 0;padding-right: 0px;">-->
+                                        <!--<span class="col-md-4">设备ID</span>-->
+                                        <!--<input class="col-md-7" name="device_id" id="device_id"-->
+                                        <!--style="height: 30px; cursor: not-allowed;" disabled/>-->
+                                        <!--<span class="col-md-1" style="padding: 0px"></span>-->
+                                        <!--</div>-->
+
                                         <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
                                             <span class="col-md-4"><span style="color: red">*</span>通讯协议</span>
                                             <select class="col-md-7" name="port" style="height: 30px;" id="port"
@@ -283,8 +289,6 @@
                                             </select>
                                             <span class="col-md-1" style="padding: 0px"></span>
                                         </div>
-                                    </div>
-                                    <div class="row">
                                         <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
                                             <span class="col-md-4"><span style="color: red">*</span>设备类型</span>
                                             <select class="col-md-7" style="height: 30px;" ng-model="selectedPtype"
@@ -294,13 +298,18 @@
                                             </select>
                                             <span class="col-md-1" style="padding: 0px"></span>
                                         </div>
-
-                                        <div class=" col-md-6 " style="margin: 10px 0;padding-right: 0px">
-                                            <span class="col-md-4"><span style="color: red">*</span>驱动名称</span>
-                                            <select class="col-md-7" style="height: 30px;" id="type" name="type"
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12" style="margin: 10px 0;">
+                                            <span class="col-md-2"><span style="color: red">*</span>驱动名称</span>
+                                            <span class="col-md-10"
+                                                  style="padding: 0%;padding-left: 0px;padding-right: 12px">
+                                            <select class="col-md-10" style="height: 30px;width: 100%" id="type"
+                                                    name="type"
                                                     ng-model="selectedType" ng-change="chgType()">
                                                 <option ng-repeat="x in pType" value="{{x.type}}">{{x.type}}</option>
                                             </select>
+                                            </span>
                                             <span class="col-md-1" style="padding: 0px"></span>
                                         </div>
                                     </div>
@@ -342,10 +351,10 @@
                                         <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
                                             <span class="col-md-4"><span style="color: red">*</span>接收超时</span>
 
-                                                <input  class="col-md-7" style="height: 30px" type="number"
-                                                       name="rev_timeout"
-                                                       id="rev_timeout"/>
-                                                <span class="col-md-1" style="padding: 0px">ms</span>
+                                            <input class="col-md-7" style="height: 30px" type="number"
+                                                   name="rev_timeout"
+                                                   id="rev_timeout"/>
+                                            <span class="col-md-1" style="padding: 0px">ms</span>
                                         </div>
                                         <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
                                             <span class="col-md-4"><span style="color: red">*</span>连续长度</span>
@@ -357,7 +366,8 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
-                                            <span class="col-md-4" style="padding-right: 0px"><span style="color: red">*</span>通讯延迟时间</span>
+                                            <span class="col-md-4" style="padding-right: 0px"><span
+                                                    style="color: red">*</span>通讯延迟时间</span>
                                             <input class="col-md-7" style="height: 30px;" type="number"
                                                    name="com_iodelaytime"
                                                    id="com_iodelaytime"/>
@@ -380,7 +390,8 @@
                                                 <!--<input class="col-md-10" style="height: 30px;" type="number"-->
                                                 <!--name="baudrate"-->
                                                 <!--id="baudrate"/>-->
-                                                <span class="col-md-10" style="padding: 0%;padding-left: 0px;padding-right: 12px">
+                                                <span class="col-md-10"
+                                                      style="padding: 0%;padding-left: 0px;padding-right: 12px">
                                                 <select style="height: 30px; width: 100%;"
                                                         name="baudrate" id="baudrate">
                                                     <option>187500</option>
@@ -466,13 +477,14 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-md-6 " style="margin: 10px 0;">
-                                             <span class="col-md-7"><span style="color: red">*</span>使用广播地址</span>
-                                                 <!--<input type="checkbox"-->
-                                                        <!--ng-click="isBroadcast()"-->
-                                                        <!--name="net_isbroadcast"-->
-                                                        <!--id="net_isbroadcast"/>-->
-                                                 <!--</span>-->
-                                                <input class="col-md-5" id="net_isbroadcast" name="switch-state" ng-click="isBroadcast()" type="checkbox" ng-checked="x.state==1">
+                                                <span class="col-md-7"><span style="color: red">*</span>使用广播地址</span>
+                                                <!--<input type="checkbox"-->
+                                                <!--ng-click="isBroadcast()"-->
+                                                <!--name="net_isbroadcast"-->
+                                                <!--id="net_isbroadcast"/>-->
+                                                <!--</span>-->
+                                                <input class="col-md-5" id="net_isbroadcast" name="switch-state"
+                                                       ng-click="isBroadcast()" type="checkbox" ng-checked="x.state==1">
 
                                                 <!--<span class="col-md-8"><span style="color: red">*</span>使用广播地址</span>-->
                                                 <!--<input class="col-md-4" style="height: 30px; margin-left: 0px" type="checkbox"-->
@@ -481,7 +493,8 @@
                                                 <!--id="net_isbroadcast"/>-->
                                             </div>
                                             <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
-                                                <span class="col-md-4" style="padding-right: 0px"><span style="color: red">*</span>广播地址站号</span>
+                                                <span class="col-md-4" style="padding-right: 0px"><span
+                                                        style="color: red">*</span>广播地址站号</span>
                                                 <input class="col-md-7" style="height: 30px;cursor: default"
                                                        type="number"
                                                        name="net_broadcastaddr"
