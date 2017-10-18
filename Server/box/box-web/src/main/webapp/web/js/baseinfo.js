@@ -106,12 +106,14 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     $scope.showPlcList = function () {
         $scope.device_id = T.common.util.getParameter("device_id");
         $("#device_id").val($scope.device_id);
-        var params = {device_id: $("#device_id").val()};
+        var params = {device_id: $scope.device_id };
         T.common.ajax.request("WeconBox", "plcInfoAction/showAllPlcConf", params, function (data, code, msg) {
             var test = 1;
             if (code == 200) {
                 $scope.infoDatas = data.infoDatas;
-                $(function () { $("[data-toggle='tooltip']").tooltip(); });
+                $(function () {
+                    $("[data-toggle='tooltip']").tooltip();
+                });
                 $scope.$apply();
             }
             else {
@@ -189,12 +191,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $('#box_stat_no').val($scope.plcInfoById.box_stat_no);
                 $('#plc_stat_no').val($scope.plcInfoById.plc_stat_no);
                 $scope.createSwitchState();
-                if($scope.plcInfoById.net_isbroadcast==1){
-                    $("#net_isbroadcast").attr("checked","true");
+                if ($scope.plcInfoById.net_isbroadcast == 1) {
+                    $("#net_isbroadcast").attr("checked", "true");
                     $('[name="switch-state"]').bootstrapSwitch('state', true, true);
                     $('#net_broadcastaddr').removeAttr('disabled');
-                }else{
-                    $("#net_isbroadcast").attr("checked","false");
+                } else {
+                    $("#net_isbroadcast").attr("checked", "false");
                     $('[name="switch-state"]').bootstrapSwitch('state', false, true);
                     $('#net_broadcastaddr').attr("disabled", "disabled");
                 }
@@ -233,7 +235,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         var params = {
             plc_id: $("#plc_id").val(),
             device_id: $("#device_id").val(),
-            type:$("#type").val(),
+            type: $("#type").val(),
             driver: $("#driver").val(),
             box_stat_no: $("#box_stat_no").val(),
             plc_stat_no: $("#plc_stat_no").val(),
@@ -258,7 +260,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             driver: $('#driver').val()
         };
         var selectport = $("#port").val();
-        if (params.device_id == "" || params.type == ""|| $scope.selectedType==""|| $scope.selectedPtype=="" || $("#ptype").val()=="" || params.driver == "" || params.box_stat_no == "" || params.plc_stat_no == "" || params.port == "" || params.retry_times == ""
+        if (params.device_id == "" || params.type == "" || $scope.selectedType == "" || $scope.selectedPtype == "" || $("#ptype").val() == "" || params.driver == "" || params.box_stat_no == "" || params.plc_stat_no == "" || params.port == "" || params.retry_times == ""
             || params.wait_timeout == "" || params.rev_timeout == "" || params.com_stepinterval == "" || params.com_iodelaytime == "" || params.retry_timeout == "") {
             alert("配置参数填未填写");
             return;
@@ -443,8 +445,9 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             $scope.ethernetShow = 0;
         }
     }
-    $scope.clearPlcInput= function () {
-        $scope.pTypeSet=""; $scope.pTypeSet="";
+    $scope.clearPlcInput = function () {
+        $scope.pTypeSet = "";
+        $scope.pTypeSet = "";
         $scope.$apply();
     }
     $scope.chgPiboxInFoName = function (device_id) {
@@ -456,13 +459,13 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             alert("地图坐标格式错误");
             return;
         }
-        var reg_a=/^[\-\+]?(0?\d{1,2}\.\d{1}|1[0-7]?\d{1}\.\d{1}|180\.0{1})$/;
-        if(!reg_a.test(map_a)){
+        var reg_a = /^[\-\+]?(0?\d{1,2}\.\d{1}|1[0-7]?\d{1}\.\d{1}|180\.0{1})$/;
+        if (!reg_a.test(map_a)) {
             alert("经度输入错误，请输入经度-180.0~180.0的数");
             return;
         }
-        var reg_o= /^[\-\+]?([0-8]?\d{1}\.\d{1}|90\.0{1})$/;
-        if(!reg_o.test(map_o)){
+        var reg_o = /^[\-\+]?([0-8]?\d{1}\.\d{1}|90\.0{1})$/;
+        if (!reg_o.test(map_o)) {
             alert("纬度输入错误，请输入纬度-90.0~90.0的数");
             return;
         }
@@ -520,7 +523,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         $("#addConfig").modal("show");
         clearForm($('#addConfig'));
         $("#port").val("COM1");
-        $scope.selectedPort="COM1";
+        $scope.selectedPort = "COM1";
         $scope.chgPort();
     };
     function clearForm(form) {
@@ -649,7 +652,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 } else {
                     $("#noticeDiv").empty();
                     $("#noticeDiv").prepend('<div>已经是最新版了，不需要更新</div>');
-                    $("#btn-ckgUpd").css('display','none');
+                    $("#btn-ckgUpd").css('display', 'none');
                     $("#btn-ckgUpd-cancel").text("确定");
                 }
                 if ($scope.firmIsUpdate) {
@@ -847,10 +850,10 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             offColor: "danger",
             size: "small",
             onSwitchChange: function (event, state) {
-                if(state==false){
+                if (state == false) {
                     $('#net_broadcastaddr').attr("disabled", "disabled");
                     $('#net_isbroadcast').val(0);
-                }else{
+                } else {
                     $('#net_broadcastaddr').removeAttr('disabled');
                     $('#net_isbroadcast').val(1);
                 }
@@ -892,7 +895,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 var jsonResult = $.parseJSON(evt.data);
 
                 //离线判断
-                if(jsonResult.errorMsg!=undefined){
+                if (jsonResult.errorMsg != undefined) {
                     alert("盒子已经离线！");
                     $("#loadingModal").modal("hide");
                     wsf.onclose();

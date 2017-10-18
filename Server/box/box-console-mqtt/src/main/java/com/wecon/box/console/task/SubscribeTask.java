@@ -11,5 +11,7 @@ public class SubscribeTask extends Thread {
 	private static final Logger logger = LogManager.getLogger(SubscribeTask.class);
 	// System.out.println(MqttConfigContext.mqttConfig.getHost());
 	// System.out.println(MqttConfigContext.mqttConfig.getUsername());
+	public void run() {
 
+	}
 }
