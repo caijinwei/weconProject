@@ -14,26 +14,44 @@
 <div class="container-fluid">
     <div id="search-div" class="container-fluid search-div">
         <div class="row form-horizontal">
-            <div class="col-xs-4 col-sm-4 col-md-4 form-group">
+            <div class="col-xs-4 col-sm-4 col-md-5 form-group">
                 <label class="col-sm-4 control-label" for="androidVersion">Android版本号</label>
-
                 <div class="col-sm-8">
                     <input type="text" class="form-control" id="androidVersion" placeholder="Android版本号">
                 </div>
             </div>
-            <div class="col-xs-4 col-sm-4 col-md-4 form-group">
-                <label class="col-sm-4 control-label" for="iosVersion">Ios版本号</label>
 
+        </div>
+        <div class="row form-horizontal">
+            <div class="col-xs-4 col-sm-4 col-md-5 form-group">
+                <label class="col-sm-4 control-label" for="iosVersion">Ios版本号</label>
                 <div class="col-sm-8">
                     <input type="text" class="form-control" id="iosVersion" placeholder="Ios版本号">
                 </div>
             </div>
-            <div class="col-xs-4 col-sm-4 col-md-4 form-group">
-                <label class="col-sm-4 control-label"></label>
+
+        </div>
+        <div class="row form-horizontal">
+            <div class="col-xs-4 col-sm-4 col-md-5 form-group">
+                <label class="col-sm-4 control-label" for="updateContent">更新内容</label>
 
                 <div class="col-sm-8">
+                    <textarea class="form-control" id="updateContent" rows="3" placeholder=""
+                              maxlength="3000"></textarea>
+
                 </div>
             </div>
+
+        </div>
+        <div class="row form-horizontal">
+            <div class="col-xs-4 col-sm-4 col-md-5 form-group">
+                <label class="col-sm-4 control-label" for="isforce">更新类型</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="isforce" placeholder="">
+                    <font size="2" color="red">0(不更新)、1(普通更新)、2(强制更新)</font>
+                </div>
+            </div>
+
         </div>
         <div>
             <button type="button" class="btn btn-primary"

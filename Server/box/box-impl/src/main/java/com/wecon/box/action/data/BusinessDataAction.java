@@ -338,6 +338,7 @@ public class BusinessDataAction {
             RedisPiBoxActData redisPiBoxActData = redisPiBoxApi.getRedisPiBoxActData(device_machine);
             List<PiBoxCom> actTimeDataList = null == redisPiBoxActData ? null : redisPiBoxActData.act_time_data_list;
             JSONObject data = new JSONObject();
+            data.put("monitorId", realCfgMap.get("id"));
             data.put("monitorName", realCfgMap.get("name"));
             data.put("connectDevice", realCfgMap.get("port"));
             int addrType = Integer.parseInt(realCfgMap.get("addr_type").toString());

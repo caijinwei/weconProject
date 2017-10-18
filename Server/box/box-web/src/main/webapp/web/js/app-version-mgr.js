@@ -11,6 +11,8 @@ appModule.controller("listController", function ($scope, $http, $compile) {
                 if (data.versions != null) {
                     $('#androidVersion').val(data.versions[0]);
                     $('#iosVersion').val(data.versions[1]);
+                    $('#updateContent').val(data.versions[2]);
+                    $('#isforce').val(data.versions[3]);
                 } else {
                     return;
                 }

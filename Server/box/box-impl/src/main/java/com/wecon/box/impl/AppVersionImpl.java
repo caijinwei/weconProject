@@ -23,27 +23,29 @@ public class AppVersionImpl implements AppVersionApi {
 
     @Override
     public void saveOrUpdate(final AppVerInfo appVerInfo){
-        int updRst = jdbcTemplate.update("update app_ver_latest set version_code=?, update_date=current_timestamp() where platform=?",
-                new Object[]{appVerInfo.version_code, appVerInfo.platform});
+        int updRst = jdbcTemplate.update("update app_ver_latest set version_code=?,version_desc=?,isforce=?, update_date=current_timestamp() where platform=?",
+                new Object[]{appVerInfo.version_code,appVerInfo.updateContent,appVerInfo.isforce, appVerInfo.platform});
         if(0 == updRst){
-            jdbcTemplate.update("insert into app_ver_latest (platform,version_code,url,create_date,update_date) values(?,?,?,current_timestamp(),current_timestamp())",
-                    new Object[]{appVerInfo.platform, appVerInfo.version_code, appVerInfo.url});
+            jdbcTemplate.update("insert into app_ver_latest (platform,version_code,version_desc,isforce,url,create_date,update_date) values(?,?,?,current_timestamp(),current_timestamp())",
+                    new Object[]{appVerInfo.platform, appVerInfo.version_code,appVerInfo.updateContent,appVerInfo.isforce, appVerInfo.url});
         }
     }
 
     @Override
     public String[] getVersions(){
-        String sql = "select version_code from app_ver_latest  WHERE platform=? or platform=?";
+        String sql = "select version_code,version_desc,isforce from app_ver_latest  WHERE platform=? or platform=?";
         List<AppVerInfo> list = jdbcTemplate.query(sql, new Object[]{MobileOption.ANDROID.value, MobileOption.IPHONE.value}, new RowMapper() {
             @Override
             public AppVerInfo mapRow(ResultSet resultSet, int i) throws SQLException {
                 AppVerInfo appVerInfo = new AppVerInfo();
                 appVerInfo.version_code = resultSet.getString("version_code");
+                appVerInfo.updateContent = resultSet.getString("version_desc");
+                appVerInfo.isforce = resultSet.getInt("isforce");
                 return appVerInfo;
             }
         });
         if (!list.isEmpty()) {
-            return new String[]{list.get(0).version_code, list.get(1).version_code};
+            return new String[]{list.get(0).version_code, list.get(1).version_code,list.get(0).updateContent,list.get(0).isforce+""};
         }
         return null;
     }

@@ -11,6 +11,8 @@ public class AppVerInfo {
 	public int platform;
 	public String version_code;
 	public String url;
+	public String updateContent;
+	public int isforce;
 	public Timestamp create_date;
 	public Timestamp update_date;
 }

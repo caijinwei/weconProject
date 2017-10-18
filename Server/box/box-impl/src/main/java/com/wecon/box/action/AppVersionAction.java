@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.AppVersionApi;
 import com.wecon.box.entity.AppVerInfo;
 import com.wecon.common.enums.MobileOption;
+import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.Client;
@@ -37,13 +38,18 @@ public class AppVersionAction {
     @Description("更新app版本号")
     @RequestMapping(value = "/updateversion")
     @WebApi(forceAuth = true, master = true, authority = {"0"})
-    public Output updateVersion(@RequestParam("androidVersion") String androidVersion, @RequestParam("iosVersion") String iosVersion) {
+    public Output updateVersion(@RequestParam("androidVersion") String androidVersion, @RequestParam("iosVersion") String iosVersion,
+                                @RequestParam("updateContent") String updateContent, @RequestParam("isforce") String isforce) {
         AppVerInfo androidVerInfo = new AppVerInfo();
         androidVerInfo.version_code = androidVersion;
         androidVerInfo.platform = MobileOption.ANDROID.value;
+        androidVerInfo.updateContent = updateContent;
+        androidVerInfo.isforce = Integer.parseInt(CommonUtils.isNullOrEmpty(isforce) ? "1" : "2");
         AppVerInfo iosVerInfo = new AppVerInfo();
         iosVerInfo.version_code = iosVersion;
         iosVerInfo.platform = MobileOption.IPHONE.value;
+        iosVerInfo.updateContent = updateContent;
+        iosVerInfo.isforce = Integer.parseInt(CommonUtils.isNullOrEmpty(isforce) ? "1" : "2");
         appVersionApi.saveOrUpdate(androidVerInfo);
         appVersionApi.saveOrUpdate(iosVerInfo);
         JSONObject data = new JSONObject();
@@ -62,13 +68,11 @@ public class AppVersionAction {
             if(MobileOption.ANDROID.value == platform.value){
                 data.put("version", versions[0]);
                 data.put("apkUrl", "web/apk/V-Box.apk");
-                data.put("updateContent", "解决相关bug");
-                data.put("updateFlag", 1);
             }else if(MobileOption.IPHONE.value == platform.value){
                 data.put("version", versions[1]);
-                data.put("updateContent", "解决相关bug");
-                data.put("updateFlag", 1);
             }
+            data.put("updateContent", versions[2]);
+            data.put("updateFlag", versions[3]);
         }
         return new Output(data);
     }
