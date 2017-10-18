@@ -46,7 +46,7 @@
 
                     <div class="col-md-11">
                         <div class="form-group" style="display: inline-block;">
-                            <input type="text" class="form-control" maxlength="15"
+                            <input type="text" class="form-control" maxlength="15" style="padding-left: 10px;"
                                    id="PIBoxName" name="PIBoxName"
                                    value="{{infoData.name}}">
                         </div>
@@ -72,12 +72,12 @@
                     <span style="font-weight: bold;margin-left: 20px;">
                          <div class="col-md-1 ">
                              <div class="form-group">
-                                 <input type="text" ng-model="map_a" id="map_a" class="form-control" placeholder="经度"/>
+                                 <input type="text" ng-model="map_a" id="map_a" class="form-control"  style="padding-left: 10px;" placeholder="经度"/>
                              </div>
                          </div>
                         <div class="col-md-1">
                             <div class="form-group">
-                                <input type="text" class="form-control" id="map_o" ng-model="map_o" placeholder="纬度"/>
+                                <input type="text" class="form-control" id="map_o" ng-model="map_o"  style="padding-left: 10px;" placeholder="纬度"/>
                             </div>
                         </div>
                         </span>
@@ -272,12 +272,12 @@
 
                                 <div class="container-fluid">
                                     <div class="row">
-                                        <!--<div class="col-md-6 " style="margin: 10px 0;padding-right: 0px;">-->
-                                        <!--<span class="col-md-4">设备ID</span>-->
-                                        <!--<input class="col-md-7" name="device_id" id="device_id"-->
-                                        <!--style="height: 30px; cursor: not-allowed;" disabled/>-->
-                                        <!--<span class="col-md-1" style="padding: 0px"></span>-->
-                                        <!--</div>-->
+                                        <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px;" >
+                                        <span class="col-md-4">设备ID</span>
+                                        <input class="col-md-7" name="device_id" id="device_id"
+                                        style="height: 30px; cursor: not-allowed;" disabled/>
+                                        <span class="col-md-1" style="padding: 0px"></span>
+                                        </div>
 
                                         <div class="col-md-6 " style="margin: 10px 0;padding-right: 0px">
                                             <span class="col-md-4"><span style="color: red">*</span>通讯协议</span>
