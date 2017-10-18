@@ -40,9 +40,9 @@ public class PlcListByType {
             plcInfo.baudrate = c.getAttributes().get("BoudRate");
             plcInfo.wait_timeout = paseInt(c.getAttributes().get("WaitTimeout"));
             plcInfo.rev_timeout = paseInt(c.getAttributes().get("RevTimeout"));
-            plcInfo.box_stat_no = paseInt(c.getAttributes().get("PlcStatNo"));
+            plcInfo.plc_stat_no = paseInt(c.getAttributes().get("PlcStatNo"));
             if (null == c.getAttributes().get("Ethernet")) {
-                plcInfo.plc_stat_no = paseInt(c.getAttributes().get("HmiStatNo"));
+                plcInfo.box_stat_no = paseInt(c.getAttributes().get("HmiStatNo"));
             }
 
 //            //连续长度 自己输
