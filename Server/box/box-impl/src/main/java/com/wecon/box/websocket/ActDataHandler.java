@@ -92,11 +92,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 					// }
 					// 发送数据
 					sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteActPhone, reclient);
-					/*Map tMap = new HashMap();
-					tMap.put("obeject","point");
-					tMap.put("type","modify");
-					tMap.put("result","提交成功");
-					session.sendMessage(new TextMessage(JSON.toJSONString(tMap)));*/
+					session.sendMessage(new TextMessage("提交成功"));
 				}
 
 			} else {
