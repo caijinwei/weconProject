@@ -3,7 +3,8 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 	$scope.boxsGroup = [];
 	//查询盒子列表
 	$scope.findBoxsList = function() {
-		var params = {};
+		var selAlarm = T.common.util.getParameter("selAlarm");
+		var params = {selAlarm : selAlarm};
 		T.common.ajax.request("WeconBox",
 				"data/boxs", params, function(
 						data, code, msg) {
@@ -48,6 +49,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 			angular.forEach(value.boxList, function(box, boxkey) {
 				var positionStr = box.map;
 				var boxName = box.boxName;
+				var state = box.state;
 				console.log("盒子的位置信息：" + positionStr);
 				if(positionStr != null) {
 					$scope.positions = positionStr.split(",");
@@ -57,8 +59,10 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 						var label = new BMap.Label(boxName, {
 							offset: new BMap.Size(20, -10)
 						});
-
-						marker = new BMap.Marker(boxTag);
+						var myIcon = new BMap.Icon("../image/"+(1==state?"box_location_online.png":"box_location_offline.png"), new BMap.Size(300, 157));
+						marker = new BMap.Marker(boxTag, {
+							icon: myIcon
+						});
 						map.addOverlay(marker);
 						marker.setLabel(label);
 						marker.addEventListener('click', function() {

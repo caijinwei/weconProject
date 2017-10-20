@@ -103,7 +103,7 @@ public interface DeviceApi {
      * @param acc_id
      * @return
      */
-    List<Map<String, Object>> getDevicesByGroup(long acc_id);
+    List<Map<String, Object>> getDevicesByGroup(long acc_id, int selAlarm);
 
     /*
     *超级管理员展示数据
