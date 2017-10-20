@@ -270,12 +270,12 @@ public class AlarmCfgImpl implements AlarmCfgApi {
         if (alarmCfg == null) {
             return false;
         }
-        String sql = "update alarm_cfg set data_id = ?, account_id=?,name=?,addr=?,addr_type=?,text=?,condition_type=?,state=?,update_date=current_timestamp(),bind_state=?,plc_id=?,device_id=?,rid=? ,data_limit=?,digit_count=?  where alarmcfg_id = ?";
+        String sql = "update alarm_cfg set data_id = ?, account_id=?,name=?,addr=?,addr_type=?,text=?,condition_type=?,state=?,update_date=current_timestamp(),bind_state=?,plc_id=?,device_id=?,rid=? ,data_limit=?,digit_count=?, digit_binary=? where alarmcfg_id = ?";
 
         jdbcTemplate.update(sql,
                 new Object[]{alarmCfg.data_id, alarmCfg.account_id, alarmCfg.name, alarmCfg.addr, alarmCfg.addr_type,
                         alarmCfg.text, alarmCfg.condition_type, alarmCfg.state, alarmCfg.bind_state, alarmCfg.plc_id,
-                        alarmCfg.device_id, alarmCfg.rid, alarmCfg.data_limit, alarmCfg.digit_count, alarmCfg.alarmcfg_id});
+                        alarmCfg.device_id, alarmCfg.rid, alarmCfg.data_limit, alarmCfg.digit_count,alarmCfg.digit_binary, alarmCfg.alarmcfg_id});
         return true;
     }
 

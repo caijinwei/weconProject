@@ -21,7 +21,7 @@
 	</ol>
 	<ul class="nav nav-pills nav-justified" role="tablist">
 		<li ng-cloak ng-if="accounttype==1 && deviceid>0"><a
-				href="baseinfo.html?device_id={{deviceid}}&device_name={{devicename}}">基本配置</a></li>
+			href="baseinfo.html?device_id={{deviceid}}&device_name={{devicename}}">基本配置</a></li>
 		<li class="active"><a
 			href="datamonitor.html?device_id={{deviceid}}&device_name={{devicename}}">实时数据</a></li>
 		<li><a
@@ -112,7 +112,10 @@
 											data-toggle="tooltip" title="地址转义失败"></i></span> <span
 										ng-switch-when="-3"><i name="act_i_state"
 											class="fa  fa-circle" style="color: black;"
-											data-toggle="tooltip" title="地址绑定失败"></i></span>
+											data-toggle="tooltip" title="地址绑定失败"></i> </span> <span
+										ng-switch-default><i name="act_i_state"
+											class="fa  fa-circle" style="color: black;"
+											data-toggle="tooltip" title="未知状态"></i> </span>
 
 								</span> <span ng-if="x.box_state==0"><i name="act_i_state"
 										class="fa  fa-circle" style="color: gray;"

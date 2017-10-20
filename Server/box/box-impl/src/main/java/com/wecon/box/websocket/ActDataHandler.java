@@ -53,6 +53,8 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 
 	private Map<String, ClientMQTT> clientMQTTs = new HashMap<String, ClientMQTT>();
 
+	private Map<String, String> paramMap = new HashMap<>();
+
 	private static final Logger logger = LogManager.getLogger(ActDataHandler.class.getName());
 
 	/**
@@ -71,9 +73,8 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 			if (CommonUtils.isNullOrEmpty(params)) {
 				return;
 			}
-			Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {
-			});
-
+			Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {});
+			paramMap.put(session.getId(), params);
 			if (null != bParams.get("markid") && "1".equals(bParams.get("markid").toString())) {
 				String value = bParams.get("value").toString();
 				String addr_id = bParams.get("addr_id").toString();
@@ -87,29 +88,22 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 					ClientMQTT reclient = new ClientMQTT(subscribeTopic, "send" + session.getId(), sendvalueCallback);
 					reclient.start();
 					clientMQTTs.put(session.getId(), reclient);
-					// if (!reclient.topicPort.contains(subscribeTopic)) {
-					// reclient.subscribe(subscribeTopic);
-					// }
+
 					// 发送数据
 					sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteActPhone, reclient);
-					/*Map tMap = new HashMap();
-					tMap.put("obeject","point");
-					tMap.put("type","modify");
-					tMap.put("result","提交成功");
-					session.sendMessage(new TextMessage(JSON.toJSONString(tMap)));*/
 				}
 
 			} else {
 				// 推送消息给移动端
 				logger.debug("WebSocket push begin");
-				Object[] oj = getRealData(params, session);
+				Object[] oj = getRealData(session);
 				session.sendMessage(new TextMessage(oj[0].toString()));
 				logger.debug("WebSocket push end");
 
 				// 订阅redis消息
 				SubscribeListener subscribeListener = subListenerMap.get(session.getId());
 				if (null != oj[1] && null == subscribeListener) {
-					subscribeRealData(params, session, (Set<String>) oj[1]);
+					subscribeRealData(session, (Set<String>) oj[1]);
 				}
 			}
 
@@ -123,30 +117,32 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 	/**
 	 * 订阅redis消息
 	 */
-	private void subscribeRealData(String params, WebSocketSession session, final Set<String> machineCodeSet) {
+	private void subscribeRealData(final WebSocketSession session, final Set<String> machineCodeSet) {
 		final String[] machineCodeArray = new String[machineCodeSet.size()];
 		int i = 0;
 		for (String machineCode : machineCodeSet) {
 			machineCodeArray[i++] = machineCode;
 		}
-		final SubscribeListener subscribeListener = new SubscribeListener(params, session, machineCodeArray);
-		subListenerMap.put(session.getId(), subscribeListener);
+
 		ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
 		cachedThreadPool.execute(new Runnable() {
 			public void run() {
 				logger.debug("Redis begin subscribe realData");
+				SubscribeListener subscribeListener = subListenerMap.get(session.getId());
+				if(null == subscribeListener){
+					subscribeListener = new SubscribeListener(session, machineCodeArray);
+					subListenerMap.put(session.getId(), subscribeListener);
+				}
 				RedisManager.subscribe(ConstKey.REDIS_GROUP_NAME, subscribeListener, machineCodeArray);
 			}
 		});
 	}
 
 	class SubscribeListener extends JedisPubSub {
-		String params;
 		WebSocketSession session;
 		String[] machineCodeArray;
 
-		public SubscribeListener(String params, WebSocketSession session, String[] machineCodeArray) {
-			this.params = params;
+		public SubscribeListener(WebSocketSession session, String[] machineCodeArray) {
 			this.session = session;
 			this.machineCodeArray = machineCodeArray;
 		}
@@ -154,9 +150,10 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 		@Override
 		public void onMessage(String channel, String message) {
 			logger.debug("Subscribe callback，channel：" + channel + "message:" + message);
-			if (!CommonUtils.isNullOrEmpty(message)) {
+			Map<String, Object> bParams = JSON.parseObject(paramMap.get(session.getId()), new TypeReference<Map<String, Object>>() {});
+			if (!CommonUtils.isNullOrEmpty(message) && null == bParams.get("markid")) {
 				try {
-					Object[] oj = getRealData(params, session);
+					Object[] oj = getRealData(session);
 					if (null != oj[0]) {
 						session.sendMessage(new TextMessage(oj[0].toString()));
 					}
@@ -173,8 +170,9 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 		}
 	}
 
-	private Object[] getRealData(String params, WebSocketSession session) {
+	private Object[] getRealData(WebSocketSession session) {
 		try {
+			String params = paramMap.get(session.getId());
 			Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {
 			});
 			RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
@@ -324,12 +322,11 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 				clientMQTTs.get(session.getId()).close();
 				clientMQTTs.remove(session.getId());
 			}
-
+			paramMap.remove(session.getId());
 			logger.debug("Redis取消订阅成功");
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.debug("afterConnectionClosed，" + e.getMessage());
 		}
-
 	}
 }

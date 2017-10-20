@@ -24,7 +24,7 @@
 	</ol>
 	<ul class="nav nav-pills nav-justified" role="tablist">
 		<li ng-cloak ng-if="accounttype==1 && deviceid>0"><a
-				href="baseinfo.html?device_id={{deviceid}}&device_name={{devicename}}">基本配置</a></li>
+			href="baseinfo.html?device_id={{deviceid}}&device_name={{devicename}}">基本配置</a></li>
 		<li><a
 			href="datamonitor.html?device_id={{deviceid}}&device_name={{devicename}}">实时数据</a></li>
 		<li><a
@@ -238,15 +238,11 @@
 									ng-if="x.state==2"><i name="his_i_state"
 										class="fa  fa-circle" style="color: orange;"
 										data-toggle="tooltip" title="条目未下发"></i></span> <span
-									ng-if="x.state==-1"><i name="his_i_state"
+									ng-if="x.state<0 || x.state>2"><i name="his_i_state"
 										class="fa  fa-circle" style="color: black;"
-										data-toggle="tooltip" title="编译失败"></i></span> <span
-									ng-if="x.state==-2"><i name="his_i_state"
-										class="fa  fa-circle" style="color: black;"
-										data-toggle="tooltip" title="地址转义失败"></i></span> <span
-									ng-if="x.state==-3"><i name="his_i_state"
-										class="fa  fa-circle" style="color: black;"
-										data-toggle="tooltip" title="地址绑定失败"></i></span> {{x.id}}</td>
+										data-toggle="tooltip"
+										title="{{x.state==-1?'编译失败':(x.state==-2?'地址转义失败':(x.state==-3?'地址绑定失败':'未知状态'))}}"></i></span>
+									{{x.id}}</td>
 								<td>{{x.name}}</td>
 								<td>{{x.his_cycle}}</td>
 								<td>{{x.condevice}}</td>
