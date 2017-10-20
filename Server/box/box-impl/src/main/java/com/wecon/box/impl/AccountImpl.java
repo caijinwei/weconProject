@@ -73,7 +73,7 @@ public class AccountImpl implements AccountApi {
             Account model = getAccount(username);
             if (!username.equalsIgnoreCase(email) && model != null && !model.email.equalsIgnoreCase(email)) {
                 //用户名和邮箱不一样 且 用户名被占用，不能注册
-                throw new BusinessException(ErrorCodeOption.AccountExisted.key, ErrorCodeOption.AccountExisted.value);
+                throw new BusinessException(ErrorCodeOption.AccountExisted_UserName.key, ErrorCodeOption.AccountExisted_UserName.value);
             }
             model = getAccount(email);
             if (model != null && model.state == -1) {
@@ -85,7 +85,7 @@ public class AccountImpl implements AccountApi {
             }
         }
 
-        throw new BusinessException(ErrorCodeOption.AccountExisted.key, ErrorCodeOption.AccountExisted.value);
+        throw new BusinessException(ErrorCodeOption.AccountExisted_Email.key, ErrorCodeOption.AccountExisted_Email.value);
     }
 
     @Override
@@ -96,7 +96,12 @@ public class AccountImpl implements AccountApi {
                 new Object[]{username, phonenum, username, phonenum, username, phonenum},
                 Integer.class);
         if (ret > 0) {
-            throw new BusinessException(ErrorCodeOption.AccountExisted.key, ErrorCodeOption.AccountExisted.value);
+            Account model = getAccount(username);
+            if (model != null) {
+                throw new BusinessException(ErrorCodeOption.AccountExisted_UserName.key, ErrorCodeOption.AccountExisted_UserName.value);
+            } else {
+                throw new BusinessException(ErrorCodeOption.AccountExisted_Phone.key, ErrorCodeOption.AccountExisted_Phone.value);
+            }
         }
         KeyHolder key = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
