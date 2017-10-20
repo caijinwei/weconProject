@@ -146,21 +146,23 @@
             <li><a id="customid" ng-click="custom()" target="content_frame"
                    href="web/html/datamonitor.html?device_id=-100&device_name=自定义监控点"
                    target="content_frame">
-					<span class="glyphicon glyphicon-eye-open " id="customspanid"> 自定义监控点</span>
-                </a>
+                <span class="glyphicon glyphicon-eye-open " id="customspanid"> 自定义监控点</span>
+            </a>
             </li>
             <li ng-repeat="x in allDatas" class="boxDir">
                 <a href="#" ng-click="sideclick(x);" ondrop="drop(event)" ondragover="allowDrop(event)"> <span
-                    class="glyphicon glyphicon-folder-close "
-                    id="spanid_{{x.accountdirId}}"> {{x.accountdirName}} </span>
-                 </a>
+                        class="glyphicon glyphicon-folder-close "
+                        id="spanid_{{x.accountdirId}}"> {{x.accountdirName}} </span>
+                </a>
                 <ul id="dir_ul_{{x.accountdirId}}" sid="{{x.accountdirId}}">
                     <a id="box_{{y.deviceId}}" target="content_frame" map="{{y.deviceMap}}"
                        href="web/html/baseinfo.html?device_id={{y.deviceId}}&device_name={{y.deviceName}}"
                        data_devid="{{y.deviceId}}" draggable="true" ondragstart="drag(event)"
                        ng-click="selectbox(y.deviceId)" class="list-group-item"
-                       ng-repeat="y in x.deviceList"><i name="i_box" class="fa  fa-circle" ng-class="{true:'onlineIcon',false:'offlineIcon'}[y.deviceState==1]"
-                                                        data-toggle="tooltip" title="{{y.deviceState==1?'在线':'离线'}}"></i>{{y.deviceName}}</a>
+                       ng-repeat="y in x.deviceList"><i name="i_box" class="fa  fa-circle"
+                                                        ng-class="{true:'onlineIcon',false:'offlineIcon'}[y.deviceState==1]"
+                                                        data-toggle="tooltip"
+                                                        title="{{y.deviceState==1?'在线':'离线'}}"></i>{{y.deviceName}}</a>
                 </ul>
             </li>
 
@@ -215,10 +217,9 @@
         </ul>
     </div>
     <div id="right" class="col-xs-9 col-sm-9 col-md-10 col-lg-10">
-        <iframe name="content_frame" frameborder="0" ng-if="type==0"></iframe>
-        <iframe src="web/html/overview.html" name="content_frame" frameborder="0" ng-if="type==1"></iframe>
-        <iframe src="web/html/datamonitor.html?device_id=-200&device_name=实时数据" name="content_frame" frameborder="0"
-                ng-if="type==2"></iframe>
+        <iframe id="ifmain"
+                src="{{type==1?'web/html/overview.html':(type==2?'web/html/datamonitor.html?device_id=-200&device_name=实时数据':'')}}"
+                name="content_frame" frameborder="0"></iframe>
     </div>
 </div>
 <script src="web/lib/jquery/jquery-3.2.1.min.js"></script>
@@ -240,10 +241,10 @@
             compress: false
         });
 
-        function attachContext(selector,map) {
+        function attachContext(selector, map) {
             context.attach(selector, [{
                 text: "地图定位",
-                href: 'web/html/box-map.html?map='+map,
+                href: 'web/html/box-map.html?map=' + map,
                 action: function () {
                     alert("menu for " + map);
                 }
@@ -251,10 +252,10 @@
             ])
         };
         $("#side_nav li :gt(1) a").each(
-                function (){
-                    var id=$(this).prop("id");
-                    var map=$(this).attr("map");
-                    attachContext("#"+id,map);
+                function () {
+                    var id = $(this).prop("id");
+                    var map = $(this).attr("map");
+                    attachContext("#" + id, map);
                 });
     });
 </script>

@@ -48,6 +48,9 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                     alert(code + " " + msg);
                 }
             });
+
+        var ht = $(window).height();//获取浏览器窗口的整体高度；
+        $("#ifmain").height(ht-5);
     }
     //右键添加菜单
     function attachContext(selector,map) {
