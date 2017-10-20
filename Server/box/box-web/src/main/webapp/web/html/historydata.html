@@ -110,6 +110,7 @@
 						<table class="table table-bordered" style="margin-top: 20px;">
 							<thead>
 								<tr>
+									<th class="col-md-2">状态</th>
 									<th class="col-md-4">时间</th>
 									<th class="col-md-8">数值</th>
 
@@ -117,7 +118,17 @@
 							</thead>
 							<tbody>
 								<tr ng-repeat="x in Hisdatas">
-
+									<td><span ng-switch="{{x.state}}"><i
+											name="his_data_state" ng-switch-when="0"
+											class="fa  fa-circle" style="color: gray;"
+											data-toggle="tooltip" title="离线"></i><i name="his_data_state"
+											ng-switch-when="1" class="fa  fa-circle"
+											style="color: green;" data-toggle="tooltip" title="在线"></i><i
+											name="his_data_state" ng-switch-when="2"
+											class="fa  fa-circle" style="color: red;"
+											data-toggle="tooltip" title="超时"></i> <i
+											name="his_data_state" ng-switch-default class="fa  fa-circle"
+											style="color: red;" data-toggle="tooltip" title="超时"></i></span></td>
 									<td>{{x.monitor_time|date:'yyyy-MM-dd HH:mm:ss'}}</td>
 									<td>{{x.value}}</td>
 
@@ -140,73 +151,6 @@
 				<div class="modal-dialog modal-sm" role="document"
 					style="margin-top: 350px; text-align: center">
 					<img src="../image/loading.jpg" />
-				</div>
-			</div>
-			<!--统计分析-->
-			<div class="tab-pane" id="statistic-analysis">
-				<div class="container-fluid" style="margin-top: 20px;">
-					<div class="row">
-						<span class="col-md-1" style="height: 30px; line-height: 30px;">监控点</span>
-						<select class="col-md-3" style="height: 35px;">
-							<option>请选择监控点</option>
-							<option>监控点1</option>
-							<option>监控点2</option>
-							<option>监控点3</option>
-						</select> <span class="col-md-1"
-							style="height: 30px; line-height: 30px; margin-left: 30px">通道</span>
-						<select class="col-md-3" style="height: 35px;">
-							<option>请选择通道</option>
-							<option>通道1</option>
-							<option>通道2</option>
-							<option>通道3</option>
-						</select>
-						<div class="btn-group" style="margin-left: 20px;">
-							<button type="button" class="btn btn-primary">分</button>
-							<button type="button" class="btn btn-default">时</button>
-							<button type="button" class="btn btn-default">天</button>
-						</div>
-					</div>
-					<div class="row" style="margin-top: 20px;">
-						<div style="display: inline-block; margin-left: -15px;"
-							class="col-md-4">
-							<span class="col-md-3" style="height: 30px; line-height: 30px;">起始日期</span>
-							<div class="input-group date form_datetime col-md-9"
-								data-date="1979-09-16T05:25:07Z"
-								data-date-format="yyyy-mm-dd hh:ii">
-								<input class="form-control" size="16" type="text" value=""
-									readonly> <span class="input-group-addon"><span
-									class="glyphicon glyphicon-remove"></span></span> <span
-									class="input-group-addon"><span
-									class="glyphicon glyphicon-calendar"></span></span>
-							</div>
-						</div>
-						<div
-							style="float: left; display: inline-block; margin-left: 35px;"
-							class="col-md-4">
-							<span class="col-md-3" style="height: 30px; line-height: 30px;">结束日期</span>
-							<div class="input-group date form_datetime col-md-9"
-								data-date="1979-09-16T05:25:07Z"
-								data-date-format="yyyy-mm-dd hh:ii">
-								<input class="form-control" size="16" type="text" value=""
-									readonly> <span class="input-group-addon"><span
-									class="glyphicon glyphicon-remove"></span></span> <span
-									class="input-group-addon"><span
-									class="glyphicon glyphicon-calendar"></span></span>
-							</div>
-						</div>
-						<button type="button" class="btn btn-primary"
-							style="margin-left: 30px;" disabled>
-							<span class="glyphicon glyphicon-search"></span>
-						</button>
-					</div>
-					<div class="row" style="margin-top: 20px;">
-						<div class="btn-group" style="margin-left: 20px; float: right;">
-							<button type="button" class="btn btn-primary">曲线图</button>
-							<button type="button" class="btn btn-default">K线图</button>
-						</div>
-					</div>
-					<div id="statistic-graph-container"
-						style="min-width: 400px; height: 400px; margin-top: 40px;"></div>
 				</div>
 			</div>
 			<!--数据登记-->

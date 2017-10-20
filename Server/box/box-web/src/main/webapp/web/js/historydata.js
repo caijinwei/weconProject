@@ -200,6 +200,8 @@ appModule
 														});
 
 												$scope.$apply();
+												$("i[name='his_data_state']")
+												.tooltip();
 												$("#loadingModal")
 														.modal("hide");
 											} else {
