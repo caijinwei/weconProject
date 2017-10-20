@@ -41,82 +41,134 @@
         <div class="tab-pane active" id="base-info">
             <!-- 基本信息展示-->
             <div class="container-fluid" style="margin-top: 12px;font-size: 15px;">
-                <div class="row" style="margin-top: 20px;">
-                    <span class="col-md-1">V-BOX名称</span>
+                <div class="col-md-6">
+                    <div class="row" style="margin-top: 20px;">
+                        <span class="col-md-2">V-BOX名称</span>
 
-                    <div class="col-md-11">
-                        <div class="form-group" style="display: inline-block;">
-                            <input type="text" class="form-control" maxlength="15" style="padding-left: 10px;"
-                                   id="PIBoxName" name="PIBoxName"
-                                   value="{{infoData.name}}">
+                        <div class="col-md-8">
+                            <div class="form-group" style="font-weight: bold;display: inline-block;">
+                                <input type="text" class="form-control" maxlength="15" style="padding-left: 10px;"
+                                       id="PIBoxName" name="PIBoxName"
+                                       value="{{infoData.name}}">
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="row" style="margin-top: 12px;">
-                    <span class="col-md-1">在线状态</span>
-                    <span style="font-weight: bold;margin-left: 20px;">{{infoData.state==1?'在线':'离线'}}</span>
-                    <button type="button" style="margin-left: 30px" class="btn btn-info" ng-click="flushState()"/>
-                    刷新</button>
-                </div>
-                <div class="row" style="margin-top: 12px;">
-                    <span class="col-md-1">机器码</span>
-                    <span style="font-weight: bold;margin-left: 20px;">{{infoData.machine_code}}</span>
-                </div>
+                    <div class="row" style="margin-top: 12px;">
+                        <span class="col-md-2">在线状态</span>
+                        <span style="font-weight: bold;margin-left: 20px;">{{infoData.state==1?'在线':'离线'}}</span>
+                        <button type="button" style="margin-left: 30px" class="btn btn-info" ng-click="flushState()"/>
+                        刷新</button>
+                    </div>
+                    <div class="row" style="margin-top: 12px;">
+                        <span class="col-md-2">机器码</span>
+                        <span style="font-weight: bold;margin-left: 20px;">{{infoData.machine_code}}</span>
+                    </div>
 
-                <div class="row" style="margin-top: 12px;">
-                    <span class="col-md-1">设备型号</span>
-                    <span style="font-weight: bold;margin-left: 20px;">{{infoData.dev_model}}</span>
-                </div>
-                <div class="row" style="margin-top: 12px;">
-                    <span class="col-md-1">地图信息</span>
+                    <div class="row" style="margin-top: 12px;">
+                        <span class="col-md-2">设备型号</span>
+                        <span style="font-weight: bold;margin-left: 20px;">{{infoData.dev_model}}</span>
+                    </div>
+                    <div class="row" style="margin-top: 12px;">
+                        <span class="col-md-2">地图信息</span>
                     <span style="font-weight: bold;margin-left: 20px;">
-                         <div class="col-md-1 ">
+                         <div class="col-md-2 ">
                              <div class="form-group">
-                                 <input type="text" ng-model="map_a" id="map_a" class="form-control"  style="padding-left: 10px;" placeholder="经度"/>
+                                 <input type="text" ng-model="map_a" id="map_a" class="form-control"
+                                        style="padding-left: 10px;" placeholder="经度"/>
                              </div>
                          </div>
-                        <div class="col-md-1">
+                        <div class="col-md-2">
                             <div class="form-group">
-                                <input type="text" class="form-control" id="map_o" ng-model="map_o"  style="padding-left: 10px;" placeholder="纬度"/>
+                                <input type="text" class="form-control" id="map_o" ng-model="map_o"
+                                       style="padding-left: 10px;" placeholder="纬度"/>
                             </div>
                         </div>
                         </span>
-                </div>
+                        <button type="button"  id="btn_map_show" style="margin-left: 30px" class="btn btn-info" ng-click="mapShow()">
+                            定位
+                        </button>
+                    </div>
 
-                <div class="row" style="margin-top:12px;">
-                    <span class="col-md-1">备注信息</span>
 
-                    <div class="form-group col-md-5" style="display: inline-block;">
+                    <div class="row" style="margin-top:12px;">
+                        <span class="col-md-2">备注信息</span>
+
+                        <div class="form-group col-md-8" style="display: inline-block;">
                         <textarea class="form-control" id="remark" rows="4"
                                   maxlength="500">{{infoData.remark}}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top: 12px;">
+                        <span class="col-md-2">高级功能</span>
+                        <!--<div class="btn-group" style="margin-left: 10px;">-->
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deletePIBox">
+                            解绑V-BOX
+                        </button>
+                        <button type="button" class="btn btn-info" ng-click="chgPiboxInFoName(infoData.device_id)">保存修改
+                        </button>
+                        <!--<button type="button" class="btn btn-danger">重启PIBox</button>-->
+                        <!--<button type="button" class="btn btn-danger">清除PIBox数据</button>-->
+                        <!--<button type="button" class="btn btn-warning">强制同步</button>-->
+                        <!--<button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">-->
+                        <!--<span class="caret"></span>-->
+                        <!--<span class="sr-only">切换下拉菜单</span>-->
+                        <!--</button>-->
+                        <!--<ul class="dropdown-menu pull-right" role="menu">-->
+                        <!--<li><a href="#">分享PIBox</a></li>-->
+                        <!--<li><a href="#">复制PIBox</a></li>-->
+                        <!--<li><a href="#">移交PIBox</a></li>-->
+                        <!--<li class="divider"></li>-->
+                        <!--<li><a href="#">切换域名</a></li>-->
+                        <!--</ul>-->
+                        <!--</div>-->
                     </div>
                 </div>
 
-                <div class="row" style="margin-top: 12px;">
-                    <span class="col-md-1">高级功能</span>
-                    <!--<div class="btn-group" style="margin-left: 10px;">-->
-                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deletePIBox">
-                        解绑V-BOX
-                    </button>
-                    <button type="button" class="btn btn-info" ng-click="chgPiboxInFoName(infoData.device_id)">保存修改
-                    </button>
-                    <!--<button type="button" class="btn btn-danger">重启PIBox</button>-->
-                    <!--<button type="button" class="btn btn-danger">清除PIBox数据</button>-->
-                    <!--<button type="button" class="btn btn-warning">强制同步</button>-->
-                    <!--<button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">-->
-                    <!--<span class="caret"></span>-->
-                    <!--<span class="sr-only">切换下拉菜单</span>-->
-                    <!--</button>-->
-                    <!--<ul class="dropdown-menu pull-right" role="menu">-->
-                    <!--<li><a href="#">分享PIBox</a></li>-->
-                    <!--<li><a href="#">复制PIBox</a></li>-->
-                    <!--<li><a href="#">移交PIBox</a></li>-->
-                    <!--<li class="divider"></li>-->
-                    <!--<li><a href="#">切换域名</a></li>-->
-                    <!--</ul>-->
-                    <!--</div>-->
+                <div class="col-md-6" style="height:450px;" id="map_body" >
+
+                    <div class="row" style="display: none" id="map_input">
+                        <div class="form-group" style="font-weight: bold;display: inline-block;">
+
+                        请输入:<input type="text" class="form-control"  id="suggestId" size="40" value="" style="width:400px;padding-left: 5px"/>
+                        </div>
+                        <button  class="btn btn-info"  ng-click="mapSearchCommit()">搜索</button>
+                    </div>
+                    <div id="searchResultPanel"
+                         style="border:1px solid #C0C0C0;width:150px;height:auto; display:none;">
+                    </div>
+                    <div id="r-result" style="display: none"></div>
+                    <div class="row">
+                        <div id="allmap" class="col-md-10" style="height: 500px;width: 100%"></div>
+                    </div>
+                </div>
+                </div>
+            <!---  提示是否给盒子经纬度赋值--->
+            <div class="modal" tabindex="-1" id="mapinfo"
+                 data-backdrop="false">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span>&times;</span>
+                            </button>
+                            <h4 class="modal-title">提示</h4>
+                        </div>
+                        <div class="modal-body">
+                            <span>是否将经度:{{map_s}}纬度:{{map_w}})赋值给本盒子</span>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-info"
+                                    ng-click="mapinfo()">确定
+                            </button>
+                            <button type="button" class="btn btn-default"
+                                    data-dismiss="modal">取消
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
+
             <!-- 删除PIBox模态框（Modal） -->
             <div class="modal" tabindex="-1" id="deletePIBox"
                  data-backdrop="false">
@@ -144,6 +196,7 @@
             </div>
 
         </div>
+
         <!--------------------------------------------------------------------------------------------- 通讯口配置--------------------------------------------------------------------------------------------------------------------------------------------------------------------->
         <div class="tab-pane" id="com-port">
             <!--通讯口展示-->
@@ -275,7 +328,7 @@
                                         <!--<div class="col-md-6 " style="margin: 10px 0;padding-right: 0px;">-->
                                         <!--<span class="col-md-4">设备ID</span>-->
                                         <input class="col-md-7" name="device_id" id="device_id"
-                                        style="height: 30px; cursor: not-allowed;display: none;" disabled/>
+                                               style="height: 30px; cursor: not-allowed;display: none;" disabled/>
                                         <!--<span class="col-md-1" style="padding: 0px"></span>-->
                                         <!--</div>-->
 
@@ -734,5 +787,12 @@
     $('#baudrate').editableSelect({filter: false});
 </script>
 </body>
+
+
+<!--                                                                               地图-->
+
+<script type="text/javascript"
+        src="http://api.map.baidu.com/api?v=2.0&ak=22nCxldLGEbsQ3gXBNTwhF4Te4UDzECE"></script>
+
 
 </html>

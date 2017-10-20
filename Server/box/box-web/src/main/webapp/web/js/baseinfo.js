@@ -18,6 +18,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         $scope.showBaseInfo();
         $scope.showPlcSetDefault();
         $("#loadingModal").modal("hide");
+        $("#map_body").css("display","none");
     }
     $scope.showBaseInfo = function () {
         $scope.device_id = T.common.util.getParameter("device_id");
@@ -106,7 +107,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     $scope.showPlcList = function () {
         $scope.device_id = T.common.util.getParameter("device_id");
         $("#device_id").val($scope.device_id);
-        var params = {device_id: $scope.device_id };
+        var params = {device_id: $scope.device_id};
         T.common.ajax.request("WeconBox", "plcInfoAction/showAllPlcConf", params, function (data, code, msg) {
             var test = 1;
             if (code == 200) {
@@ -229,14 +230,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             }
         }
     }
-
     //提交后台
     $scope.addPlcInfosetting_submit = function () {
         var params = {
             plc_id: $("#plc_id").val(),
             device_id: $("#device_id").val(),
             type: $("#type").val(),
-            driver: $("#driver").val(),
             box_stat_no: $("#box_stat_no").val(),
             plc_stat_no: $("#plc_stat_no").val(),
             port: $("#port").val(),
@@ -262,12 +261,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         var selectport = $("#port").val();
         if (params.device_id == "" || params.type == "" || $scope.selectedType == "" || $scope.selectedPtype == "" || $("#ptype").val() == "" || params.driver == "" || params.box_stat_no == "" || params.plc_stat_no == "" || params.port == "" || params.retry_times == ""
             || params.wait_timeout == "" || params.rev_timeout == "" || params.com_stepinterval == "" || params.com_iodelaytime == "" || params.retry_timeout == "") {
-            alert("配置参数填未填写");
+            alert("配置参数未填写");
             return;
         }
         if (selectport == 'Ethernet') {
             if (params.net_port == "" || params.net_type == "" || params.net_isbroadcast == "" || params.net_broadcastaddr == "" || params.net_ipaddr == "") {
-                alert("配置参数填未填写");
+                alert("配置参数未填写");
                 return;
                 if (isValidIP(params.net_ipaddr) != true) {
                     alert("情输入正确的IP地址");
@@ -459,12 +458,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             alert("地图坐标格式错误");
             return;
         }
-        var reg_a = /^[\-\+]?(0?\d{1,2}\.\d{1,3}|1[0-7]?\d{1}\.\d{1,3}|0?\d{1,2}|1[0-7]?\d{1}|180\.[0]{1,3}|180)$/;
+        var reg_a = /^[\-\+]?(0|0\.\d{1,3}|\d{1}|\d{1}\.\d{1,3}|[1-9]{1}\d{1}|[1-9]{1}\d{1}\.\d{1,3}|1[0-7]{1}\d{1}\.\d{1,3}|1[0-7]{1}\d{1}|180\.[0]{1,3}|180)$/;
         if (!reg_a.test(map_a)) {
             alert("经度输入错误，请输入经度-180.000~180.000的数");
             return;
         }
-        var reg_o = /^[\-\+]?([0-8]?\d{1}\.\d{1,3}|[0-8]?\d{1}|90|90\.[0]{1,3})$/;
+        var reg_o = /^[\-\+]?(0|0\.\d{1,3}|\d{1}|\d{1}\.\d{1,3}|[1-8]\d{1}|[1-8]\d{1}\.\d{1,3}|90|90\.[0]{1,3})$/;
         if (!reg_o.test(map_o)) {
             alert("纬度输入错误，请输入纬度-90.000~90.000的数");
             return;
@@ -929,5 +928,151 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             alert("WebSocket isn't supported by your Browser!");
         }
     }
-});
 
+
+    /*
+     *                      地图测试
+     * */
+    $scope.mapShow = function () {
+        console.log($("#map_body").css("display"));
+        if ($("#map_body").css("display")=="none") {
+            $("#btn_map_show").text("关闭地图");
+            $("#map_body")[0].style.display = "block";
+            $("#map_input")[0].style.display="block";
+            // 百度地图API功能
+            $scope.$map = new BMap.Map("allmap");
+            var map = $scope.$map;
+            map.enableScrollWheelZoom(true);
+
+            /*
+            * 根据盒子经纬度定位为中心
+            * */
+            var map_a=$("#map_a").val();
+            var map_o=$("#map_o").val();
+            if(map_a==""&&map_o==""){
+                map.centerAndZoom(new BMap.Point(119.310369,26.082246), 11);
+            }else if(map_a==""){
+                map_a=0;
+                map.centerAndZoom(new BMap.Point(map_a,map_o), 11);
+            }else if (map_o==""){
+                map_o=0;
+                map.centerAndZoom(new BMap.Point(map_a,map_o), 11);
+            }else{
+                map.centerAndZoom(new BMap.Point(map_a,map_o), 11);
+            }
+            /*
+            * 设置标注点
+            * */
+            var boxTag = new BMap.Point(map_a,map_o);
+            //var label = new BMap.Label($scope.device_name,{offset:new BMap.Size(20,-10)});
+            var marker = new BMap.Marker(boxTag);
+            map.addOverlay(marker);
+            //marker.setLabel(label);
+            /*
+             * 地图搜索功能
+             * */
+            var ac = new BMap.Autocomplete(    //建立一个自动完成的对象
+                {
+                    "input": "suggestId",
+                    "location": $scope.$map
+                });
+            ac.addEventListener("onhighlight", function (e) {  //鼠标放在下拉列表上的事件
+                var str = "";
+                var _value = e.fromitem.value;
+                var value = "";
+                if (e.fromitem.index > -1) {
+                    value = _value.province + _value.city + _value.district + _value.street + _value.business;
+                }
+                str = "FromItem<br />index = " + e.fromitem.index + "<br />value = " + value;
+                value = "";
+                if (e.toitem.index > -1) {
+                    _value = e.toitem.value;
+                    value = _value.province + _value.city + _value.district + _value.street + _value.business;
+                }
+                str += "<br />ToItem<br />index = " + e.toitem.index + "<br />value = " + value + "style='z-index:999;'position:'fixed'";
+                G("searchResultPanel").innerHTML = str;
+            });
+            var myValue;
+            ac.addEventListener("onconfirm", function (e) {    //鼠标点击下拉列表后的事件
+                var _value = e.item.value;
+                myValue = _value.province + _value.city + _value.district + _value.street + _value.business;
+                G("searchResultPanel").innerHTML = "onconfirm<br />index = " + e.item.index + "<br />myValue = " + myValue;
+                setPlace();
+            });
+            function setPlace() {
+                map.clearOverlays();    //清除地图上所有覆盖物
+                function myFun() {
+                    var pp = local.getResults().getPoi(0).point;    //获取第一个智能搜索的结果
+                    map.centerAndZoom(pp, 18);
+                    map.addOverlay(new BMap.Marker(pp));    //添加标注
+                }
+
+                var local = new BMap.LocalSearch(map, { //智能搜索
+                    onSearchComplete: myFun
+                });
+                local.search(myValue);
+            }
+
+            function G(id) {
+                return document.getElementById(id);
+            }
+
+
+            /*
+             * 添加右键功能
+             * */
+            var s;//经度
+            var w;//纬度
+            map.addEventListener("rightclick", function (e) {
+                if (e.overlay) {//判断右键单击的是否是marker
+                } else {
+                    s = e.point.lng;//经度
+                    w = e.point.lat;//维度
+                    RightClick();//右键单击map出现右键菜单事件
+                }
+            });
+            //右键单击map出现右键菜单事件
+            function RightClick() {
+                //alert('你点击的是地图');
+                var createMarker = function (map) {//右键更新站名
+                    if (true) {
+                        $scope.mapinfoModalShow(s,w);
+                    }
+                };
+                var markerMenu = new BMap.ContextMenu();
+                markerMenu.addItem(new BMap.MenuItem('盒子位置', createMarker.bind(map)));
+                map.addContextMenu(markerMenu);//给标记添加右键菜单
+            }
+        }else{
+            $("#btn_map_show").text("定位");
+            $("#map_body").css("display","none");
+            $("#map_input")[0].style.display="none";
+        }
+    }
+    $scope.mapinfoModalShow= function (s,w) {
+        $("#mapinfo").modal("show");
+        var strMaps=s.toString();
+        var strMapw= w.toString();
+        var reg=/[\-\+]?\d{1,}\.\d{1,3}/;
+        s=reg.exec(strMaps);
+        w=reg.exec(strMapw);
+        $scope.map_s=s;
+        $scope.map_w=w;
+        $scope.$apply();
+    }
+    $scope.mapinfo=function(){
+        $("#mapinfo").modal("hide");
+        $("#map_a").val($scope.map_s);
+        $("#map_o").val($scope.map_w);
+    }
+    /*
+     * 结果版面
+     * */
+    $scope.mapSearchCommit=function(){
+
+        var local = new BMap.LocalSearch( $scope.$map, {
+            renderOptions: {map:  $scope.$map, panel: "r-result"}
+        });
+        local.search($("#suggestId").val());
+    }
+});
