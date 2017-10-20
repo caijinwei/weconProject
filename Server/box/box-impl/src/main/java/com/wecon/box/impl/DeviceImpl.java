@@ -334,8 +334,7 @@ public class DeviceImpl implements DeviceApi {
                 sb.append(",").append(ss[0]);
             }
             List<String> deviceIdLst = jdbcTemplate.query(
-                    "SELECT device_id FROM alarm_cfg where device_id in("+sb.substring(1)+")",
-                    new Object[] { acc_id }, new RowMapper() {
+                    "SELECT device_id FROM alarm_cfg where device_id in("+sb.substring(1)+")", new RowMapper() {
                         @Override
                         public Object mapRow(ResultSet rs, int i) throws SQLException {
                             return rs.getLong("device_id") + "";
