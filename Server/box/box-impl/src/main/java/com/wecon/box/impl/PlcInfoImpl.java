@@ -23,6 +23,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by caijinw on 2017/8/5.
@@ -43,6 +44,17 @@ public class PlcInfoImpl implements PlcInfoApi {
     @Override
     public long savePlcInfo(final PlcInfo model) {
 
+        /*
+        * 进行通讯接口唯一性判断
+        * */
+        Integer plc_State = isExistPort(model.device_id, model.port);
+        if (!model.port.equals("Ethernet")) {
+            if (plc_State == 3) {
+                throw new BusinessException(ErrorCodeOption.PlcInfo_Port_IsExist.key, ErrorCodeOption.PlcInfo_Port_IsExist.value);
+            } else if (plc_State == 1) {
+                throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
+            }
+        }
         /*
         * INSERT INTO plc_info (device_id,type,driver,box_stat_no,plc_stat_no,port,comtype,baudrate,stop_bit,
             data_length,check_bit,retry_times,wait_timeout,rev_timeout,com_stepinterval,com_iodelaytime,retry_timeout,net_port,net_type,net_isbroadcast,net_broadcastaddr
@@ -203,7 +215,7 @@ public class PlcInfoImpl implements PlcInfoApi {
                 "WHERE plc_id=?";
         Object args[] = {model.device_id, model.type, model.driver, model.box_stat_no, model.plc_stat_no, model.port, model.comtype, model.baudrate, model.stop_bit, model.data_length, model.check_bit,
                 model.retry_times, model.wait_timeout, model.rev_timeout, model.com_stepinterval, model.com_iodelaytime, model.rev_timeout, model.net_port, model.net_type, model.net_isbroadcast, model.net_broadcastaddr,
-                model.net_ipaddr, model.state,model.file_md5,model.plc_id};
+                model.net_ipaddr, model.state, model.file_md5, model.plc_id};
         jdbcTemplate.update(sql, args);
 
     }
@@ -416,17 +428,17 @@ public class PlcInfoImpl implements PlcInfoApi {
 
 
     @Override
-    public boolean isExistPort(long device_id, String port) {
+    public Integer isExistPort(long device_id, String port) {
         if (null == port) {
-            return false;
+            return 0;
         }
         Object args[] = {device_id, port};
-        String sql = "SELECT COUNT(port) FROM plc_info WHERE device_id=? AND port=?";
-        Integer count = jdbcTemplate.queryForObject(sql, args, Integer.class);
-        if (count > 0) {
-            return true;
+        String sql = "SELECT count(1), state FROM plc_info WHERE device_id=? AND port=?";
+        Map<String, Object> result = jdbcTemplate.queryForMap(sql, args);
+        if(result.get("state")!=null){
+            return (int)result.get("state");
         }
-        return false;
+        return 0;
     }
 
     public void unBundledPlc(final Integer plcId) {

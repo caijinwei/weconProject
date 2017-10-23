@@ -86,6 +86,7 @@ public enum ErrorCodeOption {
     ViewPoint_Is_NotFount("视图没有该监控点",30031),
     Act_add_Beyond("实时配置只能添加200条",30032),
     Device_Pwd_Error("设备密码错误",300033),
+    PlcInfo_Port_IsExist("删除通讯口指令已下发，请再30秒后再添加操作",300034),
 
 
 

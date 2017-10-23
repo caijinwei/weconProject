@@ -216,9 +216,13 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     /**
      * 提交接口请求
      */
-
+        //取消按钮
+    $scope.btn_plcInfo_cancel =function(){
+        $("#btn_plcInfo_submit").removeAttr("disabled");
+    }
         //提醒
     $scope.chgTypeNotice = function () {
+        $("#btn_plcInfo_submit").attr("disabled","true");
         if ($("#plc_id").val() == 0) {
             $scope.addPlcInfosetting_submit();
         } else {
@@ -262,14 +266,17 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         if (params.device_id == "" || params.type == "" || $scope.selectedType == "" || $scope.selectedPtype == "" || $("#ptype").val() == "" || params.driver == "" || params.box_stat_no == "" || params.plc_stat_no == "" || params.port == "" || params.retry_times == ""
             || params.wait_timeout == "" || params.rev_timeout == "" || params.com_stepinterval == "" || params.com_iodelaytime == "" || params.retry_timeout == "") {
             alert("配置参数未填写");
+            $("#btn_plcInfo_submit").removeAttr("disabled");
             return;
         }
         if (selectport == 'Ethernet') {
             if (params.net_port == "" || params.net_type == "" || params.net_isbroadcast == "" || params.net_broadcastaddr == "" || params.net_ipaddr == "") {
                 alert("配置参数未填写");
+                $("#btn_plcInfo_submit").removeAttr("disabled");
                 return;
                 if (isValidIP(params.net_ipaddr) != true) {
                     alert("情输入正确的IP地址");
+                    $("#btn_plcInfo_submit").removeAttr("disabled");
                     return;
                 }
             }
@@ -311,6 +318,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             if (code == 200) {
                 alert("操作成功");
                 $("#addConfig").modal("hide");
+                $("#btn_plcInfo_submit").removeAttr("disabled");
                 $scope.showPlcList();
                 $scope.$apply();
             }

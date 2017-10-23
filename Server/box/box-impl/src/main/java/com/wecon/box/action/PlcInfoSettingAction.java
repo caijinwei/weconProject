@@ -172,8 +172,6 @@ public class PlcInfoSettingAction {
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping("savePlcInfo")
     public Output savePlcInfo(@Valid PlcInfoSettingParam param) {
-        long account_id = AppContext.getSession().client.userId;
-
         PlcInfo plcInfo = new PlcInfo();
         plcInfo.plc_id = param.plc_id;
         plcInfo.type = param.type;
@@ -199,17 +197,22 @@ public class PlcInfoSettingAction {
         plcInfo.stop_bit = param.stop_bit;
         plcInfo.retry_times = param.retry_times;
         plcInfo.wait_timeout = param.wait_timeout;
-
         if (plcInfo.plc_id <= 0) {
             if (!plcInfo.port.equals("Ethernet")) {
-                if (plcInfoApi.isExistPort(plcInfo.device_id, plcInfo.port)) {
+                Integer plcState=plcInfoApi.isExistPort(plcInfo.device_id, plcInfo.port);
+                if (plcState==3) {
+                    throw new BusinessException(ErrorCodeOption.PlcInfo_Port_IsExist.key, ErrorCodeOption.PlcInfo_Port_IsExist.value);
+                }else if(plcState==1){
                     throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
                 }
             }
         } else {
             if (!plcInfo.port.equals(plcInfoApi.findPlcInfoByPlcId((int) plcInfo.plc_id).port)) {
                 if (!plcInfo.port.equals("Ethernet")) {
-                    if (plcInfoApi.isExistPort(plcInfo.device_id, plcInfo.port)) {
+                    Integer plcState=plcInfoApi.isExistPort(plcInfo.device_id, plcInfo.port);
+                    if (plcState==3) {
+                        throw new BusinessException(ErrorCodeOption.PlcInfo_Port_IsExist.key, ErrorCodeOption.PlcInfo_Port_IsExist.value);
+                    }else if(plcState==1){
                         throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
                     }
                 }

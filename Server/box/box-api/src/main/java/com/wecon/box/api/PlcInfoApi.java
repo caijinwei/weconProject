@@ -97,7 +97,7 @@ public interface PlcInfoApi {
 	/*
 	* 通讯协议是否已经存在
 	* */
-	public boolean isExistPort(long device_id,String port);
+	public Integer isExistPort(long device_id, String port);
 
 	/*
 	* 解绑plc
