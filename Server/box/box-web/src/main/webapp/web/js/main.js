@@ -56,7 +56,13 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     function attachContext(selector,map) {
         context.attach(selector, [{
             text: "地图定位",
-            href: 'web/html/box-map.html?map='+map,
+            href: 'web/html/box-map.html?selAlarm=0&map='+map,
+            target:'content_frame',
+            action: function () {
+            }
+        },{
+            text: "报警设备",
+            href: 'web/html/box-map.html?selAlarm=1&map=' + map,
             target:'content_frame',
             action: function () {
             }
