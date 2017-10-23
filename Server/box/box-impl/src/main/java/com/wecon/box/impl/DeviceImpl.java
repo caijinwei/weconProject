@@ -334,7 +334,7 @@ public class DeviceImpl implements DeviceApi {
                 sb.append(",").append(ss[0]);
             }
             List<String> deviceIdLst = jdbcTemplate.query(
-                    "SELECT ac.device_id FROM alarm_cfg ac, alarm_cfg_data acd where ac.alarmcfg_id=acd.alarm_cfg_id and ac.state !=3 and acd.state=1 and ac.device_id in("+sb.substring(1)+")", new RowMapper() {
+                    "SELECT ac.device_id FROM alarm_cfg ac INNER JOIN alarm_cfg_data acd on ac.alarmcfg_id=acd.alarm_cfg_id where ac.state !=3 and acd.state=1 and ac.device_id in("+sb.substring(1)+")", new RowMapper() {
                         @Override
                         public Object mapRow(ResultSet rs, int i) throws SQLException {
                             return rs.getLong("device_id") + "";

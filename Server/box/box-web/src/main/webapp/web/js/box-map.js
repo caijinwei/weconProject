@@ -62,8 +62,8 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 						var label = new BMap.Label(boxName, {
 							offset: new BMap.Size(20, -10)
 						});
-						var myIcon = new BMap.Icon("../image/"+(1==state?"box_location_online.png":"box_location_offline.png"), new BMap.Size(32, 32),{
-							anchor: new BMap.Size(16, 30)
+						var myIcon = new BMap.Icon("../image/"+(1==state?"box_location_online.png":"box_location_offline.png"), new BMap.Size(25, 25),{
+							anchor: new BMap.Size(12, 23)
 						});
 						marker = new BMap.Marker(boxTag, {
 							icon: myIcon
