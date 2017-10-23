@@ -31,6 +31,11 @@
             <name>wecon</name>
             <url>http://192.168.29.184:8081/nexus-2.7.0-06/content/repositories/snapshots/</url>
         </repository>
+        <!--<repository>
+            <id>wecon_hw</id>
+            <name>wecon_hw</name>
+            <url>https://devrepo.devcloud.huaweicloud.com/01/nexus/content/repositories/909e28bf13fa428ea57082db4a714c3c_2_0/</url>
+        </repository>-->
         <repository>
             <id>aliyun</id>
             <name>aliyun</name>
