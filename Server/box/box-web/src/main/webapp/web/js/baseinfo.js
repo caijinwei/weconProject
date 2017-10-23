@@ -458,14 +458,14 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             alert("地图坐标格式错误");
             return;
         }
-        var reg_a = /^[\-\+]?(0|0\.\d{1,3}|\d{1}|\d{1}\.\d{1,3}|[1-9]{1}\d{1}|[1-9]{1}\d{1}\.\d{1,3}|1[0-7]{1}\d{1}\.\d{1,3}|1[0-7]{1}\d{1}|180\.[0]{1,3}|180)$/;
+        var reg_a = /^[\-\+]?(0|0\.\d{1,6}|\d{1}|\d{1}\.\d{1,6}|[1-9]{1}\d{1}|[1-9]{1}\d{1}\.\d{1,6}|1[0-7]{1}\d{1}\.\d{1,6}|1[0-7]{1}\d{1}|180\.[0]{1,6}|180)$/;
         if (!reg_a.test(map_a)) {
-            alert("经度输入错误，请输入经度-180.000~180.000的数");
+            alert("经度输入错误，请输入经度-180.000000~180.000000的数");
             return;
         }
-        var reg_o = /^[\-\+]?(0|0\.\d{1,3}|\d{1}|\d{1}\.\d{1,3}|[1-8]\d{1}|[1-8]\d{1}\.\d{1,3}|90|90\.[0]{1,3})$/;
+        var reg_o = /^[\-\+]?(0|0\.\d{1,6}|\d{1}|\d{1}\.\d{1,6}|[1-8]\d{1}|[1-8]\d{1}\.\d{1,6}|90|90\.[0]{1,6})$/;
         if (!reg_o.test(map_o)) {
-            alert("纬度输入错误，请输入纬度-90.000~90.000的数");
+            alert("纬度输入错误，请输入纬度-90.000000~90.000000的数");
             return;
         }
         var map = $("#map_a").val() + "," + $("#map_o").val();
@@ -1051,11 +1051,11 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     }
     $scope.mapinfoModalShow= function (s,w) {
         $("#mapinfo").modal("show");
-        var strMaps=s.toString();
-        var strMapw= w.toString();
-        var reg=/[\-\+]?\d{1,}\.\d{1,3}/;
-        s=reg.exec(strMaps);
-        w=reg.exec(strMapw);
+        //var strMaps=s.toString();
+        //var strMapw= w.toString();
+        //var reg=/[\-\+]?\d{1,}\.\d{1,3}/;
+        //s=reg.exec(strMaps);
+        //w=reg.exec(strMapw);
         $scope.map_s=s;
         $scope.map_w=w;
         $scope.$apply();

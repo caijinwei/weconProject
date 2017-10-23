@@ -29,6 +29,9 @@ public enum ErrorCodeOption {
     DelGroupHasDevice("此分组下还有绑定的设备，请先解绑或转移到其他分组", 11018),
     UserNameFormatError("用户名只能1-20字符且只能由字母数字下划线组成", 11019),
     Login_Error_Many_Times("登录失败次数过多，请半小时后重试", 11020),
+    AccountExisted_UserName("用户名被占用,不能注册", 11021),
+    AccountExisted_Email("邮箱被占用,不能注册", 11022),
+    AccountExisted_Phone("手机号码被占用,不能注册", 11023),
 
     //文件操作相关
     UploadFileError("上传文件异常", 12000),

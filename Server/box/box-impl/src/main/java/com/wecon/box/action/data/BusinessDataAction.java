@@ -226,9 +226,9 @@ public class BusinessDataAction {
      */
     @RequestMapping("data/boxs")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
-    public Output getBoxData() {
+    public Output getBoxData(@Valid BusinessDataParam param) {
         Client client = AppContext.getSession().client;
-        List<Map<String, Object>> result = deviceApi.getDevicesByGroup(client.userId);
+        List<Map<String, Object>> result = deviceApi.getDevicesByGroup(client.userId, param.selAlarm);
         JSONObject json = new JSONObject();
         json.put("list", result);
         return new Output(json);
@@ -406,6 +406,8 @@ class BusinessDataParam {
     public int type;
     @Label("状态")
     public int state;
+    @Label("盒子是否需要查询报警数据")
+    public int selAlarm;
 
     public void setBoxId(long boxId) {
         this.boxId = boxId;
@@ -441,5 +443,9 @@ class BusinessDataParam {
 
     public void setState(int state) {
         this.state = state;
+    }
+
+    public void setSelAlarm(int selAlarm) {
+        this.selAlarm = selAlarm;
     }
 }

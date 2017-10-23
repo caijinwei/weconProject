@@ -299,7 +299,7 @@ public class DeviceImpl implements DeviceApi {
         return list;
     }
 
-    public List<Map<String, Object>> getDevicesByGroup(long acc_id) {
+    public List<Map<String, Object>> getDevicesByGroup(long acc_id, int selAlarm) {
         // 获取管理员下的分组列表
         List<String[]> groupLst = jdbcTemplate.query(
                 "SELECT ad.id, ad.`name` FROM account_dir ad WHERE ad.type=0 and ad.account_id=?",
@@ -328,10 +328,34 @@ public class DeviceImpl implements DeviceApi {
             return null;
         }
 
-        List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+        if(1 == selAlarm){
+            StringBuilder sb = new StringBuilder();
+            for(String[] ss : deviceLst){
+                sb.append(",").append(ss[0]);
+            }
+            List<String> deviceIdLst = jdbcTemplate.query(
+                    "SELECT device_id FROM alarm_cfg where device_id in("+sb.substring(1)+")", new RowMapper() {
+                        @Override
+                        public Object mapRow(ResultSet rs, int i) throws SQLException {
+                            return rs.getLong("device_id") + "";
+                        }
+                    });
+
+            List<String[]> ndeviceLst = new ArrayList<>();
+            if(null != deviceIdLst && deviceIdLst.size() > 0){
+                for(String[] device : deviceLst){
+                    if(deviceIdLst.contains(device[0])){
+                        ndeviceLst.add(device);
+                    }
+                }
+            }
+            deviceLst = ndeviceLst;
+        }
+
+        List<Map<String, Object>> result = new ArrayList<>();
         for (String[] group : groupLst) {
-            Map<String, Object> m = new HashMap<String, Object>();
-            List<Map> l = new ArrayList<Map>();
+            Map<String, Object> m = new HashMap<>();
+            List<Map> l = new ArrayList<>();
             for (String[] device : deviceLst) {
                 if (group[0].equals(device[3])) {
                     Map dm = new HashMap();
@@ -348,7 +372,6 @@ public class DeviceImpl implements DeviceApi {
         }
         return result;
     }
-
 
     @Override
     public void boundDevice(final long device_id,final String name,final long acc_dir_id) {
