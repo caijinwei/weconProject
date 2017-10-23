@@ -4,7 +4,10 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 	//查询盒子列表
 	$scope.findBoxsList = function() {
 		var selAlarm = T.common.util.getParameter("selAlarm");
-		var params = {selAlarm : selAlarm};
+		var params = {};
+		if(null != selAlarm){
+			params = {selAlarm : selAlarm};
+		}
 		T.common.ajax.request("WeconBox",
 				"data/boxs", params, function(
 						data, code, msg) {
@@ -59,7 +62,9 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 						var label = new BMap.Label(boxName, {
 							offset: new BMap.Size(20, -10)
 						});
-						var myIcon = new BMap.Icon("../image/"+(1==state?"box_location_online.png":"box_location_offline.png"), new BMap.Size(300, 157));
+						var myIcon = new BMap.Icon("../image/"+(1==state?"box_location_online.png":"box_location_offline.png"), new BMap.Size(32, 32),{
+							anchor: new BMap.Size(16, 30)
+						});
 						marker = new BMap.Marker(boxTag, {
 							icon: myIcon
 						});
