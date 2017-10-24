@@ -213,13 +213,13 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     }
 
 
-    /**
-     * 提交接口请求
-     */
-        //取消按钮
-    $scope.btn_plcInfo_cancel =function(){
-        $("#btn_plcInfo_submit").removeAttr("disabled");
-    }
+    ///**
+    // * 提交接口请求
+    // */
+    //    //取消按钮
+    //$scope.btn_plcInfo_cancel =function(){
+    //    $("#btn_plcInfo_submit").removeAttr("disabled");
+    //}
         //提醒
     $scope.chgTypeNotice = function () {
         $("#btn_plcInfo_submit").attr("disabled","true");
@@ -324,9 +324,11 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             }
             else {
                 alert(code + "-" + msg);
+                $("#btn_plcInfo_submit").removeAttr("disabled");
             }
         }, function () {
             console.log("ajax error");
+            $("#btn_plcInfo_submit").removeAttr("disabled");
         });
     }
     /*
@@ -334,6 +336,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      * 用于区别是添加通讯口配置还是修改通讯口配置
      * */
     $scope.setplc_id = function (plc_id) {
+        $("#btn_plcInfo_submit").removeAttr("disabled");
         $("#plc_id").val(plc_id);
         $scope.showPlcInfoById(plc_id);
     }
@@ -527,6 +530,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     }
 
     $scope.cleanInput = function () {
+        $("#btn_plcInfo_submit").removeAttr("disabled");
         $("#addConfig").modal("show");
         clearForm($('#addConfig'));
         $("#port").val("COM1");

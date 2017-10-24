@@ -42,5 +42,10 @@ $(function () {
             }
         });
     })
-
+    /*
+     * modal框显示
+     * */
+    showUserLicenseModal = function () {
+        $("#userLicenseModal").modal("show");
+    }
 })
