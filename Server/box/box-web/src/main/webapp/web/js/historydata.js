@@ -51,7 +51,7 @@ appModule
 													true);
 										}
 										$scope.$apply();
-
+										$scope.searchHisData(1, 5);
 										$scope.paginationConf = {
 											currentPage : 1,
 											itemsPerPage : 10,
@@ -107,7 +107,7 @@ appModule
 					$scope.searchHisData = function(pageIndex, pageSize) {
 						if (pageIndex == 0)
 							pageIndex = 1;
-						$("#loadingModal").modal("show");
+						//$("#loadingModal").modal("show");
 						var params = {
 							real_his_cfg_id : $("#monitorid").val(),
 							start_date : $("#startdateid").val(),
