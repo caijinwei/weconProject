@@ -75,24 +75,27 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 			}
 			Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {});
 			paramMap.put(session.getId(), params);
-			if (null != bParams.get("markid") && "1".equals(bParams.get("markid").toString())) {
-				String value = bParams.get("value").toString();
-				String addr_id = bParams.get("addr_id").toString();
-				// 订阅消息
-				if (!CommonUtils.isNullOrEmpty(addr_id)) {
-					RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(addr_id));
-					Device device = deviceApi.getDevice(realHisCfg.device_id);
-					String subscribeTopic = "pibox/cts/" + device.machine_code;
+			String markid = null != bParams.get("markid") ? bParams.get("markid").toString() : null;
+			if(markid != null){
+				if ("1".equals(markid)) {
+					String value = bParams.get("value").toString();
+					String addr_id = bParams.get("addr_id").toString();
+					// 订阅消息
+					if (!CommonUtils.isNullOrEmpty(addr_id)) {
+						RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(addr_id));
+						Device device = deviceApi.getDevice(realHisCfg.device_id);
+						String subscribeTopic = "pibox/cts/" + device.machine_code;
 
-					SendvalueCallback sendvalueCallback = new SendvalueCallback(session, addr_id);
-					ClientMQTT reclient = new ClientMQTT(subscribeTopic, "send" + session.getId(), sendvalueCallback);
-					reclient.start();
-					clientMQTTs.put(session.getId(), reclient);
+						SendvalueCallback sendvalueCallback = new SendvalueCallback(session, addr_id);
+						ClientMQTT reclient = new ClientMQTT(subscribeTopic, "send" + session.getId(), sendvalueCallback);
+						reclient.start();
+						clientMQTTs.put(session.getId(), reclient);
 
-					// 发送数据
-					sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteActPhone, reclient);
+						// 发送数据
+						sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteActPhone, reclient);
+					}
+
 				}
-
 			} else {
 				// 推送消息给移动端
 				logger.debug("WebSocket push begin");
