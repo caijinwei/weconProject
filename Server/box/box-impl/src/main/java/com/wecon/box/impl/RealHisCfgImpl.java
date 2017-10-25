@@ -134,6 +134,33 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	}
 
 	@Override
+	public RealHisCfg getRealHisCfg(long device_id, String name, int data_type) {
+		List<Object> params = new ArrayList<Object>();
+		String sql = "select " + SEL_COL + " from real_his_cfg r where r.device_id=?";
+		params.add(device_id);
+
+		StringBuffer condition = new StringBuffer("");
+
+		if (!CommonUtils.isNullOrEmpty(name)) {
+			condition.append("  and r.name=? ");
+			params.add(name);
+		}
+		if (!CommonUtils.isNullOrEmpty(data_type)) {
+			condition.append("  and r.data_type=? ");
+			params.add(data_type);
+		}
+
+		sql = sql + condition;
+
+		List<RealHisCfg> list = jdbcTemplate.query(sql, params.toArray(), new DefaultRealHisCfgRowMapper());
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	@Override
 	public void delRealHisCfg(long id) {
 
 		String sql = "delete from  real_his_cfg r where r.id=?";

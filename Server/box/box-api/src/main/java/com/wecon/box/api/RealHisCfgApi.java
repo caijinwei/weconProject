@@ -48,6 +48,11 @@ public interface RealHisCfgApi {
 	 * @return
 	 */
 	public RealHisCfg getRealHisCfg(long device_id,String name);
+	/*
+	* 通过设备id和名称获取监控点配置
+	* */
+	public RealHisCfg getRealHisCfg(long device_id,String name,int data_type);
+
 
 	/**
 	 * 通过filter获取历史（实时）数据配置信息列表

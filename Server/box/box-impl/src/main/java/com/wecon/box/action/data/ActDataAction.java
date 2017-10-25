@@ -1,31 +1,10 @@
 package com.wecon.box.action.data;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import javax.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Description;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.wecon.box.api.AccountDirApi;
-import com.wecon.box.api.AccountDirRelApi;
-import com.wecon.box.api.DevBindUserApi;
-import com.wecon.box.api.PlcInfoApi;
-import com.wecon.box.api.RealHisCfgApi;
-import com.wecon.box.api.ViewAccountRoleApi;
+import com.wecon.box.api.*;
 import com.wecon.box.constant.Constant;
-import com.wecon.box.entity.AccountDir;
-import com.wecon.box.entity.AccountDirRel;
-import com.wecon.box.entity.DevBindUser;
-import com.wecon.box.entity.Page;
-import com.wecon.box.entity.PlcInfo;
-import com.wecon.box.entity.RealHisCfg;
-import com.wecon.box.entity.RealHisCfgDevice;
+import com.wecon.box.entity.*;
 import com.wecon.box.entity.plcdom.AddrDom;
 import com.wecon.box.entity.plcdom.Plc;
 import com.wecon.box.entity.plcdom.Res;
@@ -46,6 +25,17 @@ import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.BusinessException;
 import com.wecon.restful.core.Client;
 import com.wecon.restful.core.Output;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Description;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author lanpenghui 2017年8月9日下午1:43:32
@@ -653,7 +643,7 @@ public class ActDataAction {
 			RealHisCfg oldrealHisCfg = null;
 			RealHisCfg realHisCfg = null;
 			if (realHisCfgParam.id > 0) {
-				RealHisCfg oldre = realHisCfgApi.getRealHisCfg(realHisCfgParam.device_id, realHisCfgParam.name);
+				RealHisCfg oldre = realHisCfgApi.getRealHisCfg(realHisCfgParam.device_id, realHisCfgParam.name,realHisCfgParam.data_type);
 				if (oldre != null && oldre.id != realHisCfgParam.id) {
 					throw new BusinessException(ErrorCodeOption.Name_Repetition.key,
 							ErrorCodeOption.Name_Repetition.value);
@@ -731,7 +721,7 @@ public class ActDataAction {
 				json.put("success", 0);
 
 			} else {
-				RealHisCfg newre = realHisCfgApi.getRealHisCfg(realHisCfgParam.device_id, realHisCfgParam.name);
+				RealHisCfg newre = realHisCfgApi.getRealHisCfg(realHisCfgParam.device_id, realHisCfgParam.name,realHisCfgParam.data_type);
 				if (newre != null) {
 					throw new BusinessException(ErrorCodeOption.Name_Repetition.key,
 							ErrorCodeOption.Name_Repetition.value);
