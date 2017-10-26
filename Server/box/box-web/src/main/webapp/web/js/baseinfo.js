@@ -18,7 +18,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         $scope.showBaseInfo();
         $scope.showPlcSetDefault();
         $("#loadingModal").modal("hide");
-        $("#map_body").css("display","none");
+        $("#map_body").css("display", "none");
     }
     $scope.showBaseInfo = function () {
         $scope.device_id = T.common.util.getParameter("device_id");
@@ -220,9 +220,9 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     //$scope.btn_plcInfo_cancel =function(){
     //    $("#btn_plcInfo_submit").removeAttr("disabled");
     //}
-        //提醒
+    //提醒
     $scope.chgTypeNotice = function () {
-        $("#btn_plcInfo_submit").attr("disabled","true");
+        $("#btn_plcInfo_submit").attr("disabled", "true");
         if ($("#plc_id").val() == 0) {
             $scope.addPlcInfosetting_submit();
         } else {
@@ -465,19 +465,21 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         var remark = $("#remark").val();
         var map_a = $("#map_a").val();
         var map_o = $("#map_o").val();
-        if (isNaN(map_a) || isNaN(map_o)) {
-            alert("地图坐标格式错误");
-            return;
-        }
-        var reg_a = /^[\-\+]?(0|0\.\d{1,6}|\d{1}|\d{1}\.\d{1,6}|[1-9]{1}\d{1}|[1-9]{1}\d{1}\.\d{1,6}|1[0-7]{1}\d{1}\.\d{1,6}|1[0-7]{1}\d{1}|180\.[0]{1,6}|180)$/;
-        if (!reg_a.test(map_a)) {
-            alert("经度输入错误，请输入经度-180.000000~180.000000的数");
-            return;
-        }
-        var reg_o = /^[\-\+]?(0|0\.\d{1,6}|\d{1}|\d{1}\.\d{1,6}|[1-8]\d{1}|[1-8]\d{1}\.\d{1,6}|90|90\.[0]{1,6})$/;
-        if (!reg_o.test(map_o)) {
-            alert("纬度输入错误，请输入纬度-90.000000~90.000000的数");
-            return;
+        if (map_a != "" || map_o != "") {
+            if (isNaN(map_a) || isNaN(map_o)) {
+                alert("地图坐标格式错误");
+                return;
+            }
+            var reg_a = /^[\-\+]?(0|0\.\d{1,6}|\d{1}|\d{1}\.\d{1,6}|[1-9]{1}\d{1}|[1-9]{1}\d{1}\.\d{1,6}|1[0-7]{1}\d{1}\.\d{1,6}|1[0-7]{1}\d{1}|180\.[0]{1,6}|180)$/;
+            if (!reg_a.test(map_a)) {
+                alert("经度输入错误，请输入经度-180.000000~180.000000的数");
+                return;
+            }
+            var reg_o = /^[\-\+]?(0|0\.\d{1,6}|\d{1}|\d{1}\.\d{1,6}|[1-8]\d{1}|[1-8]\d{1}\.\d{1,6}|90|90\.[0]{1,6})$/;
+            if (!reg_o.test(map_o)) {
+                alert("纬度输入错误，请输入纬度-90.000000~90.000000的数");
+                return;
+            }
         }
         var map = $("#map_a").val() + "," + $("#map_o").val();
         var params = {
@@ -489,6 +491,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         T.common.ajax.request("WeconBox", "baseInfoAction/chgPiboxInFoName", params, function (data, code, msg) {
             if (code == 200) {
                 alert("保存成功！");
+                window.parent.reloadBoxList();
                 //$scope.$apply();
             }
             else {
@@ -947,35 +950,35 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      * */
     $scope.mapShow = function () {
         console.log($("#map_body").css("display"));
-        if ($("#map_body").css("display")=="none") {
+        if ($("#map_body").css("display") == "none") {
             $("#btn_map_show").text("关闭地图");
             $("#map_body")[0].style.display = "block";
-            $("#map_input")[0].style.display="block";
+            $("#map_input")[0].style.display = "block";
             // 百度地图API功能
             $scope.$map = new BMap.Map("allmap");
             var map = $scope.$map;
             map.enableScrollWheelZoom(true);
 
             /*
-            * 根据盒子经纬度定位为中心
-            * */
-            var map_a=$("#map_a").val();
-            var map_o=$("#map_o").val();
-            if(map_a==""&&map_o==""){
-                map.centerAndZoom(new BMap.Point(119.310369,26.082246), 11);
-            }else if(map_a==""){
-                map_a=0;
-                map.centerAndZoom(new BMap.Point(map_a,map_o), 11);
-            }else if (map_o==""){
-                map_o=0;
-                map.centerAndZoom(new BMap.Point(map_a,map_o), 11);
-            }else{
-                map.centerAndZoom(new BMap.Point(map_a,map_o), 11);
+             * 根据盒子经纬度定位为中心
+             * */
+            var map_a = $("#map_a").val();
+            var map_o = $("#map_o").val();
+            if (map_a == "" && map_o == "") {
+                map.centerAndZoom(new BMap.Point(119.310369, 26.082246), 11);
+            } else if (map_a == "") {
+                map_a = 0;
+                map.centerAndZoom(new BMap.Point(map_a, map_o), 11);
+            } else if (map_o == "") {
+                map_o = 0;
+                map.centerAndZoom(new BMap.Point(map_a, map_o), 11);
+            } else {
+                map.centerAndZoom(new BMap.Point(map_a, map_o), 11);
             }
             /*
-            * 设置标注点
-            * */
-            var boxTag = new BMap.Point(map_a,map_o);
+             * 设置标注点
+             * */
+            var boxTag = new BMap.Point(map_a, map_o);
             //var label = new BMap.Label($scope.device_name,{offset:new BMap.Size(20,-10)});
             var marker = new BMap.Marker(boxTag);
             map.addOverlay(marker);
@@ -1048,31 +1051,31 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 //alert('你点击的是地图');
                 var createMarker = function (map) {//右键更新站名
                     if (true) {
-                        $scope.mapinfoModalShow(s,w);
+                        $scope.mapinfoModalShow(s, w);
                     }
                 };
                 var markerMenu = new BMap.ContextMenu();
                 markerMenu.addItem(new BMap.MenuItem('盒子位置', createMarker.bind(map)));
                 map.addContextMenu(markerMenu);//给标记添加右键菜单
             }
-        }else{
+        } else {
             $("#btn_map_show").text("定位");
-            $("#map_body").css("display","none");
-            $("#map_input")[0].style.display="none";
+            $("#map_body").css("display", "none");
+            $("#map_input")[0].style.display = "none";
         }
     }
-    $scope.mapinfoModalShow= function (s,w) {
+    $scope.mapinfoModalShow = function (s, w) {
         $("#mapinfo").modal("show");
         //var strMaps=s.toString();
         //var strMapw= w.toString();
         //var reg=/[\-\+]?\d{1,}\.\d{1,3}/;
         //s=reg.exec(strMaps);
         //w=reg.exec(strMapw);
-        $scope.map_s=s;
-        $scope.map_w=w;
+        $scope.map_s = s;
+        $scope.map_w = w;
         $scope.$apply();
     }
-    $scope.mapinfo=function(){
+    $scope.mapinfo = function () {
         $("#mapinfo").modal("hide");
         $("#map_a").val($scope.map_s);
         $("#map_o").val($scope.map_w);
@@ -1080,10 +1083,10 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     /*
      * 结果版面
      * */
-    $scope.mapSearchCommit=function(){
+    $scope.mapSearchCommit = function () {
 
-        var local = new BMap.LocalSearch( $scope.$map, {
-            renderOptions: {map:  $scope.$map, panel: "r-result"}
+        var local = new BMap.LocalSearch($scope.$map, {
+            renderOptions: {map: $scope.$map, panel: "r-result"}
         });
         local.search($("#suggestId").val());
     }
