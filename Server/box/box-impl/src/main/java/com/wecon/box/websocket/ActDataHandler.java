@@ -94,7 +94,8 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 						// 发送数据
 						sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteActPhone, reclient);
 					}
-
+				}else if("-1".equals(markid)){
+					session.sendMessage(new TextMessage("1"));
 				}
 			} else {
 				// 推送消息给移动端
