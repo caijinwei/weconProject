@@ -328,27 +328,27 @@ public class DeviceImpl implements DeviceApi {
             return null;
         }
 
-        if(1 == selAlarm){
-            StringBuilder sb = new StringBuilder();
-            for(String[] ss : deviceLst){
-                sb.append(",").append(ss[0]);
-            }
-            List<String> deviceIdLst = jdbcTemplate.query(
-                    "SELECT ac.device_id FROM alarm_cfg ac INNER JOIN alarm_cfg_data acd on ac.alarmcfg_id=acd.alarm_cfg_id where ac.state !=3 and acd.state=1 and ac.device_id in("+sb.substring(1)+")", new RowMapper() {
-                        @Override
-                        public Object mapRow(ResultSet rs, int i) throws SQLException {
-                            return rs.getLong("device_id") + "";
-                        }
-                    });
-
-            List<String[]> ndeviceLst = new ArrayList<>();
-            if(null != deviceIdLst && deviceIdLst.size() > 0){
-                for(String[] device : deviceLst){
-                    if(deviceIdLst.contains(device[0])){
-                        ndeviceLst.add(device);
+        StringBuilder sb = new StringBuilder();
+        for(String[] ss : deviceLst){
+            sb.append(",").append(ss[0]);
+        }
+        List<String> deviceIdLst = jdbcTemplate.query(
+                "SELECT ac.device_id FROM alarm_cfg ac INNER JOIN alarm_cfg_data acd on ac.alarmcfg_id=acd.alarm_cfg_id where ac.state !=3 and acd.state=1 and ac.device_id in("+sb.substring(1)+")", new RowMapper() {
+                    @Override
+                    public Object mapRow(ResultSet rs, int i) throws SQLException {
+                        return rs.getLong("device_id") + "";
                     }
+                });
+        List<String[]> ndeviceLst = new ArrayList<>();
+        if(null != deviceIdLst && deviceIdLst.size() > 0){
+            for(String[] device : deviceLst){
+                if(deviceIdLst.contains(device[0])){
+                    ndeviceLst.add(device);
                 }
             }
+        }
+
+        if(1 == selAlarm){
             deviceLst = ndeviceLst;
         }
 
@@ -363,6 +363,7 @@ public class DeviceImpl implements DeviceApi {
                     dm.put("boxName", device[1]);
                     dm.put("map", device[2]);
                     dm.put("state", device[4]);
+                    dm.put("isAlarm", deviceIdLst.contains(device[0]) ? 1 : 0);
                     l.add(dm);
                 }
             }

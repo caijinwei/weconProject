@@ -144,7 +144,7 @@ public class FileAction {
     }
 
     @Description("下载文件接口")
-    @RequestMapping(value = "/filedownload", method = RequestMethod.GET)
+    @RequestMapping(value = "/filedownload", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<Resource> fileDownloadAction(@RequestParam("id") Long id, @RequestParam("t") String t) throws IOException {
         String redisKey = String.format(ConstKey.REDIS_FILE_DOWNLOAD_TOKEN, id);

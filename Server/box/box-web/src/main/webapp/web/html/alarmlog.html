@@ -45,9 +45,19 @@
 			<!-- <li><a href="#alarm-global-setting" data-toggle="tab" ng-cloak
 				ng-if="accounttype==1 && deviceid>0">全局设置</a></li> -->
 		</ul>
+		<form method="post" id="myform">
+		</form>
 		<div class="tab-content">
 			<div class="tab-pane active" id="current-alarm">
-				<div class="container-fluid">
+				<div class="container-fluid" style="margin-top: 20px;">
+					<div class="row">
+						<div class="btn-group" style="margin-left: 20px;">
+							<button type="button" class="btn btn-primary" data-toggle="modal"
+									ng-click="exportExcel(1);">
+								<span ></span> 导出Excel
+							</button>
+						</div>
+					</div>
 					<table class="table table-bordered" style="margin-top: 20px;">
 						<thead>
 							<tr>
@@ -131,6 +141,11 @@
 							style="margin-left: 20px;"
 							ng-click="hisalarm_submit(paginationConf_history.currentPage,paginationConf_history.itemsPerPage)">
 							<span class="glyphicon glyphicon-search"></span>
+						</button>
+						<button type="button" class="btn btn-primary"
+								style="margin-left: 20px;"
+								ng-click="exportExcel(2);">
+							导出Excel
 						</button>
 						<!-- <button type="button" class="btn btn-primary">
 							<span class="glyphicon glyphicon-share"></span>

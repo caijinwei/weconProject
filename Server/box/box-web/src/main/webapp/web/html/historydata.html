@@ -46,6 +46,8 @@
 				ng-if="accounttype==1 && deviceid>0">全局设置</a></li> -->
 
 		</ul>
+		<form method="post" id="myform">
+		</form>
 		<div class="tab-content">
 			<!--原始数据-->
 			<div class="tab-pane active" id="original-data">
@@ -63,7 +65,12 @@
 							<button id="btn-curves" type="button" class="btn btn-default"
 								ng-click="showListOrCurves('btn-curves')">曲线</button>
 						</div>
-
+						<div class="btn-group" style="margin-left: 20px;">
+							<button type="button" class="btn btn-primary" data-toggle="modal"
+									 ng-click="exportExcel();">
+								<span ></span> 导出Excel
+							</button>
+						</div>
 					</div>
 					<div class="row" style="margin-top: 20px;">
 						<div style="display: inline-block; margin-left: -15px;"

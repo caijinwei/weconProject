@@ -54,12 +54,11 @@ appModule
 										$scope.searchHisData(1, 5);
 										$scope.paginationConf = {
 											currentPage : 1,
-											itemsPerPage : 10,
+											itemsPerPage : 5,
 											totalItems : $scope.count,
 											pagesLength : 15,
 											perPageOptions : [ 5, 10, 20, 50,
 													100 ],
-											rememberPerPage : 'perPageItems',
 											onChange : function() {
 												if (this.currentPage != 0) {
 													$scope.searchHisData(
@@ -1483,4 +1482,22 @@ appModule
 
 					}
 
+					$scope.exportExcel = function() {
+						var myform = document.getElementById('myform');
+						var real_his_cfg_id = $("#monitorid").val();
+						var start_date = $("#startdateid").val();
+						var end_date = $("#enddateid").val();
+						var	pageIndex = $scope.paginationConf.currentPage;
+						pageIndex = 0 == pageIndex ? 1 : pageIndex;
+						var	pageSize =  $scope.paginationConf.itemsPerPage;
+						myform.innerHTML = '<input type="hidden" name="real_his_cfg_id" value="'+real_his_cfg_id+'"/>' +
+								'<input type="hidden" name="start_date" value="'+start_date+'"/>' +
+								'<input type="hidden" name="end_date" value="'+end_date+'"/>' +
+								'<input type="hidden" name="pageIndex" value="'+pageIndex+'"/>' +
+								'<input type="hidden" name="pageSize" value="'+pageSize+'"/>'
+						myform.action = 'http://localhost:8080/box-web/api/excelact/filedownloadExportHis';
+
+						myform.submit();
+
+					}
 				})

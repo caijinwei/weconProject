@@ -8,11 +8,13 @@ import com.wecon.box.api.*;
 import com.wecon.box.console.config.ConnectOptions;
 import com.wecon.box.console.util.MqttConfigContext;
 import com.wecon.box.console.util.SpringContextHolder;
+import com.wecon.box.constant.ConstKey;
 import com.wecon.box.constant.Constant;
 import com.wecon.box.entity.*;
 import com.wecon.box.util.Base64Util;
 import com.wecon.box.util.Converter;
 import com.wecon.box.util.GroupOp;
+import com.wecon.common.redis.RedisManager;
 import com.wecon.common.util.CommonUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -417,6 +419,7 @@ public class BoxNotifyTask extends Thread {
                     List<Map> updRealHisCfgList = (List<Map>)fbData.get("upd_real_his_cfg_list");
                     realHisCfgApi.batchUpdateState(getFeedbackUpdArgs(updRealHisCfgList, "addr_id"));
                     realHisCfgApi.batchUpdateState(getFeedbackFailArgs(updRealHisCfgList, "addr_id", null));
+                    RedisManager.publish(ConstKey.REDIS_GROUP_NAME, baseMsgFeedback.getMachine_code(), baseMsgFeedback.getMachine_code());
                     break;
                 case ACT_UPDATE_ALARM_DATA_CONFIG : //更新报警数据配置
                     List<Map> updAlarmCfgList = (List<Map>)fbData.get("upd_alarm_cfg_list");
