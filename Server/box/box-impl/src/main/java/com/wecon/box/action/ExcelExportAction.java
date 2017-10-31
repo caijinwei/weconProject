@@ -54,17 +54,15 @@ public class ExcelExportAction {
     public void exportHis(@RequestParam("real_his_cfg_id") String real_his_cfg_id,
                          @RequestParam("start_date") String start_date, @RequestParam("end_date") String end_date,
                          @RequestParam("pageIndex") Integer pageIndex, @RequestParam("pageSize") Integer pageSize) throws Exception {
-        Page<RealHisCfgData> realHisCfgDataList = new Page<RealHisCfgData>(pageIndex, pageSize, 0);
-
+        Page<RealHisCfgData> realHisCfgDataList = null;
         RealHisCfgDataFilter realHisCfgDataFilter = new RealHisCfgDataFilter();
-        if (CommonUtils.isNullOrEmpty(real_his_cfg_id)) {
-            return;
+        if (!CommonUtils.isNullOrEmpty(real_his_cfg_id)) {
+            realHisCfgDataFilter.real_his_cfg_id = Long.parseLong(real_his_cfg_id);
+            realHisCfgDataFilter.start_date = start_date;
+            realHisCfgDataFilter.end_date = end_date;
+            realHisCfgDataFilter.state = -1;
+            realHisCfgDataList = realHisCfgDataApi.getRealHisCfgDataList(realHisCfgDataFilter, pageIndex, pageSize);
         }
-        realHisCfgDataFilter.real_his_cfg_id = Long.parseLong(real_his_cfg_id);
-        realHisCfgDataFilter.start_date = start_date;
-        realHisCfgDataFilter.end_date = end_date;
-        realHisCfgDataFilter.state = -1;
-        realHisCfgDataList = realHisCfgDataApi.getRealHisCfgDataList(realHisCfgDataFilter, pageIndex, pageSize);
 
         String[] rowName = new String[]{"状态", "时间", "数值"};
         HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder

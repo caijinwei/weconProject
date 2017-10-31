@@ -4,6 +4,8 @@ package com.wecon.box.entity;
  * @author lanpenghui
  * 2017年8月1日
  */
+import com.alibaba.fastjson.JSON;
+
 import java.sql.Timestamp;
 
 public class RealHisCfgData {
@@ -19,4 +21,7 @@ public class RealHisCfgData {
 	public Timestamp create_date;
 	public int state;
 
+	public String toStringee(){
+		return JSON.toJSONString(5);
+	}
 }
