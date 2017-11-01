@@ -26,7 +26,7 @@ public class AppVersionImpl implements AppVersionApi {
         int updRst = jdbcTemplate.update("update app_ver_latest set version_code=?,version_desc=?,isforce=?, update_date=current_timestamp() where platform=?",
                 new Object[]{appVerInfo.version_code,appVerInfo.updateContent,appVerInfo.isforce, appVerInfo.platform});
         if(0 == updRst){
-            jdbcTemplate.update("insert into app_ver_latest (platform,version_code,version_desc,isforce,url,create_date,update_date) values(?,?,?,current_timestamp(),current_timestamp())",
+            jdbcTemplate.update("insert into app_ver_latest (platform,version_code,version_desc,isforce,url,create_date,update_date) values(?,?,?,?,?,current_timestamp(),current_timestamp())",
                     new Object[]{appVerInfo.platform, appVerInfo.version_code,appVerInfo.updateContent,appVerInfo.isforce, appVerInfo.url});
         }
     }

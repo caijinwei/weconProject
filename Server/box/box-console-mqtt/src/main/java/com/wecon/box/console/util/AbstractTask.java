@@ -1,4 +1,4 @@
-package com.wecon.box.util;
+package com.wecon.box.console.util;
 
 import java.util.Date;
 
@@ -16,6 +16,7 @@ public abstract class AbstractTask {
     public long getTaskId() {
 		return taskId;
 	}
+
 	public void setTaskId(long taskId) {
 		this.taskId = taskId;
 	}
@@ -25,21 +26,27 @@ public abstract class AbstractTask {
 	public void setGenerateTime(Date generateTime) {
 		this.generateTime = generateTime;
 	}
+
 	public Date getSubmitTime() {
 		return submitTime;
 	}
+
 	public void setSubmitTime(Date submitTime) {
 		this.submitTime = submitTime;
 	}
+
 	public Date getBeginExceuteTime() {
 		return beginExceuteTime;
 	}
+
 	public void setBeginExceuteTime(Date beginExceuteTime) {
 		this.beginExceuteTime = beginExceuteTime;
 	}
+
 	public Date getFinishTime() {
 		return finishTime;
 	}
+
 	public void setFinishTime(Date finishTime) {
 		this.finishTime = finishTime;
 	}
