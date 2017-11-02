@@ -16,7 +16,7 @@ public class TaskThreadPool {
 
     public static final int SYSTEM_BUSY_TASK_COUNT = 150;
     /* 默认池中线程数 */
-    public static int worker_num = 20;
+    public static int workerNum = 20;
     /* 已经处理的任务数 */
     private static int taskCounter = 0;
 
@@ -27,7 +27,7 @@ public class TaskThreadPool {
     public PoolWorker[] workers;
 
     private TaskThreadPool() {
-        workers = new PoolWorker[worker_num];
+        workers = new PoolWorker[workerNum];
         for (int i = 0; i < workers.length; i++) {
             workers[i] = new PoolWorker(i);
         }
@@ -106,7 +106,7 @@ public class TaskThreadPool {
      * 销毁线程池
      */
     public synchronized void destroy() {
-        for (int i = 0; i < worker_num; i++) {
+        for (int i = 0; i < workerNum; i++) {
             workers[i].stopWorker();
             workers[i] = null;
         }
