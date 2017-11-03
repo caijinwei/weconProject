@@ -46,10 +46,8 @@ appModule
 								function(data, code, msg) {
 									if (code == 200) {
 										$scope.commonitors = data.monitors;
-										if ($scope.commonitors == "") {
-											$("#searchid").attr("disabled",
-													true);
-										}
+										$("#searchid").attr("disabled",
+												$scope.commonitors == "");
 										$scope.$apply();
 										$scope.searchHisData(1, 5);
 										$scope.paginationConf = {
