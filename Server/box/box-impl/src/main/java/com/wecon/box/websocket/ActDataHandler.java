@@ -74,7 +74,6 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 				return;
 			}
 			Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {});
-			paramMap.put(session.getId(), params);
 			String markid = null != bParams.get("markid") ? bParams.get("markid").toString() : null;
 			if(markid != null){
 				if ("1".equals(markid)) {
@@ -98,6 +97,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 					session.sendMessage(new TextMessage("1"));
 				}
 			} else {
+				paramMap.put(session.getId(), params);
 				// 推送消息给移动端
 				logger.debug("WebSocket push begin");
 				Object[] oj = getRealData(session);

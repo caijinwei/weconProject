@@ -9,10 +9,10 @@ import java.util.List;
  * 自定义线程池，可配置线程数
  * @author whp 2017年10月28日下午5:09:01
  */
-public class TaskThreadPool {
+public class ThreadPoolExecutor {
 
     /* 单例 */
-    private static TaskThreadPool instance = null;
+    private static ThreadPoolExecutor instance = null;
 
     public static final int SYSTEM_BUSY_TASK_COUNT = 150;
     /* 默认池中线程数 */
@@ -26,18 +26,18 @@ public class TaskThreadPool {
     /* 池中的所有线程 */
     public PoolWorker[] workers;
 
-    private TaskThreadPool() {
+    private ThreadPoolExecutor() {
         workers = new PoolWorker[workerNum];
         for (int i = 0; i < workers.length; i++) {
             workers[i] = new PoolWorker(i);
         }
     }
 
-    public static TaskThreadPool getInstance() {
+    public static ThreadPoolExecutor getInstance() {
         if (instance == null) {
-            synchronized (TaskThreadPool.class) {
+            synchronized (ThreadPoolExecutor.class) {
                 if (instance == null) {
-                    instance = new TaskThreadPool();
+                    instance = new ThreadPoolExecutor();
                 }
             }
         }

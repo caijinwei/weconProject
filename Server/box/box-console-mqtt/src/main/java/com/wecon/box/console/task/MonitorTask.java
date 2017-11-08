@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.wecon.box.api.*;
-import com.wecon.box.console.util.TaskThreadPool;
+import com.wecon.box.console.util.ThreadPoolExecutor;
 import com.wecon.box.util.GroupOp;
 import com.wecon.box.util.JPushServer;
 import org.apache.logging.log4j.LogManager;
@@ -95,7 +95,7 @@ public class MonitorTask extends Thread {
 					//manageData(topic, message);
 					//采用线程池方式
 					BusDataHandleTask task = new BusDataHandleTask(topic, message, client);
-					TaskThreadPool.getInstance().addTask(task);
+					ThreadPoolExecutor.getInstance().addTask(task);
 				}
 
 				public void deliveryComplete(IMqttDeliveryToken token) {

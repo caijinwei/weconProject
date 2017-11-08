@@ -47,9 +47,9 @@
 	<bean id="getPublishClient" class="com.wecon.box.console.task.GetPublishClient" />
 	<!--mqtt配置 -->
 	<bean id="mqttConfig" class="com.wecon.box.console.config.MqttConfig">
-		<property name="host" value="${host}" />
-		<property name="username" value="${username}" />
-		<property name="password" value="${password}" />
+		<property name="host" value="${mqtt.host}" />
+		<property name="username" value="${mqtt.username}" />
+		<property name="password" value="${mqtt.password}" />
 	</bean>
 	<bean id="mqttContext" class="com.wecon.box.console.util.MqttConfigContext">
 		<property name="mqttConfig" ref="mqttConfig" />
