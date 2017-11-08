@@ -12,6 +12,8 @@ public abstract class AbstractTask {
     public Date beginExceuteTime = null;
     /* 执行完成时间 */
     public Date finishTime = null;
+
+	public int type;
     
     public long getTaskId() {
 		return taskId;
@@ -49,6 +51,14 @@ public abstract class AbstractTask {
 
 	public void setFinishTime(Date finishTime) {
 		this.finishTime = finishTime;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
 	}
 	
 	public void run(){}

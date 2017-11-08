@@ -1,5 +1,8 @@
 package com.wecon.box.console.util;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -16,7 +19,7 @@ public class ThreadPoolExecutor {
 
     public static final int SYSTEM_BUSY_TASK_COUNT = 150;
     /* 默认池中线程数 */
-    public static int workerNum = 20;
+    public static int workerNum = 0;
     /* 已经处理的任务数 */
     private static int taskCounter = 0;
 
@@ -26,11 +29,33 @@ public class ThreadPoolExecutor {
     /* 池中的所有线程 */
     public PoolWorker[] workers;
 
+    private static final Logger logger = LogManager.getLogger(ThreadPoolExecutor.class);
+
+    /**
+     * 初始化线程池，根据不同类型创建不同类型的线程
+     * @param initParams
+     */
+    public void initThreadPool(List<int[]> initParams){
+        if(null != initParams){
+            for(int[] params : initParams){
+                workerNum += params[1];
+            }
+            workers = new PoolWorker[workerNum];
+            int index = 0;
+            for(int[] params : initParams){
+                for(int i=0;i<params[1];i++){
+                    workers[index] = new PoolWorker(index, params[0]);
+                    index++;
+                }
+            }
+        }
+    }
+
     private ThreadPoolExecutor() {
-        workers = new PoolWorker[workerNum];
+        /*workers = new PoolWorker[workerNum];
         for (int i = 0; i < workers.length; i++) {
             workers[i] = new PoolWorker(i);
-        }
+        }*/
     }
 
     public static ThreadPoolExecutor getInstance() {
@@ -123,8 +148,11 @@ public class ThreadPoolExecutor {
         /* 该工作线程是否可以执行新任务 */
         private boolean isWaiting = true;
 
-        public PoolWorker(int index) {
+        private int type;
+
+        public PoolWorker(int index, int type) {
             this.index = index;
+            this.type = type;
             start();
         }
 
@@ -141,7 +169,7 @@ public class ThreadPoolExecutor {
          * 这也许是线程池的关键所在
          */
         public void run() {
-            while (isRunning) {
+            while (isRunning && isWaiting) {
                 AbstractTask task = null;
                 synchronized (taskQueue) {
                     while (taskQueue.isEmpty()) {
@@ -155,7 +183,8 @@ public class ThreadPoolExecutor {
 					/* 取出任务执行 */
                     task = taskQueue.remove(0);
                 }
-                if (task != null) {
+                if (task != null && type == task.getType()) {
+                    logger.info("线程【"+index+"】，类型【"+type+"】正在执行任务！！！");
                     isWaiting = false;
                     try {
 
