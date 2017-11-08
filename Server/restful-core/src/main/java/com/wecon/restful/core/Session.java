@@ -67,10 +67,10 @@ public class Session {
         // 非离线本地单元测试
         if (!"true".equals(test)) {
             this.fillParam();
-            logger.debug("Session fillParam" );
+            logger.debug("Session fillParam");
             client = new Client();
             client.init(this);
-            logger.debug("client.init" );
+            logger.debug("client.init");
 
             String baseUrl = request.getRequestURI();
             int begin = baseUrl.indexOf("/api/");
@@ -259,6 +259,16 @@ public class Session {
             } catch (Throwable e) {
                 throw e;
             }
+        }
+        //时间戳验证
+        if (client.timestamp > 0) {
+            //原时间戳和当前时间戳中间相隔的分钟数
+            Long s = (System.currentTimeMillis() - client.timestamp) / (1000 * 60);
+            if (s > 3) {
+                throw new DeniedException("ts is time out");
+            }
+        } else {
+            throw new DeniedException("ts is time out");
         }
     }
 
