@@ -45,16 +45,15 @@
 			<!-- <li><a href="#alarm-global-setting" data-toggle="tab" ng-cloak
 				ng-if="accounttype==1 && deviceid>0">全局设置</a></li> -->
 		</ul>
-		<form method="post" id="myform">
-		</form>
+		<form method="post" id="myform"></form>
 		<div class="tab-content">
 			<div class="tab-pane active" id="current-alarm">
 				<div class="container-fluid" style="margin-top: 20px;">
 					<div class="row">
 						<div class="btn-group" style="margin-left: 20px;">
 							<button type="button" class="btn btn-primary" data-toggle="modal"
-									ng-click="exportExcel(1);">
-								<span ></span> 导出Excel
+								ng-click="exportExcel(1);">
+								<span></span> 导出Excel
 							</button>
 						</div>
 					</div>
@@ -66,6 +65,7 @@
 								<th class="col-md-3">信息</th>
 								<th class="col-md-1">状态</th>
 								<th class="col-md-2">值</th>
+								<th class="col-md-1">报警类型</th>
 								<th class="col-md-3">时间</th>
 								<th class="col-md-2">操作</th>
 
@@ -78,6 +78,7 @@
 								<td>{{x.text}}</td>
 								<td>{{x.state==2?"确认":"未确认"}}</td>
 								<td>{{x.value}}</td>
+								<td>{{x.alarm_type==0?"解除":"触发"}}</td>
 								<td>{{x.monitor_time|date:'yyyy-MM-dd HH:mm:ss'}}</td>
 								<td><a href="#" title="确认" ng-click="confirmData(x)"><span
 										class="glyphicon glyphicon-ok" style="margin-left: 5px;"></span></a>
@@ -143,10 +144,8 @@
 							<span class="glyphicon glyphicon-search"></span>
 						</button>
 						<button type="button" class="btn btn-primary"
-								style="margin-left: 20px;"
-								ng-click="exportExcel(2);">
-							导出Excel
-						</button>
+							style="margin-left: 20px;" ng-click="exportExcel(2);">
+							导出Excel</button>
 						<!-- <button type="button" class="btn btn-primary">
 							<span class="glyphicon glyphicon-share"></span>
 						</button> -->
@@ -159,6 +158,7 @@
 								<th class="col-md-3">信息</th>
 								<th class="col-md-2">状态</th>
 								<th class="col-md-2">值</th>
+								<th class="col-md-1">报警类型</th>
 								<th class="col-md-3">时间</th>
 							</tr>
 						</thead>
@@ -169,6 +169,7 @@
 								<td>{{x.text}}</td>
 								<td>{{x.state==2?"确认":"未确认"}}</td>
 								<td>{{x.value}}</td>
+								<td>{{x.alarm_type==0?"解除":"触发"}}</td>
 								<td>{{x.monitor_time|date:'yyyy-MM-dd HH:mm:ss'}}</td>
 							</tr>
 						</tbody>

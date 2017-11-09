@@ -9,6 +9,8 @@ import com.wecon.box.api.*;
 import com.wecon.box.console.util.ThreadPoolExecutor;
 import com.wecon.box.util.GroupOp;
 import com.wecon.box.util.JPushServer;
+import com.wecon.box.util.SSLUtil;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -88,9 +90,9 @@ public class MonitorTask extends Thread {
 
 			MqttConnectOptions options = ConnectOptions.getConnectOptions(MqttConfigContext.mqttConfig.getUsername(),
 					MqttConfigContext.mqttConfig.getPassword());
+			options.setSocketFactory(SSLUtil.getSocketFactory(this.getClass().getClassLoader().getResourceAsStream("ca.crt")));
 			System.out.println("to connect mqtt......");
 			logger.info("to connect mqtt......");
-
 			client = new MqttClient(MqttConfigContext.mqttConfig.getHost(), clientId, new MemoryPersistence());
 			client.connect(options);
 			// 订阅盒子的所有发送主题

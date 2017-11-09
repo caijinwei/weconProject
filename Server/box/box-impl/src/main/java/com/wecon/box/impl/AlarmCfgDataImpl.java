@@ -27,11 +27,11 @@ import com.wecon.common.util.CommonUtils;
 public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	private final String SEL_COL = "acd.alarm_cfg_id,acd.monitor_time,acd.value,acd.create_date,acd.state";
+	private final String SEL_COL = "acd.alarm_cfg_id,acd.monitor_time,acd.value,acd.create_date,acd.state,acd.alarm_type";
 
 	@Override
 	public void saveAlarmCfgData(final List<AlarmCfgData> listmodel) {
-		String sql = "insert into alarm_cfg_data (alarm_cfg_id,monitor_time,`value`,create_date,state)values(?,?,?,current_timestamp(),?);";
+		String sql = "insert into alarm_cfg_data (alarm_cfg_id,monitor_time,`value`,create_date,state,alarm_type)values(?,?,?,current_timestamp(),?,?);";
 		jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
 
 			@Override
@@ -40,6 +40,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 				ps.setTimestamp(2, listmodel.get(i).monitor_time);
 				ps.setString(3, listmodel.get(i).value);
 				ps.setInt(4, listmodel.get(i).state);
+				ps.setInt(5, listmodel.get(i).alarm_type);
 			}
 
 			@Override
@@ -52,8 +53,8 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 
 	@Override
 	public boolean updateAlarmCfgData(AlarmCfgData alarmCfgData) {
-		String sql = "update alarm_cfg_data SET `value`=?,create_date=?,state=? where alarm_cfg_id=? and monitor_time=?";
-		jdbcTemplate.update(sql, new Object[] { alarmCfgData.value, alarmCfgData.create_date, alarmCfgData.state,
+		String sql = "update alarm_cfg_data SET `value`=?,create_date=?,state=?,alarm_type=? where alarm_cfg_id=? and monitor_time=?";
+		jdbcTemplate.update(sql, new Object[] { alarmCfgData.value, alarmCfgData.create_date, alarmCfgData.state,alarmCfgData.alarm_type,
 				alarmCfgData.alarm_cfg_id, alarmCfgData.monitor_time });
 
 		return true;
@@ -378,6 +379,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 			model.value = rs.getString("value");
 			model.create_date = rs.getTimestamp("create_date");
 			model.state = rs.getInt("state");
+			model.alarm_type=rs.getInt("alarm_type");
 
 			return model;
 		}
@@ -395,6 +397,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 			model.state = rs.getInt("state");
 			model.name = rs.getString("name");
 			model.text = rs.getString("text");
+			model.alarm_type=rs.getInt("alarm_type");
 
 			return model;
 		}
