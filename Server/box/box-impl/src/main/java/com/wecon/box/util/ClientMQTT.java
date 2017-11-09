@@ -135,8 +135,8 @@ public class ClientMQTT {
 	}
 
 	public static void main(String[] args) throws MqttException {
-		// ClientMQTT client = new ClientMQTT("pibox/stc/2222/", new
-		// PushCallback());
-		// client.start();
+//		 ClientMQTT client = new ClientMQTT("pibox/stc/2222/", new
+//		 PushCallback());
+//		 client.start();
 	}
 }
