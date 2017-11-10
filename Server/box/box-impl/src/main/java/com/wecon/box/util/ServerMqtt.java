@@ -58,8 +58,6 @@ public class ServerMqtt {
 
 		try {
 			MqttConnectOptions options = new MqttConnectOptions();
-			options.setSocketFactory(
-					SSLUtil.getSocketFactory(this.getClass().getClassLoader().getResourceAsStream("ca.crt")));
 			options.setCleanSession(false);
 			options.setUserName(userName);
 			options.setPassword(passWord.toCharArray());

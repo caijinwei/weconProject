@@ -92,13 +92,8 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 					Device device = deviceApi.getDevice(realHisCfg.device_id);
 					String subscribeTopic = "pibox/cts/" + device.machine_code;
 					SendvalueCallback sendvalueCallback = new SendvalueCallback(session, addr_id);
-					long a=System.currentTimeMillis();
-					System.out.println("开始时间=="+a);
 					ClientMQTT reclient = new ClientMQTT(subscribeTopic, "send" + session.getId(), sendvalueCallback);
 					reclient.start();
-					long b=System.currentTimeMillis();
-					long c=(b-a)/1000;
-					System.out.println("相差时间=="+c);
 					clientMQTTs.put(session.getId(), reclient);
 					sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteAct, reclient);
 				}

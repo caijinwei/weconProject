@@ -1,16 +1,8 @@
 package com.wecon.box.console.task;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import com.wecon.box.api.*;
 import com.wecon.box.console.util.ThreadPoolExecutor;
-import com.wecon.box.util.GroupOp;
-import com.wecon.box.util.JPushServer;
-import com.wecon.box.util.SSLUtil;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -21,25 +13,9 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.MqttTopic;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
 import com.wecon.box.console.config.ConnectOptions;
 import com.wecon.box.console.util.MqttConfigContext;
-import com.wecon.box.console.util.SpringContextHolder;
-import com.wecon.box.constant.ConstKey;
-import com.wecon.box.entity.AlarmCfgData;
-import com.wecon.box.entity.DevFirm;
-import com.wecon.box.entity.Device;
-import com.wecon.box.entity.PiBoxCom;
-import com.wecon.box.entity.PiBoxComAddr;
-import com.wecon.box.entity.PiBoxHisCom;
-import com.wecon.box.entity.PiBoxHisComAddr;
-import com.wecon.box.entity.RealHisCfg;
-import com.wecon.box.entity.RealHisCfgData;
-import com.wecon.box.entity.RedisPiBoxActData;
-import com.wecon.common.redis.RedisManager;
 import com.wecon.common.util.CommonUtils;
 
 /**
@@ -90,7 +66,6 @@ public class MonitorTask extends Thread {
 
 			MqttConnectOptions options = ConnectOptions.getConnectOptions(MqttConfigContext.mqttConfig.getUsername(),
 					MqttConfigContext.mqttConfig.getPassword());
-			options.setSocketFactory(SSLUtil.getSocketFactory(this.getClass().getClassLoader().getResourceAsStream("ca.crt")));
 			System.out.println("to connect mqtt......");
 			logger.info("to connect mqtt......");
 			client = new MqttClient(MqttConfigContext.mqttConfig.getHost(), clientId, new MemoryPersistence());
