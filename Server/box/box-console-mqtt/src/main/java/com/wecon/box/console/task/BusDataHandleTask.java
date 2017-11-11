@@ -26,9 +26,9 @@ import java.util.Map;
 /**
  * Created by win7 on 2017/11/1.
  */
-public class BusDataHandleTask extends AbstractTask{
+public class BusDataHandleTask extends Thread{
     public MqttClient client;
-    public JSONObject jsonObject;
+   public JSONObject jsonObject;
 
     private final int BASE_DATA = 1000;
     private final int REAL_DATA = 1001;
@@ -43,8 +43,8 @@ public class BusDataHandleTask extends AbstractTask{
         this.jsonObject = jsonObject;
     }
 
-    @Override
     public void run() {
+    	  System.out.println("线程名=="+Thread.currentThread().getName()+"线程ID=="+Thread.currentThread().getId());
         DeviceApi deviceApi = SpringContextHolder.getBean(DeviceApi.class);
         String machineCode = jsonObject.getString("machine_code");
         Integer act = jsonObject.getInteger("act");
@@ -165,6 +165,7 @@ public class BusDataHandleTask extends AbstractTask{
                 }
                 //发布消息
                 RedisManager.publish(ConstKey.REDIS_GROUP_NAME, machineCode, machineCode);
+                System.out.println("消息推送成功"+machineCode);
                 if (jsonObject.getInteger("feedback") == 1) {
                     SendMessage(machineCode, REAL_DATA);
                 }

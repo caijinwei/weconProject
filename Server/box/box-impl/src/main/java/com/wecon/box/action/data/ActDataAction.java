@@ -2,6 +2,7 @@ package com.wecon.box.action.data;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.mysql.jdbc.log.Log;
 import com.wecon.box.api.*;
 import com.wecon.box.constant.Constant;
 import com.wecon.box.entity.*;
@@ -371,6 +372,7 @@ public class ActDataAction {
 	public Output getDataType() {
 		JSONObject json = new JSONObject();
 		json.put("DataTypeOption", optionService.getDataTypeOptionOptions());
+		System.out.println("显示数据类型=="+json.toString());
 
 		return new Output(json);
 
