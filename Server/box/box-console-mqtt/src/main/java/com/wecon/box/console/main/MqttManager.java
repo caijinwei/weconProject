@@ -21,9 +21,9 @@ public class MqttManager {
 		logger.info("run profile:" + profile);
 		System.setProperty("spring.profiles.active", profile);
 
-		ApplicationContext applicationContext = new ClassPathXmlApplicationContext("spring.xml");
-//		BoxNotifyTask notifyTask = new BoxNotifyTask();
-//		notifyTask.start();
+//		ApplicationContext applicationContext = new ClassPathXmlApplicationContext("spring.xml");
+		BoxNotifyTask notifyTask = new BoxNotifyTask();
+		notifyTask.start();
 		MonitorTask monitorTask = new MonitorTask();
 		monitorTask.start();
 		// GetPublishClient

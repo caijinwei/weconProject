@@ -163,13 +163,13 @@ public class MonitorTask extends Thread {
 				System.out.println("feedback为空！");
 				return;
 			}
-		  Integer act = jsonObject.getInteger("act");
+		    Integer act = jsonObject.getInteger("act");
 			BusDataHandleTask task = new BusDataHandleTask(client, jsonObject);
 
 
 			/** 指定任务类型，以便获取对应线程进行处理 **/
-//			 task.setType(act);
-//			 ThreadPoolExecutor.getInstance().addTask(task);
+		     task.setType(act);
+			 ThreadPoolExecutor.getInstance().addTask(task);
 
 			/*
 			 * DeviceApi deviceApi =
