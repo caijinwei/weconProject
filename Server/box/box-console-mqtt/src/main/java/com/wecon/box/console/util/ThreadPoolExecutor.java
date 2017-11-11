@@ -10,6 +10,7 @@ import java.util.List;
 
 /**
  * 自定义线程池，可配置线程数
+ *
  * @author whp 2017年10月28日下午5:09:01
  */
 public class ThreadPoolExecutor {
@@ -33,17 +34,18 @@ public class ThreadPoolExecutor {
 
     /**
      * 初始化线程池，根据不同类型创建不同类型的线程
+     *
      * @param initParams
      */
-    public void initThreadPool(List<int[]> initParams){
-        if(null != initParams){
-            for(int[] params : initParams){
+    public void initThreadPool(List<int[]> initParams) {
+        if (null != initParams) {
+            for (int[] params : initParams) {
                 workerNum += params[1];
             }
             workers = new PoolWorker[workerNum];
             int index = 0;
-            for(int[] params : initParams){
-                for(int i=0;i<params[1];i++){
+            for (int[] params : initParams) {
+                for (int i = 0; i < params[1]; i++) {
                     workers[index] = new PoolWorker(index, params[0]);
                     index++;
                 }
@@ -103,7 +105,7 @@ public class ThreadPoolExecutor {
                 taskes[i].setSubmitTime(new Date());
                 taskQueue.add(taskes[i]);
             }
-			/* 唤醒队列, 开始执行 */
+            /* 唤醒队列, 开始执行 */
             taskQueue.notifyAll();
         }
         for (int i = 0; i < taskes.length; i++) {
@@ -169,6 +171,7 @@ public class ThreadPoolExecutor {
          * 这也许是线程池的关键所在
          */
         public void run() {
+            logger.info("ThreadPollExecutor -isRunning【" + isRunning + "】，isWaiting【" + isWaiting + "】,taskQueue【" + taskQueue.size() + "】");
             while (isRunning && isWaiting) {
                 AbstractTask task = null;
                 synchronized (taskQueue) {
@@ -181,22 +184,21 @@ public class ThreadPoolExecutor {
                         }
                     }
 					/* 取出任务执行 */
-                    task = taskQueue.remove(0);
-                }
-                if (task != null && type == task.getType()) {
-                    logger.info("线程【"+index+"】，类型【"+type+"】正在执行任务！！！");
-                    isWaiting = false;
-                    try {
-
-                        task.run();
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-
+                    task = taskQueue.get(0);
+                    if (type != task.getType()) {
+                        continue;
                     }
-                    isWaiting = true;
-                    task = null;
+                    taskQueue.remove(0);
                 }
+                logger.info("线程【" + index + "】，类型【" + type + "】正在执行任务！！！");
+                isWaiting = false;
+                try {
+                    task.run();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                isWaiting = true;
+                task = null;
             }
         }
     }

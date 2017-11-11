@@ -14,7 +14,7 @@ public class MqttManager {
 	private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger(MqttManager.class.getName());
 
 	public static void main(String[] args) throws InterruptedException {
-		String profile = "dev";
+		String profile = "test";
 		if (args.length > 0) {
 			profile = args[0];
 		}
