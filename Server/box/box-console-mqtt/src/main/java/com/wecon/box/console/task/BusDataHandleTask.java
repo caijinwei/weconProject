@@ -279,6 +279,7 @@ public class BusDataHandleTask extends AbstractTask{
                         }
                         alarmCfgData = new AlarmCfgData();
                         alarmCfgData.alarm_cfg_id = Long.parseLong(piBoxComAddr.addr_id);
+                        alarmCfgData.alarm_type = Integer.parseInt(piBoxComAddr.alarm_type);
                         alarmCfgData.value = piBoxComAddr.value;
                         alarmCfgData.monitor_time = Timestamp.valueOf(jsonAlarm.getString("time"));
                         alarmCfgData.state = Integer.valueOf(piBoxComAddr.state);
