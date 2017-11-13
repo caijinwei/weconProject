@@ -60,29 +60,26 @@
 					<table class="table table-bordered" style="margin-top: 20px;">
 						<thead>
 							<tr>
-								<th class="col-md-1">编码</th>
 								<th class="col-md-1">名称</th>
-								<th class="col-md-3">信息</th>
-								<th class="col-md-1">状态</th>
+								<th class="col-md-3">报警内容</th>
 								<th class="col-md-2">值</th>
-								<th class="col-md-1">报警类型</th>
-								<th class="col-md-3">时间</th>
-								<th class="col-md-2">操作</th>
+								<th class="col-md-1">事件</th>
+								<th class="col-md-3">报警时间</th>
+								<th class="col-md-1">状态</th>
+								<th class="col-md-2">标记为</th>
 
 							</tr>
 						</thead>
 						<tbody>
-							<tr style="color: red" ng-repeat="x in alarmcurrents">
-								<td>{{x.alarm_cfg_id}}</td>
+							<tr ng-repeat="x in alarmcurrents">
 								<td>{{x.name}}</td>
 								<td>{{x.text}}</td>
-								<td>{{x.state==2?"确认":"未确认"}}</td>
 								<td>{{x.value}}</td>
-								<td>{{x.alarm_type==0?"解除":"触发"}}</td>
+								<td>{{x.alarm_type==0?"恢复":"触发"}}</td>
 								<td>{{x.monitor_time|date:'yyyy-MM-dd HH:mm:ss'}}</td>
-								<td><a href="#" title="确认" ng-click="confirmData(x)"><span
-										class="glyphicon glyphicon-ok" style="margin-left: 5px;"></span></a>
-								</td>
+								<td>{{x.state==2?"确认":"未确认"}}</td>
+								<td><button type="button" class="btn btn-info"
+										ng-click="confirmData(x)">确认</button></td>
 							</tr>
 						</tbody>
 					</table>
@@ -155,21 +152,21 @@
 							<tr>
 								<th class="col-md-1">编码</th>
 								<th class="col-md-1">名称</th>
-								<th class="col-md-3">信息</th>
-								<th class="col-md-2">状态</th>
+								<th class="col-md-3">报警内容</th>
 								<th class="col-md-2">值</th>
-								<th class="col-md-1">报警类型</th>
+								<th class="col-md-1">事件</th>
+								<th class="col-md-1">状态</th>
 								<th class="col-md-3">时间</th>
 							</tr>
 						</thead>
 						<tbody>
-							<tr style="color: green" ng-repeat="x in alarmHisDatas">
+							<tr ng-repeat="x in alarmHisDatas">
 								<td>{{x.alarm_cfg_id}}</td>
 								<td>{{x.name}}</td>
 								<td>{{x.text}}</td>
-								<td>{{x.state==2?"确认":"未确认"}}</td>
 								<td>{{x.value}}</td>
-								<td>{{x.alarm_type==0?"解除":"触发"}}</td>
+								<td>{{x.alarm_type==0?"恢复":"触发"}}</td>
+								<td>{{x.state==2?"确认":"未确认"}}</td>
 								<td>{{x.monitor_time|date:'yyyy-MM-dd HH:mm:ss'}}</td>
 							</tr>
 						</tbody>
