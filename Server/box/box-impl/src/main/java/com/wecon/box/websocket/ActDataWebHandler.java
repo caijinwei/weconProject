@@ -19,6 +19,7 @@ import com.wecon.common.redis.RedisManager;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.Client;
+import redis.clients.jedis.JedisPubSub;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +27,6 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
-import redis.clients.jedis.JedisPubSub;
-
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -94,14 +92,8 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 					Device device = deviceApi.getDevice(realHisCfg.device_id);
 					String subscribeTopic = "pibox/cts/" + device.machine_code;
 					SendvalueCallback sendvalueCallback = new SendvalueCallback(session, addr_id);
-
-					System.out.println("开始时间----"+new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss:SSS").format(new Date()));
-
 					ClientMQTT reclient = new ClientMQTT(subscribeTopic, "send" + session.getId(), sendvalueCallback);
 					reclient.start();
-
-					System.out.println("结束时间----"+new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss:SSS").format(new Date()));
-
 					clientMQTTs.put(session.getId(), reclient);
 					sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteAct, reclient);
 				}

@@ -2,7 +2,6 @@ package com.wecon.box.console.task;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.wecon.box.api.*;
 import com.wecon.box.console.config.ConnectOptions;
@@ -11,17 +10,14 @@ import com.wecon.box.console.util.SpringContextHolder;
 import com.wecon.box.constant.ConstKey;
 import com.wecon.box.constant.Constant;
 import com.wecon.box.entity.*;
-import com.wecon.box.util.Base64Util;
 import com.wecon.box.util.Converter;
 import com.wecon.box.util.GroupOp;
-import com.wecon.box.util.SSLUtil;
 import com.wecon.common.redis.RedisManager;
 import com.wecon.common.util.CommonUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -636,8 +632,6 @@ public class BoxNotifyTask extends Thread {
 		try {
 			MqttConnectOptions options = ConnectOptions.getConnectOptions(
 					MqttConfigContext.mqttConfig.getUsername(), MqttConfigContext.mqttConfig.getPassword());
-			options.setSocketFactory(
-					SSLUtil.getSocketFactory(this.getClass().getClassLoader().getResourceAsStream("ca.crt")));
 			mqttClient = new MqttClient(MqttConfigContext.mqttConfig.getHost(), clientId, new MemoryPersistence());
 			mqttClient.connect(options);
 			logger.info("mqtt connect success!");
