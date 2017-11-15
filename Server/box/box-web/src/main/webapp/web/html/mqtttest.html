@@ -112,7 +112,7 @@
                 $("#disconnectBtn").show();
                 $("#subscribe").show();
 
-                client = mqtt.connect('ws://' + host + ':' + port + '', {
+                client = mqtt.connect('wss://' + host + ':' + port + '', {
                     username: $("#mqtt-username").val(),
                     password: $("#mqtt-pwd").val()
                 });

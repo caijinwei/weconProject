@@ -46,20 +46,17 @@ appModule
 								function(data, code, msg) {
 									if (code == 200) {
 										$scope.commonitors = data.monitors;
-										if ($scope.commonitors == "") {
-											$("#searchid").attr("disabled",
-													true);
-										}
+										$("#searchid").attr("disabled",
+												$scope.commonitors == "");
 										$scope.$apply();
 										$scope.searchHisData(1, 5);
 										$scope.paginationConf = {
 											currentPage : 1,
-											itemsPerPage : 10,
+											itemsPerPage : 5,
 											totalItems : $scope.count,
 											pagesLength : 15,
 											perPageOptions : [ 5, 10, 20, 50,
 													100 ],
-											rememberPerPage : 'perPageItems',
 											onChange : function() {
 												if (this.currentPage != 0) {
 													$scope.searchHisData(
@@ -107,7 +104,7 @@ appModule
 					$scope.searchHisData = function(pageIndex, pageSize) {
 						if (pageIndex == 0)
 							pageIndex = 1;
-						//$("#loadingModal").modal("show");
+						// $("#loadingModal").modal("show");
 						var params = {
 							real_his_cfg_id : $("#monitorid").val(),
 							start_date : $("#startdateid").val(),
@@ -201,7 +198,7 @@ appModule
 
 												$scope.$apply();
 												$("i[name='his_data_state']")
-												.tooltip();
+														.tooltip();
 												$("#loadingModal")
 														.modal("hide");
 											} else {
@@ -1483,4 +1480,32 @@ appModule
 
 					}
 
+					$scope.exportExcel = function() {
+						var myform = document.getElementById('myform');
+						var real_his_cfg_id = $("#monitorid").val();
+						var start_date = $("#startdateid").val();
+						var end_date = $("#enddateid").val();
+						var pageIndex = $scope.paginationConf.currentPage;
+						pageIndex = 0 == pageIndex ? 1 : pageIndex;
+						var pageSize = $scope.paginationConf.itemsPerPage;
+						myform.innerHTML = '<input type="hidden" name="real_his_cfg_id" value="'
+								+ real_his_cfg_id
+								+ '"/>'
+								+ '<input type="hidden" name="start_date" value="'
+								+ start_date
+								+ '"/>'
+								+ '<input type="hidden" name="end_date" value="'
+								+ end_date
+								+ '"/>'
+								+ '<input type="hidden" name="pageIndex" value="'
+								+ pageIndex
+								+ '"/>'
+								+ '<input type="hidden" name="pageSize" value="'
+								+ pageSize + '"/>'
+						myform.action = T.common.requestUrl.WeconBox
+								+ 'excelact/filedownloadExportHis';
+
+						myform.submit();
+
+					}
 				})

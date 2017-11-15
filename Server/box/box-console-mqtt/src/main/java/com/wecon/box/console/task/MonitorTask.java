@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.wecon.box.api.*;
+import com.wecon.box.console.util.ThreadPoolExecutor;
 import com.wecon.box.util.GroupOp;
 import com.wecon.box.util.JPushServer;
+import com.wecon.box.util.SSLUtil;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -57,6 +60,14 @@ public class MonitorTask extends Thread {
 
 	public void run() {
 		logger.info("MonitorTask run start");
+		//初始化线程池，根据不同类型分配不同线程数
+		List<int[]> initParams = new ArrayList<int[]>();
+		initParams.add(new int[]{BASE_DATA, 5});
+		initParams.add(new int[]{REAL_DATA, 10});
+		initParams.add(new int[]{HISTORY_DATA, 10});
+		initParams.add(new int[]{ALARM_DATA, 10});
+		initParams.add(new int[]{WILL_DATA, 1});
+		ThreadPoolExecutor.getInstance().initThreadPool(initParams);
 		while (true) {
 			try {
 				if (client == null || !client.isConnected()) {
@@ -79,15 +90,16 @@ public class MonitorTask extends Thread {
 
 			MqttConnectOptions options = ConnectOptions.getConnectOptions(MqttConfigContext.mqttConfig.getUsername(),
 					MqttConfigContext.mqttConfig.getPassword());
+			options.setSocketFactory(SSLUtil.getSocketFactory(this.getClass().getClassLoader().getResourceAsStream("ca.crt")));
 			System.out.println("to connect mqtt......");
 			logger.info("to connect mqtt......");
-
 			client = new MqttClient(MqttConfigContext.mqttConfig.getHost(), clientId, new MemoryPersistence());
 			client.connect(options);
 			// 订阅盒子的所有发送主题
 			client.subscribe(serverTopic);
 			System.out.println("MQTT connection is successful !");
 			logger.info("MQTT connection is successful !");
+
 			client.setCallback(new MqttCallback() {
 
 				public void messageArrived(String topic, MqttMessage message) throws Exception {
@@ -166,7 +178,14 @@ public class MonitorTask extends Thread {
 				return;
 			}
 			Integer act = jsonObject.getInteger("act");
-			DeviceApi deviceApi = SpringContextHolder.getBean(DeviceApi.class);
+
+			/** 创建处理任务加入线程池队列 **/
+			BusDataHandleTask task = new BusDataHandleTask(client, jsonObject);
+			/** 指定任务类型，以便获取对应线程进行处理 **/
+			task.setType(act);
+			ThreadPoolExecutor.getInstance().addTask(task);
+
+			/*DeviceApi deviceApi = SpringContextHolder.getBean(DeviceApi.class);
 			switch (act) {
 			// 基础数据
 			case BASE_DATA:
@@ -451,7 +470,7 @@ public class MonitorTask extends Thread {
 
 			default:
 				break;
-			}
+			}*/
 		} catch (Exception e) {
 			String simplename = e.getClass().getSimpleName();
 			if (!"JSONException".equals(simplename)) {

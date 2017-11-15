@@ -8,9 +8,13 @@ import com.wecon.box.api.RealHisCfgApi;
 import com.wecon.box.api.RedisPiBoxApi;
 import com.wecon.box.constant.ConstKey;
 import com.wecon.box.entity.*;
+import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
-import com.wecon.box.util.*;
+import com.wecon.box.util.ClientMQTT;
+import com.wecon.box.util.DbLogUtil;
+import com.wecon.box.util.SendValue;
+import com.wecon.box.util.SendvalueCallback;
 import com.wecon.common.redis.RedisManager;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.core.AppContext;
@@ -90,18 +94,16 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 					Device device = deviceApi.getDevice(realHisCfg.device_id);
 					String subscribeTopic = "pibox/cts/" + device.machine_code;
 					SendvalueCallback sendvalueCallback = new SendvalueCallback(session, addr_id);
-//					ClientMQTT reclient = new ClientMQTT(subscribeTopic, "send" + session.getId(), sendvalueCallback);
-//					reclient.start();
-//					clientMQTTs.put(session.getId(), reclient);
-//					sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteAct, reclient);
-					System.out.println("11111111111111111开始时间"+new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss:SSS").format(new Date()));
 
-					MQTTTest reclient = new MQTTTest(subscribeTopic, "send" + session.getId(), sendvalueCallback);
-//					reclient.start();
-					System.out.println("111111111111111结束时间"+new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss:SSS").format(new Date()));
+					System.out.println("开始时间----"+new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss:SSS").format(new Date()));
 
-//					clientMQTTs.put(session.getId(), reclient);
-//					sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteAct, reclient);
+					ClientMQTT reclient = new ClientMQTT(subscribeTopic, "send" + session.getId(), sendvalueCallback);
+					reclient.start();
+
+					System.out.println("结束时间----"+new SimpleDateFormat("yyyy/MM/dd-HH:mm:ss:SSS").format(new Date()));
+
+					clientMQTTs.put(session.getId(), reclient);
+					sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteAct, reclient);
 				}
 			}
 		} catch (Exception ex) {

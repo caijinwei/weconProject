@@ -26,11 +26,8 @@
 
 
     <repositories>
-        <repository>
-            <id>wecon</id>
-            <name>wecon</name>
-            <url>http://192.168.29.184:8081/nexus-2.7.0-06/content/repositories/snapshots/</url>
-        </repository>
+
+
         <!--<repository>
             <id>wecon_hw</id>
             <name>wecon_hw</name>

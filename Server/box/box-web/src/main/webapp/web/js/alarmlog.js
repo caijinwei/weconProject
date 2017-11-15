@@ -1829,4 +1829,62 @@ appModule
 
 					}
 
+					$scope.exportExcel = function(state) {
+						var myform = document.getElementById('myform');
+						var device_id = $scope.deviceid;
+						if (1 == state) {
+							var pageIndex = $scope.paginationConf_current.currentPage;
+							pageIndex = 0 == pageIndex ? 1 : pageIndex;
+							var pageSize = $scope.paginationConf_current.itemsPerPage;
+							myform.innerHTML = '<input type="hidden" name="pageIndex" value="'
+									+ pageIndex
+									+ '"/>'
+									+ '<input type="hidden" name="pageSize" value="'
+									+ pageSize
+									+ '"/>'
+									+ '<input type="hidden" name="device_id" value="'
+									+ device_id
+									+ '"/>'
+									+ '<input type="hidden" name="state" value="'
+									+ state + '"/>'
+						} else if (2 == state) {
+							var alarm_cfg_id = $("#alarmcfgid").val();
+							var alarmcfgname = $("#alarmcfgname").val();
+							var start_date = $("#startdateid").val();
+							var end_date = $("#enddateid").val();
+							var pageIndex = $scope.paginationConf_history.currentPage;
+							pageIndex = 0 == pageIndex ? 1 : pageIndex;
+							var pageSize = $scope.paginationConf_history.itemsPerPage;
+							myform.innerHTML = '<input type="hidden" name="alarm_cfg_id" value="'
+									+ alarm_cfg_id
+									+ '"/>'
+									+ '<input type="hidden" name="alarmcfgname" value="'
+									+ alarmcfgname
+									+ '"/>'
+									+ '<input type="hidden" name="start_date" value="'
+									+ start_date
+									+ '"/>'
+									+ '<input type="hidden" name="end_date" value="'
+									+ end_date
+									+ '"/>'
+									+ '<input type="hidden" name="pageIndex" value="'
+									+ pageIndex
+									+ '"/>'
+									+ '<input type="hidden" name="pageSize" value="'
+									+ pageSize
+									+ '"/>'
+									+ '<input type="hidden" name="device_id" value="'
+									+ device_id
+									+ '"/>'
+									+ '<input type="hidden" name="state" value="'
+									+ state + '"/>'
+
+						}
+
+						myform.action = T.common.requestUrl.WeconBox
+								+ 'excelact/filedownloadExportAlarm';
+
+						myform.submit();
+
+					}
 				})

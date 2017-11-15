@@ -72,6 +72,7 @@ public class ClientMQTT {
 			client = new MqttClient(HOST, clientid, new MemoryPersistence());
 			// MQTT的连接设置
 			options = new MqttConnectOptions();
+			options.setSocketFactory(SSLUtil.getSocketFactory(this.getClass().getClassLoader().getResourceAsStream("ca.crt")));
 			// 设置是否清空session,这里如果设置为false表示服务器会保留客户端的连接记录，这里设置为true表示每次连接到服务器都以新的身份连接
 			options.setCleanSession(true);
 			// 设置连接的用户名

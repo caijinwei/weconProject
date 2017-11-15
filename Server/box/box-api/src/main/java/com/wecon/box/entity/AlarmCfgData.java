@@ -17,5 +17,6 @@ public class AlarmCfgData {
 	public String value;
 	public int state;
 	public Timestamp create_date;
+	public int alarm_type; //报警类型：1-触发报警，0-解除报警
 	
 }

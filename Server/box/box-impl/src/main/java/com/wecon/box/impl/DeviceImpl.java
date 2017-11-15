@@ -314,41 +314,41 @@ public class DeviceImpl implements DeviceApi {
         }
         // 获取管理员下盒子列表
         List<String[]> deviceLst = jdbcTemplate.query(
-                "SELECT d.device_id, d.`name`, d.map, d.state, adr.acc_dir_id "
+                "SELECT d.device_id, d.`name`, d.map, d.state,d.machine_code,d.dev_model,d.remark, adr.acc_dir_id "
                         + "FROM dev_bind_user dbu, device d, account_dir_rel adr "
                         + "WHERE adr.ref_id=d.device_id and dbu.device_id=d.device_id and dbu.account_id=?",
                 new Object[] { acc_id }, new RowMapper() {
                     @Override
                     public Object mapRow(ResultSet rs, int i) throws SQLException {
                         return new String[] { rs.getLong("device_id") + "", rs.getString("name"), rs.getString("map"),
-                                rs.getLong("acc_dir_id") + "", rs.getInt("state")+"" };
+                                rs.getLong("acc_dir_id") + "", rs.getInt("state")+"",rs.getString("machine_code"), rs.getString("dev_model"), rs.getString("remark") };
                     }
                 });
         if (null == deviceLst) {
             return null;
         }
 
-        if(1 == selAlarm){
-            StringBuilder sb = new StringBuilder();
-            for(String[] ss : deviceLst){
-                sb.append(",").append(ss[0]);
-            }
-            List<String> deviceIdLst = jdbcTemplate.query(
-                    "SELECT ac.device_id FROM alarm_cfg ac INNER JOIN alarm_cfg_data acd on ac.alarmcfg_id=acd.alarm_cfg_id where ac.state !=3 and acd.state=1 and ac.device_id in("+sb.substring(1)+")", new RowMapper() {
-                        @Override
-                        public Object mapRow(ResultSet rs, int i) throws SQLException {
-                            return rs.getLong("device_id") + "";
-                        }
-                    });
-
-            List<String[]> ndeviceLst = new ArrayList<>();
-            if(null != deviceIdLst && deviceIdLst.size() > 0){
-                for(String[] device : deviceLst){
-                    if(deviceIdLst.contains(device[0])){
-                        ndeviceLst.add(device);
+        StringBuilder sb = new StringBuilder();
+        for(String[] ss : deviceLst){
+            sb.append(",").append(ss[0]);
+        }
+        List<String> deviceIdLst = jdbcTemplate.query(
+                "SELECT ac.device_id FROM alarm_cfg ac INNER JOIN alarm_cfg_data acd on ac.alarmcfg_id=acd.alarm_cfg_id where ac.state !=3 and acd.state=1 and ac.device_id in("+sb.substring(1)+")", new RowMapper() {
+                    @Override
+                    public Object mapRow(ResultSet rs, int i) throws SQLException {
+                        return rs.getLong("device_id") + "";
                     }
+                });
+        List<String[]> ndeviceLst = new ArrayList<>();
+        if(null != deviceIdLst && deviceIdLst.size() > 0){
+            for(String[] device : deviceLst){
+                if(deviceIdLst.contains(device[0])){
+                    ndeviceLst.add(device);
                 }
             }
+        }
+
+        if(1 == selAlarm){
             deviceLst = ndeviceLst;
         }
 
@@ -363,6 +363,10 @@ public class DeviceImpl implements DeviceApi {
                     dm.put("boxName", device[1]);
                     dm.put("map", device[2]);
                     dm.put("state", device[4]);
+                    dm.put("isAlarm", deviceIdLst.contains(device[0]) ? 1 : 0);
+                    dm.put("machineCode", device[5]);
+                    dm.put("devModel", device[6]);
+                    dm.put("remark", device[7]);
                     l.add(dm);
                 }
             }

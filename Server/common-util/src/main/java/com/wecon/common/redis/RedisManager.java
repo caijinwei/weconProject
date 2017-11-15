@@ -223,7 +223,8 @@ public class RedisManager {
         try {
             if (seconds > 0) {
                 jedis = getJedis(group);
-                jedis.expire(key, seconds);
+                int remainingTime = Integer.valueOf(jedis.ttl(key).toString());
+                jedis.expire(key, seconds + remainingTime);
             }
             return true;
         } finally {
@@ -437,7 +438,7 @@ public class RedisManager {
         Jedis jedis = null;
         try {
             jedis = getJedis(group);
-            
+
             jedis.subscribe(jedisPubSub, channel);
         } finally {
             returnJedis(jedis);

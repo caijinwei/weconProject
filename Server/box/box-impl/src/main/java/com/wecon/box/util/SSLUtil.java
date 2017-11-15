@@ -6,9 +6,12 @@ import org.bouncycastle.openssl.PEMReader;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -24,15 +27,15 @@ public class SSLUtil {
      * @return tls 套接字工厂
      * @throws Exception
      */
-    public static SSLSocketFactory getSocketFactory (final InputStream caCrtFile) throws NoSuchAlgorithmException, IOException, KeyStoreException, CertificateException, KeyManagementException {
+    public static SSLSocketFactory getSocketFactory (final InputStream in) throws NoSuchAlgorithmException, IOException, KeyStoreException, CertificateException, KeyManagementException {
         Security.addProvider(new BouncyCastleProvider());
 
 
         //===========加载 ca 证书==================================
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        if( null != caCrtFile ){
+        if( null != in ){
             // 加载本地指定的 ca 证书
-            PEMReader reader = new PEMReader(new InputStreamReader(caCrtFile));
+            PEMReader reader = new PEMReader(new InputStreamReader(in));
             X509Certificate caCert = (X509Certificate)reader.readObject();
             reader.close();
 
