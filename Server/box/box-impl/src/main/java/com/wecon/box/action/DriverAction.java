@@ -302,7 +302,7 @@ public class DriverAction {
                         server = new ServerMqtt("UD_" + AppContext.getSession().client.userId);
                     }
                     server.message = new MqttMessage();
-                    server.message.setQos(1);
+                    server.message.setQos(2);
                     server.message.setRetained(true);
                     server.message.setPayload(data.toString().getBytes());
                     server.topic11 = server.client.getTopic(String.format(ConstKey.MQTT_SERVER_TOPICE, deviceModel.machine_code));

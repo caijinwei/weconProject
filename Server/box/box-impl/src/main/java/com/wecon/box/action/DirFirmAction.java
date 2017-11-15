@@ -142,7 +142,7 @@ public class DirFirmAction {
                 mqttServer = new ServerMqtt("up" + userId);
             }
             mqttServer.message = new MqttMessage();
-            mqttServer.message.setQos(1);
+            mqttServer.message.setQos(2);
             mqttServer.message.setRetained(true);
             //传输的消息体
             mqttServer.message.setPayload(msg.toString().getBytes());
