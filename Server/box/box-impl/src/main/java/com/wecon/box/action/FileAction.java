@@ -31,6 +31,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -183,6 +186,45 @@ public class FileAction {
         headers.setContentLength(tempFile.length());
 
         return new ResponseEntity<Resource>(body, headers, status);
+    }
+
+    @Description("apk上传文件接口")
+    @RequestMapping(value = "/apkupload")
+    @WebApi(forceAuth = true, master = true, authority = {"0"})
+    public Output apkUploadAction(@RequestParam("act") String act) throws IOException, ServletException {
+        logger.debug("开始上传");
+        Session session = AppContext.getSession();
+        HttpServletRequest request = session.request;
+        String path = request.getSession().getServletContext().getRealPath("")+"/web/apk";
+        final Collection<Part> parts = session.request.getParts();
+        if (parts.isEmpty()) {
+            throw new BusinessException(ErrorCodeOption.UploadFileError.key, ErrorCodeOption.UploadFileError.value);
+        }
+        Part partFile = session.request.getPart("file");
+        String fileName = getFileName(partFile);
+        if(!fileName.endsWith(".apk")){
+            throw new BusinessException(ErrorCodeOption.UploadFileError.key, ErrorCodeOption.UploadFileError.value);
+        }
+        //获取item中的上传文件的输入流
+        InputStream in = partFile.getInputStream();
+        //创建一个文件输出流
+        FileOutputStream out = new FileOutputStream(path+"/V-Box.apk");
+        //创建一个缓冲区
+        byte buffer[] = new byte[1024];
+        //判断输入流中的数据是否已经读完的标识
+        int len = 0;
+        //循环将输入流读入到缓冲区当中，(len=in.read(buffer))>0就表示in里面还有数据
+        while((len=in.read(buffer))>0){
+            //使用FileOutputStream输出流将缓冲区的数据写入到指定的目录(savePath + "\\" + filename)当中
+            out.write(buffer, 0, len);
+        }
+        //关闭输入流
+        in.close();
+        //关闭输出流
+        out.close();
+
+        logger.debug("上传成功");
+        return new Output(new JSONObject());
     }
 
     /**

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="gb2312"?>
 <plcdesc filever="2.0">
-	<plc plctype="WECON SIMUTOCOL" Driver="libsimutocol.so" remark="" plcver="3.0" ComType="0" BoudRate="9600" StopBit="1" DataLength="8" CheckBit="NONE" WaitTimeout="10" RevTimeout="10" Type="WECON" 
+	<!--<plc plctype="WECON SIMUTOCOL" Driver="libsimutocol.so" remark="" plcver="3.0" ComType="0" BoudRate="9600" StopBit="1" DataLength="8" CheckBit="NONE" WaitTimeout="10" RevTimeout="10" Type="WECON"
 	Help="不与任何PLC进行通讯" 
 	EN_Help="Do not communicate with any PLC" 
 	IT_Help="Nessuna comunicazione con il PLC" 
-	TR_Help="不與任何PLC進行通訊">
+	TR_Help="不?c任何PLC?M行通?">
 		<wordaddr>
 			<res Index="9912" Rid="HDW" Jinzhi="d" Range="0 299999" Help="系统常用内部寄存器"/>
 			<res Index="9913" Rid="HAW" Jinzhi="d" Range="0 199999" Help="掉电保存寄存器"/>
@@ -17,12 +17,12 @@
 			<res Index="9122" Rid="HSX" MJinzhi="d" MRange="0 49999" BitCount="2" BJinzhi="d" BRange="0 15" Help="HMI系统寄存器"/>
 			<res Index="9123" Rid="HUX" MJinzhi="d" MRange="0 99999" BitCount="2" BJinzhi="d" BRange="0 15" Help="用户接口寄存器，UI设置专用，脚本无效"/>
 		</bitaddr>
-	</plc>
+	</plc>-->
 	<plc plctype="ModBus RTU Slave(All Fuction)" Driver="libModbusRTU_All.so" remark="" plcver="3.0" ComType="1" BoudRate="9600" StopBit="1" DataLength="8" CheckBit="NONE" WaitTimeout="300" RevTimeout="50" PlcStatNo="1" Type="ModBus" 
 	Help="HMI主动发送数据给设备,设备是master被动的发送数据,协议地址从0开始,并且包含所有功能码" 
 	EN_Help="HMI send data to device actively, the device is master, receive data passively, address start from 0, contain all function code" 
 	IT_Help="HMI invia dati al dispositivo attivamente, il dispositivo e' MASTER, ricezione dati passivamente, indirizzo iniziale 0, contiene tutte le funzioni" 
-	TR_Help="HMI主動發送數據給設備,設備是master被動的發送數據,協議地址從0開始,並且包含所有功能碼">
+	TR_Help="HMI主?影l送????o?O??,?O?涫?master被?拥陌l送???,?f?h地址??0?_始,?K且包含所有功能?a">
 		<wordaddr>
 			<res Index="3" Rid="3" Jinzhi="d" Range="0 999999" ConLen="20" Help="使用4功能码读取数据"/>
 			<res Index="4" Rid="4" Jinzhi="d" Range="0 999999" ConLen="20" Help="使用3功能码读取数据"/>
@@ -45,7 +45,7 @@
 	Help="HMI主动发送数据给设备,设备是master被动的发送数据,协议地址从1开始,偏移一个地址，并且包含所有功能码" 
 	EN_Help="HMI send data to device actively, the device is master, receive data passively, address start from 1, contain all function code" 
 	IT_Help="HMI invia dati al dispositivo attivamente, il dispositivo e' MASTER, ricezione dati passivamente, indirizzo iniziale 1, contiene tutte le funzioni" 
-	TR_Help="HMI主動發送數據給設備,設備是master被動的發送數據,協議地址從1開始,偏移壹個地址，並且包含所有功能碼">
+	TR_Help="HMI主?影l送????o?O??,?O?涫?master被?拥陌l送???,?f?h地址??1?_始,偏移壹??地址，?K且包含所有功能?a">
 		<wordaddr>
 			<res Index="3" Rid="3" Jinzhi="d" Range="1 999999" ConLen="20" Help="使用4功能码读取数据"/>
 			<res Index="4" Rid="4" Jinzhi="d" Range="1 999999" ConLen="20" Help="使用3功能码读取数据"/>
@@ -68,7 +68,7 @@
 	Help="此协议等待设备的主动发送,收到数据正确后才会回应给设备(设备是主动发送数据)" 
 	EN_Help="Wait for device to send data, and respond to device after receive data(the device send data actively)" 
 	IT_Help="Attesa invio dati dal dispositivo, e risposta al dispositivo alla ricezione dati (il dispositivo invia dati the device attivamente)" 
-	TR_Help="此協議等待設備的主動發送,收到數據正確後才會回應給設備(設備是主動發送數據)">
+	TR_Help="此?f?h等待?O?涞闹?影l送,收到???正?_後才??回???o?O??(?O?涫侵?影l送???)">
 		<wordaddr>
 			<res Index="4" Rid="4" Jinzhi="d" Range="0 99999" ConLen="20"/>
 		</wordaddr>
@@ -81,7 +81,7 @@
 	Help="此协议会主动发送数据给设备,设备是master被动的发送数据,此协议地址从0开始,针对于以太网的设备使用" 
 	EN_Help="HMI send data to device actively, the device is master, receive data passively, address start from 0, use for ethernet device" Type="ModBus" 
 	IT_Help="HMI invia dati attivamente, il dispositivo e' MASTER, ricezione dati passivamente, address start from 0, uso dispositivo ethernet" 
-	TR_Help="此協議會主動發送數據給設備,設備是master被動的發送數據,此協議地址從0開始,針對於以太網的設備使用">
+	TR_Help="此?f?h??主?影l送????o?O??,?O?涫?master被?拥陌l送???,此?f?h地址??0?_始,???於以太?W的?O?涫褂?">
 		<wordaddr>
 			<res Index="3" Rid="3" Jinzhi="d" Range="0 999999" ConLen="20" Help="使用4功能码读取数据"/>
 			<res Index="4" Rid="4" Jinzhi="d" Range="0 999999" ConLen="20" Help="使用3功能码读取数据"/>
@@ -104,7 +104,7 @@
 	Help="此协议等待设备的主动发送,收到数据正确后才会回应给设备(设备是主动发送数据)" 
 	EN_Help="The device send data actively, and HMI respond to device after receive data correctly." Type="ModBus" 
 	IT_Help="Dispositivo invia dati attivamente, e HMI risponde al dispositivo alla ricezione di dati corretti." 
-	TR_Help="此協議等待設備的主動發送,收到數據正確後才會回應給設備(設備是主動發送數據)">
+	TR_Help="此?f?h等待?O?涞闹?影l送,收到???正?_後才??回???o?O??(?O?涫侵?影l送???)">
 		<wordaddr>
 			<res Index="4" Rid="4" Jinzhi="d" Range="0 99999" ConLen="20"/>
 		</wordaddr>
@@ -117,7 +117,7 @@
 	Help="此协议会主动发送数据给设备,设备是master被动的发送数据,此协议地址从0开始,ASCII通讯协议" 
 	EN_Help="HMI send data  to device actively, the device is master, send data passively, protocol address start from 0, use for ethernet device. " Type="ModBus" 
 	IT_Help="HMI invia dati al dispositivo attivamente, il dispositivo e' MASTER, invia dati passivamente, indirizzo protocollo parte da 0, usato dispositivo ethernet. " 
-	TR_Help="此協議會主動發送數據給設備,設備是master被動的發送數據,此協議地址從0開始,ASCII通訊協議">
+	TR_Help="此?f?h??主?影l送????o?O??,?O?涫?master被?拥陌l送???,此?f?h地址??0?_始,ASCII通??f?h">
 		<wordaddr>
 			<res Index="3" Rid="3" Jinzhi="d" Range="0 999999" ConLen="20"/>
 			<res Index="4" Rid="4" Jinzhi="d" Range="0 999999" ConLen="20"/>
@@ -132,7 +132,7 @@
 	Help="此协议等待设备的主动发送,收到数据正确后才会回应给设备(设备是主动发送数据)" 
 	EN_Help="The device send data actively, and HMI respond to device after receive data correctly." Type="ModBus" 
 	IT_Help="Dispositivo invia dati attivamente, e HMI risponde al dispositivo alla ricezione di dati corretti." 
-	TR_Help="此協議等待設備的主動發送,收到數據正確後才會回應給設備(設備是主動發送數據)">
+	TR_Help="此?f?h等待?O?涞闹?影l送,收到???正?_後才??回???o?O??(?O?涫侵?影l送???)">
 		<wordaddr>
 			<res Index="3" Rid="3" Jinzhi="d" Range="0 99999" ConLen="20"/>
 			<res Index="4" Rid="4" Jinzhi="d" Range="0 99999" ConLen="20"/>
@@ -148,7 +148,7 @@
 	Help="此协议会主动发送数据给设备, 设备是master被动的返回数据,此协议地址从0开始,针对于以太网的设备使用;L用于通信指示灯，通信错误灯亮" 
 	EN_Help="HMI send data  to device actively, the device is master, respond data passively, protocol address start from 0, use ASCII code to communicate." Type="ModBus" 
 	IT_Help="HMI invia dati al dispositivo attivamente, il dispositivo e' MASTER, invia dati passivamente, indirizzo protocollo parte da 0, usa Codice ASCII per comunicare" 
-	TR_Help="此協議會主動發送數據給設備, 設備是master被動的返回數據,此協議地址從0開始,針對於以太網的設備使用;L用於通信指示燈，通信錯誤燈亮">
+	TR_Help="此?f?h??主?影l送????o?O??, ?O?涫?master被?拥姆祷???,此?f?h地址??0?_始,???於以太?W的?O?涫褂?;L用於通信指示?簦?通信?e?`?袅?">
 		<wordaddr>
 			<res Index="4" Rid="4" Jinzhi="d" Range="0 999999" ConLen="20"/>
 			<res Index="5" Rid="3" Jinzhi="d" Range="0 999999" ConLen="20"/>
@@ -164,7 +164,7 @@
 	Help="此协议会主动发送是master端，被动的监听slave端的请求并做出回应,针对于以太网的设备使用;L用于通信指示灯，通信错误灯亮" 
 	EN_Help="HMI is master, send data  to device actively,  listen data from device passively and respond it, protocol use for ethernet device. L is communicate indicator, light on when communicate error." Type="ModBus" 
 	IT_Help="HMI invia dati al dispositivo attivamente, il dispositivo e' MASTER, invia dati passivamente, indirizzo protocollo parte da 0. Uso dispositivo ethernet, L e' un indicatore di comunicazione, se ON indica errore." 
-	TR_Help="此協議會主動發送是master端，被動的監聽slave端的請求並做出回應,針對於以太網的設備使用;L用於通信指示燈，通信錯誤燈亮">
+	TR_Help="此?f?h??主?影l送是master端，被?拥谋O?slave端的?求?K做出回??,???於以太?W的?O?涫褂?;L用於通信指示?簦?通信?e?`?袅?">
 		<wordaddr>
 			<res Index="4" Rid="4" Jinzhi="d" Range="0 999999" ConLen="20"/>
 			<res Index="5" Rid="3" Jinzhi="d" Range="0 999999" ConLen="20"/>
@@ -175,7 +175,23 @@
 			<res Index="112" Rid="Lamp" MJinzhi="d" MRange="0 0" BitCount="0" BJinzhi="d" BRange="0 15" Help="用于通信指示灯，通信错误灯亮"/>
 		</bitaddr>
 	</plc>
-
+	<plc plctype="Drip_Molding_Machine" Driver="libDrip_Molding_Machine.so" remark="" plcver="3.0" ComType="1" BoudRate="960000000" StopBit="1" DataLength="8" CheckBit="NONE" WaitTimeout="300" RevTimeout="50" HmiStatNo="1" PlcStatNo="1" 
+	Help="滴塑机驱动" Type="Drip Molding" Type_Ch=""
+	EN_Help="" 
+	IT_Help=""
+	TR_Help="" >
+		<wordaddr>
+			<res Index="4" Rid="SZ" Jinzhi="d" Range="0 999999" ConLen="20"/>
+			<res Index="5" Rid="ST" Jinzhi="d" Range="0 999999" ConLen="20"/>
+			<res Index="6" Rid="TX" Jinzhi="d" Range="0 999999" ConLen="20"/>
+			<res Index="7" Rid="RX" Jinzhi="d" Range="0 999999" ConLen="20"/>				
+		</wordaddr>
+		<bitaddr>
+			<res Index="110" Rid="0" MJinzhi="d" MRange="0 999999" BitCount="0" BJinzhi="d" BRange="0 15" ConLen="10"/>
+			<res Index="111" Rid="1" MJinzhi="d" MRange="0 65535" BitCount="0" BJinzhi="d" BRange="0 15" ConLen="10"/>
+			<res Index="112" Rid="Lamp" MJinzhi="d" MRange="0 0" BitCount="0" BJinzhi="d" BRange="0 15" Help="用于通信指示灯，通信错误灯亮"/>
+		</bitaddr>
+	</plc>
 	<plc plctype="Siemens S7-200 CPU22x/Smart PPI" Driver="libSIEMENS_S7-200_PPI.so" remark="" plcver="3.0" ComType="1" BoudRate="9600" StopBit="1" DataLength="8" CheckBit="EVEN" WaitTimeout="300" RevTimeout="50" PlcStatNo="2" Type="Siemens" Type_Ch=" 西门子" Special="1" 
 	Help="支持CPU221/CPU222/CPU224/CPU224XP/CPU226/Smart/S7-1200" 
 	EN_Help="Support CPU221/CPU222/CPU224/CPU224XP/CPU226/Smart/S7-1200" 
@@ -289,7 +305,7 @@
 	Help="S7300 + CP343模块，连接模式为S7-OP" 
 	EN_Help="S7300 + CP343 , communicate mode is S7-OP" Type="Siemens" Type_Ch=" 西门子" Special="1" 
 	IT_Help="S7300 + CP343 , modalita' di comunicazione S7-OP" 
-	TR_Help="S7300 + CP343模塊，連接模式為S7-OP">
+	TR_Help="S7300 + CP343模?K，?B接模式??S7-OP">
 		<wordaddr>
 			<res Index="1100" Rid="IW" Jinzhi="d" Range="0 99999"/>
 			<res Index="1101" Rid="QW" Jinzhi="d" Range="0 99999"/>
@@ -308,14 +324,14 @@
 			<res Index="1200" Rid="I" MJinzhi="d" MRange="0 99999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="IW"/>
 			<res Index="1201" Rid="Q" MJinzhi="d" MRange="0 99999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="QW"/>
 			<res Index="1204" Rid="M" MJinzhi="d" MRange="0 99999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="MW"/>
-			<res Index="1209" Rid="DBxDB" MJinzhi="d" MRange="0 99999999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="DBxDBW" Special="1"/>
+			<res Index="1209" Rid="DBxDB" MJinzhi="d" MRange="0 99999999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="DBxDBW"/>
 		</bitaddr>
 	</plc>
 	<plc plctype="Siemens S7-300 Ethernet Basic" Driver="libSIEMENS_PI_Protocol_Ethernet.so" remark="" plcver="3.0" ComType="1" BoudRate="9600" StopBit="1" DataLength="8" CheckBit="EVEN" WaitTimeout="1500" RevTimeout="50" NETIPaddr="192.168.1.202" NETPLCPort="102" NETTYPE="2" Ethernet="1" PlcStatNo="2" 
 	Help="S7300 + CP343模块，连接模式为S7-BASIC" 
 	EN_Help="S7300 + CP343 ,communicate mode is S7-BASIC" Type="Siemens" Type_Ch=" 西门子" Special="1" 
 	IT_Help="S7300 + CP343 ,modalita' di comunicazione S7-BASIC" 
-	TR_Help="S7300 + CP343模塊，連接模式為S7-BASIC">
+	TR_Help="S7300 + CP343模?K，?B接模式??S7-BASIC">
 		<wordaddr>
 			<res Index="1100" Rid="IW" Jinzhi="d" Range="0 99999"/>
 			<res Index="1101" Rid="QW" Jinzhi="d" Range="0 99999"/>
@@ -334,7 +350,7 @@
 			<res Index="1200" Rid="I" MJinzhi="d" MRange="0 99999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="IW"/>
 			<res Index="1201" Rid="Q" MJinzhi="d" MRange="0 99999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="QW"/>
 			<res Index="1204" Rid="M" MJinzhi="d" MRange="0 99999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="MW"/>
-			<res Index="1209" Rid="DBxDB" MJinzhi="d" MRange="0 99999999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="DBxDBW" Special="1"/>
+			<res Index="1209" Rid="DBxDB" MJinzhi="d" MRange="0 99999999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="DBxDBW"/>
 		</bitaddr>
 	</plc>
 	<plc plctype="Siemens S7-1200 Ethernet" Driver="libSIEMENS_PI_Protocol_Ethernet.so" remark="" plcver="3.0" ComType="1" BoudRate="9600" StopBit="1" DataLength="8" CheckBit="EVEN" WaitTimeout="1500" RevTimeout="50" NETIPaddr="192.168.1.202" NETPLCPort="102" NETTYPE="2" Ethernet="1" PlcStatNo="2" Type="Siemens" Type_Ch=" 西门子" Special="1" 
@@ -358,8 +374,8 @@
 		<bitaddr>
 			<res Index="1200" Rid="I" MJinzhi="d" MRange="0 99999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="IW"/>
 			<res Index="1201" Rid="Q" MJinzhi="d" MRange="0 99999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="QW"/>
-			<res Index="1204" Rid="M" MJinzhi="d" MRange="0 99999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="MW" Special="1"/>
-			<res Index="1209" Rid="DBxDB" MJinzhi="d" MRange="0 99999999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="DBxDBW" Special="1"/>
+			<res Index="1204" Rid="M" MJinzhi="d" MRange="0 99999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="MW"/>
+			<res Index="1209" Rid="DBxDB" MJinzhi="d" MRange="0 99999999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="DBxDBW"/>
 		</bitaddr>
 	</plc>
 	<plc plctype="Siemens S7-xxx Ethernet" Driver="libSIEMENS_PI_Protocol_Ethernet.so" remark="" plcver="3.0" ComType="1" BoudRate="9600" StopBit="1" DataLength="8" CheckBit="EVEN" WaitTimeout="1500" RevTimeout="50" NETIPaddr="192.168.1.202" NETPLCPort="102" NETTYPE="2" Ethernet="1" PlcStatNo="2" Type="Siemens" Type_Ch=" 西门子" Special="1" 
@@ -384,14 +400,14 @@
 			<res Index="1200" Rid="I" MJinzhi="d" MRange="0 99999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="IW"/>
 			<res Index="1201" Rid="Q" MJinzhi="d" MRange="0 99999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="QW"/>
 			<res Index="1204" Rid="M" MJinzhi="d" MRange="0 99999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="MW"/>
-			<res Index="1209" Rid="DBxDB" MJinzhi="d" MRange="0 99999999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="DBxDBW" Special="1"/>
+			<res Index="1209" Rid="DBxDB" MJinzhi="d" MRange="0 99999999" BitCount="1" BJinzhi="d" BRange="0 7" BInW="DBxDBW"/>
 		</bitaddr>
 	</plc>
 	<plc plctype="Siemens S7-300 (with PC Adaptor)" Driver="libSIEMENS_S7-300_MPI.so" remark="" plcver="3.0" ComType="0" BoudRate="19200" StopBit="1" DataLength="8" CheckBit="ODD" WaitTimeout="300" RevTimeout="50" 
 	Help="CPU300/400系列MPI协议 适配器连接" 
 	EN_Help="CPU300/400 MPI protocol, connect to adapter " PlcStatNo="2" Type="Siemens" Type_Ch=" 西门子" Special="1" 
 	IT_Help="CPU300/400 Protocollo MPI , connettere con adattatore " 
-	TR_Help="CPU300/400系列MPI協議 這配器連接">
+	TR_Help="CPU300/400系列MPI?f?h ?@配器?B接">
 		<wordaddr>
 			<res Index="1000" Rid="IW" Jinzhi="d" Range="0 65534" ConLen="20"/>
 			<res Index="1001" Rid="QW" Jinzhi="d" Range="0 65534" ConLen="20"/>
@@ -1629,7 +1645,7 @@
 	Help="松下FP系列PLC 位带小数点" 
 	EN_Help="NAIS FP PLC Serials" Type_Ch=" 松下电工" 
 	IT_Help="NAIS FP PLC Seriale" 
-	TR_Help="松下FP系列PLC 位帶小數點">
+	TR_Help="松下FP系列PLC 位??小?迭c">
 		<wordaddr>
 			<res Index="0" Rid="WX" Jinzhi="d" Range="0 9999" ConLen="20"/>
 			<res Index="1" Rid="WY" Jinzhi="d" Range="0 9999" ConLen="20"/>
@@ -1654,7 +1670,7 @@
 	Help="松下FP系列PLC 与PLC编址一致" 
 	EN_Help="NAIS FP PLC Serials-same to NAIS programmer" Type="NAIS" Type_Ch=" 松下电工" 
 	IT_Help="NAIS FP PLC Seriale come programmatore NAIS" 
-	TR_Help="松下FP系列PLC 與PLC編址壹致">
+	TR_Help="松下FP系列PLC ?cPLC?址壹致">
 		<wordaddr>
 			<res Index="0" Rid="WX" Jinzhi="d" Range="0 9999" ConLen="20"/>
 			<res Index="1" Rid="WY" Jinzhi="d" Range="0 9999" ConLen="20"/>
@@ -1856,6 +1872,38 @@
 	EN_Help="Allen-Bradley FreeTag Protocol" 
 	IT_Help="Protocollo FreeTag Allen-Bradley" 
 	TR_Help="Allen-Bradley 动态标签通讯协议">
+	</plc>
+	<plc plctype="User-defined Protocol" Driver="libUser_defined_Protocol.so" remark="" plcver="3.0" ComType="1" BoudRate="9600" StopBit="1" DataLength="8" CheckBit="NONE" WaitTimeout="300" RevTimeout="50" PlcStatNo="1" 
+	Help="本协议需配置自定义协议参数后使用" 
+	EN_Help="Configure user defined protocol first" Type="User-defined" Type_Ch=" 用户自定义" 
+	IT_Help="Prima di tutto configurare il Protocollo Utente" 
+	TR_Help="本?f?h需配置自定?x?f?h?K?滇崾褂?">
+		<wordaddr>
+			<res Index="400" Rid="Data" Jinzhi="d" Range="0 999999" Help="用于字数据部件"/>
+			<res Index="401" Rid="Ctrl" Jinzhi="d" Range="0 1" Help="用于标识部件，进行简单的通讯控制，Ctrl0控制通讯开始，Ctrl1控制通讯周期"/>
+		</wordaddr>
+		<bitaddr>
+			<res Index="1100" Rid="Data" MJinzhi="d" MRange="0 999999" BitCount="0" BJinzhi="d" BRange="0 15" Help="用于位数据部件"/>
+			<res Index="1101" Rid="Ctrl" MJinzhi="d" MRange="0 10" BitCount="0" BJinzhi="d" BRange="0 15" Help="用于标识部件，进行简单的通讯控制，Ctrl0控制通讯开始，Ctrl1控制通讯周期"/>
+			<res Index="1102" Rid="OneCtlBit" MJinzhi="d" MRange="1 999999" BitCount="0" BJinzhi="d" BRange="0 15" Help="专门用于单次指令的发送控制位"/>
+			<res Index="1103" Rid="Lamp" MJinzhi="d" MRange="0 0" BitCount="0" BJinzhi="d" BRange="0 15" Help="Lamp0用于通信指示灯，通信错误灯亮"/>
+		</bitaddr>
+	</plc>
+	<plc plctype="User-defined Protocol_TCP" Driver="libUser_defined_Protocol.so" remark="" plcver="3.0" ComType="1" BoudRate="19200" StopBit="1" DataLength="8" CheckBit="NONE" WaitTimeout="1500" RevTimeout="50" NETIPaddr="192.168.1.201" NETPLCPort="502" NETTYPE="2" PlcStatNo="1" Ethernet="1" 
+	Help="本协议需配置自定义协议参数后使用" 
+	EN_Help="Configure user defined protocol first" Type="User-defined" Type_Ch=" 用户自定义" 
+	IT_Help="Prima di tutto configurare il protocollo definito dall'utente" 
+	TR_Help="本?f?h需配置自定?x?f?h?K?滇崾褂?">
+		<wordaddr>
+			<res Index="400" Rid="Data" Jinzhi="d" Range="0 999999" Help="用于字数据部件"/>
+			<res Index="401" Rid="Ctrl" Jinzhi="d" Range="0 1" Help="用于标识部件，进行简单的通讯控制，Ctrl0控制通讯开始，Ctrl1控制通讯周期"/>
+		</wordaddr>
+		<bitaddr>
+			<res Index="1100" Rid="Data" MJinzhi="d" MRange="0 999999" BitCount="0" BJinzhi="d" BRange="0 15" Help="用于位数据部件"/>
+			<res Index="1101" Rid="Ctrl" MJinzhi="d" MRange="0 10" BitCount="0" BJinzhi="d" BRange="0 15" Help="用于标识部件，进行简单的通讯控制，Ctrl0控制通讯开始，Ctrl1控制通讯周期"/>
+			<res Index="1102" Rid="OneCtlBit" MJinzhi="d" MRange="1 999999" BitCount="0" BJinzhi="d" BRange="0 15" Help="专门用于单次指令的发送控制位"/>
+			<res Index="1103" Rid="Lamp" MJinzhi="d" MRange="0 0" BitCount="0" BJinzhi="d" BRange="0 15" Help="Lamp0用于通信指示灯，通信错误灯亮"/>
+		</bitaddr>
 	</plc>
 	<plc plctype="LG MASTER K120S" Driver="libLG_MASTER_K300S.so" remark="" plcver="3.0" ComType="0" BoudRate="38400" StopBit="1" DataLength="8" CheckBit="NONE" WaitTimeout="300" RevTimeout="50" 
 	Help="K120s K200s" 
@@ -2100,7 +2148,7 @@
 	Help="KV 700/1000/3000/5000 都可以使用,可以使用任意波特率进行通讯" 
 	EN_Help="Support KV 700/1000/3000/5000, communicate with any baud rate." Type="Keyence" Type_Ch=" 日本基恩士" 
 	IT_Help="Supporta KV 700/1000/3000/5000, comunicazione indipendente dal baud rate." 
-	TR_Help="KV 700/1000/3000/5000 都可以使用,可以使用任意波特率進行通訊">
+	TR_Help="KV 700/1000/3000/5000 都可以使用,可以使用任意波特率?M行通?">
 		<wordaddr>
 			<res Index="110" Rid="DM" Jinzhi="d" Range="0 65534" ConLen="20"/>
 			<res Index="131" Rid="CM" Jinzhi="d" Range="0 11998" ConLen="20"/>
@@ -2128,8 +2176,54 @@
 			<res Index="231" Rid="T" MJinzhi="d" MRange="0 99999" BitCount="0" BJinzhi="d" BRange="0 3" ConLen="10"/>
 		</bitaddr>
 	</plc>
-
-
+	<!--GSM短信模块-->
+	<plc plctype="ShortMessage_Module" Driver="libAT_Driver.so" remark="" plcver="3.0" ComType="0" BoudRate="9600" StopBit="1" DataLength="8" CheckBit="NONE" WaitTimeout="300" RevTimeout="10" Type="Other Protocol" Type_Ch=" 其它协议" 
+	EN_Help="" 
+	IT_Help="" 
+	TR_Help="">
+		<wordaddr>
+			<res Index="1" Rid="Signal" Jinzhi="d" Range="0 0" Help="用于读取短信模块信号强度，写操作无效"/>
+		</wordaddr>
+	</plc>
+	<plc plctype="OpenCAN" Driver="libOpenCAN.so" remark="" plcver="3.0" ComType="4" BoudRate="250000" StopBit="1" DataLength="8" CheckBit="NONE" WaitTimeout="300" RevTimeout="50" PlcStatNo="1" CAN="1" 
+	Help="本协议需在OpenCAN Assistant配置后使用" 
+	EN_Help="Configure OpenCAN Assistant first" Type="CANDevice" Type_Ch=" CAN设备" 
+	IT_Help="Prima di tutto configurare OpenCAN Assistant" 
+	TR_Help="本?f?h需在OpenCAN Assistant配置後使用">
+		<wordaddr>
+			<res Index="400" Rid="CData" Jinzhi="d" Range="0 999999" Help="操作CAN数据"/>
+			<res Index="401" Rid="CSID" Jinzhi="d" Range="0 3" Help="CAN发送ID寄存器,CS-ID0为最低字节"/>
+			<res Index="402" Rid="CSBYTE" Jinzhi="d" Range="0 7" Help="CAN发送数据寄存器,CS-BYTE0为最低字节"/>
+			<res Index="403" Rid="CSLEN" Jinzhi="d" Range="0 0" Help="CAN发送数据长度寄存器,值0~8,大于8取8"/>
+			<!--<res Index="401" Rid="Ctrl" Jinzhi="d" Range="0 1" Help="通信控制，进行简单的通讯控制，Ctrl0控制通讯开始，Ctrl1控制通讯周期" />-->
+		</wordaddr>
+		<bitaddr>
+			<res Index="1100" Rid="CData" MJinzhi="d" MRange="0 99999" BitCount="2" BJinzhi="d" BRange="0 15" Help="用于位数据部件"/>
+			<res Index="1101" Rid="RFLAG" MJinzhi="d" MRange="0 0" BitCount="0" BJinzhi="d" BRange="0 15" Help="CAN发送远程帧标志"/>
+			<res Index="1102" Rid="EFLAG" MJinzhi="d" MRange="0 0" BitCount="0" BJinzhi="d" BRange="0 15" Help="CAN发送扩展帧标志"/>
+			<res Index="1103" Rid="SFLAG" MJinzhi="d" MRange="0 0" BitCount="0" BJinzhi="d" BRange="0 15" Help="CAN发送标志"/>
+			<!--<res Index="1101" Rid="Ctrl" MJinzhi="d" MRange="0 10" BitCount="0" BJinzhi="d" BRange="0 15" Help="用于标识部件，进行简单的通讯控制，Ctrl0控制通讯开始，Ctrl1控制通讯周期" />-->
+			<!--<res Index="1102" Rid="OneCtlBit" MJinzhi="d" MRange="1 999999" BitCount="0" BJinzhi="d" BRange="0 15" Help="专门用于单次指令的发送控制位" />-->
+			<res Index="1104" Rid="Lamp" MJinzhi="d" MRange="0 255" BitCount="0" BJinzhi="d" BRange="0 15" Help="Lamp0用于通信指示灯，通信错误灯亮"/>
+			<res Index="1105" Rid="CtrlB" MJinzhi="d" MRange="0 255" BitCount="0" BJinzhi="d" BRange="0 0" Help="用于指令的发送控制位"/>
+		</bitaddr>
+	</plc>
+	<!--电动汽车非车载传导式充电机与电池管理系统间的通信协议-->
+	<plc plctype="Charger-BMS" Driver="libChargerBMS.so" remark="" plcver="3.0" ComType="4" BoudRate="250000" StopBit="1" DataLength="8" CheckBit="NONE" WaitTimeout="300" RevTimeout="50" PlcStatNo="1" CAN="1" 
+	Help="充电机和电池管理系统的协议" Type="CANDevice" Type_Ch=" CAN设备" 
+	EN_Help="Communication protocols between charger and battery managerment system" 
+	IT_Help="Protocolli di comunicazione tra il caricatore e il sistema di gestione della batteria" 
+	TR_Help="充电机和电池管理系统的协议">
+		<wordaddr>
+			<res Index="400" Rid="SPN" Jinzhi="d" Range="0 999999" Help=""/>
+			<res Index="401" Rid="Ctrl" Jinzhi="d" Range="0 1" Help="阶段控制:1-握手,2-配置,3-充电,4-结束"/>
+			<res Index="402" Rid="State" Jinzhi="d" Range="0 1" Help="阶段完成标示:1-握手,2-配置,3-充电,4-结束"/>
+			<res Index="403" Rid="Reset" Jinzhi="d" Range="0 1" Help="1 - CAN 通道重启"/>
+		</wordaddr>
+		<bitaddr>
+			<res Index="1104" Rid="Lamp" MJinzhi="d" MRange="0 255" BitCount="0" BJinzhi="d" BRange="0 15" Help="Lamp0用于通信指示灯，通信错误灯亮"/>
+		</bitaddr>
+	</plc>
 	<plc plctype="Yamatake CPL" Driver="libYamatake_CPL.so" remark="" plcver="3.0" ComType="1" BoudRate="9600" StopBit="1" DataLength="8" CheckBit="EVEN" WaitTimeout="300" RevTimeout="50" Type="Yamatake" Type_Ch=" 山武" 
 	EN_Help="" 
 	IT_Help="" 
@@ -2251,7 +2345,7 @@
 	Help="海为全系列PLC" 
 	EN_Help="Haiwell PLC Serials" PlcStatNo="1" Type="Haiwell" Type_Ch=" 海为" 
 	IT_Help="Haiwell PLC Seriale" 
-	TR_Help="海為全系列PLC">
+	TR_Help="海?槿?系列PLC">
 		<wordaddr>
 			<res Index="4" Rid="AI" Jinzhi="d" Range="0 99999" ConLen="20"/>
 			<res Index="5" Rid="AQ" Jinzhi="d" Range="0 99999" ConLen="20"/>
@@ -2317,7 +2411,7 @@
 	Help="电表协议" 
 	EN_Help="Electric meter protocol" Type="Other Protocol" Type_Ch=" 其它协议" 
 	IT_Help="Protocollo Contatore Electric" 
-	TR_Help="電表協議">
+	TR_Help="?表?f?h">
 		<wordaddr>
 			<res Index="212" Rid="TM" Jinzhi="d" Range="0 4" ConLen="5" Help="最大需量发生时间--年/月/日/时/分"/>
 		</wordaddr>
@@ -2362,7 +2456,7 @@
 	Help="丰炜全系列PLC" PlcStatNo="0" 
 	EN_Help="All VIGOR PLC" Type="VIGOR" Type_Ch=" 丰炜" 
 	IT_Help="Tutti i Plc VIGOR" 
-	TR_Help="豐煒全系列PLC">
+	TR_Help="?S??全系列PLC">
 		<wordaddr>
 			<res Index="1008" Rid="RT" Jinzhi="d" Range="0 511" ConLen="20"/><!--目前值-->
 			<res Index="1009" Rid="RC" Jinzhi="d" Range="0 199" ConLen="20"/><!--目前值-->
@@ -2653,5 +2747,111 @@
 		</bitaddr>
 	</plc>
 
+	
+	
+	<plc plctype="SP-RME3/RME4/RMD8" Driver="libPRINT.so" remark="" plcver="3.0" ComType="1" UsbDevice="1"  BoudRate="9600" StopBit="1" DataLength="8" CheckBit="NONE" WaitTimeout="300" RevTimeout="50" HmiStatNo="1" PlcStatNo="1" 
+	Help="支持SP-RME3UHB、SP-RME4、SP-RMD8CUH-USB 打印机" Type="PRINTER " Type_Ch="打印机"
+	EN_Help="Support SP-RME3UHB、SP-RME4、SP-RMD8CUH-USB printer" 
+	IT_Help="Support SP-RME3UHB、SP-RME4、SP-RMD8CUH-USB printer" 
+	TR_Help="支持SP-RME3UHB、SP-RME4、SP-RMD8CUH-USB 打印?C" >
+	<wordaddr>
+		<!--<res Index="0" Rid="PT" Jinzhi="d" Range="0 0" ConLen="10" Help="存储打印文本或者图片路径"/>
+			<res Index="1" Rid="PD" Jinzhi="d" Range="0 0" ConLen="10" Help="存储打印方向1:正向 2:反向"/>
+			<res Index="2" Rid="PS" Jinzhi="d" Range="0 0" ConLen="10" Help="打印触发位1:打印文本 2：打印图片"/>
+			<res Index="3" Rid="PM" Jinzhi="d" Range="0 0" ConLen="10" Help="打印点阵类型1:8点点阵 2:24点阵"/>
+			<res Index="4" Rid="PW" Jinzhi="d" Range="0 0" ConLen="10" Help="打印宽度以像素点计算"/>
+			<res Index="5" Rid="PG" Jinzhi="d" Range="0 0" ConLen="10" Help="设置打印机指令类型1:图形打印指令 2:点密度打印指令"/>
+			<res Index="6" Rid="PR" Jinzhi="d" Range="0 0" ConLen="10" Help="存储打印结果1:发送成功 2:发送失败 3:打开图片失败 4:图片格式错误"/>
+			<res Index="7" Rid="PC" Jinzhi="d" Range="0 0" ConLen="10" Help="切纸功能1:启用 2:禁用"/>
+			<res Index="8" Rid="PP" Jinzhi="d" Range="0 0" ConLen="10" Help="打印模式1:左对齐 2:居中 3右对齐"/>
+		--></wordaddr>
+	</plc>
+	<plc plctype="SP-EU80" Driver="libPRINT.so" remark="" plcver="3.0" ComType="1" UsbDevice="1"  BoudRate="9600" StopBit="1" DataLength="8"  CheckBit="NONE" WaitTimeout="300" RevTimeout="50" HmiStatNo="1" PlcStatNo="1" 
+	Help="支持SP-EU80、SP-EU80N、SP-EU801SU-USB 打印机" Type="PRINTER " Type_Ch="打印机"
+	EN_Help="Support SP-EU80、SP-EU80N、SP-EU801SU-USB printer" 
+	IT_Help="Support SP-EU80、SP-EU80N、SP-EU801SU-USB printer" 
+	TR_Help="支持SP-EU80、SP-EU80N、SP-EU801SU-USB 打印?C" >
+	<wordaddr>
+		<!--<res Index="0" Rid="PT" Jinzhi="d" Range="0 0" ConLen="10" Help="存储打印文本或者图片路径"/>
+			<res Index="1" Rid="PD" Jinzhi="d" Range="0 0" ConLen="10" Help="存储打印方向1:正向 2:反向"/>
+			<res Index="2" Rid="PS" Jinzhi="d" Range="0 0" ConLen="10" Help="打印触发位1:打印文本 2：打印图片"/>
+			<res Index="3" Rid="PM" Jinzhi="d" Range="0 0" ConLen="10" Help="打印点阵类型1:8点点阵 2:24点阵"/>
+			<res Index="3" Rid="PM" Jinzhi="d" Range="0 0" ConLen="10" Help="打印点阵类型1:8点点阵 2:24点阵"/>
+			<res Index="4" Rid="PW" Jinzhi="d" Range="0 0" ConLen="10" Help="打印宽度以像素点计算"/>
+			<res Index="5" Rid="PG" Jinzhi="d" Range="0 0" ConLen="10" Help="设置打印机指令类型1:图形打印指令 2:点密度打印指令"/>
+			<res Index="6" Rid="PR" Jinzhi="d" Range="0 0" ConLen="10" Help="存储打印结果1:发送成功 2:发送失败 3:打开图片失败 4:图片格式错误"/>
+			<res Index="7" Rid="PC" Jinzhi="d" Range="0 0" ConLen="10" Help="切纸功能1:启用 2:禁用"/>
+			<res Index="8" Rid="PP" Jinzhi="d" Range="0 0" ConLen="10" Help="打印模式1:左对齐 2:居中 3右对齐"/>
+		--></wordaddr>
+	</plc>
+	<plc plctype="WH-AXX/EXX/AA-XXE8XX" Driver="libPRINT.so" remark="" plcver="3.0" ComType="0" BoudRate="9600" StopBit="1" DataLength="8" CheckBit="NONE" WaitTimeout="300" RevTimeout="50" HmiStatNo="1" PlcStatNo="1" 
+	Help="支持WH-E22、WH-A6、WH-A7、WH-A9、WH-E21、WH-AA、E222R90-0DE1182TGA 打印机" Type="PRINTER " Type_Ch="打印机"
+	EN_Help="Support WH-E22、WH-A6、WH-A7、WH-A9、WH-E21、WH-AA、E222R90-0DE1182TGA printer" 
+	IT_Help="Support WH-E22、WH-A6、WH-A7、WH-A9、WH-E21、WH-AA、E222R90-0DE1182TGA printer" 
+	TR_Help="Support WH-E22、WH-A6、WH-A7、WH-A9、WH-E21、WH-AA、E222R90-0DE1182TGA 打印?C" >
+	<wordaddr>
+		<!--<res Index="0" Rid="PT" Jinzhi="d" Range="0 0" ConLen="10" Help="存储打印文本或者图片路径"/>
+			<res Index="1" Rid="PD" Jinzhi="d" Range="0 0" ConLen="10" Help="存储打印方向1:正向 2:反向"/>
+			<res Index="2" Rid="PS" Jinzhi="d" Range="0 0" ConLen="10" Help="打印触发位1:打印文本 2：打印图片"/>
+			<res Index="3" Rid="PM" Jinzhi="d" Range="0 0" ConLen="10" Help="打印点阵类型1:8点点阵 2:24点阵"/>
+			<res Index="4" Rid="PW" Jinzhi="d" Range="0 0" ConLen="10" Help="打印宽度以像素点计算"/>
+			<res Index="5" Rid="PG" Jinzhi="d" Range="0 0" ConLen="10" Help="设置打印机指令类型1:图形打印指令 2:点密度打印指令"/>
+			<res Index="6" Rid="PR" Jinzhi="d" Range="0 0" ConLen="10" Help="存储打印结果1:发送成功 2:发送失败 3:打开图片失败 4:图片格式错误"/>
+			<res Index="7" Rid="PC" Jinzhi="d" Range="0 0" ConLen="10" Help="切纸功能1:启用 2:禁用"/>
+			<res Index="8" Rid="PP" Jinzhi="d" Range="0 0" ConLen="10" Help="打印模式1:左对齐 2:居中 3右对齐"/>
+		--></wordaddr>
+	</plc>
+	<plc plctype="RD-DXX/EXX" Driver="libPRINT.so" remark="" plcver="3.0" ComType="0" BoudRate="9600" StopBit="1" DataLength="8" CheckBit="NONE" WaitTimeout="300" RevTimeout="50" HmiStatNo="1" PlcStatNo="1" 
+	Help="支持RD-DH32、RD-DP32、RD-DG32、RD-DE32、RD-E32、RD-EH32、RD-ES32、RD-EM32、RD-EF32、RD-ET32 打印机" Type="PRINTER " Type_Ch="打印机"
+	EN_Help="Support RD-DH32、RD-DP32、RD-DG32、RD-DE32、RD-E32、RD-EH32、RD-ES32、RD-EM32、RD-EF32、RD-ET32 printer" 
+	IT_Help="Support RD-DH32、RD-DP32、RD-DG32、RD-DE32、RD-E32、RD-EH32、RD-ES32、RD-EM32、RD-EF32、RD-ET32 printer" 
+	TR_Help="支持RD-DH32、RD-DP32、RD-DG32、RD-DE32、RD-E32、RD-EH32、RD-ES32、RD-EM32、RD-EF32、RD-ET32 打印?C" >
+	<wordaddr>
+		<!--<res Index="0" Rid="PT" Jinzhi="d" Range="0 0" ConLen="10" Help="存储打印文本或者图片路径"/>
+			<res Index="1" Rid="PD" Jinzhi="d" Range="0 0" ConLen="10" Help="存储打印方向1:正向 2:反向"/>
+			<res Index="2" Rid="PS" Jinzhi="d" Range="0 0" ConLen="10" Help="打印触发位1:打印文本 2：打印图片"/>
+			<res Index="3" Rid="PM" Jinzhi="d" Range="0 0" ConLen="10" Help="打印点阵类型1:8点点阵 2:24点阵"/>
+			<res Index="4" Rid="PW" Jinzhi="d" Range="0 0" ConLen="10" Help="打印宽度以像素点计算"/>
+			<res Index="5" Rid="PG" Jinzhi="d" Range="0 0" ConLen="10" Help="设置打印机指令类型1:图形打印指令 2:点密度打印指令"/>
+			<res Index="6" Rid="PR" Jinzhi="d" Range="0 0" ConLen="10" Help="存储打印结果1:发送成功 2:发送失败 3:打开图片失败 4:图片格式错误"/>
+			<res Index="7" Rid="PC" Jinzhi="d" Range="0 0" ConLen="10" Help="切纸功能1:启用 2:禁用"/>
+			<res Index="8" Rid="PP" Jinzhi="d" Range="0 0" ConLen="10" Help="打印模式1:左对齐 2:居中 3右对齐"/>
+		--></wordaddr>
+	</plc>
+	<plc plctype="SP-RMDXX/RMEXX/DVII" Driver="libPRINT.so" remark="" plcver="3.0" ComType="0" BoudRate="9600" StopBit="1" DataLength="8" CheckBit="NONE" WaitTimeout="300" RevTimeout="50" HmiStatNo="1" PlcStatNo="1" 
+	Help="支持SP-RMD6A、SP-RMD6B、SP-RMD8A、SP-RMD8B、SP-RMD8C、SP-DVII、SP-RME4 打印机" Type="PRINTER " Type_Ch="打印机"
+	EN_Help="Support SP-RMD6A、SP-RMD6B、SP-RMD8A、SP-RMD8B、SP-RMD8C、SP-DVII、SP-RME4 printer" 
+	IT_Help="Support SP-RMD6A、SP-RMD6B、SP-RMD8A、SP-RMD8B、SP-RMD8C、SP-DVII、SP-RME4 printer" 
+	TR_Help="支持SP-RMD6A、SP-RMD6B、SP-RMD8A、SP-RMD8B、SP-RMD8C、SP-DVII、SP-RME4 打印?C" >
+	<wordaddr>
+		<!--<res Index="0" Rid="PT" Jinzhi="d" Range="0 0" ConLen="10" Help="存储打印文本或者图片路径"/>
+			<res Index="1" Rid="PD" Jinzhi="d" Range="0 0" ConLen="10" Help="存储打印方向1:正向 2:反向"/>
+			<res Index="2" Rid="PS" Jinzhi="d" Range="0 0" ConLen="10" Help="打印触发位1:打印文本 2：打印图片"/>
+			<res Index="3" Rid="PM" Jinzhi="d" Range="0 0" ConLen="10" Help="打印点阵类型1:8点点阵 2:24点阵"/>
+			<res Index="4" Rid="PW" Jinzhi="d" Range="0 0" ConLen="10" Help="打印宽度以像素点计算"/>
+			<res Index="5" Rid="PG" Jinzhi="d" Range="0 0" ConLen="10" Help="设置打印机指令类型1:图形打印指令 2:点密度打印指令"/>
+			<res Index="6" Rid="PR" Jinzhi="d" Range="0 0" ConLen="10" Help="存储打印结果1:发送成功 2:发送失败 3:打开图片失败 4:图片格式错误"/>
+			<res Index="7" Rid="PC" Jinzhi="d" Range="0 0" ConLen="10" Help="切纸功能1:启用 2:禁用"/>
+			<res Index="8" Rid="PP" Jinzhi="d" Range="0 0" ConLen="10" Help="打印模式1:左对齐 2:居中 3右对齐"/>
+		--></wordaddr>
+	</plc>
+	
+	<!--plc plctype="YASKAWA_Memobus(MP Series Controllers)" Driver="libMEMODBUS_RTU.so" remark="" plcver="3.0" ComType="1" BoudRate="19200" StopBit="1" DataLength="8" CheckBit="EVEN" WaitTimeout="300" RevTimeout="50" PlcStatNo="1"  
+	Help="" Type="YASKAWA" Type_Ch="安川电气" Special="4">
+		<wordaddr>
+			<res Index="1" Rid="MF" Jinzhi="d" Range="0 65533" ConLen="20"/>
+			<res Index="2" Rid="ML" Jinzhi="d" Range="0 65533" ConLen="20"/>
+			<res Index="3" Rid="MW" Jinzhi="d" Range="0 65534" ConLen="20"/>
+			<res Index="4" Rid="IF" Jinzhi="h" Range="0 43007" ConLen="20"/>
+			<res Index="5" Rid="IL" Jinzhi="h" Range="0 43007" ConLen="20"/>
+			<res Index="6" Rid="IW" Jinzhi="h" Range="0 43007" ConLen="20"/>			
+		</wordaddr>
+		<bitaddr>
+			<res Index="110" Rid="MB-1" MJinzhi="d" MRange="0 9999" BitCount="2" BJinzhi="h" BRange="0 15" ConLen="10"/>
+			<res Index="111" Rid="MB-2" MJinzhi="d" MRange="10000 65534" BitCount="2" BJinzhi="h" BRange="0 15" ConLen="10"/>
+			<res Index="112" Rid="IB" MJinzhi="h" MRange="0 688112" BitCount="0" BJinzhi="h" BRange="0 15" ConLen="10"/>
+			<res Index="113" Rid="IW-Bit" MJinzhi="h" MRange="0 43007" BitCount="2" BJinzhi="d" BRange="0 15" ConLen="10"/>
+		</bitaddr>
+	</plc-->
 	
 </plcdesc>

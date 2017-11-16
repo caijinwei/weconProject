@@ -309,7 +309,7 @@ public class DeviceImpl implements DeviceApi {
                         return new String[] { rs.getLong("id") + "", rs.getString("name") };
                     }
                 });
-        if (null == groupLst) {
+        if (null == groupLst || groupLst.size() == 0) {
             return null;
         }
         // 获取管理员下盒子列表
@@ -324,7 +324,7 @@ public class DeviceImpl implements DeviceApi {
                                 rs.getLong("acc_dir_id") + "", rs.getInt("state")+"",rs.getString("machine_code"), rs.getString("dev_model"), rs.getString("remark") };
                     }
                 });
-        if (null == deviceLst) {
+        if (null == deviceLst || deviceLst.size() == 0) {
             return null;
         }
 
