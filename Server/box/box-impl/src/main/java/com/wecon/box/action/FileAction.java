@@ -209,19 +209,28 @@ public class FileAction {
         InputStream in = partFile.getInputStream();
         //创建一个文件输出流
         FileOutputStream out = new FileOutputStream(path+"/V-Box.apk");
-        //创建一个缓冲区
-        byte buffer[] = new byte[1024];
-        //判断输入流中的数据是否已经读完的标识
-        int len = 0;
-        //循环将输入流读入到缓冲区当中，(len=in.read(buffer))>0就表示in里面还有数据
-        while((len=in.read(buffer))>0){
-            //使用FileOutputStream输出流将缓冲区的数据写入到指定的目录(savePath + "\\" + filename)当中
-            out.write(buffer, 0, len);
+        try {
+            //创建一个缓冲区
+            byte buffer[] = new byte[1024];
+            //判断输入流中的数据是否已经读完的标识
+            int len = 0;
+            //循环将输入流读入到缓冲区当中，(len=in.read(buffer))>0就表示in里面还有数据
+            while((len=in.read(buffer))>0){
+                //使用FileOutputStream输出流将缓冲区的数据写入到指定的目录(savePath + "\\" + filename)当中
+                out.write(buffer, 0, len);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            //关闭输入流
+            if(null != in){
+                in.close();
+            }
+            //关闭输出流
+            if(null != out){
+                out.close();
+            }
         }
-        //关闭输入流
-        in.close();
-        //关闭输出流
-        out.close();
 
         logger.debug("上传成功");
         return new Output(new JSONObject());
