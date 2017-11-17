@@ -75,7 +75,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 			if ("0".equals(bParams.get("markid").toString())) {
 
 				logger.debug("WebSocket push begin");
-				if (paramMaps.get(session.getId()) != null) {
+				if (paramMaps.containsKey(session.getId())) {
 					paramMaps.remove(session.getId());
 				}
 				paramMaps.put(session.getId(), bParams);
@@ -286,7 +286,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 						}
 					}
 				}
-				if (machineCodeSet != null && subscribeListeners.get(session.getId()) == null) {
+				if (machineCodeSet != null && subscribeListeners.containsKey(session.getId())) {
 
 					subscribeRealData(session, machineCodeSet);
 				}
@@ -333,21 +333,23 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
 		try {
 			logger.debug("关闭连接");
-			if (null != clients.get(session.getId())) {
+			if (clients.containsKey(session.getId())) {
 				clients.remove(session.getId());
-			}
 
-			if (null != subscribeListeners.get(session.getId())) {
+			}
+			if (subscribeListeners.containsKey(session.getId())) {
 				subscribeListeners.get(session.getId()).unsubscribe();
 				subscribeListeners.remove(session.getId());
-			}
 
-			if (null != paramMaps.get(session.getId())) {
-				paramMaps.remove(session.getId());
 			}
-			if (null != clientMQTTs.get(session.getId())) {
+			if (paramMaps.containsKey(session.getId())) {
+				paramMaps.remove(session.getId());
+
+			}
+			if (clientMQTTs.containsKey(session.getId())) {
 				clientMQTTs.get(session.getId()).close();
 				clientMQTTs.remove(session.getId());
+
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

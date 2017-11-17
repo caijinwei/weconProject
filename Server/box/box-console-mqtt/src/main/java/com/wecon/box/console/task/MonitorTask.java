@@ -121,6 +121,7 @@ public class MonitorTask extends Thread {
 			logger.info("消息为空！");
 			System.out.println("消息为空！");
 			return;
+			
 		}
 		String boxMsg = "";
 		try {
