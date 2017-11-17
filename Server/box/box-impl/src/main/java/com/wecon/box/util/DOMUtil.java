@@ -38,7 +38,9 @@ public class DOMUtil {
         }
         return document;
     }
+public static void main(String[] a){
 
+}
     /**
      * 获取某个元素的所有的子节点
      *

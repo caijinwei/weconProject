@@ -44,12 +44,12 @@ public class AppVersionAction {
         androidVerInfo.version_code = androidVersion;
         androidVerInfo.platform = MobileOption.ANDROID.value;
         androidVerInfo.updateContent = updateContent;
-        androidVerInfo.isforce = Integer.parseInt(CommonUtils.isNullOrEmpty(isforce) ? "1" : "2");
+        androidVerInfo.isforce = Integer.parseInt(isforce);
         AppVerInfo iosVerInfo = new AppVerInfo();
         iosVerInfo.version_code = iosVersion;
         iosVerInfo.platform = MobileOption.IPHONE.value;
         iosVerInfo.updateContent = updateContent;
-        iosVerInfo.isforce = Integer.parseInt(CommonUtils.isNullOrEmpty(isforce) ? "1" : "2");
+        iosVerInfo.isforce = Integer.parseInt(isforce);
         appVersionApi.saveOrUpdate(androidVerInfo);
         appVersionApi.saveOrUpdate(iosVerInfo);
         JSONObject data = new JSONObject();
