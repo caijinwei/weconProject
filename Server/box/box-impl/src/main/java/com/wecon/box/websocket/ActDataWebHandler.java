@@ -286,7 +286,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 						}
 					}
 				}
-				if (machineCodeSet != null && subscribeListeners.containsKey(session.getId())) {
+				if (machineCodeSet != null && !subscribeListeners.containsKey(session.getId())) {
 
 					subscribeRealData(session, machineCodeSet);
 				}
