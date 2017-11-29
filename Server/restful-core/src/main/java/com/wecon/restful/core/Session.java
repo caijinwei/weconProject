@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import com.wecon.restful.authcompany.AuthComHelper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -211,6 +212,11 @@ public class Session {
             else {
                 SessionManager.expireSid(client.sid, 3600 * 12);// * 24 * 30
             }
+        }
+
+        //第三方接口comid,compvtkey验证
+        if(!AuthComHelper.isRight(client.comid,client.compvtkey)){
+            throw new DeniedException("company private key is error");
         }
 
         // 生产和生产测试环境验证用户接口权限验证
