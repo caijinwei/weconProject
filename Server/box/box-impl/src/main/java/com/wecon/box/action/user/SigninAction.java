@@ -6,6 +6,7 @@ import com.wecon.box.entity.Account;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
+import com.wecon.box.param.SigninParam;
 import com.wecon.common.redis.RedisManager;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
@@ -81,29 +82,3 @@ public class SigninAction extends UserBaseAction {
     }
 }
 
-class SigninParam {
-    @Label("用户名、邮箱、电话")
-    @NotNull
-    @Length(max = 32, min = 1)
-    public String alias;
-    @Label("密码md5")
-    @NotNull
-    @Length(max = 32, min = 32)
-    public String password;
-    @Label("是否记住登录状态30天")
-    @NotNull
-    @Range(min = 0, max = 1)
-    public Integer isremeber;
-
-    public void setIsremeber(Integer isremeber) {
-        this.isremeber = isremeber;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-}
