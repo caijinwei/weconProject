@@ -389,6 +389,22 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         }
         $scope.selectedPtype = "";
         $scope.selectedType = "";
+
+        $scope.portIfShow=0;
+        $scope.ethernetShow=0;
+
+        //清空 所有 form下的所有表单
+        $("input[type!='hidden'][name!='device_id'][id!='port']", $('#addConfig')).each(function () {
+            var type = this.type;
+            //var tag = this.tagName.toLowerCase();
+            if (type == 'text' || type == 'number') {
+                this.value = "";
+                $('#plc_id').val("0");
+            }
+        });
+        $("select", form).each(function () {
+            this.selectedIndex = -1;
+        });
     }
     /*
      * 修改设备类型
@@ -539,6 +555,8 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         $("#port").val("COM1");
         $scope.selectedPort = "COM1";
         $scope.chgPort();
+        $scope.portIfShow=0;
+        $scope.ethernetShow=0;
     };
     function clearForm(form) {
         $("input[type!='hidden'][name!='device_id']", form).each(function () {
