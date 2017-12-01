@@ -33,6 +33,7 @@ public class UserInfoAction extends UserBaseAction {
     @RequestMapping("user/userinfo")
     @WebApi(forceAuth = true, master = true)
     public Output getUserInfo() {
+        System.out.println("user/userinfo");
         JSONObject data = new JSONObject();
         data.put("username", AppContext.getSession().client.account);
         data.put("type", AppContext.getSession().client.userInfo.getUserType());

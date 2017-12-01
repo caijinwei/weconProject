@@ -10,8 +10,12 @@ import java.util.Map;
  * Created by zengzhipeng on 2017/11/29.
  */
 public class AuthComHelper {
-    private static final Logger logger = LogManager.getLogger(AuthComHelper.class);
     private static Map<Integer, String> comMap = new HashMap<>();
+    private static String proxyHost;
+
+    public static void setProxyHost(String proxyHost) {
+        AuthComHelper.proxyHost = proxyHost;
+    }
 
     public static void setComMap(Map<Integer, String> comMap) {
         AuthComHelper.comMap = comMap;

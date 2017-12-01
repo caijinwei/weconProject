@@ -54,7 +54,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>box-site-web</finalName>
+		<finalName>box-data</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

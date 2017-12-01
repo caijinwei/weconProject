@@ -41,9 +41,10 @@ public class WsTestHandler extends AbstractWebSocketHandler {
         params = message.getPayload();
         try {
             count++;
-            session.sendMessage(new TextMessage("handleTextMessage - count:" + count));
-            session.sendMessage(new TextMessage("handleTextMessage - this.client.userId:" + this.client.userId));
-            session.sendMessage(new TextMessage("handleTextMessage - this.clientMap.userId:" + this.clients.get(session.getId()).userId));
+            session.sendMessage(new TextMessage("WsTestHandler handleTextMessage - 收到消息 - " + params));
+//            session.sendMessage(new TextMessage("handleTextMessage - count:" + count));
+//            session.sendMessage(new TextMessage("handleTextMessage - this.client.userId:" + this.client.userId));
+//            session.sendMessage(new TextMessage("handleTextMessage - this.clientMap.userId:" + this.clients.get(session.getId()).userId));
 //            session.sendMessage(new TextMessage("handleTextMessage - AppContext.getSession().client.userId:" + AppContext.getSession().client.userId));
             System.out.println(this.clientTl.get() == null);
 //            session.sendMessage(new TextMessage("handleTextMessage - this.clientTl.userId:" + this.clientTl.get().userId));
@@ -67,8 +68,9 @@ public class WsTestHandler extends AbstractWebSocketHandler {
      * @param session
      */
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) {
+    public void afterConnectionEstablished(WebSocketSession session) throws IOException {
         logger.debug("WsTestHandler afterConnectionEstablished - 连接成功后 - " + session.getId());
+        session.sendMessage(new TextMessage("WsTestHandler afterConnectionEstablished - 连接成功后 - " + session.getId()));
         try {
             this.client = AppContext.getSession().client;
             this.clientTl.set(AppContext.getSession().client);
