@@ -6,7 +6,7 @@
 
     <listener>
         <!--<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>-->
-        <listener-class>com.wecon.restful.core.RestfulContextListener</listener-class>
+        <listener-class>com.wecon.restful.core.RestfulContextListenerEx</listener-class>
     </listener>
 
     <context-param>
@@ -32,7 +32,7 @@
             <file-size-threshold>1048576</file-size-threshold> <!-- 1MB -->
         </multipart-config>
     </servlet>
-    <servlet>
+    <!--<servlet>
         <servlet-name>default</servlet-name>
         <servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class>
         <init-param>
@@ -40,7 +40,7 @@
             <param-value>false</param-value>
         </init-param>
         <load-on-startup>0</load-on-startup>
-    </servlet>
+    </servlet>-->
     <servlet-mapping>
         <servlet-name>api</servlet-name>
         <url-pattern>/api/*</url-pattern>

@@ -95,7 +95,8 @@ public class Session {
                 // 读写分离标记
                 this.master = api.master;
             } else {
-                throw new RuntimeException("restful api not exists");
+//                throw new RuntimeException("restful api not exists");
+                throw new DeniedException("restful api not exists");
             }
         }
         // 离线本地单元测试， 创建client

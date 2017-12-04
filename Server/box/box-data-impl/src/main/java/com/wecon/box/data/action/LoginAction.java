@@ -19,7 +19,7 @@ import javax.validation.Valid;
 public class LoginAction extends UserBaseAction {
     @Autowired
     private com.wecon.box.action.user.SigninAction signinAction;
-    @RequestMapping("user/login")
+    @RequestMapping("we-data/user/login")
     @WebApi(forceAuth = false, master = true)
     public Output signin(@Valid SigninParam param) {
 
