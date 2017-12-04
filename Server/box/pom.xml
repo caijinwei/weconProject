@@ -28,9 +28,9 @@
         <module>box-api</module>
         <module>box-impl</module>
         <module>box-console-mqtt</module>
-        <module>box-site-api</module>
-        <module>box-site-impl</module>
-        <module>box-site-web</module>
+        <module>box-data-api</module>
+        <module>box-data-impl</module>
+        <module>box-data-web</module>
     </modules>
 
 
