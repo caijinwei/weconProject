@@ -24,7 +24,7 @@ public class BusDataAction {
      * @param param
      * @return
      */
-    @RequestMapping("bdata/real")
+    @RequestMapping("we-data/data/real")
     @WebApi(forceAuth = true, master = true)
     public Output getRealData(@Valid BusinessDataParam param) {
 
@@ -36,7 +36,7 @@ public class BusDataAction {
      * @param param
      * @return
      */
-    @RequestMapping("bdata/history")
+    @RequestMapping("we-data/data/history")
     @WebApi(forceAuth = true, master = true)
     public Output getHistoryData(@Valid BusinessDataParam param) {
 
@@ -48,7 +48,7 @@ public class BusDataAction {
      * @param param
      * @return
      */
-    @RequestMapping("bdata/alarm")
+    @RequestMapping("we-data/data/alarm")
     @WebApi(forceAuth = true, master = true)
     public Output getAlarmData(@Valid BusinessDataParam param) {
 
@@ -59,7 +59,7 @@ public class BusDataAction {
      * 获取盒子列表
      * @return
      */
-    @RequestMapping("bdata/boxs")
+    @RequestMapping("we-data/data/boxs")
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     public Output getBoxData(@Valid BusinessDataParam param) {
 
@@ -70,7 +70,7 @@ public class BusDataAction {
      * 获取分组数据
      * @return
      */
-    @RequestMapping("bdata/groups")
+    @RequestMapping("we-data/data/groups")
     @WebApi(forceAuth = true, master = true)
     public Output getGroupData(@Valid BusinessDataParam param) {
 
@@ -81,7 +81,7 @@ public class BusDataAction {
      * 获取监控点列表
      * @return
      */
-    @RequestMapping("bdata/monitors")
+    @RequestMapping("we-data/data/monitors")
     @WebApi(forceAuth = true, master = true)
     public Output getMonitorData(@Valid BusinessDataParam param) {
 
@@ -92,7 +92,7 @@ public class BusDataAction {
      * 获取实时数据详情
      * @return
      */
-    @RequestMapping("bdata/realdetail")
+    @RequestMapping("we-data/data/realdetail")
     @WebApi(forceAuth = true, master = true)
     public Output getRealDetail(BusinessDataParam param) {
 
