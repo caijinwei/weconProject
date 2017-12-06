@@ -402,9 +402,9 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $('#plc_id').val("0");
             }
         });
-        $("select", form).each(function () {
-            this.selectedIndex = -1;
-        });
+        //$("select", $('#addConfig')).each(function () {
+        //    this.selectedIndex = -1;
+        //});
     }
     /*
      * 修改设备类型
