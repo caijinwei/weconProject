@@ -1,14 +1,20 @@
 package com.wecon.box.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.LogAccountApi;
 import com.wecon.box.entity.LogAccount;
 import com.wecon.box.entity.LogAccountFilter;
 import com.wecon.box.entity.Page;
+import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
+import com.wecon.box.util.VerifyUtil;
 import com.wecon.common.util.EnumUtil;
 import com.wecon.common.web.IpAddrHelper;
 import com.wecon.restful.core.AppContext;
+import com.wecon.restful.core.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -138,6 +144,16 @@ public class LogAccountImpl implements LogAccountApi {
         return log;
     }
 
+    @Override
+    public JSONArray getSelData(String sqlStr) {
+        if(VerifyUtil.isSelStr(sqlStr)){
+            return jdbcTemplate.queryForObject(sqlStr,new DefaultSqlMapper());
+        }else{
+            throw new BusinessException(ErrorCodeOption.SqlStrIsLllegality.key,
+                    ErrorCodeOption.SqlStrIsLllegality.value);
+        }
+    }
+
     public static final class DefaultOpLogRowMapper implements RowMapper<LogAccount> {
 
         @Override
@@ -164,6 +180,85 @@ public class LogAccountImpl implements LogAccountApi {
             }
 
             return log;
+        }
+    }
+
+    public static final class DefaultSqlMapper implements RowMapper<JSONArray> {
+
+        @Override
+        public JSONArray mapRow(ResultSet rs, int i) throws SQLException {
+            //创建一个JSONArray对象
+            JSONArray jsonArray = new JSONArray();
+            //获得ResultSetMeataData对象
+            ResultSetMetaData rsmd = rs.getMetaData();
+            while (rs.next()) {
+                //定义json对象
+                JSONObject obj = new JSONObject();
+                //判断数据类型&获取value
+                getType(rs, rsmd, obj);
+                //将对象添加到JSONArray中
+                jsonArray.add(obj);
+            }
+            return jsonArray;
+        }
+    }
+
+    private static void getType(ResultSet rs, ResultSetMetaData rsmd,
+                         JSONObject obj) throws SQLException {
+        int total_rows = rsmd.getColumnCount();
+        for (int i = 0; i < total_rows; i++) {
+            String columnName = rsmd.getColumnLabel(i + 1);
+            if (obj.containsKey(columnName)) {
+                columnName += "1";
+            }
+            try {
+                switch (rsmd.getColumnType(i + 1)) {
+                    case java.sql.Types.ARRAY:
+                        obj.put(columnName, rs.getArray(columnName));
+                        break;
+                    case java.sql.Types.BIGINT:
+                        obj.put(columnName, rs.getInt(columnName));
+                        break;
+                    case java.sql.Types.BOOLEAN:
+                        obj.put(columnName, rs.getBoolean(columnName));
+                        break;
+                    case java.sql.Types.BLOB:
+                        obj.put(columnName, rs.getBlob(columnName));
+                        break;
+                    case java.sql.Types.DOUBLE:
+                        obj.put(columnName, rs.getDouble(columnName));
+                        break;
+                    case java.sql.Types.FLOAT:
+                        obj.put(columnName, rs.getFloat(columnName));
+                        break;
+                    case java.sql.Types.INTEGER:
+                        obj.put(columnName, rs.getInt(columnName));
+                        break;
+                    case java.sql.Types.NVARCHAR:
+                        obj.put(columnName, rs.getNString(columnName));
+                        break;
+                    case java.sql.Types.VARCHAR:
+                        obj.put(columnName, rs.getString(columnName));
+                        break;
+                    case java.sql.Types.TINYINT:
+                        obj.put(columnName, rs.getInt(columnName));
+                        break;
+                    case java.sql.Types.SMALLINT:
+                        obj.put(columnName, rs.getInt(columnName));
+                        break;
+                    case java.sql.Types.DATE:
+                        obj.put(columnName, rs.getDate(columnName));
+                        break;
+                    case java.sql.Types.TIMESTAMP:
+                        obj.put(columnName, rs.getTimestamp(columnName));
+                        break;
+                    default:
+                        obj.put(columnName, rs.getObject(columnName));
+                        break;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

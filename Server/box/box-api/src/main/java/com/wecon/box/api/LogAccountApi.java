@@ -1,5 +1,6 @@
 package com.wecon.box.api;
 
+import com.alibaba.fastjson.JSONArray;
 import com.wecon.box.entity.LogAccount;
 import com.wecon.box.entity.LogAccountFilter;
 import com.wecon.box.entity.Page;
@@ -18,6 +19,7 @@ public interface LogAccountApi {
 
     /**
      * 日志列表
+     *
      * @param filter
      * @param pageIndex
      * @param pageSize
@@ -31,4 +33,12 @@ public interface LogAccountApi {
      * @return
      */
     LogAccount getLogInit();
+
+    /**
+     * 查询结构转为jsonarray
+     *
+     * @param sqlStr
+     * @return
+     */
+    JSONArray getSelData(String sqlStr);
 }

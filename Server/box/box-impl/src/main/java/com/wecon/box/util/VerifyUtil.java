@@ -53,6 +53,31 @@ public class VerifyUtil {
         return b;
     }
 
+    /**
+     * 是否是sql查询语句
+     *
+     * @param p
+     * @return
+     */
+    public static boolean isSelStr(String p) {
+        p = p.toUpperCase();
+
+        if (p.indexOf("DELETE") >= 0 || p.indexOf("ASCII") >= 0
+                || p.indexOf("UPDATE") >= 0 ||  p.indexOf("SUBSTR(") >= 0
+                || p.indexOf("DROP") >= 0
+                || p.indexOf("EXECUTE") >= 0 || p.indexOf("EXEC") >= 0
+                || p.indexOf("TRUNCATE") >= 0 || p.indexOf("INTO") >= 0
+                || p.indexOf("DECLARE") >= 0 || p.indexOf("MASTER") >= 0
+                ) {
+            return false;
+        }
+        if (p.indexOf("SELECT") >= 0 && p.indexOf("LIMIT") >= 0) {
+            //必须使用LIMIT
+            return true;
+        }
+        return false;
+    }
+
     /*
     *
     * */

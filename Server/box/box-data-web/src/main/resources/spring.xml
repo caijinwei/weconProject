@@ -16,7 +16,7 @@
 
     <!-- 框架配置 -->
     <bean id="config" class="com.wecon.restful.core.Config">
-        <property name="signKey" value="5cee621329f24e5cbdc43daa959ce9a1"/>
+        <property name="signKey" value="f1cd9351930d4e589922edbcf3b09a7c"/>
     </bean>
     <bean id="authcom" class="com.wecon.restful.authcompany.AuthComHelper">
         <property name="comMap">
