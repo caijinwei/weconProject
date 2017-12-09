@@ -32,4 +32,5 @@ public class Device {
 	public Timestamp create_date;
 	public Timestamp update_date;
 	public List<PlcInfo> plcInfo;
+	public int max_his_data_count;
 }

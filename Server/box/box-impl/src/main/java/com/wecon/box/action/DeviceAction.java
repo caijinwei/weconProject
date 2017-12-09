@@ -10,6 +10,7 @@ import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
 import com.wecon.box.filter.*;
 import com.wecon.box.util.DbLogUtil;
+import com.wecon.box.util.DeviceUseQuerier;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
@@ -78,9 +79,11 @@ public class DeviceAction {
         devBindUserApi.isRecord(device_id, AppContext.getSession().client.userId);
 
         Device device = deviceApi.getDevice(device_id);
+        DeviceUse deviceUse = deviceApi.getDeviceUse(device_id);
         JSONObject data = new JSONObject();
         data.put("device", device);
         data.put("userType", userType);
+        data.put("deviceUse",deviceUse);
         if (device == null || data.size() == 0) {
             throw new BusinessException(ErrorCodeOption.PiBoxDevice_IsNot_Found.key,
                     ErrorCodeOption.PiBoxDevice_IsNot_Found.value);
@@ -107,6 +110,15 @@ public class DeviceAction {
         return new Output();
     }
 
+    @Label("获取所有盒子行业应用的option")
+    @RequestMapping(value = "getDeviceUseOptions")
+    @WebApi(forceAuth = true, master = true, authority = {"1"})
+    public Output getDeviceUseOptions(){
+        JSONObject data=new JSONObject();
+        data.put("data",DeviceUseQuerier.allDeviceUses);
+        return new Output(data);
+    }
+
     /*
      * 测试 没有用户登入等验证 直接先传入user_id
      */
@@ -114,7 +126,11 @@ public class DeviceAction {
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping(value = "/boundBox")
     public Output boundBox(@RequestParam("machine_code") String machine_code, @RequestParam("password") String password,
-                           @RequestParam("name") String name, @RequestParam("acc_dir_id") Integer acc_dir_id) {
+                           @RequestParam("name") String name, @RequestParam("acc_dir_id") Integer acc_dir_id,
+                           @RequestParam("deviceUseCode")Integer deviceUseCode,
+                           @RequestParam("deviceUseName")String deviceUseName) {
+
+
         /*
          * 验证是否该盒子是否存在
 		 */
@@ -137,6 +153,27 @@ public class DeviceAction {
             throw new BusinessException(ErrorCodeOption.Device_Bind_NotDir.key, ErrorCodeOption.Device_Bind_NotDir.value);
         }
         deviceApi.boundDevice(device_id, name, acc_dir_id);
+
+
+         /*
+        * 行业类型保存
+        * */
+        if(CommonUtils.isNotNull(deviceUseCode)){
+            if(deviceUseCode!=999){
+                DeviceUse deviceUse=new DeviceUse();
+                deviceUse.useName=DeviceUseQuerier.allDeviceUsesMap.get(deviceUseCode);
+                deviceUse.useCode=deviceUseCode;
+                deviceUse.deviceId=device.device_id;
+                deviceApi.updateDeviceUse(deviceUse);
+            }else{
+                DeviceUse deviceUse=new DeviceUse();
+                deviceUse.otherUseName=deviceUseName;
+                deviceUse.useCode=deviceUseCode;
+                deviceUse.deviceId=device.device_id;
+                deviceApi.updateDeviceUse(deviceUse);
+            }
+        }
+
 
         // <editor-fold desc="操作日志">
         dbLogUtil.addOperateLog(OpTypeOption.BindDevice, ResTypeOption.Device, device_id,
@@ -502,6 +539,9 @@ public class DeviceAction {
     @RequestMapping("chgPiboxInFoName")
     public Output chgPiboxInFoName(@RequestParam("deviceId") Integer deviceId,
                                    @RequestParam("piBoxName") String piBoxName, @RequestParam("remark") String remark,
+                                   @RequestParam("deviceUseCode") Integer deviceUseCode,
+                                   @RequestParam("deviceUseName") String deviceUseName,
+                                   @RequestParam("maxHisDataCount")Integer maxHisDataCount,
                                    @RequestParam("map") String map) {
         Device device = deviceApi.getDevice(deviceId);
         Device oldDevice = device;
@@ -521,6 +561,25 @@ public class DeviceAction {
         if (CommonUtils.isNotNull(map)) {
             device.map = map;
         }
+        if(CommonUtils.isNotNull(maxHisDataCount)){
+            device.max_his_data_count=maxHisDataCount;
+        }
+        if(CommonUtils.isNotNull(deviceUseCode)){
+            if(deviceUseCode!=999){
+                DeviceUse deviceUse=new DeviceUse();
+                deviceUse.useName=DeviceUseQuerier.allDeviceUsesMap.get(deviceUseCode);
+                deviceUse.useCode=deviceUseCode;
+                deviceUse.deviceId=deviceId;
+                deviceApi.updateDeviceUse(deviceUse);
+            }else{
+                DeviceUse deviceUse=new DeviceUse();
+                deviceUse.otherUseName=deviceUseName;
+                deviceUse.useCode=deviceUseCode;
+                deviceUse.deviceId=deviceId;
+                deviceApi.updateDeviceUse(deviceUse);
+            }
+        }
+
         deviceApi.updateDevice(device);
         // <editor-fold desc="操作日志">
         dbLogUtil.updOperateLog(OpTypeOption.UpdateDeviceInfo, ResTypeOption.Device, deviceId, oldDevice, device);

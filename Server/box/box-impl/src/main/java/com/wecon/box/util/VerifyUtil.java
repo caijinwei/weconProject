@@ -108,7 +108,9 @@ public class VerifyUtil {
     }
 
     public static void main(String[] args) {
-        getVersionNum("v5.0.0.0");
+//        getVersionNum("v5.0.0.0");
+        System.out.println(isNumeric("1212"));
+
     }
 
     /*
@@ -142,6 +144,16 @@ public class VerifyUtil {
             // 相等 比较下一组值
         }
 
+        return true;
+    }
+
+
+    public static boolean isNumeric(String str){
+        Pattern pattern = Pattern.compile("[0-9]*");
+        Matcher isNum = pattern.matcher(str);
+        if( !isNum.matches() ){
+            return false;
+        }
         return true;
     }
 //    public static void main(String[] args){

@@ -11,6 +11,9 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      * 盒子基本信息展示
      * */
     $scope.onInit = function () {
+        $scope.getDeviceUseOptions();
+        $scope.$apply();
+
         $("#loadingModal").modal("hide");
         $scope.device_id = T.common.util.getParameter("device_id");
         $scope.device_name = T.common.util.getParameter("device_name");
@@ -26,6 +29,19 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         T.common.ajax.request("WeconBox", "baseInfoAction/showBaseInfo", params, function (data, code, msg) {
             if (code == 200) {
                 $scope.infoData = data.device;
+
+                //行业类型对象
+                var deviceUse = data.deviceUse;
+                if (deviceUse != null) {
+                    if (deviceUse.useCode == 999) {
+                        $("#deviceUse").val(deviceUse.useCode);
+                        $("#otherDeviceUseName").show();
+                        $scope.$apply();
+                        $("#otherDeviceUseName").val(deviceUse.otherUseName);
+                    }else{
+                        $("#deviceUse").val(deviceUse.useCode);
+                    }
+                }
 
                 //固件更新时候要用到
                 $scope.dev_model = data.device.dev_model;
@@ -91,6 +107,25 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             console.log("ajax error");
         });
     }
+
+    /*
+     * 展示行业应用的option
+     * */
+    $scope.getDeviceUseOptions = function () {
+        var parmas = {};
+        T.common.ajax.request("WeconBox", "baseInfoAction/getDeviceUseOptions", parmas, function (data, code, msg) {
+            if (code == 200) {
+                $scope.deviceUseOptions = data.data;
+                console.log("获取到的deviceUseOption的值是:", data.data);
+            }
+            else {
+                alert(code + "-" + msg);
+            }
+        }, function () {
+            console.log("ajax error");
+        });
+    }
+
     /*
      * --------------------------------------------------------通讯口配置------------------------------------------------------------------------------
      * */
@@ -390,8 +425,8 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         $scope.selectedPtype = "";
         $scope.selectedType = "";
 
-        $scope.portIfShow=0;
-        $scope.ethernetShow=0;
+        $scope.portIfShow = 0;
+        $scope.ethernetShow = 0;
 
         //清空 所有 form下的所有表单
         $("input[type!='hidden'][name!='device_id'][id!='port']", $('#addConfig')).each(function () {
@@ -481,6 +516,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         var remark = $("#remark").val();
         var map_a = $("#map_a").val();
         var map_o = $("#map_o").val();
+        var maxHisDataCount = $("#maxHisDataCount").val();
+        var regMaxHisCount=/^[1-9]{1}[0-9]{0,4}$/
+        if(!regMaxHisCount.test(maxHisDataCount)||maxHisDataCount>50000){
+            alert("历史数据最多保存条数设置错误,请输入1-50000");
+            return;
+        }
         if (map_a != "" || map_o != "") {
             if (isNaN(map_a) || isNaN(map_o)) {
                 alert("地图坐标格式错误");
@@ -497,11 +538,29 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 return;
             }
         }
+        /*
+         * 如果选择其他行业   去读输入框值
+         * */
+        var deviceUseCode = $("#deviceUse").val();
+        var deviceUseName = "";
+        if (deviceUseCode == 999) {
+            deviceUseName = $("#otherDeviceUseName").val();
+            if (deviceUseName == "" || deviceUseName == undefined) {
+                alert("其他行业参数未填写！");
+                return false;
+            }
+        } else {
+            deviceUseName = $("#deviceUse").text();
+        }
+
         var map = $("#map_a").val() + "," + $("#map_o").val();
         var params = {
             deviceId: device_id,
             piBoxName: piBoxName,
             remark: remark,
+            deviceUseCode: deviceUseCode,
+            deviceUseName: deviceUseName,
+            maxHisDataCount:maxHisDataCount,
             map: map
         }
         T.common.ajax.request("WeconBox", "baseInfoAction/chgPiboxInFoName", params, function (data, code, msg) {
@@ -555,8 +614,8 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         $("#port").val("COM1");
         $scope.selectedPort = "COM1";
         $scope.chgPort();
-        $scope.portIfShow=0;
-        $scope.ethernetShow=0;
+        $scope.portIfShow = 0;
+        $scope.ethernetShow = 0;
     };
     function clearForm(form) {
         $("input[type!='hidden'][name!='device_id']", form).each(function () {
@@ -1109,3 +1168,15 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         local.search($("#suggestId").val());
     }
 });
+
+/*
+ * 是否选择了其他行业;
+ *   是  展示input框
+ * */
+var isOtherOption = function () {
+    if ($("#deviceUse").val() == 999) {
+        $("#otherDeviceUseName").show();
+    } else {
+        $("#otherDeviceUseName").hide();
+    }
+}

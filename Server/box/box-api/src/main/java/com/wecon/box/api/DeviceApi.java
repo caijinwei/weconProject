@@ -1,6 +1,7 @@
 package com.wecon.box.api;
 
 import com.wecon.box.entity.Device;
+import com.wecon.box.entity.DeviceUse;
 import com.wecon.box.entity.Page;
 import com.wecon.box.filter.DeviceDir;
 import com.wecon.box.filter.DeviceFilter;
@@ -134,4 +135,14 @@ public interface DeviceApi {
     * 超管用户搜索
     * */
     public Page<DeviceDir> getAllDeviceByFilter(DeviceSearchFilter filter, Integer pageNum, Integer pageSize);
+
+    /*
+    * 添加或者修改 用户行业表
+    * */
+    public void updateDeviceUse(DeviceUse deviceUse);
+
+    /*
+    * 根据设备id获取用户行业表
+    * */
+    public DeviceUse getDeviceUse(long deviceId);
 }

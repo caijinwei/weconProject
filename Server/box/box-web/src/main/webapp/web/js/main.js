@@ -50,20 +50,20 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             });
 
         var ht = $(window).height();//获取浏览器窗口的整体高度；
-        $("#ifmain").height(ht-5);
+        $("#ifmain").height(ht - 5);
     }
     //右键添加菜单
-    function attachContext(selector,map) {
+    function attachContext(selector, map) {
         context.attach(selector, [{
             text: "地图定位",
-            href: 'web/html/box-map.html?selAlarm=0&map='+map,
-            target:'content_frame',
+            href: 'web/html/box-map.html?selAlarm=0&map=' + map,
+            target: 'content_frame',
             action: function () {
             }
-        },{
+        }, {
             text: "报警设备",
             href: 'web/html/box-map.html?selAlarm=1&map=' + map,
-            target:'content_frame',
+            target: 'content_frame',
             action: function () {
             }
         }
@@ -87,9 +87,27 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         if ($("#acc_dir_id").val() == "" || $("#machine_code").val() == ""
             || $("#dev_password").val() == "" || $("#dev_name").val() == "") {
             alert("必填参数没有填写完整");
-            return;
+            return false;
         }
+
+        /*
+         * 如果选择其他行业   去读输入框值
+         * */
+        var deviceUseCode = $("#deviceUse").val();
+        var deviceUseName = "";
+        if (deviceUseCode == 999) {
+            deviceUseName = $("#otherDeviceUseName").val();
+            if (deviceUseName == "" || deviceUseName == undefined) {
+                alert("其他行业参数未填写！");
+                return false;
+            }
+        } else {
+            deviceUseName = $("#deviceUse").text();
+        }
+
         var params = {
+            deviceUseCode: deviceUseCode,
+            deviceUseName: deviceUseName,
             acc_dir_id: $("#acc_dir_id").val(),
             machine_code: $("#machine_code").val(),
             name: $("#dev_name").val(),
@@ -142,10 +160,10 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                         $scope.showSearchItems(searchBoxIds);
                     });
                     $("#side_nav li :gt(1) a").each(
-                        function (){
-                            var id=$(this).prop("id");
-                            var map=$(this).attr("map");
-                            attachContext("#"+id,map);
+                        function () {
+                            var id = $(this).prop("id");
+                            var map = $(this).attr("map");
+                            attachContext("#" + id, map);
                         });
 
                 } else {
@@ -193,6 +211,8 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      * 绑定PIBox表单中展示几个分组
      */
     $scope.getRefList = function () {
+        $("#otherDeviceUseName").hide();
+        $scope.getDeviceUseOptions();
         var params = {
             type: "0"
         }
@@ -240,6 +260,23 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 console.log("ajax error");
             });
 
+    }
+
+    /*
+     * 展示行业应用的option
+     * */
+    $scope.getDeviceUseOptions = function () {
+        var parmas = {};
+        T.common.ajax.request("WeconBox", "baseInfoAction/getDeviceUseOptions", parmas, function (data, code, msg) {
+            if (code == 200) {
+                $scope.deviceUseOptions = data.data;
+            }
+            else {
+                alert(code + "-" + msg);
+            }
+        }, function () {
+            console.log("ajax error");
+        });
     }
 
     /**
@@ -353,5 +390,17 @@ function reloadBoxList() {
     var appElement = document.querySelector('[ng-controller=infoController]');
     var $scope = angular.element(appElement).scope();
     $scope.searchbox();
+}
+
+/*
+ * 是否选择了其他行业;
+ *   是  展示input框
+ * */
+var isOtherOption = function () {
+    if ($("#deviceUse").val() == 999) {
+        $("#otherDeviceUseName").show();
+    } else {
+        $("#otherDeviceUseName").hide();
+    }
 }
 

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<use-list>
+
+    <use useCode="1" useName="智能家居"></use>
+    <use useCode="2" useName="车联网"></use>
+    <use useCode="3" useName="智能安防"></use>
+    <use useCode="4" useName="智能电网"></use>
+    <use useCode="5" useName="智能交通"></use>
+    <use useCode="6" useName="智能工业"></use>
+    <use useCode="7" useName="智能农业"></use>
+    <use useCode="8" useName="智能物流"></use>
+    <use useCode="9" useName="人工智能"></use>
+    <use useCode="10" useName="节能环保市场"></use>
+
+
+
+    <use useCode="999" useName="其他行业"></use>
+</use-list>
