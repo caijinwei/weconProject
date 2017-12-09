@@ -11,14 +11,11 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      * 盒子基本信息展示
      * */
     $scope.onInit = function () {
-        $scope.getDeviceUseOptions();
-        $scope.$apply();
-
         $("#loadingModal").modal("hide");
         $scope.device_id = T.common.util.getParameter("device_id");
         $scope.device_name = T.common.util.getParameter("device_name");
         $("#loadingModal").modal("show");
-
+        $scope.showBaseInfo();
         $scope.showPlcSetDefault();
         $("#loadingModal").modal("hide");
         $("#map_body").css("display", "none");
@@ -28,8 +25,9 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         var params = {device_id: $scope.device_id};
         T.common.ajax.request("WeconBox", "baseInfoAction/showBaseInfo", params, function (data, code, msg) {
             if (code == 200) {
+                $scope.deviceUseOptions = data.deviceUseOptions;
+                $scope.$apply();
                 $scope.infoData = data.device;
-
                 //行业类型对象
                 var deviceUse = data.deviceUse;
                 if (deviceUse != null) {
@@ -111,21 +109,20 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     /*
      * 展示行业应用的option
      * */
-    $scope.getDeviceUseOptions = function () {
-        var parmas = {};
-        T.common.ajax.request("WeconBox", "baseInfoAction/getDeviceUseOptions", parmas, function (data, code, msg) {
-            if (code == 200) {
-                $scope.deviceUseOptions = data.data;
-                $scope.showBaseInfo();
-                console.log("获取到的deviceUseOption的值是:", data.data);
-            }
-            else {
-                alert(code + "-" + msg);
-            }
-        }, function () {
-            console.log("ajax error");
-        });
-    }
+    //$scope.getDeviceUseOptions = function () {
+    //    var parmas = {};
+    //    T.common.ajax.request("WeconBox", "baseInfoAction/getDeviceUseOptions", parmas, function (data, code, msg) {
+    //        if (code == 200) {
+    //            $scope.deviceUseOptions = data.data;
+    //            console.log("获取到的deviceUseOption的值是:", data.data);
+    //        }
+    //        else {
+    //            alert(code + "-" + msg);
+    //        }
+    //    }, function () {
+    //        console.log("ajax error");
+    //    });
+    //}
 
     /*
      * --------------------------------------------------------通讯口配置------------------------------------------------------------------------------

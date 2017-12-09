@@ -9,6 +9,7 @@ import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
 import com.wecon.box.util.DbLogUtil;
+import com.wecon.box.util.DeviceUseQuerier;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
 import com.wecon.restful.core.BusinessException;
@@ -59,6 +60,7 @@ public class AccountDirAction {
         }
         JSONObject data = new JSONObject();
         data.put("list", list);
+        data.put("deviceUseOptions", DeviceUseQuerier.allDeviceUses);
         return new Output(data);
     }
 

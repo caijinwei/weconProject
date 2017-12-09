@@ -212,13 +212,13 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      */
     $scope.getRefList = function () {
         $("#otherDeviceUseName").hide();
-        $scope.getDeviceUseOptions();
         var params = {
             type: "0"
         }
         T.common.ajax.request("WeconBox", "userdiract/getuserdirs", params,
             function (data, code, msg) {
                 if (code == 200) {
+                    $scope.deviceUseOptions=data.deviceUseOptions;
                     $scope.refList = data.list;
                     $scope.$apply();
                 } else {
@@ -262,22 +262,22 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 
     }
 
-    /*
-     * 展示行业应用的option
-     * */
-    $scope.getDeviceUseOptions = function () {
-        var parmas = {};
-        T.common.ajax.request("WeconBox", "baseInfoAction/getDeviceUseOptions", parmas, function (data, code, msg) {
-            if (code == 200) {
-                $scope.deviceUseOptions = data.data;
-            }
-            else {
-                alert(code + "-" + msg);
-            }
-        }, function () {
-            console.log("ajax error");
-        });
-    }
+    ///*
+    // * 展示行业应用的option
+    // * */
+    //$scope.getDeviceUseOptions = function () {
+    //    var parmas = {};
+    //    T.common.ajax.request("WeconBox", "baseInfoAction/getDeviceUseOptions", parmas, function (data, code, msg) {
+    //        if (code == 200) {
+    //            $scope.deviceUseOptions = data.data;
+    //        }
+    //        else {
+    //            alert(code + "-" + msg);
+    //        }
+    //    }, function () {
+    //        console.log("ajax error");
+    //    });
+    //}
 
     /**
      * 搜索盒子

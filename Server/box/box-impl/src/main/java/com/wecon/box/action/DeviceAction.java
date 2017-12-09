@@ -81,6 +81,7 @@ public class DeviceAction {
         Device device = deviceApi.getDevice(device_id);
         DeviceUse deviceUse = deviceApi.getDeviceUse(device_id);
         JSONObject data = new JSONObject();
+        data.put("deviceUseOptions",DeviceUseQuerier.allDeviceUses);
         data.put("device", device);
         data.put("userType", userType);
         data.put("deviceUse",deviceUse);
@@ -110,14 +111,15 @@ public class DeviceAction {
         return new Output();
     }
 
-    @Label("获取所有盒子行业应用的option")
-    @RequestMapping(value = "getDeviceUseOptions")
-    @WebApi(forceAuth = true, master = true, authority = {"1"})
-    public Output getDeviceUseOptions(){
-        JSONObject data=new JSONObject();
-        data.put("data",DeviceUseQuerier.allDeviceUses);
-        return new Output(data);
-    }
+//    @Label("获取所有盒子行业应用的option")
+//    @RequestMapping(value = "getDeviceUseOptions")
+//    @WebApi(forceAuth = true, master = true, authority = {"1"})
+//    public Output getDeviceUseOptions(){
+//        JSONObject data=new JSONObject();
+//        data.put("deviceUseOptions",DeviceUseQuerier.allDeviceUses);
+//        data.put("data",DeviceUseQuerier.allDeviceUses);
+//        return new Output(data);
+//    }
 
     /*
      * 测试 没有用户登入等验证 直接先传入user_id
