@@ -65,7 +65,7 @@ public class SigninAction extends UserBaseAction {
         }
 
         int expire = ConstKey.SESSION_EXPIRE_TIME;
-        if (param.isremeber == 1) {
+        if (param.isremeber != null && param.isremeber == 1) {
             expire = 3600 * 24 * 30;
         }
         String sid = accountApi.createSession(user, client.appid, client.fuid, client.ip, client.timestamp, expire);

@@ -19,7 +19,6 @@ public class SigninParam {
     @Length(max = 32, min = 32)
     public String password;
     @Label("是否记住登录状态30天")
-    @NotNull
     @Range(min = 0, max = 1)
     public Integer isremeber;
 
