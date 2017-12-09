@@ -146,9 +146,15 @@ public class LogAccountImpl implements LogAccountApi {
 
     @Override
     public JSONArray getSelData(String sqlStr) {
-        if(VerifyUtil.isSelStr(sqlStr)){
-            return jdbcTemplate.queryForObject(sqlStr,new DefaultSqlMapper());
-        }else{
+        if (VerifyUtil.isSelStr(sqlStr)) {
+            List<JSONObject> list = jdbcTemplate.query(sqlStr,
+                    new DefaultSqlMapper2());
+            JSONArray jsonArray = new JSONArray();
+            for (JSONObject it : list) {
+                jsonArray.add(it);
+            }
+            return jsonArray;
+        } else {
             throw new BusinessException(ErrorCodeOption.SqlStrIsLllegality.key,
                     ErrorCodeOption.SqlStrIsLllegality.value);
         }
@@ -183,6 +189,18 @@ public class LogAccountImpl implements LogAccountApi {
         }
     }
 
+    public static final class DefaultSqlMapper2 implements RowMapper<JSONObject> {
+
+        @Override
+        public JSONObject mapRow(ResultSet rs, int i) throws SQLException {
+            //创建一个JSONArray对象
+            JSONObject jsonObject = new JSONObject();
+            ResultSetMetaData rsmd = rs.getMetaData();
+            getType(rs, rsmd, jsonObject);
+            return jsonObject;
+        }
+    }
+
     public static final class DefaultSqlMapper implements RowMapper<JSONArray> {
 
         @Override
@@ -191,6 +209,14 @@ public class LogAccountImpl implements LogAccountApi {
             JSONArray jsonArray = new JSONArray();
             //获得ResultSetMeataData对象
             ResultSetMetaData rsmd = rs.getMetaData();
+            if (rs.first()) {
+                //定义json对象
+                JSONObject obj = new JSONObject();
+                //判断数据类型&获取value
+                getType(rs, rsmd, obj);
+                //将对象添加到JSONArray中
+                jsonArray.add(obj);
+            }
             while (rs.next()) {
                 //定义json对象
                 JSONObject obj = new JSONObject();
@@ -204,7 +230,7 @@ public class LogAccountImpl implements LogAccountApi {
     }
 
     private static void getType(ResultSet rs, ResultSetMetaData rsmd,
-                         JSONObject obj) throws SQLException {
+                                JSONObject obj) throws SQLException {
         int total_rows = rsmd.getColumnCount();
         for (int i = 0; i < total_rows; i++) {
             String columnName = rsmd.getColumnLabel(i + 1);

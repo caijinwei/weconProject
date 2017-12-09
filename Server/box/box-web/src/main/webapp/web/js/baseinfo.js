@@ -18,7 +18,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         $scope.device_id = T.common.util.getParameter("device_id");
         $scope.device_name = T.common.util.getParameter("device_name");
         $("#loadingModal").modal("show");
-        $scope.showBaseInfo();
+
         $scope.showPlcSetDefault();
         $("#loadingModal").modal("hide");
         $("#map_body").css("display", "none");
@@ -116,6 +116,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         T.common.ajax.request("WeconBox", "baseInfoAction/getDeviceUseOptions", parmas, function (data, code, msg) {
             if (code == 200) {
                 $scope.deviceUseOptions = data.data;
+                $scope.showBaseInfo();
                 console.log("获取到的deviceUseOption的值是:", data.data);
             }
             else {
