@@ -90,6 +90,21 @@
         </property>
     </bean>
 
+    <bean id="springContextHolder" class="com.wecon.box.util.SpringContextHolder"
+          lazy-init="false" />
+
+    <websocket:handlers allowed-origins="*">
+        <websocket:mapping handler="wsTestHandler" path="/wstest-websocket"/>
+        <websocket:mapping handler="actDataHandler" path="/actdata-websocket"/>
+
+        <websocket:handshake-interceptors>
+            <bean class="com.wecon.restful.core.WsHandShakeInterceptor"/>
+        </websocket:handshake-interceptors>
+        <websocket:sockjs/>
+    </websocket:handlers>
+    <bean id="wsTestHandler" class="com.wecon.box.data.websocket.WsTestHandler" />
+    <bean id="actDataHandler" class="com.wecon.box.data.websocket.ActDataHandler"/>
+
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/**"/>
