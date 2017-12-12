@@ -80,21 +80,40 @@ appModule
 					 */
 					$scope.getAlarmGrade = function() {
 						var params = {};
-						T.common.ajax.request("WeconBox",
-								"alarmDataAction/getAlarmGrade", params, function(
-										data, code, msg) {
-									if (code == 200) {
-										$scope.alarmGrade = data.alarmGradeOption;
-										$scope.$apply();
-										$scope.datatype();
-									} else {
-										alert(code + "-" + msg);
-									}
-								}, function() {
-									console.log("ajax error");
-								});
+						T.common.ajax
+								.request(
+										"WeconBox",
+										"alarmDataAction/getAlarmGrade",
+										params,
+										function(data, code, msg) {
+											if (code == 200) {
+												$scope.alarmGrade = data.alarmGradeOption;
+												$scope.$apply();
+												$scope.datatype();
+											} else {
+												alert(code + "-" + msg);
+											}
+										}, function() {
+											console.log("ajax error");
+										});
 
 					}
+					$("#GradeSelect")
+							.change(
+									function() {
+										$scope
+												.alarm_submit(
+														$scope.paginationConf_current.currentPage,
+														$scope.paginationConf_current.itemsPerPage);
+									});
+					$("#EventSelect")
+							.change(
+									function() {
+										$scope
+												.alarm_submit(
+														$scope.paginationConf_current.currentPage,
+														$scope.paginationConf_current.itemsPerPage);
+									});
 
 					/**
 					 * 提交当前报警接口请求
@@ -104,6 +123,8 @@ appModule
 						if (pageIndex == 0)
 							pageIndex = 1;
 						var params = {
+							grade_id : $("#GradeSelect").val(),
+							event_id : $("#EventSelect").val(),
 							device_id : $scope.deviceid,
 							state : 1,
 							pageIndex : pageIndex,
@@ -152,6 +173,8 @@ appModule
 							pageIndex = 1;
 
 						var params = {
+							grade_id : -1,
+							event_id : -1,
 							alarm_cfg_id : $("#alarmcfgid").val(),
 							state : 2,
 							name : $("#alarmcfgname").val(),
@@ -402,8 +425,9 @@ appModule
 															alarmfo.text);
 													$('#selectgroup').val(
 															alarmfo.dirId);
-													$('#gradeid').val(
-															alarmfo.alarm_level);
+													$('#gradeid')
+															.val(
+																	alarmfo.alarm_level);
 
 													if ($("#addrtypeid").val() == 0) {// 如果是位地址隐藏
 														$('#datadigitid').css(
@@ -1047,7 +1071,7 @@ appModule
 									});
 
 					/**
-					 * 更加组ID获取报警配置
+					 * 更新组ID获取报警配置
 					 */
 					$scope.showAlarmCfg = function(pageIndex, pageSize) {
 						if (pageIndex == 0)
@@ -1859,6 +1883,8 @@ appModule
 							var pageIndex = $scope.paginationConf_current.currentPage;
 							pageIndex = 0 == pageIndex ? 1 : pageIndex;
 							var pageSize = $scope.paginationConf_current.itemsPerPage;
+							var gradeid = $("#GradeSelect").val();
+							var eventid = $("#EventSelect").val();
 							myform.innerHTML = '<input type="hidden" name="pageIndex" value="'
 									+ pageIndex
 									+ '"/>'
@@ -1867,6 +1893,12 @@ appModule
 									+ '"/>'
 									+ '<input type="hidden" name="device_id" value="'
 									+ device_id
+									+ '"/>'
+									+ '<input type="hidden" name="grade_id" value="'
+									+ gradeid
+									+ '"/>'
+									+ '<input type="hidden" name="event_id" value="'
+									+ eventid
 									+ '"/>'
 									+ '<input type="hidden" name="state" value="'
 									+ state + '"/>'
@@ -1898,6 +1930,12 @@ appModule
 									+ '"/>'
 									+ '<input type="hidden" name="device_id" value="'
 									+ device_id
+									+ '"/>'
+									+ '<input type="hidden" name="grade_id" value="'
+									+ -1
+									+ '"/>'
+									+ '<input type="hidden" name="event_id" value="'
+									+ -1
 									+ '"/>'
 									+ '<input type="hidden" name="state" value="'
 									+ state + '"/>'

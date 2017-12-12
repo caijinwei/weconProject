@@ -54,8 +54,8 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 	@Override
 	public boolean updateAlarmCfgData(AlarmCfgData alarmCfgData) {
 		String sql = "update alarm_cfg_data SET `value`=?,create_date=?,state=?,alarm_type=? where alarm_cfg_id=? and monitor_time=?";
-		jdbcTemplate.update(sql, new Object[] { alarmCfgData.value, alarmCfgData.create_date, alarmCfgData.state,alarmCfgData.alarm_type,
-				alarmCfgData.alarm_cfg_id, alarmCfgData.monitor_time });
+		jdbcTemplate.update(sql, new Object[] { alarmCfgData.value, alarmCfgData.create_date, alarmCfgData.state,
+				alarmCfgData.alarm_type, alarmCfgData.alarm_cfg_id, alarmCfgData.monitor_time });
 
 		return true;
 	}
@@ -175,7 +175,14 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 		if (!CommonUtils.isNullOrEmpty(filter.name)) {
 			condition.append(" and ac.name like ? ");
 			params.add("%" + filter.name + "%");
-
+		}
+		if (filter.event_id > -1) {
+			condition.append(" and acd.alarm_type = ? ");
+			params.add(filter.event_id);
+		}
+		if (filter.grade_id > -1) {
+			condition.append(" and ac.alarm_level = ? ");
+			params.add(filter.grade_id);
 		}
 		// 操作时间起
 		if (!CommonUtils.isNullOrEmpty(filter.start_date)) {
@@ -241,6 +248,14 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 			condition.append(" and ac.name like ? ");
 			params.add("%" + filter.name + "%");
 
+		}
+		if (filter.event_id > -1) {
+			condition.append(" and acd.alarm_type = ? ");
+			params.add(filter.event_id);
+		}
+		if (filter.grade_id > -1) {
+			condition.append(" and ac.alarm_level = ? ");
+			params.add(filter.grade_id);
 		}
 		// 操作时间起
 		if (!CommonUtils.isNullOrEmpty(filter.start_date)) {
@@ -367,8 +382,6 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 
 	}
 
-
-
 	public static final class DefaultAlarmCfgDataRowMapper implements RowMapper<AlarmCfgData> {
 
 		@Override
@@ -379,7 +392,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 			model.value = rs.getString("value");
 			model.create_date = rs.getTimestamp("create_date");
 			model.state = rs.getInt("state");
-			model.alarm_type=rs.getInt("alarm_type");
+			model.alarm_type = rs.getInt("alarm_type");
 
 			return model;
 		}
@@ -398,7 +411,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 			model.alarm_level = rs.getInt("alarm_level");
 			model.name = rs.getString("name");
 			model.text = rs.getString("text");
-			model.alarm_type=rs.getInt("alarm_type");
+			model.alarm_type = rs.getInt("alarm_type");
 
 			return model;
 		}

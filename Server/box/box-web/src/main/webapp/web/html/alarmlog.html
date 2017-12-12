@@ -42,14 +42,28 @@
 				ng-click="hisalarm_submit(paginationConf_history.currentPage,paginationConf_history.itemsPerPage)">历史报警</a></li>
 			<li><a href="#alarm-record" data-toggle="tab" ng-cloak
 				ng-if="accounttype==1 && deviceid>0" ng-click="alarm_group()">报警登记</a></li>
-			<!-- <li><a href="#alarm-global-setting" data-toggle="tab" ng-cloak
-				ng-if="accounttype==1 && deviceid>0">全局设置</a></li> -->
 		</ul>
 		<form method="post" id="myform"></form>
 		<div class="tab-content">
 			<div class="tab-pane active" id="current-alarm">
 				<div class="container-fluid" style="margin-top: 20px;">
 					<div class="row">
+						<div class="col-md-2">
+							<select id="GradeSelect" class=" form-control form-inline">
+								<option value="-1">全部</option>
+								<option value="1">一般报警</option>
+								<option value="2">严重报警</option>
+								<option value="3">特别严重报警</option>
+							</select>
+						</div>
+						<div class="col-md-2">
+							<select id="EventSelect" class=" form-control form-inline">
+								<option value="-1">全部</option>
+								<option value="0">恢复</option>
+								<option value="1">触发</option>
+
+							</select>
+						</div>
 						<div class="btn-group" style="margin-left: 20px;">
 							<button type="button" class="btn btn-primary" data-toggle="modal"
 								ng-click="exportExcel(1);">
@@ -71,9 +85,10 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr ng-repeat="x in alarmcurrents"  ng-style="{color: x.alarm_level == '1' ? 'blue' : x.alarm_level == '2' ? 'orange':'red'}">
+							<tr ng-repeat="x in alarmcurrents"
+								ng-style="{color: x.alarm_level == '1' ? 'blue' : x.alarm_level == '2' ? 'orange':'red'}">
 								<td>{{x.name}}</td>
-								<td  >{{x.alarm_level==1?'一般报警':x.alarm_level==2?'严重报警':'特别严重报警'}}</td>
+								<td>{{x.alarm_level==1?'一般报警':x.alarm_level==2?'严重报警':'特别严重报警'}}</td>
 								<td>{{x.text}}</td>
 								<td>{{x.value}}</td>
 								<td>{{x.alarm_type==0?"恢复":"触发"}}</td>
@@ -441,8 +456,7 @@
 									</div>
 									<div class="row col-md-11 col-md-offset-1"
 										style="margin: 10px 0;">
-										<span class="col-md-3">报警级别</span> 
-										<select class="col-md-9"
+										<span class="col-md-3">报警级别</span> <select class="col-md-9"
 											id="gradeid" style="height: 30px;">
 											<option ng-repeat="x in alarmGrade" value="{{x.value}}">{{x.text}}</option>
 										</select>

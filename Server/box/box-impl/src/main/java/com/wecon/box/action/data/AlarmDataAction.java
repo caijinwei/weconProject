@@ -101,6 +101,12 @@ public class AlarmDataAction {
 		if (!CommonUtils.isNullOrEmpty(alarmDataParam.state)) {
 			filter.state = Integer.parseInt(alarmDataParam.state);
 		}
+		if (!CommonUtils.isNullOrEmpty(alarmDataParam.grade_id)) {
+			filter.grade_id = Integer.parseInt(alarmDataParam.grade_id);
+		}
+		if (!CommonUtils.isNullOrEmpty(alarmDataParam.event_id)) {
+			filter.event_id = Integer.parseInt(alarmDataParam.event_id);
+		}
 
 		filter.account_id = client.userId;
 
@@ -193,6 +199,7 @@ public class AlarmDataAction {
 		return new Output();
 
 	}
+
 	/**
 	 * 获取报警级别
 	 * 
@@ -204,7 +211,7 @@ public class AlarmDataAction {
 	public Output getAlarmGrade() {
 		JSONObject json = new JSONObject();
 		json.put("alarmGradeOption", optionService.getAlarmGradeOptionOptions());
-		System.out.println("显示报警级别=="+json.toString());
+		System.out.println("显示报警级别==" + json.toString());
 
 		return new Output(json);
 
@@ -614,6 +621,8 @@ public class AlarmDataAction {
 		AlarmCfgDataFilter filter = new AlarmCfgDataFilter();
 		filter.account_id = client.userId;
 		filter.state = 1;
+		filter.grade_id = -1;
+		filter.event_id = -1;
 		Page<AlarmCfgDataAlarmCfg> alarmCfgDataAlarmCfgList = alarmCfgDataApi.getRealHisCfgDataList(filter, -1, -1);
 		JSONObject json = new JSONObject();
 		// 当前报警条目

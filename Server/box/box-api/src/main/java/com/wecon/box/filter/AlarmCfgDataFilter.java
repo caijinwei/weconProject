@@ -14,6 +14,8 @@ public class AlarmCfgDataFilter {
 	public String name;//配置中的名称
 	public long account_id;
 	public long device_id;
+	public int grade_id;
+	public int event_id;
 	public String start_date;// 开始时间
 	public String end_date;// 结束时间
 }

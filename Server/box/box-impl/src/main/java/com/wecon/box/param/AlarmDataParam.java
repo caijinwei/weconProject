@@ -13,6 +13,10 @@ public class AlarmDataParam {
 	public String device_id;
 	@Label("alarm_cfg_id")
 	public String alarm_cfg_id;
+	@Label("级别")
+	public String grade_id;
+	@Label("事件")
+	public String event_id;
 	@Label("状态")
 	public String state;
 	@Label("名称")
@@ -56,6 +60,14 @@ public class AlarmDataParam {
 
 	public void setPageSize(Integer pageSize) {
 		this.pageSize = pageSize;
+	}
+
+	public void setGrade_id(String grade_id) {
+		this.grade_id = grade_id;
+	}
+
+	public void setEvent_id(String event_id) {
+		this.event_id = event_id;
 	}
 
 }
