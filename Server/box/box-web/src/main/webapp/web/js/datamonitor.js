@@ -62,6 +62,7 @@ appModule
 					var actgroupId;// 分组id
 					var lockReconnect = false;// 避免重复连接
 					var inivalize = 0;
+					var isclick=false;//下发数据是否点击确定键
 
 					$scope.createWebSocket = function() {
 						try {
@@ -118,10 +119,17 @@ appModule
 
 									angular.forEach($scope.actDatas, function(
 											data, index, array) {
+
 										$scope.editable_name(data, 0);
-										$scope.editable_value(data, 0);
+										if (data.addr_type != 0) {
+											$scope.editable_value(data, 0);
+										} else {
+											$scope.createSwitchState(data);
+										}
+
 									});
 									$("i[name='act_i_state']").tooltip();
+
 								}
 
 							} else {
@@ -136,19 +144,27 @@ appModule
 											$scope.paginationConf.itemsPerPage,
 											actgroupId);
 								} else {
-									inivalize = 0;
-									alert("数据下发盒子成功！");
+									if (inivalize == 1) {
+										alert("数据下发盒子成功！");
+									}
+									
+
 								}
+								inivalize = 0;
+								isclick=false;
 
 								// $scope.ws_send(
 								// $scope.paginationConf.currentPage,
 								// $scope.paginationConf.itemsPerPage,
 								// actgroupId);
 							}
+
 							// 如果获取到消息，心跳检测重置
 							// 拿到任何消息都说明当前连接是正常的
 							heartCheck.reset().start();
+
 						}
+
 					}
 
 					$scope.reconnect = function() {
@@ -212,7 +228,7 @@ appModule
 					}
 					// 下发数据到盒子
 					$scope.putMess = function(model, value) {
-
+                
 						var params = {
 							markid : 1,
 							value : value,
@@ -221,6 +237,71 @@ appModule
 						ws.send(angular.toJson(params));
 
 					}
+					// 位地址初始化控件
+					$scope.createSwitchState = function(data) {
+						$swithId = $('#mySwitch_' + data.id + ' ' + 'input');
+						$swithId.bootstrapSwitch({
+							onText : "ON",
+							offText : "OFF",
+							onColor : "success",
+							offColor : "danger",
+							size : "small",
+							state : data.re_value == 1 ? true : false
+						}).on(
+								"switchChange.bootstrapSwitch",
+								function(event, state) {
+
+									var model = JSON.parse($(this).attr(
+											"data-bit"));
+
+									if (model.box_state != 1) {
+										alert("检查盒子是否在线！");
+										if (state != false) {
+											$(this).bootstrapSwitch('state',
+													false, true);
+										}
+										if (state != true) {
+											$(this).bootstrapSwitch('state',
+													true, true);
+										}
+										return false;
+
+									} else if (model.state != 0) {
+										alert("条目未下发！");
+										if (state != false) {
+											$(this).bootstrapSwitch('state',
+													false, true);
+										}
+										if (state != true) {
+											$(this).bootstrapSwitch('state',
+													true, true);
+										}
+										return false;
+									} else if (model.re_state != 1) {
+										alert("检查监控点是否在线！");
+										if (state != false) {
+											$(this).bootstrapSwitch('state',
+													false, true);
+										}
+										if (state != true) {
+											$(this).bootstrapSwitch('state',
+													true, true);
+										}
+										return false;
+									}
+									var value = 0;
+									if (state) {
+										value = 1;
+									} else {
+										value = 0;
+									}
+									inivalize=2;
+									$scope.putMess(model, value);
+
+								});
+
+					}
+
 					// 复制监控点
 					$scope.copymonitor = function(model) {
 						$scope.monitorid = model.id;// 监控点id
@@ -518,8 +599,8 @@ appModule
 					$scope.editable_name = function(model, index) {
 						if (index == 1) {
 							inivalize = 1;
+							isclick=false;
 						}
-
 						$act_name = $('#act_name_' + model.id);
 						$act_name.editable({
 							type : "text", // 编辑框的类型。支持text|textarea|select|date|checklist等
@@ -542,14 +623,14 @@ appModule
 							inivalize = 0;
 						});
 					}
-
+					
 					$scope.editable_value = function(model, index) {
-
+                     
 						$act_value = $('#act_value_' + model.id);
 						if (index == 1) {
+							isclick=false;
 							inivalize = 1;
 						}
-
 						$act_value.editable({
 							type : "text",
 							title : "监控点数值",
@@ -577,7 +658,10 @@ appModule
 								}
 
 								$("#loadingModal").modal("show");
+								isclick=true;
+							console.log("isclick=="+isclick);
 								$scope.putMess(model, value);
+								
 							}
 
 						}).click(function() {
@@ -586,7 +670,11 @@ appModule
 							});
 						});
 						$act_value.on('hidden.bs.modal', function() {// 点击空白处的时候触发
-							inivalize = 0;
+							console.log("isclick33=="+isclick);
+							if(isclick==false){
+								inivalize = 0;
+							}
+							
 						});
 
 					}
@@ -710,32 +798,6 @@ appModule
 															minfo.main_addr);
 													$("#describeid").val(
 															minfo.describe);
-
-													if ($("#addrtypeid").val() == 0) {// 如果是位地址隐藏
-														$('#datadigitid').css(
-																'display',
-																'none');
-														$('#div_stringid').css(
-																'display',
-																'none');
-														$("#dataid").val("");
-														$("#decid").val("");
-														$("#stringid").val("");
-
-													} else {
-														$('#datadigitid').css(
-																'display',
-																'block');
-													}
-													if ($("#datatypeid").val() == 1000) {
-														$("#stringid").val(
-																minfo.num);
-													} else {
-														$("#dataid").val(
-																minfo.num);
-														$("#decid").val(
-																minfo.dec);
-													}
 
 												} else {
 													if (dealtype == 0) {
@@ -875,40 +937,9 @@ appModule
 																		'none');
 													}
 													$scope.$apply();
-													if (mtype == 0
-															|| mtype == 2) {
-														if ($("#addrtypeid")
-																.val() == 0) {// 如果是位地址隐藏
-															$('#divdatatypeid')
-																	.css(
-																			'display',
-																			'none');
-															$('#datadigitid')
-																	.css(
-																			'display',
-																			'none');
-															$('#div_stringid')
-																	.css(
-																			'display',
-																			'none');
 
-															$("#dataid")
-																	.val("");
-															$("#decid").val("");
-															$("#stringid").val(
-																	"");
-														} else {
-															$('#divdatatypeid')
-																	.css(
-																			'display',
-																			'block');
-															$('#datadigitid')
-																	.css(
-																			'display',
-																			'block');
-														}
+													if (mtype == 1) {
 
-													} else {
 														if (minfo.child_addr != null) {
 															$(
 																	'#child_registeraddr')
@@ -965,47 +996,6 @@ appModule
 																	.val(
 																			data.allAddr[0].addrkey);
 
-															if ($("#addrtypeid")
-																	.val() == 0) {// 如果是位地址隐藏
-																$(
-																		'#divdatatypeid')
-																		.css(
-																				'display',
-																				'none');
-																$(
-																		'#datadigitid')
-																		.css(
-																				'display',
-																				'none');
-																$(
-																		'#div_stringid')
-																		.css(
-																				'display',
-																				'none');
-															} else {
-																$(
-																		'#divdatatypeid')
-																		.css(
-																				'display',
-																				'block');
-																if ($(
-																		"#datatypeid")
-																		.val() == 1000) {
-																	$(
-																			'#div_stringid')
-																			.css(
-																					'display',
-																					'block');
-																} else {
-																	$(
-																			'#datadigitid')
-																			.css(
-																					'display',
-																					'block');
-																}
-
-															}
-
 															if ($scope.addrvalues != null) {
 																$("#registerid")
 																		.val(
@@ -1029,49 +1019,15 @@ appModule
 															$("#scaleid")
 																	.html(
 																			minfo.main_binary);
-
-															if ($("#addrtypeid")
-																	.val() == 0) {// 如果是位地址隐藏
-																$(
-																		'#divdatatypeid')
-																		.css(
-																				'display',
-																				'none');
-																$(
-																		'#datadigitid')
-																		.css(
-																				'display',
-																				'none');
-																$(
-																		'#div_stringid')
-																		.css(
-																				'display',
-																				'none');
-															} else {
-																$(
-																		'#divdatatypeid')
-																		.css(
-																				'display',
-																				'block');
-																if ($(
-																		"#datatypeid")
-																		.val() == 1000) {
-																	$(
-																			'#div_stringid')
-																			.css(
-																					'display',
-																					'block');
-																} else {
-																	$(
-																			'#datadigitid')
-																			.css(
-																					'display',
-																					'block');
-																}
-															}
+															$("#unitid")
+																	.html(
+																			minfo.ext_unit);
 
 														}
+
 													}
+													// 判断地址，相应的隐藏界面
+													$scope.initbit();
 												}
 
 											} else {
@@ -1082,25 +1038,48 @@ appModule
 										});
 
 					}
+					/**
+					 * 地址判断后的操作 0-添加 1-修改
+					 */
+					$scope.initbit = function() {
+
+						if ($("#addrtypeid").val() == 0) {// 如果是位地址隐藏
+							$('#divdatatypeid').css('display', 'none');
+							$('#datadigitid').css('display', 'none');
+							$('#div_stringid').css('display', 'none');
+							$('#div_unit').css('display', 'none');
+							$("#dataid").val("");
+							$("#decid").val("");
+							$("#unitid").val("");
+							$("#stringid").val("");
+						} else {
+							console.log("dsada=" + $("#datatypeid").val());
+							$('#divdatatypeid').css('display', 'block');
+							$('#div_unit').css('display', 'block');
+							if (mtype == 1) {
+								$("#unitid").val(minfo.ext_unit);
+							}
+
+							if ($("#datatypeid").val() == 1000) {
+								if (mtype == 1) {
+									$("#stringid").val(minfo.num);
+								}
+								$('#div_stringid').css('display', 'block');
+							} else {
+								if (mtype == 1) {
+									$("#dataid").val(minfo.num);
+									$("#decid").val(minfo.dec);
+								}
+								$('#datadigitid').css('display', 'block');
+							}
+						}
+
+					}
 					// 地址类型点击
 					$("#addrtypeid").change(function() {
 
 						$scope.changeaddrtype($("#addrtypeid").val());
-						if ($("#addrtypeid").val() == 0) {
-							$('#divdatatypeid').css('display', 'none');
-							$('#datadigitid').css('display', 'none');
-							$('#div_stringid').css('display', 'none');
-							$("#dataid").val("");
-							$("#decid").val("");
-							$("#stringid").val("");
-						} else {
-							$('#divdatatypeid').css('display', 'block');
-							if ($("#datatypeid").val() == 1000) {
-								$('#div_stringid').css('display', 'block');
-							} else {
-								$('#datadigitid').css('display', 'block');
-							}
-						}
+						$scope.initbit();
 					});
 					$scope.changeaddrtype = function(value) {
 						angular
@@ -1446,7 +1425,7 @@ appModule
 							return;
 						}
 						if ($("#nameid").val() == "" || plcId == ""
-							|| $("addrtypeid").val() == ""
+								|| $("addrtypeid").val() == ""
 								|| $("registerid").val() == "") {
 							alert("参数未配置完整！");
 							return;
@@ -1870,7 +1849,8 @@ appModule
 							data_type : "0",
 							batch : batchvalue,
 							increase : $("#increaseid").val(),
-							group_id : actgroupId
+							group_id : actgroupId,
+							unit : $("#unitid").val()
 
 						};
 						T.common.ajax

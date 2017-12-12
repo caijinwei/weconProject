@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.wecon.box.enums.AlarmGradeOption;
 import com.wecon.box.enums.DataTypeOption;
 
 /**
@@ -20,6 +21,13 @@ public class OptionUtil {
             options.add(createOption(it.getValue(), it.getKey()));
         }
         return options;
+    }
+    public JSONArray getAlarmGradeOptionOptions() {
+    	JSONArray options = new JSONArray();
+    	for (AlarmGradeOption it : AlarmGradeOption.values()) {
+    		options.add(createOption(it.getValue(), it.getKey()));
+    	}
+    	return options;
     }
 
     /**

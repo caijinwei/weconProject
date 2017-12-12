@@ -33,6 +33,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+
+import static org.hamcrest.CoreMatchers.endsWith;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -656,6 +659,7 @@ public class ActDataAction {
 				realHisCfg.addr = realHisCfgParam.addr;
 				realHisCfg.addr_type = realHisCfgParam.addr_type;
 				realHisCfg.data_id = realHisCfgParam.data_id;
+				realHisCfg.ext_unit=realHisCfgParam.unit;
 				if (realHisCfgParam.name.length() > 64) {
 					realHisCfg.name = realHisCfgParam.name.substring(0, 64);
 				} else {
@@ -738,6 +742,7 @@ public class ActDataAction {
 				realHisCfg.data_limit = realHisCfgParam.rang;
 				realHisCfg.digit_count = realHisCfgParam.digit_count;
 				realHisCfg.digit_binary = realHisCfgParam.digit_binary;
+				realHisCfg.ext_unit=realHisCfgParam.unit;
 				realHisCfg.state = 1;// 0：已同步给盒子1：新增配置2：更新配置3：删除配置，如果同步成功再做物理删除，同时需要删除监控点绑定和权限的分配，和其他相关数据
 				if (!CommonUtils.isNullOrEmpty(realHisCfgParam.describe)) {
 					if (realHisCfgParam.describe.length() > 64) {

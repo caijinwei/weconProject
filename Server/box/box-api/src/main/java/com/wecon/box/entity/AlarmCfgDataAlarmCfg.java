@@ -7,5 +7,6 @@ package com.wecon.box.entity;
 public class AlarmCfgDataAlarmCfg extends AlarmCfgData {
 	public String name;
 	public String text;
+	public int alarm_level;
 
 }

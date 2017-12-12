@@ -46,8 +46,7 @@
 				ng-if="accounttype==1 && deviceid>0">全局设置</a></li> -->
 
 		</ul>
-		<form method="post" id="myform">
-		</form>
+		<form method="post" id="myform"></form>
 		<div class="tab-content">
 			<!--原始数据-->
 			<div class="tab-pane active" id="original-data">
@@ -67,8 +66,8 @@
 						</div>
 						<div class="btn-group" style="margin-left: 20px;">
 							<button type="button" class="btn btn-primary" data-toggle="modal"
-									 ng-click="exportExcel();">
-								<span ></span> 导出Excel
+								ng-click="exportExcel();">
+								<span></span> 导出Excel
 							</button>
 						</div>
 					</div>
@@ -76,7 +75,8 @@
 						<div style="display: inline-block; margin-left: -15px;"
 							class="col-md-4">
 							<span class="col-md-3" style="height: 30px; line-height: 30px;">起始日期</span>
-							<div class="input-group date form_datetime col-md-9" data-link-field="dtp_input1">
+							<div class="input-group date form_datetime col-md-9"
+								data-link-field="dtp_input1">
 								<input id="startdateid" class="form-control" size="16"
 									type="text" value="" readonly> <span
 									class="input-group-addon"><span
@@ -89,7 +89,8 @@
 							style="float: left; display: inline-block; margin-left: 35px;"
 							class="col-md-4">
 							<span class="col-md-3" style="height: 30px; line-height: 30px;">结束日期</span>
-							<div class="input-group date form_datetime col-md-9" data-link-field="dtp_input1">
+							<div class="input-group date form_datetime col-md-9"
+								data-link-field="dtp_input1">
 								<input id="enddateid" class="form-control" size="16" type="text"
 									value="" readonly> <span class="input-group-addon"><span
 									class="glyphicon glyphicon-remove"></span></span> <span
@@ -174,6 +175,7 @@
 								<th>连接设备</th>
 								<th>数据类型</th>
 								<th>地址类型</th>
+								<th>单位</th>
 								<th>操作</th>
 							</tr>
 						</thead>
@@ -195,6 +197,7 @@
 								<td>{{x.condevice}}</td>
 								<td>{{x.data_value}}</td>
 								<td>{{x.rid}}</td>
+								<td>{{x.ext_unit}}</td>
 
 								<td><a href="#" title="编辑" data-toggle="modal"
 									data-target="#dataRecord" ng-cloak ng-if="accounttype==1"
@@ -256,7 +259,7 @@
 						<div class="container-fluid">
 							<div class="row col-md-11 col-md-offset-1"
 								style="margin: 10px 0;">
-								<span class="col-md-3">名称</span> <input id="nameid" type="text"
+								<span class="col-md-3">名&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称</span> <input id="nameid" type="text"
 									class="col-md-9" style="height: 30px; padding-left: 5px;"
 									placeholder="请输入少于50位的字符" maxlength="50" />
 							</div>
@@ -299,6 +302,13 @@
 
 							</div>
 							<div class="row col-md-11 col-md-offset-1"
+								style="margin: 10px 0;" id="div_unit">
+								<span class="col-md-3">单&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;位</span>
+								<input id="unitid" type="text" class="col-md-9"
+									style="height: 30px; padding-left: 5px;"
+									placeholder="请输入少于20位的字符" maxlength="20" />
+							</div>
+							<div class="row col-md-11 col-md-offset-1"
 								style="margin: 10px 0;" id="divdatatypeid">
 								<span class="col-md-3">数据格式</span> <select id="datatypeid"
 									class="col-md-9" style="height: 30px;">
@@ -329,7 +339,7 @@
 							</div>
 							<div class="row col-md-11 col-md-offset-1"
 								style="margin: 10px 0;">
-								<span class="col-md-3">描述</span> <input type="text"
+								<span class="col-md-3">描&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;述</span> <input type="text"
 									id="describeid" class="col-md-9"
 									style="height: 30px; padding-left: 5px;"
 									placeholder="请输入少于50位的字符" maxlength="50" />

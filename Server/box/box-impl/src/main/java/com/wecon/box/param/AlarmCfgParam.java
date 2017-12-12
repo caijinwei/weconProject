@@ -59,6 +59,9 @@ public class AlarmCfgParam {
 	public String digit_count;
 	@Label("进制")
 	public String digit_binary;
+	@Label("报警级别")
+	@NotNull
+	public int alarm_level;
 	
 
 	public void setDigit_binary(String digit_binary) {
@@ -132,5 +135,10 @@ public class AlarmCfgParam {
 	public void setText(String text) {
 		this.text = text;
 	}
+
+	public void setAlarm_level(int alarm_level) {
+		this.alarm_level = alarm_level;
+	}
+	
 
 }

@@ -52,6 +52,8 @@ public class RealHisCfgParam {
 	public int batch;
 	@Label("增量")
 	public String increase;
+	@Label("单位")
+	public String unit;
 
 	public void setBatch(int batch) {
 		this.batch = batch;
@@ -119,6 +121,10 @@ public class RealHisCfgParam {
 
 	public void setHis_cycle(int his_cycle) {
 		this.his_cycle = his_cycle;
+	}
+
+	public void setUnit(String unit) {
+		this.unit = unit;
 	}
 
 }

@@ -33,6 +33,7 @@ public class AlarmCfg {
 	public int state;
 	public int bind_state;// 1.绑定状态 0.解绑状态
 	public String rid;// 寄存器类型
+	public int alarm_level;//报警等级：1一般报警，2严重报警，3特别严重报警
 	public Timestamp create_date;
 	public Timestamp update_date;
 

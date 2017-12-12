@@ -287,32 +287,6 @@ appModule
 													$("#describeid").val(
 															minfo.describe);
 
-													if ($("#addrtypeid").val() == 0) {// 如果是位地址隐藏
-														$('#datadigitid').css(
-																'display',
-																'none');
-														$('#div_stringid').css(
-																'display',
-																'none');
-														$("#dataid").val("");
-														$("#decid").val("");
-														$("#stringid").val("");
-
-													} else {
-														$('#datadigitid').css(
-																'display',
-																'block');
-													}
-													if ($("#datatypeid").val() == 1000) {
-														$("#stringid").val(
-																minfo.num);
-													} else {
-														$("#dataid").val(
-																minfo.num);
-														$("#decid").val(
-																minfo.dec);
-													}
-
 												}
 												$scope.datatype();
 
@@ -430,43 +404,7 @@ appModule
 																		'none');
 													}
 													$scope.$apply();
-													if (mtype == 0) {
-														if ($("#addrtypeid")
-																.val() == 0) {// 如果是位地址隐藏
-															$('#divdatatypeid')
-																	.css(
-																			'display',
-																			'none');
-															$('#datadigitid')
-																	.css(
-																			'display',
-																			'none');
-															$('#div_stringid')
-																	.css(
-																			'display',
-																			'none');
-														} else {
-															$('#divdatatypeid')
-																	.css(
-																			'display',
-																			'block');
-															if ($("#datatypeid")
-																	.val() == 1000) {
-																$(
-																		'#div_stringid')
-																		.css(
-																				'display',
-																				'block');
-															} else {
-																$(
-																		'#datadigitid')
-																		.css(
-																				'display',
-																				'block');
-															}
-														}
-
-													} else {
+													if (mtype == 1) {
 														if (minfo.child_addr != null) {
 															$(
 																	'#child_registeraddr')
@@ -522,47 +460,6 @@ appModule
 															$("#addrtypeid")
 																	.val(
 																			data.allAddr[0].addrkey);
-
-															if ($("#addrtypeid")
-																	.val() == 0) {// 如果是位地址隐藏
-																$(
-																		'#divdatatypeid')
-																		.css(
-																				'display',
-																				'none');
-																$(
-																		'#datadigitid')
-																		.css(
-																				'display',
-																				'none');
-																$(
-																		'#div_stringid')
-																		.css(
-																				'display',
-																				'none');
-															} else {
-																$(
-																		'#divdatatypeid')
-																		.css(
-																				'display',
-																				'block');
-																if ($(
-																		"#datatypeid")
-																		.val() == 1000) {
-																	$(
-																			'#div_stringid')
-																			.css(
-																					'display',
-																					'block');
-																} else {
-																	$(
-																			'#datadigitid')
-																			.css(
-																					'display',
-																					'block');
-																}
-															}
-
 															if ($scope.addrvalues != null) {
 																$("#registerid")
 																		.val(
@@ -586,48 +483,10 @@ appModule
 															$("#scaleid")
 																	.html(
 																			minfo.main_binary);
-															if ($("#addrtypeid")
-																	.val() == 0) {// 如果是位地址隐藏
-																$(
-																		'#divdatatypeid')
-																		.css(
-																				'display',
-																				'none');
-																$(
-																		'#datadigitid')
-																		.css(
-																				'display',
-																				'none');
-																$(
-																		'#div_stringid')
-																		.css(
-																				'display',
-																				'none');
-															} else {
-																$(
-																		'#divdatatypeid')
-																		.css(
-																				'display',
-																				'block');
-																if ($(
-																		"#datatypeid")
-																		.val() == 1000) {
-																	$(
-																			'#div_stringid')
-																			.css(
-																					'display',
-																					'block');
-																} else {
-																	$(
-																			'#datadigitid')
-																			.css(
-																					'display',
-																					'block');
-																}
-															}
 
 														}
 													}
+													$scope.initbit();
 												}
 
 											} else {
@@ -639,24 +498,47 @@ appModule
 
 					}
 
+					/**
+					 * 地址判断后的操作
+					 */
+					$scope.initbit = function() {
+
+						if ($("#addrtypeid").val() == 0) {// 如果是位地址隐藏
+							$('#divdatatypeid').css('display', 'none');
+							$('#datadigitid').css('display', 'none');
+							$('#div_stringid').css('display', 'none');
+							$('#div_unit').css('display', 'none');
+							$("#dataid").val("");
+							$("#decid").val("");
+							$("#unitid").val("");
+							$("#stringid").val("");
+						} else {
+
+							$('#divdatatypeid').css('display', 'block');
+							$('#div_unit').css('display', 'block');
+							if (mtype == 1) {
+								$("#unitid").val(minfo.ext_unit);
+							}
+							if ($("#datatypeid").val() == 1000) {
+								if (mtype == 1) {
+									$("#stringid").val(minfo.num);
+								}
+								$('#div_stringid').css('display', 'block');
+							} else {
+								if (mtype == 1) {
+									$("#dataid").val(minfo.num);
+									$("#decid").val(minfo.dec);
+								}
+								$('#datadigitid').css('display', 'block');
+							}
+						}
+
+					}
 					// 地址类型点击
 					$("#addrtypeid").change(function() {
 
 						$scope.changeaddrtype($("#addrtypeid").val());
-						if ($("#addrtypeid").val() == 0) {
-							$('#divdatatypeid').css('display', 'none');
-							$('#datadigitid').css('display', 'none');
-							$('#div_stringid').css('display', 'none');
-							$("#dataid").val("");
-							$("#decid").val("");
-						} else {
-							$('#divdatatypeid').css('display', 'block');
-							if ($("#datatypeid").val() == 1000) {
-								$('#div_stringid').css('display', 'block');
-							} else {
-								$('#datadigitid').css('display', 'block');
-							}
-						}
+						$scope.initbit();
 					});
 					$scope.changeaddrtype = function(value) {
 						angular
@@ -1380,7 +1262,8 @@ appModule
 							describe : $("#describeid").val(),
 							digit_count : digs,
 							data_type : "1",
-							his_cycle : $("#hiscycleid").val()
+							his_cycle : $("#hiscycleid").val(),
+							unit : $("#unitid").val()
 						};
 
 						T.common.ajax

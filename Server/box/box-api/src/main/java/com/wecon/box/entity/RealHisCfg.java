@@ -23,6 +23,7 @@ public class RealHisCfg {
 	 * `CREATE_DATE`datetime DEFAULT NULL,
      * `UPDATE_DATE` datetime DEFAULT NULL, 
      * `bind_state` int(11) DEFAULT '1' COMMENT '1.绑定状态 0.解绑状态',
+     *  ext_unit 单位，只对于字地址可以填写，可不填
 	 */
 	public long id;
 	public long data_id;
@@ -42,6 +43,7 @@ public class RealHisCfg {
 	public int state;//状态:1-启用; 0-未启用
 	public int bind_state;//1.绑定状态 0.解绑状态
 	public String rid;//寄存器类型
+	public String ext_unit;//单位
 	public Timestamp create_date;
 	public Timestamp update_date;
 	

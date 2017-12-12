@@ -38,6 +38,7 @@ import com.wecon.box.filter.DevBindUserFilter;
 import com.wecon.box.param.AlarmCfgParam;
 import com.wecon.box.param.AlarmDataParam;
 import com.wecon.box.util.DbLogUtil;
+import com.wecon.box.util.OptionUtil;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
@@ -70,6 +71,8 @@ public class AlarmDataAction {
 	private DevBindUserApi devBindUserApi;
 	@Autowired
 	protected DbLogUtil dbLogUtil;
+	@Autowired
+	private OptionUtil optionService;
 
 	@WebApi(forceAuth = true, master = true)
 	@Description("获取当前/历史报警")
@@ -188,6 +191,22 @@ public class AlarmDataAction {
 					ErrorCodeOption.OnlyOperateOneselfGroup.value);
 		}
 		return new Output();
+
+	}
+	/**
+	 * 获取报警级别
+	 * 
+	 * @return
+	 */
+	@Description("获取报警级别")
+	@WebApi(forceAuth = true, master = true)
+	@RequestMapping(value = "/getAlarmGrade")
+	public Output getAlarmGrade() {
+		JSONObject json = new JSONObject();
+		json.put("alarmGradeOption", optionService.getAlarmGradeOptionOptions());
+		System.out.println("显示报警级别=="+json.toString());
+
+		return new Output(json);
 
 	}
 
@@ -398,6 +417,7 @@ public class AlarmDataAction {
 					alarmCfg.bind_state = 1;
 					alarmCfg.data_id = alarmCfgParam.data_id;
 					alarmCfg.plc_id = alarmCfgParam.plc_id;
+					alarmCfg.alarm_level = alarmCfgParam.alarm_level;
 					alarmCfg.rid = alarmCfgParam.rid;
 					if (alarmCfgParam.name.length() > 50) {
 						alarmCfg.name = alarmCfgParam.name.substring(0, 50);
@@ -476,6 +496,7 @@ public class AlarmDataAction {
 				alarmCfg.bind_state = 1;
 				alarmCfg.data_id = alarmCfgParam.data_id;
 				alarmCfg.plc_id = alarmCfgParam.plc_id;
+				alarmCfg.alarm_level = alarmCfgParam.alarm_level;
 				alarmCfg.rid = alarmCfgParam.rid;
 				if (alarmCfgParam.name.length() > 50) {
 					alarmCfg.name = alarmCfgParam.name.substring(0, 50);

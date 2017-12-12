@@ -147,7 +147,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 	@Override
 	public Page<AlarmCfgDataAlarmCfg> getRealHisCfgDataList(AlarmCfgDataFilter filter, int pageIndex, int pageSize) {
 		String sqlCount = "select count(0) from alarm_cfg ac ,alarm_cfg_data acd,plc_info pli where 1=1  and  ac.alarmcfg_id=acd.alarm_cfg_id and ac.bind_state=1 and pli.`plc_id`=ac.plc_id and ac.bind_state=1";
-		String sql = " select " + SEL_COL + ",ac.name,ac.text "
+		String sql = " select " + SEL_COL + ",ac.name,ac.text,ac.alarm_level "
 				+ " from alarm_cfg ac ,alarm_cfg_data acd,plc_info pli where 1=1 and  ac.alarmcfg_id=acd.alarm_cfg_id and ac.bind_state=1 and pli.`plc_id`=ac.plc_id and ac.bind_state=1";
 
 		StringBuffer condition = new StringBuffer("");
@@ -395,6 +395,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 			model.value = rs.getString("value");
 			model.create_date = rs.getTimestamp("create_date");
 			model.state = rs.getInt("state");
+			model.alarm_level = rs.getInt("alarm_level");
 			model.name = rs.getString("name");
 			model.text = rs.getString("text");
 			model.alarm_type=rs.getInt("alarm_type");

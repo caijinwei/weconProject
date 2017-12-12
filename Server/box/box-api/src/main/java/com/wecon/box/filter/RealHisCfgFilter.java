@@ -20,6 +20,7 @@ public class RealHisCfgFilter {
 	public long device_id;
 	public String rid;// 寄存器类型
 	public long dirId;// 分组id
+	public String ext_unit;//单位
 	public Timestamp create_date;
 	public Timestamp update_date;
 }

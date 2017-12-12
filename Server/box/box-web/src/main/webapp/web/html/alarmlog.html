@@ -61,18 +61,19 @@
 						<thead>
 							<tr>
 								<th class="col-md-1">名称</th>
+								<th class="col-md-1">报警等级</th>
 								<th class="col-md-3">报警内容</th>
 								<th class="col-md-2">值</th>
 								<th class="col-md-1">事件</th>
 								<th class="col-md-3">报警时间</th>
 								<th class="col-md-1">状态</th>
 								<th class="col-md-2">标记为</th>
-
 							</tr>
 						</thead>
 						<tbody>
-							<tr ng-repeat="x in alarmcurrents">
+							<tr ng-repeat="x in alarmcurrents"  ng-style="{color: x.alarm_level == '1' ? 'blue' : x.alarm_level == '2' ? 'orange':'red'}">
 								<td>{{x.name}}</td>
+								<td  >{{x.alarm_level==1?'一般报警':x.alarm_level==2?'严重报警':'特别严重报警'}}</td>
 								<td>{{x.text}}</td>
 								<td>{{x.value}}</td>
 								<td>{{x.alarm_type==0?"恢复":"触发"}}</td>
@@ -148,6 +149,7 @@
 							<tr>
 								<th class="col-md-1">编码</th>
 								<th class="col-md-1">名称</th>
+								<th class="col-md-1">报警等级</th>
 								<th class="col-md-3">报警内容</th>
 								<th class="col-md-2">值</th>
 								<th class="col-md-1">事件</th>
@@ -159,6 +161,7 @@
 							<tr ng-repeat="x in alarmHisDatas">
 								<td>{{x.alarm_cfg_id}}</td>
 								<td>{{x.name}}</td>
+								<td>{{x.alarm_level==1?'一般报警':x.alarm_level==2?'严重报警':'特别严重报警'}}</td>
 								<td>{{x.text}}</td>
 								<td>{{x.value}}</td>
 								<td>{{x.alarm_type==0?"恢复":"触发"}}</td>
@@ -206,6 +209,7 @@
 								<th class="col-md-3">触发条件<span data-action="label_trigger"></span></th>
 								<th class="col-md-3">报警内容<span
 									data-action="label_alarmcontent"></span></th>
+								<th class="col-md-2">报警等级<span data-action="label_group"></span></th>
 								<th class="col-md-2">分组<span data-action="label_group"></span></th>
 								<th class="col-md-2">操作<span data-action="label_operation"></span></th>
 							</tr>
@@ -226,6 +230,7 @@
 								<td>{{x.name}}</td>
 								<td>{{x.triggerValue}}</td>
 								<td>{{x.text}}</td>
+								<td>{{x.alarm_level==1?'一般报警':x.alarm_level==2?'严重报警':'特别严重报警'}}</td>
 								<td>{{x.dirName}}</td>
 								<td><a href="#" style="text-decoration: none"> <span
 										class="glyphicon glyphicon-edit" data-toggle="modal"
@@ -432,6 +437,14 @@
 										<span class="col-md-3">连接设备</span> <select class="col-md-9"
 											id="conid" style="height: 30px;">
 											<option ng-repeat="x in infoDatas" value="{{x.plcId}}">{{$index+1}}-{{x.port}}</option>
+										</select>
+									</div>
+									<div class="row col-md-11 col-md-offset-1"
+										style="margin: 10px 0;">
+										<span class="col-md-3">报警级别</span> 
+										<select class="col-md-9"
+											id="gradeid" style="height: 30px;">
+											<option ng-repeat="x in alarmGrade" value="{{x.value}}">{{x.text}}</option>
 										</select>
 									</div>
 

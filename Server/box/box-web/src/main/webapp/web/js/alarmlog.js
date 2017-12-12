@@ -17,6 +17,7 @@ appModule
 								});
 
 						$scope.getDataType();
+						$scope.getAlarmGrade();
 						$scope.paginationConf_current = {
 							currentPage : 1,
 							itemsPerPage : 10,
@@ -73,6 +74,26 @@ appModule
 					}
 					$scope.paginationConf_alarmcfg = {
 						totalItems : $scope.count,
+					}
+					/**
+					 * 获取报警级别
+					 */
+					$scope.getAlarmGrade = function() {
+						var params = {};
+						T.common.ajax.request("WeconBox",
+								"alarmDataAction/getAlarmGrade", params, function(
+										data, code, msg) {
+									if (code == 200) {
+										$scope.alarmGrade = data.alarmGradeOption;
+										$scope.$apply();
+										$scope.datatype();
+									} else {
+										alert(code + "-" + msg);
+									}
+								}, function() {
+									console.log("ajax error");
+								});
+
 					}
 
 					/**
@@ -381,6 +402,8 @@ appModule
 															alarmfo.text);
 													$('#selectgroup').val(
 															alarmfo.dirId);
+													$('#gradeid').val(
+															alarmfo.alarm_level);
 
 													if ($("#addrtypeid").val() == 0) {// 如果是位地址隐藏
 														$('#datadigitid').css(
@@ -1746,7 +1769,6 @@ appModule
 						}
 						var alarmtypes = types.join(",");
 						var alarmvalues = values.join(",");
-
 						var params = {
 							alarmcfg_id : alarmid,
 							plc_id : plcId,
@@ -1763,7 +1785,8 @@ appModule
 							condition_type : $("#selectWith").val(),
 							digit_count : digs,
 							type : alarmtypes,
-							value : alarmvalues
+							value : alarmvalues,
+							alarm_level : $("#gradeid").val()
 
 						};
 

@@ -274,7 +274,8 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 
 										if (realHisCfgDevice.id == Long.parseLong(piBoxComAddr.addr_id)) {
 											realHisCfgDevice.re_state = piBoxComAddr.state;
-											realHisCfgDevice.re_value = piBoxComAddr.value;
+											realHisCfgDevice.re_value =piBoxComAddr.value;
+											
 
 										}
 

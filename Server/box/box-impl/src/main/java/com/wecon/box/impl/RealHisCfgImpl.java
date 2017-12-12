@@ -32,7 +32,7 @@ import java.util.Map;
 public class RealHisCfgImpl implements RealHisCfgApi {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	private final String SEL_COL = "r.id,r.data_id,r.account_id,r.plc_id,r.name,r.addr,r.addr_type,r.describe,r.digit_count,r.data_limit,r.his_cycle,r.data_type,r.state,r.create_date,r.update_date,r.bind_state,r.device_id,r.rid,r.digit_binary";
+	private final String SEL_COL = "r.id,r.data_id,r.account_id,r.plc_id,r.name,r.addr,r.addr_type,r.describe,r.digit_count,r.data_limit,r.his_cycle,r.data_type,r.state,r.create_date,r.update_date,r.bind_state,r.device_id,r.rid,r.digit_binary,r.ext_unit";
 
 	@Override
 	public long saveRealHisCfg(final RealHisCfg model) {
@@ -41,7 +41,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			@Override
 			public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
 				PreparedStatement preState = con.prepareStatement(
-						"insert into real_his_cfg(data_id,account_id,plc_id,`name`,addr,addr_type,`describe`,digit_count,data_limit,his_cycle,data_type,state,create_date,update_date,bind_state,device_id,rid,digit_binary)values(?,?,?,?,?,?,?,?,?,?,?,?,current_timestamp(),current_timestamp(),1,?,?,?);",
+						"insert into real_his_cfg(data_id,account_id,plc_id,`name`,addr,addr_type,`describe`,digit_count,data_limit,his_cycle,data_type,state,create_date,update_date,bind_state,device_id,rid,digit_binary,ext_unit)values(?,?,?,?,?,?,?,?,?,?,?,?,current_timestamp(),current_timestamp(),1,?,?,?,?);",
 						Statement.RETURN_GENERATED_KEYS);
 				preState.setLong(1, model.data_id);
 				preState.setLong(2, model.account_id);
@@ -58,6 +58,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 				preState.setLong(13, model.device_id);
 				preState.setString(14, model.rid);
 				preState.setString(15, model.digit_binary);
+				preState.setString(16, model.ext_unit);
 				return preState;
 			}
 		}, key);
@@ -67,11 +68,12 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 	@Override
 	public boolean updateRealHisCfg(RealHisCfg model) {
-		String sql = "update real_his_cfg SET data_id=?,account_id=?,plc_id=?,`name`=?,addr=?,addr_type=?,`describe`=?,digit_count=?,data_limit=?,his_cycle=?,data_type=?,state=?,update_date=current_timestamp(),bind_state=?,device_id=?,rid=?,digit_binary=? where id=?";
+		String sql = "update real_his_cfg SET data_id=?,account_id=?,plc_id=?,`name`=?,addr=?,addr_type=?,`describe`=?,digit_count=?,data_limit=?,his_cycle=?,data_type=?,state=?,update_date=current_timestamp(),bind_state=?,device_id=?,rid=?,digit_binary=?,ext_unit=? where id=?";
 		jdbcTemplate.update(sql,
 				new Object[] { model.data_id, model.account_id, model.plc_id, model.name, model.addr, model.addr_type,
 						model.describe, model.digit_count, model.data_limit, model.his_cycle, model.data_type,
-						model.state, model.bind_state, model.device_id, model.rid, model.digit_binary, model.id });
+						model.state, model.bind_state, model.device_id, model.rid, model.digit_binary, model.ext_unit,
+						model.id });
 
 		return true;
 	}
@@ -232,6 +234,11 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			params.add(filter.state);
 
 		}
+		if (!CommonUtils.isNullOrEmpty(filter.ext_unit)) {
+			condition.append(" and r.ext_unit = ? ");
+			params.add(filter.ext_unit);
+
+		}
 
 		sql += condition;
 		List<RealHisCfgDevice> list = jdbcTemplate.query(sql, params.toArray(), new DefaultHisCfgDeviceRowMapper());
@@ -314,6 +321,11 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		if (!CommonUtils.isNullOrEmpty(filter.rid)) {
 			condition.append(" and r.rid like ? ");
 			params.add("%" + filter.rid + "%");
+		}
+		if (!CommonUtils.isNullOrEmpty(filter.ext_unit)) {
+			condition.append(" and r.ext_unit = ? ");
+			params.add(filter.ext_unit);
+
 		}
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
@@ -457,6 +469,11 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			params.add(filter.bind_state);
 
 		}
+		if (!CommonUtils.isNullOrEmpty(filter.ext_unit)) {
+			condition.append(" and r.ext_unit = ? ");
+			params.add(filter.ext_unit);
+
+		}
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<RealHisCfgDevice> page = new Page<RealHisCfgDevice>(pageIndex, pageSize, totalRecord);
@@ -534,9 +551,12 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			params.add(groupId);
 		}
 		String sqlCount = "select count(distinct r.id, ad.id) " + fromStr
-				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and r.id=adr.ref_id and r.bind_state=1 and r.state != "+ Constant.State.STATE_DELETE_CONFIG;
-		String sql = "select distinct " + SEL_COL + ",d.machine_code, d.state as dstate, adr.ref_alais,adr.acc_dir_id" + "  " + fromStr
-				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and r.id=adr.ref_id and r.bind_state=1 and r.state != "+ Constant.State.STATE_DELETE_CONFIG;
+				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and r.id=adr.ref_id and r.bind_state=1 and r.state != "
+				+ Constant.State.STATE_DELETE_CONFIG;
+		String sql = "select distinct " + SEL_COL + ",d.machine_code, d.state as dstate, adr.ref_alais,adr.acc_dir_id"
+				+ "  " + fromStr
+				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and r.id=adr.ref_id and r.bind_state=1 and r.state != "
+				+ Constant.State.STATE_DELETE_CONFIG;
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<RealHisCfgDevice> page = new Page<RealHisCfgDevice>(pageIndex, pageSize, totalRecord);
@@ -577,7 +597,8 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		}
 		String sqlCount = "select count(distinct r.id, ad.id) " + fromStr
 				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and r.id=adr.ref_id and r.bind_state=1";
-		String sql = "select distinct " + SEL_COL + ",d.machine_code, d.state as dstate, adr.ref_alais,adr.acc_dir_id" + "  " + fromStr
+		String sql = "select distinct " + SEL_COL + ",d.machine_code, d.state as dstate, adr.ref_alais,adr.acc_dir_id"
+				+ "  " + fromStr
 				+ " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and r.id=adr.ref_id and r.bind_state=1";
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
@@ -609,6 +630,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 				model.put("data_id", rs.getLong("data_id"));
 				model.put("digit_count", rs.getString("digit_count"));
 				model.put("describe", rs.getString("describe"));
+				model.put("ext_unit", rs.getString("ext_unit"));
 				return model;
 			}
 		});
@@ -732,7 +754,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	}
 
 	@Override
-	public List<Long> getRealHisCfgIdsByPlcIds(List<Long> plcIds){
+	public List<Long> getRealHisCfgIdsByPlcIds(List<Long> plcIds) {
 		if (null == plcIds || plcIds.size() == 0) {
 			return null;
 		}
@@ -742,12 +764,13 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			idSb.append(",").append(plcId);
 		}
 
-		List<Long> cfgIds = jdbcTemplate.query("select id from real_his_cfg where plc_id in(" + idSb.substring(1) + ")", new RowMapper() {
-			@Override
-			public Object mapRow(ResultSet resultSet, int i) throws SQLException {
-				return resultSet.getLong("plc_id");
-			}
-		});
+		List<Long> cfgIds = jdbcTemplate.query("select id from real_his_cfg where plc_id in(" + idSb.substring(1) + ")",
+				new RowMapper() {
+					@Override
+					public Object mapRow(ResultSet resultSet, int i) throws SQLException {
+						return resultSet.getLong("plc_id");
+					}
+				});
 
 		return cfgIds;
 	}
@@ -777,6 +800,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.rid = rs.getString("rid");
 			model.device_id = rs.getLong("device_id");
 			model.bind_state = rs.getInt("bind_state");
+			model.ext_unit = rs.getString("ext_unit");
 
 			return model;
 		}
@@ -809,9 +833,11 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.device_id = rs.getLong("device_id");
 			model.bind_state = rs.getInt("bind_state");
 			model.dstate = rs.getInt("dstate");
+			model.ext_unit = rs.getString("ext_unit");
 			try {
 				model.dir_id = rs.getLong("acc_dir_id");
-			}catch (Exception e){}
+			} catch (Exception e) {
+			}
 			return model;
 		}
 	}
@@ -842,6 +868,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.upd_time = TimeUtil.getYYYYMMDDHHMMSSDate(model.update_date);
 			model.machine_code = rs.getString("machine_code");
 			model.rid = rs.getString("rid");
+			model.ext_unit = rs.getString("ext_unit");
 			// model.ref_alais = rs.getString("ref_alais");
 
 			return model;
@@ -875,6 +902,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.role_type = rs.getInt("role_type");
 			model.device_id = rs.getLong("device_id");
 			model.bind_state = rs.getInt("bind_state");
+			model.ext_unit = rs.getString("ext_unit");
 			return model;
 		}
 	}
@@ -904,6 +932,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 			model.create_date = rs.getTimestamp("create_date");
 			model.update_date = rs.getTimestamp("update_date");
 			model.machine_code = rs.getString("machine_code");
+			model.ext_unit = rs.getString("ext_unit");
 			return model;
 		}
 	}
@@ -939,10 +968,10 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	/*
 	 * 盒子用户改变 监控点迁移
 	 */
-	public boolean updatePointAccAndState(long accountId, long deviceId,int state) {
+	public boolean updatePointAccAndState(long accountId, long deviceId, int state) {
 
 		String sql = "UPDATE real_his_cfg a SET a.account_id=?,a.bind_state=? WHERE a.device_id=?;";
-		Object[] args = new Object[] { accountId,state,deviceId };
+		Object[] args = new Object[] { accountId, state, deviceId };
 		Integer count = jdbcTemplate.update(sql, args);
 		if (count <= 0) {
 			return false;
@@ -952,20 +981,20 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	}
 
 	@Override
-	public void updateRealHisState(long plc_id,int state) {
-		if(plc_id>0) {
+	public void updateRealHisState(long plc_id, int state) {
+		if (plc_id > 0) {
 			String sql = "UPDATE real_his_cfg a SET a.state=? WHERE a.plc_id=?";
-			jdbcTemplate.update(sql, new Object[]{state,plc_id});
+			jdbcTemplate.update(sql, new Object[] { state, plc_id });
 		}
 	}
 
 	@Override
-	public List<RealHisCfg> findRealHisCfgsByPlcId(long plc_id){
-		if(plc_id<0){
+	public List<RealHisCfg> findRealHisCfgsByPlcId(long plc_id) {
+		if (plc_id < 0) {
 			return null;
 		}
 		String sql = "select " + SEL_COL + " from real_his_cfg r where r.plc_id=?";
-		List<RealHisCfg> list = jdbcTemplate.query(sql,new Object[]{plc_id}, new DefaultRealHisCfgRowMapper());
+		List<RealHisCfg> list = jdbcTemplate.query(sql, new Object[] { plc_id }, new DefaultRealHisCfgRowMapper());
 		if (!list.isEmpty()) {
 			return list;
 		}
