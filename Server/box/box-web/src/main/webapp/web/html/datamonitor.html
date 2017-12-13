@@ -134,8 +134,15 @@
 									ng-if="accounttype==2&&x.role_type!=3&&x.addr_type!=0">{{x.re_value}}</span><span
 									style="float: right;"
 									ng-if="accounttype==2&&x.role_type!=3&&x.addr_type!=0">&nbsp;&nbsp;{{x.ext_unit}}</span>
-									<p ng-if="x.addr_type==0" class="switch" id="mySwitch_{{x.id}}">
+									<p
+										ng-if="(accounttype==1&&x.addr_type==0)||(accounttype==2&&x.role_type==3&&x.addr_type==0)"
+										class="switch" id="mySwitch_{{x.id}}">
 										<input name="switch-state" type="checkbox" data-bit="{{x}}">
+									</p>
+									<p ng-if="(accounttype==2&&x.role_type!=3&&x.addr_type==0)"
+										class="switch" id="mySwitch_{{x.id}}">
+										<input name="switch-state" type="checkbox" data-bit="{{x}}"
+											checked disabled>
 									</p></td>
 								<td>{{x.describe}}</td>
 								<td><a href="#" title="编辑" data-toggle="modal"
