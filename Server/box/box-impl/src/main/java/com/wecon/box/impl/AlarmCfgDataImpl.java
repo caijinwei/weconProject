@@ -219,7 +219,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 	public Page<AlarmCfgDataAlarmCfg> getViewRealHisCfgDataList(AlarmCfgDataFilter filter, int pageIndex,
 			int pageSize) {
 		String sqlCount = "select count(0) from view_account_role var,alarm_cfg ac,alarm_cfg_data  acd,plc_info pli where 1=1 and ac.alarmcfg_id=var.cfg_id and ac.alarmcfg_id=acd.alarm_cfg_id and var.cfg_type=2 and ac.bind_state=1 and pli.`plc_id`=ac.plc_id ";
-		String sql = " select " + SEL_COL + ",ac.name,ac.text "
+		String sql = " select " + SEL_COL + ",ac.name,ac.text,ac.alarm_level "
 				+ " from view_account_role var,alarm_cfg ac,alarm_cfg_data  acd,plc_info pli where 1=1 and ac.alarmcfg_id=var.cfg_id  and ac.alarmcfg_id=acd.alarm_cfg_id and var.cfg_type=2 and ac.bind_state=1 and pli.`plc_id`=ac.plc_id";
 
 		StringBuffer condition = new StringBuffer("");
