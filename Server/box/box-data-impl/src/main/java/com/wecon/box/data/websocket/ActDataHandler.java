@@ -9,13 +9,13 @@ import com.wecon.box.api.RealHisCfgApi;
 import com.wecon.box.api.RedisPiBoxApi;
 import com.wecon.box.constant.ConstKey;
 import com.wecon.box.constant.Constant;
+import com.wecon.box.data.util.SendvalueCallback;
 import com.wecon.box.entity.*;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.box.util.ClientMQTT;
 import com.wecon.box.util.SendValue;
-import com.wecon.box.util.SendvalueCallback;
 import com.wecon.common.redis.RedisManager;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.core.AppContext;
@@ -92,21 +92,21 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 						// 发送数据
 						sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteActPhone, reclient);
 					}
-				}else if("-1".equals(markid)){
-					session.sendMessage(new TextMessage("1"));
-				}
-			} else {
-				paramMap.put(session.getId(), params);
-				// 推送消息给移动端
-				logger.debug("WebSocket push begin");
-				Object[] oj = getRealData(session);
-				session.sendMessage(new TextMessage(oj[0].toString()));
-				logger.debug("WebSocket push end");
+				}else if("0".equals(markid)){
+					paramMap.put(session.getId(), params);
+					// 推送消息给移动端
+					logger.debug("WebSocket push begin");
+					Object[] oj = getRealData(session);
+					session.sendMessage(new TextMessage(oj[0].toString()));
+					logger.debug("WebSocket push end");
 
-				// 订阅redis消息
-				SubscribeListener subscribeListener = subListenerMap.get(session.getId());
-				if (null != oj[1] && null == subscribeListener) {
-					subscribeRealData(session, (Set<String>) oj[1]);
+					// 订阅redis消息
+					SubscribeListener subscribeListener = subListenerMap.get(session.getId());
+					if (null != oj[1] && null == subscribeListener) {
+						subscribeRealData(session, (Set<String>) oj[1]);
+					}
+				} else if("-1".equals(markid)){
+					session.sendMessage(new TextMessage("1"));
 				}
 			}
 
@@ -209,7 +209,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 			JSONArray arr = new JSONArray();
 
 			if (realHisCfgDeviceList == null || realHisCfgDeviceList.size() < 1) {
-				return new Object[] { json.toJSONString(), null };
+				return new Object[] {json.toJSONString(), null };
 			}
 			Set<String> machineCodeSet = new HashSet<>();
 			for (int i = 0; i < realHisCfgDeviceList.size(); i++) {
@@ -274,8 +274,12 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 			json.put("list", arr);
 			json.put("totalPage", realHisCfgDevicePage.getTotalPage());
 			json.put("currentPage", realHisCfgDevicePage.getCurrentPage());
-			logger.debug("Websocket push msg: " + json.toJSONString());
-			return new Object[] { json.toJSONString(), machineCodeSet };
+			JSONObject result = new JSONObject();
+			result.put("msg", "实时数据");
+			result.put("markid", 0);
+			result.put("result", json);
+			logger.debug("Websocket push msg: " + result.toJSONString());
+			return new Object[] {result.toJSONString(), machineCodeSet};
 		} catch (Exception e) {
 			logger.debug("Server error，" + e.getMessage());
 			e.printStackTrace();
