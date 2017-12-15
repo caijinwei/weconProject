@@ -85,9 +85,11 @@ public enum ErrorCodeOption {
     Device_IsNot_Online("盒子已经离线",300029),
     Device_Bind_NotDir("没有选择盒子分组",300030),
     ViewPoint_Is_NotFount("视图没有该监控点",30031),
-    Act_add_Beyond("实时配置只能添加200条",30032),
+    Act_add_Beyond("实时配置只能添加500条",30032),
     Device_Pwd_Error("设备密码错误",300033),
     PlcInfo_Port_IsExist("删除通讯口指令已下发，请再30秒后再添加操作",300034),
+    His_add_Beyond("历史配置只能添加100条",30035),
+    Alarm_add_Beyond("报警配置只能添加200条",30036),
 
 
 

@@ -780,6 +780,20 @@ public class ActDataAction {
 					if (realHisCfgParam.his_cycle > 0) {
 						realHisCfg.his_cycle = realHisCfgParam.his_cycle;
 					}
+					/** 管理 **/
+					realHisCfgFilter.addr_type = -1;
+					realHisCfgFilter.data_type = 1;
+					realHisCfgFilter.his_cycle = -1;
+					realHisCfgFilter.state = 3;
+					realHisCfgFilter.bind_state = 1;
+					realHisCfgFilter.account_id = account_id;
+					realHisCfgFilter.device_id = realHisCfgParam.device_id;
+
+					realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(realHisCfgFilter);
+					if (realHisCfgDeviceList.size() >= Constant.AddNum.HIS_SET_NUM) {
+						throw new BusinessException(ErrorCodeOption.His_add_Beyond.key,
+								ErrorCodeOption.His_add_Beyond.value);
+					}
 
 				}
 

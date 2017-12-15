@@ -20,6 +20,7 @@ import com.wecon.box.api.AlarmTriggerApi;
 import com.wecon.box.api.DevBindUserApi;
 import com.wecon.box.api.DeviceApi;
 import com.wecon.box.api.ViewAccountRoleApi;
+import com.wecon.box.constant.Constant;
 import com.wecon.box.entity.AccountDir;
 import com.wecon.box.entity.AccountDirRel;
 import com.wecon.box.entity.AlarmCfg;
@@ -495,6 +496,12 @@ public class AlarmDataAction {
 				if (newarm != null) {
 					throw new BusinessException(ErrorCodeOption.Name_Repetition.key,
 							ErrorCodeOption.Name_Repetition.value);
+				}
+				//判断报警配置是否达到上限
+				List<AlarmCfg> listAlarmCfg = alarmCfgApi.getAlarmCfg(account_id, alarmCfgParam.device_id);
+				if (listAlarmCfg.size() >= Constant.AddNum.ALARM_SET_NUM) {
+					throw new BusinessException(ErrorCodeOption.Alarm_add_Beyond.key,
+							ErrorCodeOption.Alarm_add_Beyond.value);
 				}
 				alarmCfg = new AlarmCfg();
 				alarmCfg.account_id = account_id;
