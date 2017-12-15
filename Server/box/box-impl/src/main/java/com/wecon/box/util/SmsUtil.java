@@ -10,7 +10,9 @@ import java.net.URLEncoder;
  * Created by zengzhipeng on 2017/8/15.
  */
 public class SmsUtil {
-    public static final String APIURL = "http://m.5c.com.cn/api/send/";
+	//115.28.23.78
+	//http://m.5c.com.cn/api/send/
+    public static final String APIURL = "http://115.28.23.78/api/send/";
     public static final String APIKEY = "7128e18ccb802f9d8e6a6c017b213292";
     public static final String USERNAME = "weikongdz";
     public static final String PASSWORD = "mlrt1234";
@@ -58,5 +60,17 @@ public class SmsUtil {
         }
         return resutl;
     }
+    public static void main(String args[]){
+    	
+    	try {
+			String a=sendSMS("15959010890","2222");
+			System.out.println(a);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	
+    	
+    }
+    
 
 }
