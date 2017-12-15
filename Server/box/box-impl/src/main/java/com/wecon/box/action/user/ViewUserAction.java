@@ -109,6 +109,32 @@ public class ViewUserAction extends UserBaseAction {
         return new Output();
     }
 
+    @Label("管理帐号修改子视图帐号密码")
+    @RequestMapping("user/chgviewpwd")
+    @WebApi(forceAuth = true, master = true, authority = {"1"})
+    public Output chgAccountInfoByUpper(@RequestParam("account_id") long accountId, @RequestParam("password") String password) {
+        Account oldAcc = accountApi.getAccount(accountId);
+        //已经绑定邮箱手机的帐号，请使用找回密码功能
+        if (CommonUtils.isNotEmpty(oldAcc.email) || CommonUtils.isNotEmpty(oldAcc.phonenum)) {
+            throw new BusinessException(ErrorCodeOption.BindEmailPhone_UseFindPwd.key, ErrorCodeOption.BindEmailPhone_UseFindPwd.value);
+        }
+        long managerId = accountApi.getManagerId(accountId);
+        if (managerId != AppContext.getSession().client.userId) {
+            throw new BusinessException(ErrorCodeOption.NotOperateRole.key, ErrorCodeOption.NotOperateRole.value);
+        }
+        Account newAcc = accountApi.getAccount(accountId);
+        if (CommonUtils.isNotEmpty(password)) {
+            newAcc.password = password;
+            accountApi.updatePwd(accountId, password);
+            //<editor-fold desc="操作日志">
+            dbLogUtil.updOperateLog(OpTypeOption.ChgPwd, ResTypeOption.Account, accountId, oldAcc, newAcc);
+            //</editor-fold>
+        }
+        //修改用户密码退出登录
+        SessionManager.deleteUserSession(accountId);
+        return new Output();
+    }
+
 
 }
 

@@ -165,6 +165,39 @@ appModule.controller("listController", function ($scope, $http, $compile) {
         },
         viewpointalarm: function (model) {
             location = "viewpointalarm.html?type=2&viewid=" + model.account_id + "&name=" + model.username;
+        },
+        chgviewpwd: function (model) {
+            $("#newWinModal").modal('show');
+            $("#newPwdInput").val("");
+            $scope.selectedAccountId = model.account_id;
+            $scope.selecetedUsername = model.username;
         }
+    }
+    /*
+     * 修改用户信息密码
+     * */
+    $scope.chgPwdSubmit = function () {
+        var newPwdInput = $("#newPwdInput").val();
+        if (newPwdInput == undefined || newPwdInput == "") {
+            return;
+        }
+        newPwdInput = T.common.util.md5(newPwdInput);
+        var params = {
+            account_id: $scope.selectedAccountId,
+            password: newPwdInput
+        }
+        T.common.ajax.request("WeconBox", "user/chgviewpwd", params, function (data, code, msg) {
+            if (code == 200) {
+                $scope.getList($scope.paginationConf.currentPage, $scope.paginationConf.itemsPerPage);
+                $("#newWinModal").modal("hide");
+                alert("设置成功");
+            }
+            else {
+                alert(msg);
+                $("#loadingModal").modal("hide");
+            }
+        }, function () {
+            console.log("ajax error");
+        });
     }
 })
