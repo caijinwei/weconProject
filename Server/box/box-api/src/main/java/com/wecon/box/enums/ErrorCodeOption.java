@@ -33,6 +33,7 @@ public enum ErrorCodeOption {
     AccountExisted_UserName("用户名被占用,不能注册", 11021),
     AccountExisted_Email("邮箱被占用,不能注册", 11022),
     AccountExisted_Phone("手机号码被占用,不能注册", 11023),
+    BindEmailPhone_UseFindPwd("此帐号已经绑定邮箱/手机，请使用找回密码功能", 11024),
 
     //文件操作相关
     UploadFileError("上传文件异常", 12000),

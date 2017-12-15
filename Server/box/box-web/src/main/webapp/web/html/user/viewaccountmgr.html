@@ -47,6 +47,8 @@
                 <!--<button class="btn {{x.state?'btn-danger':'btn-success'}} btn-xs {{x.state?'glyphicon glyphicon-remove':'glyphicon glyphicon-ok'}}"
                         ng-click="methods.updstate(x)">{{x.state?'禁用':'启用'}}
                 </button>-->
+                <button class="btn btn-info btn-xs glyphicon glyphicon-lock" ng-click="methods.chgviewpwd(x)">修改密码
+                </button>
                 <button class="btn btn-primary btn-xs glyphicon glyphicon-eye-open" ng-click="methods.viewpoint0(x)">实时监控点
                 </button>
                 <button class="btn btn-primary btn-xs glyphicon glyphicon-stats" ng-click="methods.viewpoint1(x)">历史监控点
@@ -58,6 +60,34 @@
         </tbody>
     </table>
     <tm-pagination conf="paginationConf"></tm-pagination>
+    <!-- 弹出修改密码窗口 -->
+    <div class="modal fade" id="newWinModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">重置用户:{{selecetedUsername}}密码</h4>
+                </div>
+
+                <div class="modal-body form-horizontal" style="word-wrap: break-word;">
+                    <div class="row form-group">
+                        <label class="col-sm-2 col-md-2 col-xs-2 control-label" for="newPwdInput">新密码</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="newPwdInput" placeholder="请输入新密码">
+                        </div>
+                        <div class="col-md-1"><span style="color: red">*</span></div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="chgPwdSubmit()">确定
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!--创建视图账号-->
     <div class="modal" id="addViewAccount" tabindex="-1" data-backdrop="false">
         <div class="modal-dialog modal-sm">
