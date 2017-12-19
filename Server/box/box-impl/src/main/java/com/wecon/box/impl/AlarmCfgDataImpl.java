@@ -392,7 +392,11 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 			model.value = rs.getString("value");
 			model.create_date = rs.getTimestamp("create_date");
 			model.state = rs.getInt("state");
-			model.alarm_type = rs.getInt("alarm_type");
+			if(!CommonUtils.isNullOrEmpty(rs.getObject("alarm_type"))){
+				model.alarm_type = rs.getInt("alarm_type");
+			}else{
+				model.alarm_type = -1;
+			}
 
 			return model;
 		}
@@ -411,8 +415,11 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 			model.alarm_level = rs.getInt("alarm_level");
 			model.name = rs.getString("name");
 			model.text = rs.getString("text");
-			model.alarm_type = rs.getInt("alarm_type");
-
+			if(!CommonUtils.isNullOrEmpty(rs.getObject("alarm_type"))){
+				model.alarm_type = rs.getInt("alarm_type");
+			}else{
+				model.alarm_type = -1;
+			}
 			return model;
 		}
 	}

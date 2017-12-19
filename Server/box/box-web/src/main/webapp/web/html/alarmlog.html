@@ -91,7 +91,7 @@
 								<td>{{x.alarm_level==1?'一般报警':x.alarm_level==2?'严重报警':'特别严重报警'}}</td>
 								<td>{{x.text}}</td>
 								<td>{{x.value}}</td>
-								<td>{{x.alarm_type==0?"恢复":"触发"}}</td>
+								<td>{{x.alarm_type==0?"恢复":x.alarm_type==1?"触发":""}}</td>
 								<td>{{x.monitor_time|date:'yyyy-MM-dd HH:mm:ss'}}</td>
 								<td>{{x.state==2?"确认":"未确认"}}</td>
 								<td><button type="button" class="btn btn-info"
@@ -179,7 +179,7 @@
 								<td>{{x.alarm_level==1?'一般报警':x.alarm_level==2?'严重报警':'特别严重报警'}}</td>
 								<td>{{x.text}}</td>
 								<td>{{x.value}}</td>
-								<td>{{x.alarm_type==0?"恢复":"触发"}}</td>
+								<td>{{x.alarm_type==0?"恢复":x.alarm_type==1?"触发":""}}</td>
 								<td>{{x.state==2?"确认":"未确认"}}</td>
 								<td>{{x.monitor_time|date:'yyyy-MM-dd HH:mm:ss'}}</td>
 							</tr>
