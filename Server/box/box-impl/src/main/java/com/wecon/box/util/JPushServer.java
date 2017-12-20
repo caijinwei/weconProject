@@ -59,7 +59,7 @@ public class JPushServer {
      * @param alert
      * @return json
      */
-    public static JSONObject generateJson(String alias, String alert, boolean apns_production, int time_to_live){
+    public static JSONObject generateJson(String alias, String alert, boolean apns_production, int time_to_live) throws Exception{
         JSONObject json = new JSONObject();
         JSONArray platform = new JSONArray();//平台
         platform.add("android");
@@ -72,14 +72,14 @@ public class JPushServer {
 
         JSONObject notification = new JSONObject();//通知内容
         JSONObject android = new JSONObject();//android通知内容
-        android.put("alert", "有新的报警数据");
+        android.put("alert", java.net.URLEncoder.encode("有新的报警数据", "UTF-8"));
         android.put("builder_id", 1);
         JSONObject android_extras = new JSONObject();//android额外参数
         android_extras.put("type", "alias");
         android.put("extras", android_extras);
 
         JSONObject ios = new JSONObject();//ios通知内容
-        ios.put("alert", "有新的报警数据");
+        ios.put("alert", java.net.URLEncoder.encode("有新的报警数据", "UTF-8"));
         ios.put("sound", "default");
         ios.put("badge", "+1");
         JSONObject ios_extras = new JSONObject();//ios额外参数
@@ -112,7 +112,7 @@ public class JPushServer {
      * @param alert
      * @return result
      */
-    public static String push(String reqUrl, String alias, String alert, String appKey, String masterSecret, boolean apns_production, int time_to_live){
+    public static String push(String reqUrl, String alias, String alert, String appKey, String masterSecret, boolean apns_production, int time_to_live) throws Exception{
         String base64_auth_string = encryptBASE64(appKey + ":" + masterSecret);
         String authorization = "Basic " + base64_auth_string;
         return sendPostRequest(reqUrl, generateJson(alias,alert,apns_production,time_to_live).toString(),"UTF-8",authorization);
@@ -168,6 +168,6 @@ public class JPushServer {
             data.put("number", "5"+i);
             list.add(data);
         }
-        new JPushServer().push("lph", JSON.toJSONString(list));
+        new JPushServer().push("xlj", JSON.toJSONString(list));
     }
 }
