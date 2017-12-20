@@ -32,8 +32,8 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	private final String SEL_COL = "real_his_cfg_id,monitor_time,`value`,create_date,state";
-	private final int UPPER_LIMIT_COUNT = 230000;
-    private final int SINGLE_DEL_COUNT = 1000;
+	private final int UPPER_LIMIT_COUNT = 50000;
+    private final int SINGLE_DEL_COUNT = 2000;
 
 	@Override
 	public long saveRealHisCfgData(final RealHisCfgData model) {
