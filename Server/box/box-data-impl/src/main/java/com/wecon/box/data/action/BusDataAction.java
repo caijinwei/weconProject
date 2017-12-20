@@ -86,6 +86,17 @@ public class BusDataAction {
     }
 
     /**
+     * 获取盒子列表
+     * @return
+     */
+    @RequestMapping("we-data/boxdetail")
+    @WebApi(forceAuth = true, master = true, authority = {"1"})
+    public Output getBoxDetail(@Valid BusinessDataParam param) {
+
+        return busDataAct.getBoxData(param);
+    }
+
+    /**
      * 获取分组数据
      * @return
      */

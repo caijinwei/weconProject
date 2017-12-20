@@ -145,4 +145,10 @@ public interface DeviceApi {
     * 根据设备id获取用户行业表
     * */
     public DeviceUse getDeviceUse(long deviceId);
+
+    /**
+     * 获取所有盒子ID
+     * @return
+     */
+    public List<Long> getAllDeviceIds();
 }

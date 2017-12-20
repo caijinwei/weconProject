@@ -1,5 +1,6 @@
 package com.wecon.box.console.main;
 
+import com.wecon.box.console.task.DBDataClearTask;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -22,10 +23,12 @@ public class MqttManager {
 		System.setProperty("spring.profiles.active", profile);
 
 		ApplicationContext applicationContext = new ClassPathXmlApplicationContext("spring.xml");
-		BoxNotifyTask notifyTask = new BoxNotifyTask();
+		/*BoxNotifyTask notifyTask = new BoxNotifyTask();
 		notifyTask.start();
 		MonitorTask monitorTask = new MonitorTask();
-		monitorTask.start();
+		monitorTask.start();*/
+		DBDataClearTask task = new DBDataClearTask();
+		task.start();
 		// GetPublishClient
 		// getPublishClient=applicationContext.getBean(GetPublishClient.class);
 		// MqttClient client=getPublishClient.conMqtt();

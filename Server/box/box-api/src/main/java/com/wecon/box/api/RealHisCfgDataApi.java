@@ -86,4 +86,11 @@ public interface RealHisCfgDataApi {
 	 * @return
 	 */
 	public Page<Map<String, Object>> getRealHisCfgDataPage(ViewAccountRoleFilter filter, Map<String, Object> bParams, int pageIndex, int pageSize);
+
+	/**
+	 * 清除多余的历史数据
+	 * @return
+     */
+	public int clearHisCfgData(long deviceId);
+
 }

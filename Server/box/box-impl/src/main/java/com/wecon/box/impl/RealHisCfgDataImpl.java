@@ -8,6 +8,7 @@ import com.wecon.box.filter.RealHisCfgDataFilter;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.common.util.CommonUtils;
+import com.wecon.common.util.TimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -31,6 +32,8 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	private final String SEL_COL = "real_his_cfg_id,monitor_time,`value`,create_date,state";
+	private final int UPPER_LIMIT_COUNT = 230000;
+    private final int SINGLE_DEL_COUNT = 1000;
 
 	@Override
 	public long saveRealHisCfgData(final RealHisCfgData model) {
@@ -272,6 +275,40 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 		page.setList(list);
 		return page;
 
+	}
+
+	@Override
+	public int clearHisCfgData(long deviceId){
+		try {
+			int totalRecord = jdbcTemplate.queryForObject("select count(0) from real_his_cfg r, real_his_cfg_data rd " +
+					"where r.id=rd.real_his_cfg_id and r.device_id=?", new Object[]{deviceId}, Integer.class);
+			//超过上限，进行清除
+			if(totalRecord > UPPER_LIMIT_COUNT){
+				//删除总数
+				int delRecord = totalRecord - UPPER_LIMIT_COUNT;
+				//删除次数
+				int delCount = delRecord / SINGLE_DEL_COUNT;
+				int remainder = delRecord % SINGLE_DEL_COUNT;
+				if(remainder > 0){
+					delCount += 1;
+				}
+				for(int i = 1;i <= delCount;i++){
+					Timestamp monitorIime = jdbcTemplate.queryForObject("select rd.monitor_time from real_his_cfg r, real_his_cfg_data rd where r.id=rd.real_his_cfg_id and r.device_id=?" +
+							" order by rd.monitor_time limit "+(i==delCount ? remainder : SINGLE_DEL_COUNT) +",1", new Object[]{deviceId}, Timestamp.class);
+
+					jdbcTemplate.update("delete rd from real_his_cfg r, real_his_cfg_data rd where r.id=rd.real_his_cfg_id and r.device_id=? " +
+							"and date_format(rd.monitor_time,'%Y-%m-%d %H:%i:%s') <= date_format(str_to_date(?,'%Y-%m-%d %H:%i:%s'),'%Y-%m-%d %H:%i:%s')", new Object[]{deviceId, TimeUtil.getYYYYMMDDHHMMSSDate(monitorIime)});
+
+					Thread.sleep(100);
+				}
+				return delRecord;
+			}
+
+
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return 0;
 	}
 
 	public static final class DefaultRealHisCfgDataRowMapper implements RowMapper<RealHisCfgData> {

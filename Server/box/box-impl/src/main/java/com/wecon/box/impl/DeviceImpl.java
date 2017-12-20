@@ -380,6 +380,18 @@ public class DeviceImpl implements DeviceApi {
     }
 
     @Override
+    public List<Long> getAllDeviceIds(){
+        List<Long> deviceIdLst = jdbcTemplate.query(
+                "select device_id from device", new RowMapper() {
+                    @Override
+                    public Long mapRow(ResultSet rs, int i) throws SQLException {
+                        return rs.getLong("device_id");
+                    }
+                });
+        return deviceIdLst;
+    }
+
+    @Override
     public void boundDevice(final long device_id, final String name, final long acc_dir_id) {
         TransactionTemplate tt = new TransactionTemplate(transactionManager);
         try {
