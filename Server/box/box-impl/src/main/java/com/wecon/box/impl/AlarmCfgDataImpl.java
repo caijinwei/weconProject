@@ -27,7 +27,7 @@ import com.wecon.common.util.CommonUtils;
 public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	private final String SEL_COL = "acd.alarm_cfg_id,acd.monitor_time,acd.value,acd.create_date,acd.state,acd.alarm_type,acd.alarm_level";
+	private final String SEL_COL = "acd.alarm_cfg_id,acd.monitor_time,acd.value,acd.create_date,acd.state,acd.alarm_type";
 
 	@Override
 	public void saveAlarmCfgData(final List<AlarmCfgData> listmodel) {
@@ -319,7 +319,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 		}
 
 		String sqlCount = "select count(0) " + fromStr + whereStr;
-		String sql = " select " + SEL_COL + ",ac.name, ac.text " + fromStr + whereStr;
+		String sql = " select " + SEL_COL + ",ac.name, ac.text,ac.alarm_level " + fromStr + whereStr;
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<AlarmCfgDataAlarmCfg> page = new Page<AlarmCfgDataAlarmCfg>(pageIndex, pageSize, totalRecord);
@@ -369,7 +369,7 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 		}
 
 		String sqlCount = "select count(0) " + fromStr + whereStr;
-		String sql = " select " + SEL_COL + ",ac.name,ac.text " + fromStr + whereStr;
+		String sql = " select " + SEL_COL + ",ac.name,ac.text,ac.alarm_level " + fromStr + whereStr;
 		sqlCount += condition;
 		int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
 		Page<AlarmCfgDataAlarmCfg> page = new Page<AlarmCfgDataAlarmCfg>(pageIndex, pageSize, totalRecord);
