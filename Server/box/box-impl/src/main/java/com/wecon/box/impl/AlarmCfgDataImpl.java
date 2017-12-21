@@ -27,7 +27,7 @@ import com.wecon.common.util.CommonUtils;
 public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
-	private final String SEL_COL = "acd.alarm_cfg_id,acd.monitor_time,acd.value,acd.create_date,acd.state,acd.alarm_type";
+	private final String SEL_COL = "acd.alarm_cfg_id,acd.monitor_time,acd.value,acd.create_date,acd.state,acd.alarm_type,acd.alarm_level";
 
 	@Override
 	public void saveAlarmCfgData(final List<AlarmCfgData> listmodel) {

@@ -91,6 +91,6 @@ public interface RealHisCfgDataApi {
 	 * 清除多余的历史数据
 	 * @return
      */
-	public int clearHisCfgData(long deviceId);
+	public int clearHisCfgData(String[] params);
 
 }

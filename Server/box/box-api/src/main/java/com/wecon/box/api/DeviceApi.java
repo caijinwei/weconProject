@@ -150,5 +150,5 @@ public interface DeviceApi {
      * 获取所有盒子ID
      * @return
      */
-    public List<Long> getAllDeviceIds();
+    public List<String[]> getDeviceIdsAndMaxHisCount();
 }

@@ -380,12 +380,12 @@ public class DeviceImpl implements DeviceApi {
     }
 
     @Override
-    public List<Long> getAllDeviceIds(){
-        List<Long> deviceIdLst = jdbcTemplate.query(
-                "select device_id from device", new RowMapper() {
+    public List<String[]> getDeviceIdsAndMaxHisCount(){
+        List<String[]> deviceIdLst = jdbcTemplate.query(
+                "select device_id,max_his_data_count from device", new RowMapper() {
                     @Override
-                    public Long mapRow(ResultSet rs, int i) throws SQLException {
-                        return rs.getLong("device_id");
+                    public String[] mapRow(ResultSet rs, int i) throws SQLException {
+                        return new String[]{rs.getLong("device_id")+"", rs.getInt("max_his_data_count")+""};
                     }
                 });
         return deviceIdLst;

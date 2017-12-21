@@ -45,16 +45,11 @@ public class DBDataClearTask extends Thread {
 		DeviceApi deviceApi = SpringContextHolder.getBean(DeviceApi.class);
 		final RealHisCfgDataApi realHisCfgDataApi = SpringContextHolder.getBean(RealHisCfgDataApi.class);
 		try {
-			List<Long> deviceIds = deviceApi.getAllDeviceIds();
-			if(null != deviceIds){
-				for(final Long deviceId : deviceIds){
-					ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
-					cachedThreadPool.execute(new Runnable() {
-						public void run() {
-							int delRecord = realHisCfgDataApi.clearHisCfgData(deviceId);
-							logger.info("清除盒子【"+deviceId+"】历史数据，删除条数："+delRecord);
-						}
-					});
+			List<String[]> dLst = deviceApi.getDeviceIdsAndMaxHisCount();
+			if(null != dLst){
+				for(final String[] ss : dLst){
+					int delRecord = realHisCfgDataApi.clearHisCfgData(ss);
+					logger.info("清除盒子【"+ss[0]+"】历史数据，删除条数："+delRecord);
 				}
 			}
 		}catch (Exception e){

@@ -63,6 +63,8 @@ public class BusinessDataAction {
         if(param.groupId != 0){
             bParams.put("groupId", param.groupId);
         }
+        param.pageIndex = 0 == param.pageIndex ? 1 : param.pageIndex;
+        param.pageSize = 0 == param.pageSize ? 10 : param.pageSize;
         /** 管理者账号 **/
         if (client.userInfo.getUserType() == 1) {
             realHisCfgFilter.data_type = 0;
@@ -140,6 +142,8 @@ public class BusinessDataAction {
         if(!CommonUtils.isNullOrEmpty(param.monitorEndTime)){
             bParams.put("monitorEndTime", param.monitorEndTime);
         }
+        param.pageIndex = 0 == param.pageIndex ? 1 : param.pageIndex;
+        param.pageSize = 0 == param.pageSize ? 10 : param.pageSize;
         /** 管理者账号 **/
         if (client.userInfo.getUserType() == 1) {
             RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
@@ -192,6 +196,8 @@ public class BusinessDataAction {
         if(param.boxId != 0 && param.boxId != -100 && param.boxId != -200){
             bParams.put("boxId", param.boxId);
         }
+        param.pageIndex = 0 == param.pageIndex ? 1 : param.pageIndex;
+        param.pageSize = 0 == param.pageSize ? 10 : param.pageSize;
         /** 管理者账号 **/
         if (client.userInfo.getUserType() == 1) {
             alarmCfgDataPage = alarmCfgDataApi.getAdminAlarmCfgDataPage(filter, bParams, param.pageIndex, param.pageSize);

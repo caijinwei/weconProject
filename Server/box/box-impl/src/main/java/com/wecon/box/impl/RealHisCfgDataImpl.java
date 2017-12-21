@@ -32,7 +32,7 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	private final String SEL_COL = "real_his_cfg_id,monitor_time,`value`,create_date,state";
-	private final int UPPER_LIMIT_COUNT = 50000;
+
     private final int SINGLE_DEL_COUNT = 2000;
 
 	@Override
@@ -278,14 +278,18 @@ public class RealHisCfgDataImpl implements RealHisCfgDataApi {
 	}
 
 	@Override
-	public int clearHisCfgData(long deviceId){
+	public int clearHisCfgData(String[] params){
 		try {
+			int deviceId = Integer.parseInt(params[0]);
+			int maxCount = Integer.parseInt(params[1]);
+
 			int totalRecord = jdbcTemplate.queryForObject("select count(0) from real_his_cfg r, real_his_cfg_data rd " +
 					"where r.id=rd.real_his_cfg_id and r.device_id=?", new Object[]{deviceId}, Integer.class);
+
 			//超过上限，进行清除
-			if(totalRecord > UPPER_LIMIT_COUNT){
+			if(totalRecord > maxCount){
 				//删除总数
-				int delRecord = totalRecord - UPPER_LIMIT_COUNT;
+				int delRecord = totalRecord - maxCount;
 				//删除次数
 				int delCount = delRecord / SINGLE_DEL_COUNT;
 				int remainder = delRecord % SINGLE_DEL_COUNT;
