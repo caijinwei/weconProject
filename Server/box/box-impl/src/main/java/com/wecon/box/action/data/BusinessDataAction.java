@@ -116,6 +116,8 @@ public class BusinessDataAction {
         }
         json.put("list", arr);
         json.put("totalPage", realHisCfgDevicePage.getTotalPage());
+        json.put("totalRecord", realHisCfgDevicePage.getTotalRecord());
+        json.put("currentPage", realHisCfgDevicePage.getCurrentPage());
         return new Output(json);
     }
 
@@ -174,6 +176,8 @@ public class BusinessDataAction {
 
         json.put("list", arr);
         json.put("totalPage", realHisCfgDataPage.getTotalPage());
+        json.put("totalRecord", realHisCfgDataPage.getTotalRecord());
+        json.put("currentPage", realHisCfgDataPage.getCurrentPage());
         return new Output(json);
     }
 
@@ -196,6 +200,8 @@ public class BusinessDataAction {
         if(param.boxId != 0 && param.boxId != -100 && param.boxId != -200){
             bParams.put("boxId", param.boxId);
         }
+        bParams.put("alarmType", param.alarmType);
+        bParams.put("alarmLevel", param.alarmLevel);
         param.pageIndex = 0 == param.pageIndex ? 1 : param.pageIndex;
         param.pageSize = 0 == param.pageSize ? 10 : param.pageSize;
         /** 管理者账号 **/
@@ -218,10 +224,14 @@ public class BusinessDataAction {
                 data.put("state", alarmCfg.state);
                 data.put("number", alarmCfg.value);
                 data.put("monitorTime", alarmCfg.monitor_time);
+                data.put("alarmType", alarmCfg.alarm_type);
+                data.put("alarmLevel", alarmCfg.alarm_level);
                 arr.add(data);
             }
             json.put("list", arr);
             json.put("totalPage", alarmCfgDataPage.getTotalPage());
+            json.put("totalRecord", alarmCfgDataPage.getTotalRecord());
+            json.put("currentPage", alarmCfgDataPage.getCurrentPage());
         }
 
         return new Output(json);

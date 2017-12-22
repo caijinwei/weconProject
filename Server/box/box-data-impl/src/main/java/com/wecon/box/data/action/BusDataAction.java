@@ -4,12 +4,17 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.wecon.box.api.DeviceApi;
 import com.wecon.box.api.RealHisCfgApi;
 import com.wecon.box.constant.Constant;
+import com.wecon.box.data.util.SendvalueCallback;
 import com.wecon.box.entity.*;
+import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.box.param.BusinessDataParam;
+import com.wecon.box.util.ClientMQTT;
+import com.wecon.box.util.SendValue;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
@@ -20,6 +25,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -33,29 +39,43 @@ import java.util.*;
 @RestController
 public class BusDataAction {
     @Autowired
+    private DeviceApi deviceApi;
+    @Autowired
+    private SendValue sendValue;
+    @Autowired
     private RealHisCfgApi realHisCfgApi;
     @Autowired
     private com.wecon.box.action.data.BusinessDataAction busDataAct;
     
     private static final Logger logger = LogManager.getLogger(BusDataAction.class.getName());
     /**
-     * 获取实时数据
+     * 实时监控点数据列表
      * @param param
      * @return
      */
-    @RequestMapping("we-data/real")
+    @RequestMapping("we-data/realdata")
     @WebApi(forceAuth = true, master = true)
     public Output getRealData(@Valid BusinessDataParam param) {
-
+        if(0 == param.boxId){
+            Client client = AppContext.getSession().client;
+            /** 管理者账号 **/
+            if (client.userInfo.getUserType() == 1) {
+                param.boxId = -100;
+            }
+            /** 视图账号 **/
+            else if (client.userInfo.getUserType() == 2) {
+                param.boxId = -200;
+            }
+        }
         return busDataAct.getRealData(param);
     }
 
     /**
-     * 获取历史数据
+     * 历史监控点数据列表
      * @param param
      * @return
      */
-    @RequestMapping("we-data/history")
+    @RequestMapping("we-data/historydata")
     @WebApi(forceAuth = true, master = true)
     public Output getHistoryData(@Valid BusinessDataParam param) {
 
@@ -63,11 +83,11 @@ public class BusDataAction {
     }
 
     /**
-     * 获取报警数据
+     * 报警监控点数据列表
      * @param param
      * @return
      */
-    @RequestMapping("we-data/alarm")
+    @RequestMapping("we-data/alarmdata")
     @WebApi(forceAuth = true, master = true)
     public Output getAlarmData(@Valid BusinessDataParam param) {
 
@@ -75,7 +95,7 @@ public class BusDataAction {
     }
 
     /**
-     * 获取盒子列表
+     * 盒子列表
      * @return
      */
     @RequestMapping("we-data/boxs")
@@ -85,22 +105,12 @@ public class BusDataAction {
         return busDataAct.getBoxData(param);
     }
 
-    /**
-     * 获取盒子列表
-     * @return
-     */
-    @RequestMapping("we-data/boxdetail")
-    @WebApi(forceAuth = true, master = true, authority = {"1"})
-    public Output getBoxDetail(@Valid BusinessDataParam param) {
-
-        return busDataAct.getBoxData(param);
-    }
 
     /**
-     * 获取分组数据
+     * 实时监控点分组列表
      * @return
      */
-    @RequestMapping("we-data/groups")
+    @RequestMapping("we-data/realgroups")
     @WebApi(forceAuth = true, master = true)
     public Output getGroupData(@Valid BusinessDataParam param) {
         param.type = 1;
@@ -119,7 +129,7 @@ public class BusDataAction {
     }
 
     /**
-     * 获取监控点列表
+     * 历史监控点名称列表
      * @return
      */
     @RequestMapping("we-data/monitors")
@@ -130,21 +140,10 @@ public class BusDataAction {
     }
 
     /**
-     * 获取实时数据详情
+     * 实时监控点配置列表
      * @return
      */
-    @RequestMapping("we-data/realdetail")
-    @WebApi(forceAuth = true, master = true)
-    public Output getRealDetail(BusinessDataParam param) {
-
-        return busDataAct.getRealDetail(param);
-    }
-
-    /**
-     * 获取监控点配置
-     * @return
-     */
-    @RequestMapping("we-data/realcfg")
+    @RequestMapping("we-data/realcfgs")
     @WebApi(forceAuth = true, master = true)
     public Output getRealcfg(BusinessDataParam param) {
         try {
@@ -201,6 +200,7 @@ public class BusDataAction {
             }
             json.put("cfg_list", arr);
             json.put("totalPage", realHisCfgDevicePage.getTotalPage());
+            json.put("totalRecord", realHisCfgDevicePage.getTotalRecord());
             json.put("currentPage", realHisCfgDevicePage.getCurrentPage());
 
             return new Output(json);
@@ -210,5 +210,29 @@ public class BusDataAction {
         }
 
         return null;
+    }
+
+    /**
+     * 修改实时监控点数据
+     * @return
+     */
+    @RequestMapping("we-data/updrealdata")
+    @WebApi(forceAuth = true, master = true)
+    public Output updateRealData(@RequestParam("monitorId") String monitorId,
+              @RequestParam("value") String value) {
+        // 订阅消息
+        if (!CommonUtils.isNullOrEmpty(monitorId)) {
+            RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(monitorId));
+            Device device = deviceApi.getDevice(realHisCfg.device_id);
+            String subscribeTopic = "pibox/cts/" + device.machine_code;
+
+            SendvalueCallback sendvalueCallback = new SendvalueCallback(null, monitorId);
+            ClientMQTT reclient = new ClientMQTT(subscribeTopic, "wecon-updrealdata", sendvalueCallback);
+            reclient.start();
+
+            // 发送数据
+            sendValue.putMQTTMess(value, null, monitorId, OpTypeOption.WriteActPhone, reclient);
+        }
+        return new Output(new JSONObject());
     }
 }

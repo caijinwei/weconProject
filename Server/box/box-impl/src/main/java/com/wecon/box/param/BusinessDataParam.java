@@ -26,6 +26,10 @@ public class BusinessDataParam {
     public int state;
     @Label("盒子是否需要查询报警数据")
     public int selAlarm;
+    @Label("报警事件")
+    public Integer alarmType;
+    @Label("报警等级")
+    public Integer alarmLevel;
 
     public void setBoxId(long boxId) {
         this.boxId = boxId;

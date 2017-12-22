@@ -72,14 +72,14 @@ public class JPushServer {
 
         JSONObject notification = new JSONObject();//通知内容
         JSONObject android = new JSONObject();//android通知内容
-        android.put("alert", java.net.URLEncoder.encode("有新的报警数据", "UTF-8"));
+        android.put("alert", "有新的报警数据");
         android.put("builder_id", 1);
         JSONObject android_extras = new JSONObject();//android额外参数
         android_extras.put("type", "alias");
         android.put("extras", android_extras);
 
         JSONObject ios = new JSONObject();//ios通知内容
-        ios.put("alert", java.net.URLEncoder.encode("有新的报警数据", "UTF-8"));
+        ios.put("alert", "有新的报警数据");
         ios.put("sound", "default");
         ios.put("badge", "+1");
         JSONObject ios_extras = new JSONObject();//ios额外参数
@@ -168,6 +168,6 @@ public class JPushServer {
             data.put("number", "5"+i);
             list.add(data);
         }
-        new JPushServer().push("xlj", JSON.toJSONString(list));
+        new JPushServer().push("lph", JSON.toJSONString(list));
     }
 }

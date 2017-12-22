@@ -313,11 +313,20 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 		}
 
 		Object boxId = bParams.get("boxId");
+		Object alarmType = bParams.get("alarmType");
+		Object alarmLevel = bParams.get("alarmLevel");
 		if (null != boxId) {
 			condition.append(" and ac.device_id = ? ");
 			params.add(boxId);
 		}
-
+		if(null != alarmType){
+			condition.append(" and acd.alarm_type = ? ");
+			params.add(alarmType);
+		}
+		if(null != alarmLevel){
+			condition.append(" and ac.alarm_level = ? ");
+			params.add(alarmLevel);
+		}
 		String sqlCount = "select count(0) " + fromStr + whereStr;
 		String sql = " select " + SEL_COL + ",ac.name, ac.text,ac.alarm_level " + fromStr + whereStr;
 		sqlCount += condition;
@@ -363,11 +372,20 @@ public class AlarmCfgDataImpl implements AlarmCfgDataApi {
 		}
 
 		Object boxId = bParams.get("boxId");
+		Object alarmType = bParams.get("alarmType");
+		Object alarmLevel = bParams.get("alarmLevel");
 		if (null != boxId) {
 			condition.append(" and ac.device_id = ? ");
 			params.add(boxId);
 		}
-
+		if(null != alarmType){
+			condition.append(" and acd.alarm_type = ? ");
+			params.add(alarmType);
+		}
+		if(null != alarmLevel){
+			condition.append(" and ac.alarm_level = ? ");
+			params.add(alarmLevel);
+		}
 		String sqlCount = "select count(0) " + fromStr + whereStr;
 		String sql = " select " + SEL_COL + ",ac.name,ac.text,ac.alarm_level " + fromStr + whereStr;
 		sqlCount += condition;
