@@ -81,6 +81,18 @@ public class DevBindUserImpl implements DevBindUserApi {
 		return jdbcTemplate.queryForObject(sql, args, Integer.class);
 	}
 
+	@Override
+	public List<String> getMachineCodesByAccountId(long accountId){
+		String sql = "SELECT d.machine_code FROM dev_bind_user dbu, device d WHERE dbu.device_id=d.device_id and dbu.account_id=?";
+		List<String> list = jdbcTemplate.query(sql, new Object[]{accountId}, new RowMapper<String>() {
+			@Override
+			public String mapRow(ResultSet resultSet, int i) throws SQLException {
+				return resultSet.getString("machine_code");
+			}
+		});
+		return list;
+	}
+
 	public static final class DefaultDevBindUserRowMapper implements RowMapper<DevBindUser> {
 
 		@Override

@@ -45,7 +45,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	private Map<String, SubscribeListener> subscribeListeners = new HashMap<String, SubscribeListener>();
 	private Map<String, Map<String, Object>> paramMaps = new HashMap<String, Map<String, Object>>();
 	private Map<String, ClientMQTT> clientMQTTs = new HashMap<String, ClientMQTT>();
-
+	private List<String> machineCodeCache = new ArrayList<>();
 	@Autowired
 	protected DbLogUtil dbLogUtil;
 	@Autowired
@@ -256,7 +256,10 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 							}
 						}
 						String device_machine = realHisCfgDevice.machine_code;
-						machineCodeSet.add(device_machine);
+						if(!CommonUtils.isNullOrEmpty(device_machine) && !machineCodeCache.contains(device_machine)){
+							machineCodeSet.add(device_machine);
+							machineCodeCache.add(device_machine);
+						}
 						Device device = deviceApi.getDevice(device_machine);
 						realHisCfgDevice.box_state = device.state;
 						// 通过机器码去redis中获取数据
@@ -287,7 +290,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 						}
 					}
 				}
-				if (machineCodeSet != null && !subscribeListeners.containsKey(session.getId())) {
+				if (machineCodeSet != null && machineCodeSet.size() > 0) {
 
 					subscribeRealData(session, machineCodeSet);
 				}

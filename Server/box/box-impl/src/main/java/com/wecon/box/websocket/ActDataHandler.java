@@ -55,6 +55,8 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 
 	private Map<String, String> paramMap = new HashMap<>();
 
+	private List<String> machineCodeCache = new ArrayList<>();
+
 	private static final Logger logger = LogManager.getLogger(ActDataHandler.class.getName());
 
 	/**
@@ -104,10 +106,10 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 				session.sendMessage(new TextMessage(oj[0].toString()));
 				logger.debug("WebSocket push end");
 
-				// 订阅redis消息
-				SubscribeListener subscribeListener = subListenerMap.get(session.getId());
-				if (null != oj[1] && null == subscribeListener) {
-					subscribeRealData(session, (Set<String>) oj[1]);
+				// 订阅redis消息，有新的机器码则进行订阅
+				Set<String> machineCodeSet = (Set<String>) oj[1];
+				if (machineCodeSet.size() > 0) {
+					subscribeRealData(session, machineCodeSet);
 				}
 			}
 
@@ -216,7 +218,10 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 			for (int i = 0; i < realHisCfgDeviceList.size(); i++) {
 				RealHisCfgDevice realHisCfgDevice = realHisCfgDeviceList.get(i);
 				String device_machine = realHisCfgDevice.machine_code;
-				machineCodeSet.add(device_machine);
+				if(!CommonUtils.isNullOrEmpty(device_machine) && !machineCodeCache.contains(device_machine)){
+					machineCodeSet.add(device_machine);
+					machineCodeCache.add(device_machine);
+				}
 				// 通过机器码去redis中获取数据
 				RedisPiBoxActData redisPiBoxActData = redisPiBoxApi.getRedisPiBoxActData(device_machine);
 				List<PiBoxCom> actTimeDataList = null == redisPiBoxActData ? null

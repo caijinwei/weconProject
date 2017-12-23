@@ -127,4 +127,19 @@ public interface ViewAccountRoleApi {
      * @return
      */
 	boolean batchDeleteViewAccRoleByCfgId(final List<Long> cfgIds, int type);
+
+	/**
+	 * 获取视图账号有权限的所有机器码
+	 * @param viewId
+	 * @return
+     */
+	List<String> getMachineCodesByViewId(long viewId);
+
+	/**
+	 * 获取视图账号某个实时监控点的权限
+	 * @param viewId
+	 * @param cfgId
+	 * @return
+     */
+	int getViewRealRoleTypeByCfgId(long viewId, long cfgId);
 }

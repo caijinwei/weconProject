@@ -29,7 +29,7 @@ public interface DevBindUserApi {
 	public List<DevBindUser> getDevBindUser(DevBindUserFilter devBindUser);
 	/**
 	 * 查询某条用户关联设备信息个数
-	 * @param devBindUser
+	 * @param account_id
 	 * @return
 	 */
 	public int getDevBindUserCount(long account_id);
@@ -52,4 +52,11 @@ public interface DevBindUserApi {
 	* 		    设备号id	用户账户id
 	* */
 	public boolean isRecord(Integer device_id,long account_id);
+
+	/**
+	 * 获取管理员有权限的所有机器码
+	 * @param accountId
+	 * @return
+     */
+	public List<String> getMachineCodesByAccountId(long accountId);
 }
