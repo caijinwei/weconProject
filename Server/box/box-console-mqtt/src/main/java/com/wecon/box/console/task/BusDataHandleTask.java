@@ -166,7 +166,7 @@ public class BusDataHandleTask extends AbstractTask{
                 //发布消息
                 RedisManager.publish(ConstKey.REDIS_GROUP_NAME, machineCode, machineCode);
                 //发布上报的实时数据
-                RedisManager.publish(ConstKey.REDIS_GROUP_NAME, machineCode+"realdata", JSON.toJSONString(redisModel));
+                RedisManager.publish(ConstKey.REDIS_GROUP_NAME, machineCode+"realdata", JSON.toJSONString(newModel));
                 if (jsonObject.getInteger("feedback") == 1) {
                     SendMessage(machineCode, REAL_DATA);
                 }

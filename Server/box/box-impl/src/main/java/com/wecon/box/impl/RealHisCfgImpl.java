@@ -775,6 +775,22 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		return cfgIds;
 	}
 
+	@Override
+	public List<RealHisCfg> getRealCfgByIds(final List<Long> ids) {
+		if (null == ids || ids.size() == 0) {
+			return null;
+		}
+
+		StringBuilder idSb = new StringBuilder();
+		for (long id : ids) {
+			idSb.append(",").append(id);
+		}
+		String sql = "select distinct " + SEL_COL + " from real_his_cfg where id in(" + idSb.substring(1) + ") order by field(id,"+idSb.substring(1)+");";
+		List<RealHisCfg> realCfgList = jdbcTemplate.query(sql, new DefaultRealHisCfgRowMapper());
+
+		return realCfgList;
+	}
+
 	public static final class DefaultRealHisCfgRowMapper implements RowMapper<RealHisCfg> {
 
 		@Override

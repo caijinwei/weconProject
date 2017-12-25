@@ -187,4 +187,12 @@ public interface RealHisCfgApi {
 	* 根据plc_id找realHis
 	* */
 	public List<RealHisCfg> findRealHisCfgsByPlcId(long plc_id);
-	}
+
+	/**
+	 * 根据ID列表获取实时数据配置信息
+	 * @param ids
+	 * @return
+     */
+	public List<RealHisCfg> getRealCfgByIds(final List<Long> ids);
+
+}

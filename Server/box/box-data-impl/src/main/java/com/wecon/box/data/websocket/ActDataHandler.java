@@ -79,9 +79,10 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 			}
 			Client client = clientMap.get(session.getId());
 			Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {});
-			String markid = null != bParams.get("markid") ? bParams.get("markid").toString() : null;
-			if(markid != null){
-				if("2".equals(markid)){
+			String markId = null != bParams.get("markId") ? bParams.get("markId").toString() : null;
+			if(markId != null){
+				if("2".equals(markId)){
+					paramMap.put(session.getId(), params);
 					List<String> machineCodeList = null;
 					/** 管理者账号 **/
 					if (client.userInfo.getUserType() == 1) {
@@ -98,7 +99,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 						}
 						subscribeRealData(session, machineCodeSet);
 					}
-				}else if ("1".equals(markid)) {
+				}else if ("1".equals(markId)) {
 					String value = bParams.get("value").toString();
 					String addr_id = bParams.get("addr_id").toString();
 
@@ -122,7 +123,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 						// 发送数据
 						sendValue.putMQTTMess(value, session, addr_id, OpTypeOption.WriteActPhone, reclient);
 					}
-				}else if("0".equals(markid)){
+				}else if("0".equals(markId)){
 					paramMap.put(session.getId(), params);
 					// 推送消息给移动端
 					logger.debug("WebSocket push begin");
@@ -135,7 +136,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 					if (machineCodeSet.size() > 0) {
 						subscribeRealData(session, machineCodeSet);
 					}
-				} else if("-1".equals(markid)){
+				} else if("-1".equals(markId)){
 					session.sendMessage(new TextMessage("1"));
 				}
 			}
@@ -185,7 +186,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 			logger.debug("Subscribe callback，channel：" + channel + "message:" + message);
 			Map<String, Object> bParams = JSON.parseObject(paramMap.get(session.getId()), new TypeReference<Map<String, Object>>() {});
 			if (!CommonUtils.isNullOrEmpty(message)) {
-				if("0".equals(bParams.get("markid"))){
+				if("0".equals(bParams.get("markId").toString())){
 					try {
 						Object[] oj = getRealData(session);
 						if (null != oj[0]) {
@@ -200,21 +201,34 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 						e.printStackTrace();
 						logger.debug("Subscribe callback error，" + e.getMessage());
 					}
-				}else if("2".equals(bParams.get("markid"))){
+				}else if("2".equals(bParams.get("markId").toString())){
 					try {
 						RedisPiBoxActData redisModel = JSON.parseObject(message, RedisPiBoxActData.class);
 						List<PiBoxCom> act_time_data_list = redisModel.act_time_data_list;
 						JSONObject list = new JSONObject();
 						JSONArray arr = new JSONArray();
 						if(null != act_time_data_list){
+							List<Long> cfgIds = new ArrayList<>();
+							for(PiBoxCom piBoxCom : act_time_data_list){
+								List<PiBoxComAddr> addr_list = piBoxCom.addr_list;
+								if(null != addr_list){
+									for(PiBoxComAddr piBoxComAddr : addr_list){
+										cfgIds.add(Long.parseLong(piBoxComAddr.addr_id));
+									}
+								}
+							}
+							List<RealHisCfg> realCfgList = realHisCfgApi.getRealCfgByIds(cfgIds);
+							int i = 0;
 							for(PiBoxCom piBoxCom : act_time_data_list){
 								List<PiBoxComAddr> addr_list = piBoxCom.addr_list;
 								if(null != addr_list){
 									for(PiBoxComAddr piBoxComAddr : addr_list){
 										JSONObject data = new JSONObject();
-										data.put("addr_id", piBoxComAddr.addr_id);
+										data.put("monitorId", piBoxComAddr.addr_id);
 										data.put("state", piBoxComAddr.state);
-										data.put("value", piBoxComAddr.value);
+										data.put("number", piBoxComAddr.value);
+										data.put("dataId", realCfgList.get(i).data_id);
+										data.put("digitCount", realCfgList.get(i++).digit_count);
 										arr.add(data);
 									}
 								}
@@ -223,7 +237,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 						list.put("list", arr);
 						JSONObject respone = new JSONObject();
 						respone.put("msg", "实时数据");
-						respone.put("markid", 2);
+						respone.put("markId", 2);
 						respone.put("result", list);
 						session.sendMessage(new TextMessage(respone.toJSONString()));
 					}catch (Exception e){
@@ -293,6 +307,8 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 				data.put("monitorName", CommonUtils.isNullOrEmpty(realHisCfgDevice.ref_alais) ? realHisCfgDevice.name
 						: realHisCfgDevice.ref_alais);
 				data.put("number", 0);
+				data.put("dataId", realHisCfgDevice.data_id);
+				data.put("digitCount", realHisCfgDevice.digit_count);
 				String stateText = null;
 				if (realHisCfgDevice.dstate == Constant.State.STATE_BOX_OFFLINE) {
 					stateText = "0";
@@ -344,7 +360,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 			json.put("currentPage", realHisCfgDevicePage.getCurrentPage());
 			JSONObject result = new JSONObject();
 			result.put("msg", "实时数据");
-			result.put("markid", 0);
+			result.put("markId", 0);
 			result.put("result", json);
 			logger.debug("Websocket push msg: " + result.toJSONString());
 			return new Object[] {result.toJSONString(), machineCodeSet};
