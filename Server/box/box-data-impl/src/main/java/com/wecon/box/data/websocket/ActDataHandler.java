@@ -100,8 +100,8 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 						subscribeRealData(session, machineCodeSet);
 					}
 				}else if ("1".equals(markId)) {
-					String value = bParams.get("value").toString();
-					String addr_id = bParams.get("addr_id").toString();
+					String value = bParams.get("number").toString();
+					String addr_id = bParams.get("monitorId").toString();
 
 					// 订阅消息
 					if (!CommonUtils.isNullOrEmpty(addr_id)) {
