@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lanpenghui 2017年8月7日下午1:51:25
@@ -233,5 +234,30 @@ public class AccountDirRelImpl implements AccountDirRelApi {
         jdbcTemplate.update(sql);
 
         return true;
+    }
+
+    @Override
+    public void copyAccDeviceRel(Map<Long, Long> fromtoRealCfgMap, Map<Long, Long> fromtoAccountDirMap) {
+        for(Map.Entry<Long,Long> fromtoAccountDir:fromtoAccountDirMap.entrySet()){
+            List<AccountDirRel> accountDirRels =getAccountDirRel(fromtoAccountDir.getKey());
+            /*
+            * 分组下没有值  就跳过
+            * */
+            if(accountDirRels ==null || accountDirRels.size() <=0){
+                continue;
+            }
+
+            for(AccountDirRel accountDirRel:accountDirRels){
+                /*
+                * 针对脏数据
+                * */
+                if(fromtoRealCfgMap.get(accountDirRel.ref_id)==null){
+                    continue;
+                }
+                accountDirRel.ref_id=fromtoRealCfgMap.get(accountDirRel.ref_id);
+                accountDirRel.acc_dir_id=fromtoAccountDir.getValue();
+                saveAccountDirRel(accountDirRel);
+            }
+        }
     }
 }

@@ -1,13 +1,13 @@
 package com.wecon.box.impl;
 
+import com.wecon.box.api.AccountDirApi;
+import com.wecon.box.api.AccountDirRelApi;
 import com.wecon.box.api.AlarmCfgApi;
-
-import com.wecon.box.entity.AlarmCfg;
-import com.wecon.box.entity.AlarmCfgExtend;
-import com.wecon.box.entity.AlarmCfgTrigger;
-import com.wecon.box.entity.AlarmTrigger;
-import com.wecon.box.entity.Page;
+import com.wecon.box.api.AlarmTriggerApi;
+import com.wecon.box.entity.*;
+import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.common.util.TimeUtil;
+import com.wecon.restful.core.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,11 +16,18 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author lanpenghui 2017年8月9日下午2:20:05
@@ -29,6 +36,19 @@ import java.util.Map;
 public class AlarmCfgImpl implements AlarmCfgApi {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
+
+	@Autowired
+	private AccountDirApi accountDirApi;
+
+	@Autowired
+	private AccountDirRelApi accountDirRelApi;
+
+	@Autowired
+	private AlarmTriggerApi alarmTriggerApi;
+
+	@Autowired
+	public PlatformTransactionManager transactionManager;
+
 
 	private final String SEL_COL = "alarmcfg_id,data_id,account_id,name,addr,addr_type,text,condition_type,state,plc_id,device_id,rid,data_limit,digit_count,digit_binary,alarm_level,bind_state,create_date,update_date";
 
@@ -575,6 +595,84 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 		}
 
 		return result;
+	}
+
+	@Override
+	public Map<Long,Long> copyAlarmCfg(Long accId,Long toDeviceId,Map<Long,Long>fromtoPlcIdMap) {
+		/*
+		* 已存在报警配置  不能复制配置
+		* */
+		List<AlarmCfg> toAlarmCfgs = getAlarmCfg(accId, toDeviceId);
+
+		if (toAlarmCfgs != null) {
+			for (AlarmCfg alarmCfg : toAlarmCfgs) {
+				if (alarmCfg.state != 3) {
+					throw new BusinessException(ErrorCodeOption.AlarmConfig_Is_Exist.key, ErrorCodeOption.AlarmConfig_Is_Exist.value);
+				}
+			}
+		}
+		Map<Long,Long> resultMap =new HashMap<Long,Long>();
+
+
+		for (Map.Entry<Long, Long> entry : fromtoPlcIdMap.entrySet()) {
+			List<AlarmCfg> fromAlarmCfgList = getAlarmByPlcId(entry.getKey());
+
+			if(fromAlarmCfgList == null|| fromAlarmCfgList.size()<=0){
+					throw new BusinessException(ErrorCodeOption.AlarmCfg_Is_Empty.key,ErrorCodeOption.AlarmCfg_Is_Empty.value);
+			}
+
+
+			for (AlarmCfg alarmCfg : fromAlarmCfgList) {
+				if (alarmCfg.state != 3) {
+					alarmCfg.device_id = toDeviceId;
+					alarmCfg.plc_id = entry.getValue();
+					resultMap.put(alarmCfg.alarmcfg_id,saveAlarmCfg(alarmCfg));
+				}
+			}
+		}
+		if(resultMap.size() >0){
+			return resultMap;
+		}
+		return null;
+	}
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	@Override
+	public void copyAlarm(final Long accountId, final Long fromDeviceId, final Long toDeviceId, final Map<Long, Long> fromtoPlcIdMap) {
+		/*
+		* 分组type   报警类型为: 3
+		* */
+		final int TYPE=3;
+		TransactionTemplate tt = new TransactionTemplate(transactionManager);
+
+		 /*
+            * 先删除 目标设备的默认分组
+            * */
+		List<AccountDir> toAccountDir=accountDirApi.getAccountDirList(accountId,TYPE,toDeviceId);
+		for(AccountDir accountDir :toAccountDir){
+			if(accountDir.name.equals("默认组")){
+				accountDirApi.delAccountDir(accountDir.id);
+				break;
+			}
+		}
+		try {
+			tt.execute(new TransactionCallback() {
+				@Override
+				public Object doInTransaction(TransactionStatus ts) {
+
+					Map<Long,Long> fromtoAlarmCfgIdMap =copyAlarmCfg(accountId,toDeviceId,fromtoPlcIdMap);
+					if(fromtoAlarmCfgIdMap != null && fromtoAlarmCfgIdMap.size() >0) {
+						Map<Long, Long> fromtoAccountDirMap = accountDirApi.copyAccountDir(accountId, fromDeviceId, toDeviceId, TYPE);
+						accountDirRelApi.copyAccDeviceRel(fromtoAlarmCfgIdMap, fromtoAccountDirMap);
+						alarmTriggerApi.copyAlarmTrigger(fromtoAlarmCfgIdMap);
+					}
+					return true;
+				}
+			});
+		} catch (Exception e) {
+			Logger.getLogger(AccountImpl.class.getName()).log(Level.SEVERE, null, e);
+			throw new BusinessException(ErrorCodeOption.AlarmCfg_Copy_Faile.key,ErrorCodeOption.AlarmCfg_Copy_Faile.value);
+		}
+
 	}
 
 	public static final class DefaultPushAlarmCfgRowMapper implements RowMapper<Map> {

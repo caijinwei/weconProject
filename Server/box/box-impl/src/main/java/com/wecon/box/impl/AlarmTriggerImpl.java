@@ -1,19 +1,21 @@
 package com.wecon.box.impl;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import com.wecon.box.api.AlarmTriggerApi;
+import com.wecon.box.entity.AlarmTrigger;
+import com.wecon.box.filter.AlarmTriggerFilter;
+import com.wecon.common.util.CommonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-import com.wecon.box.api.AlarmTriggerApi;
-import com.wecon.box.entity.AlarmTrigger;
-import com.wecon.box.filter.AlarmTriggerFilter;
-import com.wecon.common.util.CommonUtils;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author lanpenghui 2017年8月9日下午2:31:37
@@ -43,6 +45,14 @@ public class AlarmTriggerImpl implements AlarmTriggerApi {
 			}
 		});
 	}
+
+	@Override
+	public void saveAlarmTrigger(AlarmTrigger alarmTrigger) {
+		String sql = "insert into alarm_trigger (alarmcfg_id,type,value,create_date,update_date)values(?,?,?,current_timestamp(),current_timestamp())";
+		Object[] args =new Object[]{alarmTrigger.alarmcfg_id,alarmTrigger.type,alarmTrigger.value};
+		jdbcTemplate.update(sql,args);
+	}
+
 
 	@Override
 	public List<AlarmTrigger> getAlarmTrigger(AlarmTriggerFilter filter) {
@@ -121,6 +131,23 @@ public class AlarmTriggerImpl implements AlarmTriggerApi {
 		String sql = "delete from  alarm_trigger where alarmcfg_id=?";
 		jdbcTemplate.update(sql, new Object[] { alarmcfg_id });
 
+	}
+
+	@Override
+	public void copyAlarmTrigger(Map<Long,Long> fromtoAlarmCfgMap)
+	{
+		if(fromtoAlarmCfgMap != null && fromtoAlarmCfgMap.size() >0){
+			for(Map.Entry<Long,Long> entry:fromtoAlarmCfgMap.entrySet()){
+				AlarmTriggerFilter filter =new AlarmTriggerFilter();
+				filter.type = -1;
+				filter.alarmcfg_id=entry.getKey();
+				List<AlarmTrigger>list=	getAlarmTrigger(filter);
+				for(AlarmTrigger alarmTrigger:list){
+					alarmTrigger.alarmcfg_id =entry.getValue();
+					saveAlarmTrigger(alarmTrigger);
+				}
+			}
+		}
 	}
 
 }

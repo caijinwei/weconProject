@@ -73,7 +73,8 @@
                         <span class="col-md-2" style="padding-top:10px;padding-left: 0px">行业应用</span>
 
                         <div class="col-md-3">
-                            <select class="form-control" id="deviceUse" name="deviceUse" style="padding-left: 0px;padding-right: 0px"
+                            <select class="form-control" id="deviceUse" name="deviceUse"
+                                    style="padding-left: 0px;padding-right: 0px"
                                     onchange="isOtherOption()" value="{{deviceUseOptions}}">
                                 <option ng-repeat="use in deviceUseOptions" value="{{use.useCode}}">{{use.useName}}
                                 </option>
@@ -88,7 +89,8 @@
 
 
                     <div class="row" style="margin-top: 12px">
-                        <span class="col-md-2" style="padding-top:10px;padding-left: 0px;padding-right: 0px">历史数据最多保存</span>
+                        <span class="col-md-2"
+                              style="padding-top:10px;padding-left: 0px;padding-right: 0px">历史数据最多保存</span>
 
                         <div class="col-md-3" style="padding-bottom: 0px">
                             <div class="form-group" style="font-weight: bold;display: inline-block;">
@@ -103,12 +105,13 @@
 
                     <div class="row">
                         <span class="col-md-2" style="padding-top:10px;padding-left: 0px">地图信息</span>
-                         <div class="col-md-3 " style="font-weight: bold;padding-right: 0px">
-                             <div class="form-group">
-                                 <input type="text" ng-model="map_a" id="map_a" class="form-control"
-                                        style="padding-left: 10px;width:90%" placeholder="经度"/>
-                             </div>
-                         </div>
+
+                        <div class="col-md-3 " style="font-weight: bold;padding-right: 0px">
+                            <div class="form-group">
+                                <input type="text" ng-model="map_a" id="map_a" class="form-control"
+                                       style="padding-left: 10px;width:90%" placeholder="经度"/>
+                            </div>
+                        </div>
                         <div class="col-md-3" style="padding-left: 0px">
                             <div class="form-group">
                                 <input type="text" class="form-control" id="map_o" ng-model="map_o"
@@ -140,6 +143,7 @@
                         </button>
                         <button type="button" class="btn btn-info" ng-click="chgPiboxInFoName(infoData.device_id)">保存修改
                         </button>
+                        <button type="button" class="btn btn-info" ng-click="getDeviceByAccId()">复制配置</button>
                         <!--<button type="button" class="btn btn-danger">重启PIBox</button>-->
                         <!--<button type="button" class="btn btn-danger">清除PIBox数据</button>-->
                         <!--<button type="button" class="btn btn-warning">强制同步</button>-->
@@ -229,6 +233,121 @@
                 </div>
             </div>
 
+            <!-- 复制配置模态框（Modal） -->
+            <div class="modal" tabindex="-1" id="copyConfigModal"
+                 data-backdrop="false">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span>&times;</span>
+                            </button>
+                            <h4 class="modal-title">配置复制</h4>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table table-bordered table-hover">
+
+                                <tbody>
+                                <tr class="input-group col-md-12">
+                                    <td colspan="2">
+                                        <select id="fromDeviceId" style="height: 30px;width: 100%;">
+                                            <option ng-repeat="x in devices" value="{{x.device_id}}">{{x.name}}</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr class="input-group">
+                                    <td class="col-md-1">
+                                    <span>
+                                        <input name="copyCheckbox" type="checkbox" id="baseInfoChck"/>
+                                    </span>
+                                    </td>
+                                    <td class="col-md-11">
+                                        <span>基本信息</span>
+                                    </td>
+                                </tr>
+                                <tr class="input-group">
+                                    <td class="col-md-1">
+                                        <span>
+                                            <input  name="copyCheckbox" type="checkbox" id="comSelCheck" onchange="isShowOtherSel()"/>
+                                        </span>
+                                    </td>
+                                    <td class="col-md-11">
+                                        <span>通讯口配置</span>
+                                    </td>
+                                </tr>
+                                <tr class="input-group" style="display: none" name="otherSel">
+                                    <td class="col-md-1">
+                                    <span>
+                                        <input name="copyCheckbox" type="checkbox" id="isRealSelCheck"/>
+                                    </span>
+                                    </td>
+                                    <td class="col-md-11">
+                                        <span>实时数据</span>
+                                    </td>
+                                </tr>
+                                <tr class="input-group" style="display: none" name="otherSel">
+                                    <td class="col-md-1">
+                                    <span>
+                                        <input name="copyCheckbox" id="isAlarmSelCheck" type="checkbox"/>
+                                    </span>
+                                    </td>
+                                    <td class="col-md-11">
+                                        <span>报警记录</span>
+                                    </td>
+                                </tr>
+                                <tr class="input-group" style="display: none" name="otherSel">
+                                    <td class="col-md-1">
+                                    <span>
+                                        <input name="copyCheckbox" id="isHisSelCheck" type="checkbox"/>
+                                    </span>
+                                    </td>
+                                    <td class="col-md-11">
+                                        <span>历史数据</span>
+                                    </td>
+                                </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-info"
+                                    ng-click="copyDeviceConfig()">确定
+                            </button>
+                            <button type="button" class="btn btn-default" id=""
+                                    data-dismiss="modal">取消
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="modal" tabindex="-1" id="noticeCopy"
+             data-backdrop="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                        <h4 class="modal-title">提示</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="noticeMessage">
+                            <span style="color: red;"></span>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-default"
+                                data-dismiss="modal">确定
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!--------------------------------------------------------------------------------------------- 通讯口配置--------------------------------------------------------------------------------------------------------------------------------------------------------------------->

@@ -1,15 +1,16 @@
 package com.wecon.box.api;
 
-import java.util.List;
-
+import com.wecon.box.entity.AlarmTrigger;
+import com.wecon.box.filter.AlarmTriggerFilter;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author lanpenghui
  * 2017年8月1日
  */
-
-import com.wecon.box.entity.AlarmTrigger;
-import com.wecon.box.filter.AlarmTriggerFilter;
 
 @Component
 public interface AlarmTriggerApi {
@@ -26,6 +27,9 @@ public interface AlarmTriggerApi {
 	public AlarmTrigger getAlarmTrigger(long alarmtrig_id);
 	public boolean upAlarmTrigger(AlarmTrigger alarmTrigger);
 	public void saveAlarmTrigger(List<AlarmTrigger> listalarmTrigger);
+	public void saveAlarmTrigger(AlarmTrigger alarmTrigger);
 	public void delAlarmTrigger(long alarmcfg_id);
+
+	public void copyAlarmTrigger(Map<Long,Long> fromtoAlarmCfgMap);
 
 }

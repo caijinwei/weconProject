@@ -5,6 +5,7 @@ import com.wecon.box.entity.RealHisCfg;
 import com.wecon.box.entity.RealHisCfgDevice;
 import com.wecon.box.entity.RealHisCfgExtend;
 import com.wecon.box.filter.RealHisCfgFilter;
+import com.wecon.box.filter.RealHisConfigFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import org.springframework.stereotype.Component;
 
@@ -187,4 +188,19 @@ public interface RealHisCfgApi {
 	* 根据plc_id找realHis
 	* */
 	public List<RealHisCfg> findRealHisCfgsByPlcId(long plc_id);
+
+	/*
+	* 实时历史配置copy
+	* @param dataType  0 实时   1 历史
+	* */
+	public Map<Long,Long> copyRealHisCfg(Map<Long,Long> fromtoPlcId ,int dataType, long toDeviceId);
+
+	/*
+	* 实时历史配置信息copy事务
+	*
+	* */
+	public void copyRealHis(Long accountId,Long fromDeviceId,Long toDeviceId,int dataType,Map<Long,Long> fromtoPlcId);
+
+
+	public List<RealHisCfg> findRealHisCfgs(RealHisConfigFilter filter);
 	}

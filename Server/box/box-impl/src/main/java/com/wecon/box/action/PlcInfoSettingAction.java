@@ -202,7 +202,7 @@ public class PlcInfoSettingAction {
                 Integer plcState=plcInfoApi.isExistPort(plcInfo.device_id, plcInfo.port);
                 if (plcState==3) {
                     throw new BusinessException(ErrorCodeOption.PlcInfo_Port_IsExist.key, ErrorCodeOption.PlcInfo_Port_IsExist.value);
-                }else if(plcState==1){
+                }else {
                     throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
                 }
             }
@@ -212,7 +212,7 @@ public class PlcInfoSettingAction {
                     Integer plcState=plcInfoApi.isExistPort(plcInfo.device_id, plcInfo.port);
                     if (plcState==3) {
                         throw new BusinessException(ErrorCodeOption.PlcInfo_Port_IsExist.key, ErrorCodeOption.PlcInfo_Port_IsExist.value);
-                    }else if(plcState==1){
+                    }else {
                         throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
                     }
                 }

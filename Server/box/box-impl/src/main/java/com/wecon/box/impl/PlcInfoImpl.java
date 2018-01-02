@@ -22,6 +22,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -169,6 +170,35 @@ public class PlcInfoImpl implements PlcInfoApi {
             return list;
         }
         return null;
+    }
+
+    @Override
+    public Map<Long,Long> copyDeviceCom(long fromDeviceId, long toDeviceId) {
+        Map<Long,Long> resultMap = new HashMap<Long,Long>();
+
+        /*
+        * 判断是否已经存在通讯口配置
+        * */
+        List<PlcInfo> toinfoList = getListPlcInfo(toDeviceId);
+        if(toinfoList != null && toinfoList.size() >0){
+            for(PlcInfo plcInfo:toinfoList){
+                if(plcInfo.state!=3){
+                    throw new BusinessException(ErrorCodeOption.ComConfig_Is_Exist.key,ErrorCodeOption.ComConfig_Is_Exist.value);
+                }
+            }
+        }
+
+
+        List<PlcInfo> frominfoList = getListPlcInfo(fromDeviceId);
+        if( frominfoList!=null && frominfoList.size() >= 0 ){
+            for(PlcInfo p : frominfoList){
+                if(p.state != 3){
+                p.device_id=toDeviceId;
+                resultMap.put(p.plc_id,savePlcInfo(p));
+                }
+            }
+        }
+        return resultMap;
     }
 
 

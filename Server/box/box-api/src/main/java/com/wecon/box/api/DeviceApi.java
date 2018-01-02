@@ -151,4 +151,15 @@ public interface DeviceApi {
      * @return
      */
     public List<String[]> getDeviceIdsAndMaxHisCount();
+
+    /*
+    * 复制盒子基本信息
+    *           -地图信息
+    *           -历史数据最多保存
+    *           -备注信息
+    * UPDATE device a,device b SET a.map=b.map ,a.max_his_data_count=b.max_his_data_count,a.remark=b.remark WHERE a.device_id = 3333 AND b.device_id =2222;
+    * */
+    public void copyDeviceBaseinfo(long fromDeviceId,long toDeviceId);
+
+
 }

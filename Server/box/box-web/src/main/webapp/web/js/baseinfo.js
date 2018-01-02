@@ -106,23 +106,71 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         });
     }
 
-    /*
-     * 展示行业应用的option
-     * */
-    //$scope.getDeviceUseOptions = function () {
-    //    var parmas = {};
-    //    T.common.ajax.request("WeconBox", "baseInfoAction/getDeviceUseOptions", parmas, function (data, code, msg) {
-    //        if (code == 200) {
-    //            $scope.deviceUseOptions = data.data;
-    //            console.log("获取到的deviceUseOption的值是:", data.data);
-    //        }
-    //        else {
-    //            alert(code + "-" + msg);
-    //        }
-    //    }, function () {
-    //        console.log("ajax error");
-    //    });
-    //}
+    $scope.getDeviceByAccId = function(){
+        cleanCopyCheccbox();
+        var params = {currentDeviceId:$scope.infoData.device_id};
+        T.common.ajax.request("WeconBox", "baseInfoAction/getOtherDeviceByAccId", params, function (data, code, msg) {
+            if (code == 200) {
+                $scope.devices=data.deviceList;
+                $scope.$apply();
+                $("#copyConfigModal").modal("show");
+            }
+            else {
+                alert(code + "-" + msg);
+            }
+        }, function () {
+            console.log("ajax error");
+        });
+    }
+    $scope.copyDeviceConfig = function(){
+
+        var fromDeviceId=$("#fromDeviceId").val();
+        var baseInfoChck = ($("#baseInfoChck").get(0).checked == true ?  1 : 0) +"";
+        var comSelCheck = ($("#comSelCheck").get(0).checked == true ?  1 : 0)+"";
+        var isRealSelCheck = ($("#isRealSelCheck").get(0).checked == true ?  1 : 0+"");
+        var isAlarmSelCheck = ($("#isAlarmSelCheck").get(0).checked == true ?  1 : 0+"");
+        var isHisSelCheck = ($("#isHisSelCheck").get(0).checked == true ?  1 : 0)+"";
+        var params = {
+            fromDeviceId: fromDeviceId+"",
+            toDeviceId : $scope.infoData.device_id,
+            isCopyBaseInfo : baseInfoChck,
+            isCopyCom : comSelCheck,
+            isCopyReal : isRealSelCheck,
+            isCopyHis : isHisSelCheck,
+            isCopyAlarm:isAlarmSelCheck
+        };
+        /*
+        * isCopyBaseInfo='null', isCopyCom='null', isCopyReal='null', isCopyHis='null', isCopyAlarm='null'
+        * */
+        T.common.ajax.request("WeconBox", "baseInfoAction/copyDeviceConfig", params, function (data, code, msg) {
+            if (code == 200) {
+                var alarmMes ="";
+                $("#copyConfigModal").modal("hide");
+
+                $scope.copyMessage=data.data;
+                $.each(data.data,function(name,value){
+                    if(value == "成功"){
+                        alarmMes += name+"&nbsp;&nbsp;&nbsp;&nbsp;<span  style='color: green;'>"+value+"</span></br>";
+
+                    }else{
+                        alarmMes += name+"&nbsp;&nbsp;&nbsp;&nbsp;<span  style='color: red;'>"+value+"</span></br>";
+
+                    }
+                });
+                $("#noticeMessage").empty();
+                $("#noticeMessage").append(alarmMes);
+                console.log("消息是:   "+alarmMes);
+                $("#noticeCopy").modal("show");
+            }
+            else {
+                alert(code + "-" + msg);
+            }
+        }, function () {
+            console.log("ajax error");
+        });
+
+    }
+
 
     /*
      * --------------------------------------------------------通讯口配置------------------------------------------------------------------------------
@@ -1176,5 +1224,25 @@ var isOtherOption = function () {
         $("#otherDeviceUseName").show();
     } else {
         $("#otherDeviceUseName").hide();
+    }
+}
+
+var cleanCopyCheccbox =function(){
+    $("input[name= copyCheckbox]").each(function (index,element) {
+        element.checked =false;
+    });
+    isShowOtherSel();
+}
+
+
+var isShowOtherSel = function(){
+    if(($("#comSelCheck").get(0).checked)){
+        $("tr[name='otherSel']").each(function(index,element){
+            $(element).show();
+        });
+    }else{
+        $("tr[name='otherSel']").each(function(index,element){
+            $(element).hide();
+        });
     }
 }

@@ -1,11 +1,12 @@
 package com.wecon.box.api;
 
-import com.wecon.box.entity.PlcInfo;
 import com.wecon.box.entity.PlcExtend;
+import com.wecon.box.entity.PlcInfo;
 import com.wecon.box.entity.PlcInfoDetail;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lanpenghui
@@ -129,5 +130,11 @@ public interface PlcInfoApi {
 	* 获取 非(删除配置)state!=3  的plcDetail
 	* */
 	public List<PlcInfoDetail> getActiveListPlcInfoDetail(long device_id);
+
+	/*
+	* 复制盒子通讯口配置
+	*
+	* */
+	public Map<Long,Long> copyDeviceCom(long fromDeviceId, long toDeviceId);
 
 }

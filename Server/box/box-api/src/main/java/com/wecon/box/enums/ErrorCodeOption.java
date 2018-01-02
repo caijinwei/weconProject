@@ -91,6 +91,15 @@ public enum ErrorCodeOption {
     PlcInfo_Port_IsExist("删除通讯口指令已下发，请再30秒后再添加操作",300034),
     His_add_Beyond("历史配置只能添加100条",30035),
     Alarm_add_Beyond("报警配置只能添加200条",30036),
+    AlarmConfig_Is_Exist("报警配置已经存在，复制失败！",30037),
+    RealHisConfig_Is_Exist("实时历史配置已经存在，复制失败！",30038),
+    ComConfig_Is_Exist("通讯口配置已经存在，复制失败！",30039),
+    AlarmCfg_Copy_Faile("报警配置复制失败！",30040),
+    RealCfg_Copy_Faile("实时配置复制失败！",30041),
+    HisCfg_Copy_Faile("历史配置复制失败！",30042),
+    AlarmCfg_Is_Empty("待复制的报警配置为空！",30043),
+    RealCfg_Is_Empty("待复制的实时配置为空！",30044),
+    HisCfg_Is_Empty("待复制的历史配置为空！",30045),
 
 
 

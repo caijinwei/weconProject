@@ -392,6 +392,18 @@ public class DeviceImpl implements DeviceApi {
     }
 
     @Override
+    public void copyDeviceBaseinfo(long fromDeviceId, long toDeviceId) {
+
+        if(fromDeviceId < 0 || toDeviceId < 0){
+            throw new BusinessException(ErrorCodeOption.DeviceId_Is_Unknown.key,ErrorCodeOption.DeviceId_Is_Unknown.value);
+        }
+        String sql = "UPDATE device toD,device fromD SET toD.map=fromD.map ,toD.max_his_data_count=fromD.max_his_data_count,toD.remark=fromD.remark WHERE toD.device_id=? and fromD.device_id=?";
+        Object[] args =new Object[]{toDeviceId,fromDeviceId};
+        jdbcTemplate.update(sql,args);
+    }
+
+
+    @Override
     public void boundDevice(final long device_id, final String name, final long acc_dir_id) {
         TransactionTemplate tt = new TransactionTemplate(transactionManager);
         try {

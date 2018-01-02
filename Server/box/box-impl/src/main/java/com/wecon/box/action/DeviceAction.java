@@ -24,7 +24,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by caijinw on 2017/8/8.
@@ -61,6 +63,9 @@ public class DeviceAction {
     @Autowired
     private AlarmCfgDataApi alarmCfgDataApi;
 
+    @Autowired
+    private PlcInfoApi plcInfoApi;
+
     /**
      * 盒子基本信息的展示
      *
@@ -81,10 +86,10 @@ public class DeviceAction {
         Device device = deviceApi.getDevice(device_id);
         DeviceUse deviceUse = deviceApi.getDeviceUse(device_id);
         JSONObject data = new JSONObject();
-        data.put("deviceUseOptions",DeviceUseQuerier.allDeviceUses);
+        data.put("deviceUseOptions", DeviceUseQuerier.allDeviceUses);
         data.put("device", device);
         data.put("userType", userType);
-        data.put("deviceUse",deviceUse);
+        data.put("deviceUse", deviceUse);
         if (device == null || data.size() == 0) {
             throw new BusinessException(ErrorCodeOption.PiBoxDevice_IsNot_Found.key,
                     ErrorCodeOption.PiBoxDevice_IsNot_Found.value);
@@ -129,8 +134,8 @@ public class DeviceAction {
     @RequestMapping(value = "/boundBox")
     public Output boundBox(@RequestParam("machine_code") String machine_code, @RequestParam("password") String password,
                            @RequestParam("name") String name, @RequestParam("acc_dir_id") Integer acc_dir_id,
-                           @RequestParam("deviceUseCode")Integer deviceUseCode,
-                           @RequestParam("deviceUseName")String deviceUseName) {
+                           @RequestParam("deviceUseCode") Integer deviceUseCode,
+                           @RequestParam("deviceUseName") String deviceUseName) {
 
 
         /*
@@ -143,8 +148,8 @@ public class DeviceAction {
             throw new BusinessException(ErrorCodeOption.Device_Pwd_Error.key, ErrorCodeOption.Device_Pwd_Error.value);
         }
         long device_id = device.device_id;
-		/*
-		 * 该设备没有被别的用户绑定过
+        /*
+         * 该设备没有被别的用户绑定过
 		 */
         if (devBindUserApi.findByDevId(device_id) != 0) {
             throw new BusinessException(ErrorCodeOption.Device_AlreadyBind.key,
@@ -160,18 +165,18 @@ public class DeviceAction {
          /*
         * 行业类型保存
         * */
-        if(CommonUtils.isNotNull(deviceUseCode)){
-            if(deviceUseCode!=999){
-                DeviceUse deviceUse=new DeviceUse();
-                deviceUse.useName=DeviceUseQuerier.allDeviceUsesMap.get(deviceUseCode);
-                deviceUse.useCode=deviceUseCode;
-                deviceUse.deviceId=device.device_id;
+        if (CommonUtils.isNotNull(deviceUseCode)) {
+            if (deviceUseCode != 999) {
+                DeviceUse deviceUse = new DeviceUse();
+                deviceUse.useName = DeviceUseQuerier.allDeviceUsesMap.get(deviceUseCode);
+                deviceUse.useCode = deviceUseCode;
+                deviceUse.deviceId = device.device_id;
                 deviceApi.updateDeviceUse(deviceUse);
-            }else{
-                DeviceUse deviceUse=new DeviceUse();
-                deviceUse.otherUseName=deviceUseName;
-                deviceUse.useCode=deviceUseCode;
-                deviceUse.deviceId=device.device_id;
+            } else {
+                DeviceUse deviceUse = new DeviceUse();
+                deviceUse.otherUseName = deviceUseName;
+                deviceUse.useCode = deviceUseCode;
+                deviceUse.deviceId = device.device_id;
                 deviceApi.updateDeviceUse(deviceUse);
             }
         }
@@ -228,7 +233,7 @@ public class DeviceAction {
 
                     Device device = deviceList.get(j);
                     devicedata.put("deviceId", device.device_id);
-                    devicedata.put("deviceMap",device.map);
+                    devicedata.put("deviceMap", device.map);
                     devicedata.put("deviceName", device.name);
                     devicedata.put("deviceState", device.state);
                     devicearr.add(devicedata);
@@ -271,15 +276,15 @@ public class DeviceAction {
     @Label("超级管理员查看所有device盒子")
     @WebApi(forceAuth = true, master = true, authority = {"0"})
     @RequestMapping(value = "showAllDeviceDir")
-    public Output showAllDeviceDir(@RequestParam("state")Integer state,@RequestParam("machine_code")String machine_code,@RequestParam("accountId")long accountId,@RequestParam("device_id")String device_id,@RequestParam("bind_state")Integer bind_state,@RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize){
-        DeviceSearchFilter filter =new DeviceSearchFilter();
-        filter.state=state;
-        filter.machine_code=machine_code;
-        filter.accountId=accountId;
-        filter.device_id=Long.parseLong(device_id);
-        filter.bind_state=bind_state;
-        JSONObject data=new JSONObject();
-        data.put("page",deviceApi.getAllDeviceByFilter(filter,pageNum,pageSize));
+    public Output showAllDeviceDir(@RequestParam("state") Integer state, @RequestParam("machine_code") String machine_code, @RequestParam("accountId") long accountId, @RequestParam("device_id") String device_id, @RequestParam("bind_state") Integer bind_state, @RequestParam("pageNum") Integer pageNum, @RequestParam("pageSize") Integer pageSize) {
+        DeviceSearchFilter filter = new DeviceSearchFilter();
+        filter.state = state;
+        filter.machine_code = machine_code;
+        filter.accountId = accountId;
+        filter.device_id = Long.parseLong(device_id);
+        filter.bind_state = bind_state;
+        JSONObject data = new JSONObject();
+        data.put("page", deviceApi.getAllDeviceByFilter(filter, pageNum, pageSize));
         return new Output(data);
     }
 
@@ -543,7 +548,7 @@ public class DeviceAction {
                                    @RequestParam("piBoxName") String piBoxName, @RequestParam("remark") String remark,
                                    @RequestParam("deviceUseCode") Integer deviceUseCode,
                                    @RequestParam("deviceUseName") String deviceUseName,
-                                   @RequestParam("maxHisDataCount")Integer maxHisDataCount,
+                                   @RequestParam("maxHisDataCount") Integer maxHisDataCount,
                                    @RequestParam("map") String map) {
         Device device = deviceApi.getDevice(deviceId);
         Device oldDevice = device;
@@ -563,21 +568,21 @@ public class DeviceAction {
         if (CommonUtils.isNotNull(map)) {
             device.map = map;
         }
-        if(CommonUtils.isNotNull(maxHisDataCount)){
-            device.max_his_data_count=maxHisDataCount;
+        if (CommonUtils.isNotNull(maxHisDataCount)) {
+            device.max_his_data_count = maxHisDataCount;
         }
-        if(CommonUtils.isNotNull(deviceUseCode)){
-            if(deviceUseCode!=999){
-                DeviceUse deviceUse=new DeviceUse();
-                deviceUse.useName=DeviceUseQuerier.allDeviceUsesMap.get(deviceUseCode);
-                deviceUse.useCode=deviceUseCode;
-                deviceUse.deviceId=deviceId;
+        if (CommonUtils.isNotNull(deviceUseCode)) {
+            if (deviceUseCode != 999) {
+                DeviceUse deviceUse = new DeviceUse();
+                deviceUse.useName = DeviceUseQuerier.allDeviceUsesMap.get(deviceUseCode);
+                deviceUse.useCode = deviceUseCode;
+                deviceUse.deviceId = deviceId;
                 deviceApi.updateDeviceUse(deviceUse);
-            }else{
-                DeviceUse deviceUse=new DeviceUse();
-                deviceUse.otherUseName=deviceUseName;
-                deviceUse.useCode=deviceUseCode;
-                deviceUse.deviceId=deviceId;
+            } else {
+                DeviceUse deviceUse = new DeviceUse();
+                deviceUse.otherUseName = deviceUseName;
+                deviceUse.useCode = deviceUseCode;
+                deviceUse.deviceId = deviceId;
                 deviceApi.updateDeviceUse(deviceUse);
             }
         }
@@ -588,4 +593,87 @@ public class DeviceAction {
         // </editor-fold>
         return new Output();
     }
+
+
+    @Label("获取该用户下的device名称")
+    @WebApi(forceAuth = true, master = true, authority = {"1"})
+    @RequestMapping("getOtherDeviceByAccId")
+    public Output getDevBindUser(Long currentDeviceId) {
+        if (currentDeviceId == null || currentDeviceId < 0) {
+            throw new BusinessException(ErrorCodeOption.DeviceId_Is_Unknown.key, ErrorCodeOption.DeviceId_Is_Unknown.value);
+        }
+        List<Device> deviceList = deviceApi.getDeviceNameByAccId(AppContext.getSession().client.userId);
+        for (Device device : deviceList) {
+            if (device.device_id == currentDeviceId) {
+                deviceList.remove(device);
+                break;
+            }
+        }
+        JSONObject data = new JSONObject();
+        data.put("deviceList", deviceList);
+        return new Output(data);
+    }
+
+    @Label("复制盒子配置")
+    @WebApi(forceAuth = true, master = true, authority = {"1"})
+    @RequestMapping("copyDeviceConfig")
+    public Output copyDeviceConfig(Long fromDeviceId, Long toDeviceId, int isCopyBaseInfo, int isCopyCom, int isCopyReal, int isCopyHis, int isCopyAlarm) {
+
+        JSONObject data = new JSONObject();
+        Exception currentException = null;
+        Map<String, String> resultMap = new HashMap<>();
+        Map<Long, Long> fromtoPlcMap = null;
+        long accountId = AppContext.getSession().client.userId;
+
+        try {
+            if (isCopyBaseInfo == 1) {
+                resultMap.put("基本信息复制状态", "失败");
+                deviceApi.copyDeviceBaseinfo(fromDeviceId, toDeviceId);
+                resultMap.put("基本信息复制状态", "成功");
+            }
+            if (isCopyCom == 1) {
+                resultMap.put("通讯口复制状态", "失败");
+                fromtoPlcMap = plcInfoApi.copyDeviceCom(fromDeviceId, toDeviceId);
+                resultMap.put("通讯口复制状态", "成功");
+
+
+                if (fromtoPlcMap != null && fromtoPlcMap.size() > 0) {
+                    if (isCopyReal == 1) {
+                        resultMap.put("实时配置复制状态", "失败");
+                        realHisCfgApi.copyRealHis(accountId, fromDeviceId, toDeviceId, 0, fromtoPlcMap);
+                        resultMap.put("实时配置复制状态", "成功");
+                    }
+
+                    if (isCopyHis == 1) {
+                        resultMap.put("历史配置复制状态", "失败");
+                        realHisCfgApi.copyRealHisCfg(fromtoPlcMap, 1, toDeviceId);
+                        resultMap.put("历史配置复制状态", "成功");
+                    }
+                    if (isCopyAlarm == 1) {
+                        resultMap.put("报警配置复制状态", "失败");
+                        alarmCfgApi.copyAlarm(accountId, fromDeviceId, toDeviceId, fromtoPlcMap);
+                        resultMap.put("报警配置复制状态", "成功");
+                    }
+                }
+            }
+        } catch (BusinessException be) {
+            currentException = be;
+
+        } catch (Exception e) {
+            currentException = e;
+            e.printStackTrace();
+        } finally {
+            if (currentException != null) {
+                for (Map.Entry<String, String> entry : resultMap.entrySet()) {
+                    if (entry.getValue().equals("失败")) {
+                        entry.setValue(entry.getValue() + currentException.getMessage());
+                    }
+                }
+            }
+            data.put("data", resultMap);
+            System.out.println("获取得到的结果集是: " + data.toJSONString());
+            return new Output(data);
+        }
+    }
+
 }

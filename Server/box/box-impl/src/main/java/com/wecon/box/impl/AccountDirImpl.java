@@ -18,9 +18,7 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -165,6 +163,56 @@ public class AccountDirImpl implements AccountDirApi {
         String sql="UPDATE account_dir SET account_id=? WHERE device_id=?";
         Object[] args=new Object[]{accountId,deviceId};
         jdbcTemplate.update(sql,args);
+    }
+
+    @Override
+    public Map<Long, Long> copyAccountDir(long accountId,long fromDeviceId, long toDeviceId,int type) {
+        List<AccountDir> fromAccountDir=getAccountDirList(accountId,type,fromDeviceId);
+        if(fromAccountDir !=null && fromAccountDir.size()>0){
+
+            Map<Long,Long> resultFromToAccDirId = new HashMap<Long,Long>();
+            /*
+            * 复制 分组
+            * */
+            for(AccountDir accountDir :fromAccountDir){
+                accountDir.device_id = toDeviceId;
+                resultFromToAccDirId.put(accountDir.id,copyAddAccountDir(accountDir));
+            }
+            return resultFromToAccDirId;
+        }
+        return null;
+    }
+
+    @Override
+    public long copyAddAccountDir(final AccountDir model) {
+            // 相同用户，相同类型，不允许重名
+            String sql = "select id,count(1) from account_dir where account_id = ? and `name` = ? and `type` = ? and `device_id` = ?  ";
+
+            Map<String, Object> ret = jdbcTemplate.queryForMap(sql, new Object[]{model.account_id, model.name, model.type, model.device_id});
+            if (ret.get("id") != null ) {
+                return Long.parseLong(ret.get("id")+"");
+            }
+
+            KeyHolder key = new GeneratedKeyHolder();
+            jdbcTemplate.update(new PreparedStatementCreator() {
+                @Override
+                public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                    PreparedStatement preState = con.prepareStatement(
+                            "insert into account_dir(account_id,`name`,`type`,create_date,update_date,device_id) values (?,?,?,current_timestamp(),current_timestamp(),?);",
+                            Statement.RETURN_GENERATED_KEYS);
+                    String secret_key = DigestUtils.md5Hex(UUID.randomUUID().toString());
+                    preState.setLong(1, model.account_id);
+                    preState.setString(2, model.name);
+                    preState.setInt(3, model.type);
+                    preState.setLong(4, model.device_id);
+
+                    return preState;
+                }
+            }, key);
+            // 从主键持有者中获得主键值
+            long dir_id = key.getKey().longValue();
+            model.id = dir_id;
+            return dir_id;
     }
 
     public static final class DefaultAccountDirRowMapper implements RowMapper<AccountDir> {

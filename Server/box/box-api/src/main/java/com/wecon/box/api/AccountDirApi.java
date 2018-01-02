@@ -1,10 +1,10 @@
 package com.wecon.box.api;
 
+import com.wecon.box.entity.AccountDir;
 import org.springframework.stereotype.Component;
 
-import com.wecon.box.entity.AccountDir;
-
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lanpenghui
@@ -60,4 +60,14 @@ public interface AccountDirApi {
     * */
     public void updateAccountBydeviceAndType(long accountId,long deviceId);
 
+    /*
+    * 复制分组信息
+    * */
+    public Map<Long,Long> copyAccountDir(long accountId,long fromDeviceId,long toDeviceId,int type);
+
+    /*
+    * 复制分组（添加）
+    * 允许同名分组
+    * */
+    public long copyAddAccountDir(AccountDir model);
 }

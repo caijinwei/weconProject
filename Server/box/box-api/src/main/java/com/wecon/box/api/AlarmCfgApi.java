@@ -140,4 +140,13 @@ public interface AlarmCfgApi {
 
 	List<Map> getPushAlarmCfg(List<Object[]> params);
 
+	/*
+	* 复制报警配置
+	* */
+	public Map<Long,Long> copyAlarmCfg(Long accId,Long toDeviceId,Map<Long,Long>fromtoPlcIdMap);
+
+	/*
+	* 复制报警  配置  分组  分组映射
+	* */
+	public void copyAlarm(Long accountId,Long fromDeviceId,Long toDeviceId,Map<Long,Long> fromtoPlcIdMap);
 }

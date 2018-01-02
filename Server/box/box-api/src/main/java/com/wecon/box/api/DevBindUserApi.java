@@ -29,7 +29,6 @@ public interface DevBindUserApi {
 	public List<DevBindUser> getDevBindUser(DevBindUserFilter devBindUser);
 	/**
 	 * 查询某条用户关联设备信息个数
-	 * @param devBindUser
 	 * @return
 	 */
 	public int getDevBindUserCount(long account_id);
