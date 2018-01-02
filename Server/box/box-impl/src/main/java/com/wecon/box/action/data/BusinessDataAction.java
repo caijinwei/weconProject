@@ -93,10 +93,12 @@ public class BusinessDataAction {
             List<PiBoxCom> actTimeDataList = null == redisPiBoxActData ? null : redisPiBoxActData.act_time_data_list;
 
             JSONObject data = new JSONObject();
-            data.put("id", realHisCfgDevice.id);
+            data.put("monitorId", realHisCfgDevice.id);
             data.put("state", realHisCfgDevice.state);
             data.put("monitorName", realHisCfgDevice.name);
             data.put("number", 0);
+            data.put("com", realHisCfgDevice.plc_id);
+            data.put("groupId", realHisCfgDevice.dir_id);
             if(null != actTimeDataList){
                 for (int j = 0; j < actTimeDataList.size(); j++) {
                     PiBoxCom piBoxCom = actTimeDataList.get(j);

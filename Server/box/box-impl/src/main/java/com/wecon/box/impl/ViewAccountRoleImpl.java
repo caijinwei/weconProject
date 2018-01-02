@@ -426,6 +426,24 @@ public class ViewAccountRoleImpl implements ViewAccountRoleApi {
     }
 
     @Override
+    public List<String> getMachineCodesByViewId(long viewId){
+        String sql = "SELECT d.machine_code FROM view_account_role v, real_his_cfg r, device d WHERE v.cfg_id=r.id and r.device_id=d.device_id and v.view_id=?";
+        List<String> list = jdbcTemplate.query(sql, new Object[]{viewId}, new RowMapper<String>() {
+            @Override
+            public String mapRow(ResultSet resultSet, int i) throws SQLException {
+                return resultSet.getString("machine_code");
+            }
+        });
+        return list;
+    }
+
+    @Override
+    public int getViewRealRoleTypeByCfgId(long viewId, long cfgId){
+        int roleType = jdbcTemplate.queryForObject("SELECT role_type FROM view_account_role WHERE cfg_type=1 and view_id=? and cfg_id=?", new Object[]{viewId, cfgId}, Integer.class);
+        return roleType;
+    }
+
+    @Override
     public ViewAccountRole findViewAccountRoleById(long accId, Integer cgfId) {
         String sql = "SELECT * FROM view_account_role a WHERE a.cfg_id=? AND a.view_id=? limit 1";
         Object[] args = new Object[]{cgfId, accId};

@@ -86,7 +86,7 @@ public class SendvalueCallback implements MqttCallback {
 
 					int upd_state = jsonBase.getInteger("upd_state");
 					json.put("msg", "修改监控点数据");
-					json.put("markid", 1);
+					json.put("markId", 1);
 					if (1 == upd_state) {
 						json.put("resultData", 1);// 反馈成功信息
 
