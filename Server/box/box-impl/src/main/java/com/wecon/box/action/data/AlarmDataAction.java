@@ -485,7 +485,7 @@ public class AlarmDataAction {
 				}
 				//判断报警配置是否达到上限
 				List<AlarmCfg> listAlarmCfg = alarmCfgApi.getAlarmCfg(account_id, alarmCfgParam.device_id);
-				if (listAlarmCfg.size() >= Constant.AddNum.ALARM_SET_NUM) {
+				if (listAlarmCfg != null && listAlarmCfg.size() >= Constant.AddNum.ALARM_SET_NUM) {
 					throw new BusinessException(ErrorCodeOption.Alarm_add_Beyond.key,
 							ErrorCodeOption.Alarm_add_Beyond.value);
 				}

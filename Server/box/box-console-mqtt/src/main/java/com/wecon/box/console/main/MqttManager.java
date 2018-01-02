@@ -23,10 +23,10 @@ public class MqttManager {
 		System.setProperty("spring.profiles.active", profile);
 
 		ApplicationContext applicationContext = new ClassPathXmlApplicationContext("spring.xml");
-		/*BoxNotifyTask notifyTask = new BoxNotifyTask();
+		BoxNotifyTask notifyTask = new BoxNotifyTask();
 		notifyTask.start();
 		MonitorTask monitorTask = new MonitorTask();
-		monitorTask.start();*/
+		monitorTask.start();
 		DBDataClearTask task = new DBDataClearTask();
 		task.start();
 		// GetPublishClient
