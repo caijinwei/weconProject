@@ -28,6 +28,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $scope.deviceUseOptions = data.deviceUseOptions;
                 $scope.$apply();
                 $scope.infoData = data.device;
+                $("#maxHisDataCount").val($scope.infoData.max_his_data_count);
                 //行业类型对象
                 var deviceUse = data.deviceUse;
                 if (deviceUse != null) {
@@ -308,11 +309,18 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             $scope.addPlcInfosetting_submit();
         } else {
             var oldType = $scope.plcInfoById.type;
-            if ($('#type').val() != oldType) {
+            var oldPort = $scope.plcInfoById.port;
+
+            if($("#port").val() != oldPort ){
                 $("#noticeType").modal("show");
-            } else {
-                $scope.addPlcInfosetting_submit();
+            }else {
+                if ($('#type').val() != oldType) {
+                    $("#noticeType").modal("show");
+                } else {
+                    $scope.addPlcInfosetting_submit();
+                }
             }
+
         }
     }
     //提交后台
@@ -394,7 +402,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
          * 当plc_id 不等于0
          * 对plc_id的通讯口就行修改编辑
          * */
-
         T.common.ajax.request("WeconBox", "plcInfoAction/savePlcInfo", params, function (data, code, msg) {
             if (code == 200) {
                 alert("操作成功");
@@ -480,7 +487,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             //var tag = this.tagName.toLowerCase();
             if (type == 'text' || type == 'number') {
                 this.value = "";
-                $('#plc_id').val("0");
             }
         });
         //$("select", $('#addConfig')).each(function () {
