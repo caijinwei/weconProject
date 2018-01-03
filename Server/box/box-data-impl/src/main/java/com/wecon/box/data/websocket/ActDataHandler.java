@@ -57,7 +57,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 
 	private Map<String, String> paramMap = new HashMap<>();
 
-	private List<String> machineCodeCache = new ArrayList<>();
+	private Map<String, List<String>> machineCodeCache = new HashMap<>();
 
 	private static final Logger logger = LogManager.getLogger(ActDataHandler.class.getName());
 
@@ -100,8 +100,8 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 						subscribeRealData(session, machineCodeSet);
 					}
 				}else if ("1".equals(markId)) {
-					String value = bParams.get("value").toString();
-					String addr_id = bParams.get("addr_id").toString();
+					String value = bParams.get("number").toString();
+					String addr_id = bParams.get("monitorId").toString();
 
 					// 订阅消息
 					if (!CommonUtils.isNullOrEmpty(addr_id)) {
@@ -289,12 +289,17 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 				return new Object[] {json.toJSONString(), null };
 			}
 			Set<String> machineCodeSet = new HashSet<>();
+			List<String> machineCodeList = machineCodeCache.get(session.getId());
+			if(null == machineCodeList){
+				machineCodeList = new ArrayList<>();
+				machineCodeCache.put(session.getId(), machineCodeList);
+			}
 			for (int i = 0; i < realHisCfgDeviceList.size(); i++) {
 				RealHisCfgDevice realHisCfgDevice = realHisCfgDeviceList.get(i);
 				String device_machine = realHisCfgDevice.machine_code;
-				if(!CommonUtils.isNullOrEmpty(device_machine) && !machineCodeCache.contains(device_machine)){
+				if(!CommonUtils.isNullOrEmpty(device_machine) && !machineCodeList.contains(device_machine)){
 					machineCodeSet.add(device_machine);
-					machineCodeCache.add(device_machine);
+					machineCodeList.add(device_machine);
 				}
 
 				// 通过机器码去redis中获取数据
@@ -309,15 +314,30 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 				data.put("number", 0);
 				data.put("dataId", realHisCfgDevice.data_id);
 				data.put("digitCount", realHisCfgDevice.digit_count);
+				int state = 0;
 				String stateText = null;
-				if (realHisCfgDevice.dstate == Constant.State.STATE_BOX_OFFLINE) {
-					stateText = "0";
-				} else {
-					if (realHisCfgDevice.state < 0) {
-						stateText = realHisCfgDevice.state + "";
-					} else if (realHisCfgDevice.state != Constant.State.STATE_SYNCED_BOX) {
-						stateText = "3";
+				//盒子在线
+				if (realHisCfgDevice.dstate == Constant.State.STATE_BOX_ONLINE) {
+					//未同步给盒子
+					if(realHisCfgDevice.state != Constant.State.STATE_SYNCED_BOX){
+						if (realHisCfgDevice.state == Constant.State.STATE_NEW_CONFIG) {
+							stateText = "条目未下发";
+						} else if(realHisCfgDevice.state == Constant.State.STATE_UPDATE_CONFIG){
+							stateText = "条目未下发";
+						} else if(realHisCfgDevice.state == Constant.State.STATE_COMPILE_FAILED){
+							stateText = "编译失败";
+						} else if(realHisCfgDevice.state == Constant.State.STATE_ADDR_TRANS_FAILED){
+							stateText = "地址转义失败";
+						}  else if(realHisCfgDevice.state == Constant.State.STATE_ADDR_BIND_FAILED){
+							stateText = "地址绑定失败";
+						} else {
+							stateText = "未知状态";
+						}
+						state = realHisCfgDevice.state;
 					}
+				} else {
+					stateText = "离线";
+					state = Constant.State.STATE_MONITOR_OFFLINE;
 				}
 				if (null != actTimeDataList) {
 					outer: for (int j = 0; j < actTimeDataList.size(); j++) {
@@ -327,18 +347,20 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 							for (int k = 0; k < addrList.size(); k++) {
 								PiBoxComAddr piBoxComAddr = addrList.get(k);
 								if (Long.parseLong(piBoxComAddr.addr_id) == realHisCfgDevice.id) {
-									if (CommonUtils.isNullOrEmpty(stateText)) {
+									if (realHisCfgDevice.dstate == Constant.State.STATE_BOX_ONLINE
+											&& realHisCfgDevice.state == Constant.State.STATE_SYNCED_BOX) {
 										try {
-											if (Integer.parseInt(
-													piBoxComAddr.state) == Constant.State.STATE_MONITOR_ONLINE) {
-												stateText = "1";
-											} else if (Integer.parseInt(
-													piBoxComAddr.state) == Constant.State.STATE_MONITOR_OFFLINE) {
-												stateText = "0";
-											} else if (Integer.parseInt(
-													piBoxComAddr.state) == Constant.State.STATE_MONITOR_TIMEOUT) {
-												stateText = "2";
+											int rState = Integer.parseInt(piBoxComAddr.state);
+											if (rState == Constant.State.STATE_MONITOR_ONLINE) {
+												stateText = "在线";
+											} else if (rState == Constant.State.STATE_MONITOR_OFFLINE) {
+												stateText = "离线";
+											} else if (rState == Constant.State.STATE_MONITOR_TIMEOUT) {
+												stateText = "超时";
+											} else {
+												stateText = "超时";
 											}
+											state = rState;
 										} catch (Exception e) {
 											e.printStackTrace();
 										}
@@ -349,8 +371,13 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 							}
 						}
 					}
+				}else{
+					if(null == stateText){
+						stateText = "超时";
+					}
 				}
-				data.put("state", stateText);
+				data.put("state", state);
+				data.put("stateText", stateText);
 				data.put("com", realHisCfgDevice.plc_id);
 				data.put("groupId", realHisCfgDevice.dir_id);
 				arr.add(data);
@@ -414,6 +441,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 				clientMQTTs.remove(session.getId());
 			}
 			paramMap.remove(session.getId());
+			machineCodeCache.get(session.getId()).clear();
 			logger.debug("Redis取消订阅成功");
 		} catch (Exception e) {
 			e.printStackTrace();

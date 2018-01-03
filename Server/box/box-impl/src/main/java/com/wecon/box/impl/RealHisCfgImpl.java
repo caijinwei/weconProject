@@ -781,7 +781,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 		for (long id : ids) {
 			idSb.append(",").append(id);
 		}
-		String sql = "select distinct " + SEL_COL + " from real_his_cfg where id in(" + idSb.substring(1) + ") order by field(id,"+idSb.substring(1)+");";
+		String sql = "select " + SEL_COL + " from real_his_cfg r where r.id in(" + idSb.substring(1) + ") order by field(r.id,"+idSb.substring(1)+");";
 		List<RealHisCfg> realCfgList = jdbcTemplate.query(sql, new DefaultRealHisCfgRowMapper());
 
 		return realCfgList;
