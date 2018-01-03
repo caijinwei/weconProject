@@ -45,7 +45,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 	private Map<String, SubscribeListener> subscribeListeners = new HashMap<String, SubscribeListener>();
 	private Map<String, Map<String, Object>> paramMaps = new HashMap<String, Map<String, Object>>();
 	private Map<String, ClientMQTT> clientMQTTs = new HashMap<String, ClientMQTT>();
-	private List<String> machineCodeCache = new ArrayList<>();
+	private Map<String, List<String>> machineCodeCache = new HashMap<>();
 	@Autowired
 	protected DbLogUtil dbLogUtil;
 	@Autowired
@@ -256,9 +256,14 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 							}
 						}
 						String device_machine = realHisCfgDevice.machine_code;
-						if(!CommonUtils.isNullOrEmpty(device_machine) && !machineCodeCache.contains(device_machine)){
+						List<String> machineCodeList = machineCodeCache.get(session.getId());
+						if(null == machineCodeList){
+							machineCodeList = new ArrayList<>();
+							machineCodeCache.put(session.getId(), machineCodeList);
+						}
+						if(!CommonUtils.isNullOrEmpty(device_machine) && !machineCodeList.contains(device_machine)){
 							machineCodeSet.add(device_machine);
-							machineCodeCache.add(device_machine);
+							machineCodeList.add(device_machine);
 						}
 						Device device = deviceApi.getDevice(device_machine);
 						realHisCfgDevice.box_state = device.state;
@@ -355,6 +360,7 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 				clientMQTTs.remove(session.getId());
 
 			}
+			machineCodeCache.get(session.getId()).clear();
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.debug("afterConnectionClosed，" + e.getMessage());

@@ -55,7 +55,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 
 	private Map<String, String> paramMap = new HashMap<>();
 
-	private List<String> machineCodeCache = new ArrayList<>();
+	private Map<String, List<String>> machineCodeCache = new HashMap<>();
 
 	private static final Logger logger = LogManager.getLogger(ActDataHandler.class.getName());
 
@@ -215,12 +215,17 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 				return new Object[] { json.toJSONString(), null };
 			}
 			Set<String> machineCodeSet = new HashSet<>();
+			List<String> machineCodeList = machineCodeCache.get(session.getId());
+			if(null == machineCodeList){
+				machineCodeList = new ArrayList<>();
+				machineCodeCache.put(session.getId(), machineCodeList);
+			}
 			for (int i = 0; i < realHisCfgDeviceList.size(); i++) {
 				RealHisCfgDevice realHisCfgDevice = realHisCfgDeviceList.get(i);
 				String device_machine = realHisCfgDevice.machine_code;
-				if(!CommonUtils.isNullOrEmpty(device_machine) && !machineCodeCache.contains(device_machine)){
+				if(!CommonUtils.isNullOrEmpty(device_machine) && !machineCodeList.contains(device_machine)){
 					machineCodeSet.add(device_machine);
-					machineCodeCache.add(device_machine);
+					machineCodeList.add(device_machine);
 				}
 				// 通过机器码去redis中获取数据
 				RedisPiBoxActData redisPiBoxActData = redisPiBoxApi.getRedisPiBoxActData(device_machine);
@@ -332,6 +337,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 				clientMQTTs.remove(session.getId());
 			}
 			paramMap.remove(session.getId());
+			machineCodeCache.get(session.getId()).clear();
 			logger.debug("Redis取消订阅成功");
 		} catch (Exception e) {
 			e.printStackTrace();
