@@ -238,14 +238,26 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 						: realHisCfgDevice.ref_alais);
 				data.put("number", 0);
 				String stateText = null;
-				if (realHisCfgDevice.dstate == Constant.State.STATE_BOX_OFFLINE) {
-					stateText = "0";
-				} else {
-					if (realHisCfgDevice.state < 0) {
-						stateText = realHisCfgDevice.state + "";
-					} else if (realHisCfgDevice.state != Constant.State.STATE_SYNCED_BOX) {
-						stateText = "3";
+				//盒子在线
+				if (realHisCfgDevice.dstate == Constant.State.STATE_BOX_ONLINE) {
+					//未同步给盒子
+					if(realHisCfgDevice.state != Constant.State.STATE_SYNCED_BOX){
+						if (realHisCfgDevice.state == Constant.State.STATE_NEW_CONFIG) {
+							stateText = "条目未下发";
+						} else if(realHisCfgDevice.state == Constant.State.STATE_UPDATE_CONFIG){
+							stateText = "条目未下发";
+						} else if(realHisCfgDevice.state == Constant.State.STATE_COMPILE_FAILED){
+							stateText = "编译失败";
+						} else if(realHisCfgDevice.state == Constant.State.STATE_ADDR_TRANS_FAILED){
+							stateText = "地址转义失败";
+						}  else if(realHisCfgDevice.state == Constant.State.STATE_ADDR_BIND_FAILED){
+							stateText = "地址绑定失败";
+						} else {
+							stateText = "未知状态";
+						}
 					}
+				} else {
+					stateText = "离线";
 				}
 				if (null != actTimeDataList) {
 					outer: for (int j = 0; j < actTimeDataList.size(); j++) {
@@ -255,17 +267,20 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 							for (int k = 0; k < addrList.size(); k++) {
 								PiBoxComAddr piBoxComAddr = addrList.get(k);
 								if (Long.parseLong(piBoxComAddr.addr_id) == realHisCfgDevice.id) {
-									if (CommonUtils.isNullOrEmpty(stateText)) {
+									if (realHisCfgDevice.dstate == Constant.State.STATE_BOX_ONLINE
+											&& realHisCfgDevice.state == Constant.State.STATE_SYNCED_BOX) {
 										try {
 											if (Integer.parseInt(
 													piBoxComAddr.state) == Constant.State.STATE_MONITOR_ONLINE) {
-												stateText = "1";
+												stateText = "在线";
 											} else if (Integer.parseInt(
 													piBoxComAddr.state) == Constant.State.STATE_MONITOR_OFFLINE) {
-												stateText = "0";
+												stateText = "离线";
 											} else if (Integer.parseInt(
 													piBoxComAddr.state) == Constant.State.STATE_MONITOR_TIMEOUT) {
-												stateText = "2";
+												stateText = "超时";
+											} else {
+												stateText = "超时";
 											}
 										} catch (Exception e) {
 											e.printStackTrace();
@@ -276,6 +291,10 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 								}
 							}
 						}
+					}
+				}else{
+					if(null == stateText){
+						stateText = "超时";
 					}
 				}
 				data.put("state", stateText);
