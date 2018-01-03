@@ -200,21 +200,25 @@ public class PlcInfoSettingAction {
         if (plcInfo.plc_id <= 0) {
             if (!plcInfo.port.equals("Ethernet")) {
                 Integer plcState=plcInfoApi.isExistPort(plcInfo.device_id, plcInfo.port);
+                if(plcState != 0){
                 if (plcState==3) {
                     throw new BusinessException(ErrorCodeOption.PlcInfo_Port_IsExist.key, ErrorCodeOption.PlcInfo_Port_IsExist.value);
                 }else {
                     throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
+                }
                 }
             }
         } else {
             if (!plcInfo.port.equals(plcInfoApi.findPlcInfoByPlcId((int) plcInfo.plc_id).port)) {
                 if (!plcInfo.port.equals("Ethernet")) {
                     Integer plcState=plcInfoApi.isExistPort(plcInfo.device_id, plcInfo.port);
-                    if (plcState==3) {
-                        throw new BusinessException(ErrorCodeOption.PlcInfo_Port_IsExist.key, ErrorCodeOption.PlcInfo_Port_IsExist.value);
-                    }else {
-                        throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
-                    }
+                   if(plcState != 0) {
+                       if (plcState == 3) {
+                           throw new BusinessException(ErrorCodeOption.PlcInfo_Port_IsExist.key, ErrorCodeOption.PlcInfo_Port_IsExist.value);
+                       } else {
+                           throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
+                       }
+                   }
                 }
             }
         }
