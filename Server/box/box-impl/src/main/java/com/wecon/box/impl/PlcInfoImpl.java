@@ -463,7 +463,7 @@ public class PlcInfoImpl implements PlcInfoApi {
             return 0;
         }
         Object args[] = {device_id, port};
-        String sql = "SELECT count(1), state FROM plc_info WHERE device_id=? AND port=?";
+        String sql = "SELECT count(1), state FROM plc_info WHERE device_id=? AND port=? GROUP BY state";
         Map<String, Object> result = jdbcTemplate.queryForMap(sql, args);
         if(result.get("state")!=null){
             return (int)result.get("state");
