@@ -48,12 +48,15 @@ public class PlcInfoImpl implements PlcInfoApi {
         /*
         * 进行通讯接口唯一性判断
         * */
-        Integer plc_State = isExistPort(model.device_id, model.port);
+
         if (!model.port.equals("Ethernet")) {
-            if (plc_State == 3) {
-                throw new BusinessException(ErrorCodeOption.PlcInfo_Port_IsExist.key, ErrorCodeOption.PlcInfo_Port_IsExist.value);
-            } else if (plc_State == 1) {
-                throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
+            List<Integer> plc_StateList = getPortState(model.device_id, model.port);
+            if(plc_StateList.size() > 0) {
+                if (plc_StateList.get(0) == 3) {
+                    throw new BusinessException(ErrorCodeOption.PlcInfo_Port_IsExist.key, ErrorCodeOption.PlcInfo_Port_IsExist.value);
+                } else {
+                    throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
+                }
             }
         }
         /*
@@ -458,17 +461,19 @@ public class PlcInfoImpl implements PlcInfoApi {
 
 
     @Override
-    public Integer isExistPort(long device_id, String port) {
-        if (null == port) {
-            return 0;
-        }
+    public List<Integer> getPortState(long device_id, String port) {
+        List<Integer> resultList =new ArrayList<Integer>();
+
         Object args[] = {device_id, port};
-        String sql = "SELECT count(1), state FROM plc_info WHERE device_id=? AND port=? GROUP BY state";
-        Map<String, Object> result = jdbcTemplate.queryForMap(sql, args);
-        if(result.get("state")!=null){
-            return (int)result.get("state");
+        String sql = "SELECT state FROM plc_info WHERE device_id=? AND port=? GROUP BY state";
+        List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, args);
+
+
+        for(Map<String,Object>map :result){
+            resultList.add(Integer.parseInt(map.get("state").toString()));
         }
-        return 0;
+
+       return resultList;
     }
 
     public void unBundledPlc(final Integer plcId) {
