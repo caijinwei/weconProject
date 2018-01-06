@@ -188,13 +188,13 @@ public class BusDataAction {
                 data.put("monitorId", realHisCfgDevice.id);
                 data.put("monitorName", CommonUtils.isNullOrEmpty(realHisCfgDevice.ref_alais) ? realHisCfgDevice.name
                         : realHisCfgDevice.ref_alais);
-                data.put("upd_time", realHisCfgDevice.update_date);
-                data.put("data_id", realHisCfgDevice.data_id);
+                data.put("updTime", realHisCfgDevice.update_date);
+                data.put("dataId", realHisCfgDevice.data_id);
                 data.put("addr", realHisCfgDevice.addr);
-                data.put("addr_type", realHisCfgDevice.addr_type);
-                data.put("digit_count", realHisCfgDevice.digit_count);
-                data.put("digit_binary", realHisCfgDevice.digit_binary);
-                data.put("data_limit", realHisCfgDevice.data_limit);
+                data.put("addrType", realHisCfgDevice.addr_type);
+                data.put("digitCount", realHisCfgDevice.digit_count);
+                data.put("digitBinary", realHisCfgDevice.digit_binary);
+                data.put("dataLimit", realHisCfgDevice.data_limit);
                 data.put("rid", realHisCfgDevice.rid);
                 arr.add(data);
             }

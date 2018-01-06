@@ -100,7 +100,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 						subscribeRealData(session, machineCodeSet);
 					}
 				}else if ("1".equals(markId)) {
-					String value = bParams.get("number").toString();
+					String value = bParams.get("value").toString();
 					String addr_id = bParams.get("monitorId").toString();
 
 					// 订阅消息
@@ -226,7 +226,8 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 										JSONObject data = new JSONObject();
 										data.put("monitorId", piBoxComAddr.addr_id);
 										data.put("state", piBoxComAddr.state);
-										data.put("number", piBoxComAddr.value);
+										data.put("value", piBoxComAddr.value);
+										data.put("addrType", realCfgList.get(i).addr_type);
 										data.put("dataId", realCfgList.get(i).data_id);
 										data.put("digitCount", realCfgList.get(i++).digit_count);
 										arr.add(data);
@@ -311,7 +312,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 				data.put("monitorId", realHisCfgDevice.id);
 				data.put("monitorName", CommonUtils.isNullOrEmpty(realHisCfgDevice.ref_alais) ? realHisCfgDevice.name
 						: realHisCfgDevice.ref_alais);
-				data.put("number", 0);
+				data.put("value", 0);
 				data.put("dataId", realHisCfgDevice.data_id);
 				data.put("digitCount", realHisCfgDevice.digit_count);
 				int state = 0;
@@ -365,7 +366,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 											e.printStackTrace();
 										}
 									}
-									data.put("number", piBoxComAddr.value);
+									data.put("value", piBoxComAddr.value);
 									break outer;
 								}
 							}
