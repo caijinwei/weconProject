@@ -236,7 +236,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 				data.put("id", realHisCfgDevice.id);
 				data.put("monitorName", CommonUtils.isNullOrEmpty(realHisCfgDevice.ref_alais) ? realHisCfgDevice.name
 						: realHisCfgDevice.ref_alais);
-				data.put("value", 0);
+				data.put("value", "");
 				String stateText = null;
 				//盒子在线
 				if (realHisCfgDevice.dstate == Constant.State.STATE_BOX_ONLINE) {

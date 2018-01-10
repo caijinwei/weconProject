@@ -96,7 +96,7 @@ public class BusinessDataAction {
             data.put("monitorId", realHisCfgDevice.id);
             data.put("state", realHisCfgDevice.state);
             data.put("monitorName", realHisCfgDevice.name);
-            data.put("value", 0);
+            data.put("value", "");
             data.put("com", realHisCfgDevice.plc_id);
             data.put("groupId", realHisCfgDevice.dir_id);
             if(null != actTimeDataList){
@@ -384,6 +384,7 @@ public class BusinessDataAction {
                 }
             }
             data.put("describe", realCfgMap.get("describe"));
+            data.put("value", "");
             if(null != actTimeDataList){
                 for (int j = 0; j < actTimeDataList.size(); j++) {
                     PiBoxCom piBoxCom = actTimeDataList.get(j);

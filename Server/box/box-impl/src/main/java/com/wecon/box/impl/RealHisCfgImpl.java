@@ -615,7 +615,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
         }
         String sqlCount = "select count(distinct r.id, ad.id) " + fromStr
                 + " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and r.id=adr.ref_id and r.bind_state=1";
-        String sql = "select distinct " + SEL_COL + ",d.machine_code, d.state as dstate, adr.ref_alais,adr.acc_dir_id"
+        String sql = "select distinct " + SEL_COL + ",d.machine_code, d.state as dstate, adr.ref_alais,adr.acc_dir_id,v.role_type"
                 + "  " + fromStr
                 + " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and r.id=adr.ref_id and r.bind_state=1";
         sqlCount += condition;
@@ -870,6 +870,10 @@ public class RealHisCfgImpl implements RealHisCfgApi {
             model.ext_unit = rs.getString("ext_unit");
             try {
                 model.dir_id = rs.getLong("acc_dir_id");
+            } catch (Exception e) {
+            }
+            try {
+                model.role_type = rs.getInt("role_type");
             } catch (Exception e) {
             }
             return model;

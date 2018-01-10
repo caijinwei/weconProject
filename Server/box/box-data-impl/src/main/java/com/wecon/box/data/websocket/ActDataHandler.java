@@ -312,7 +312,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 				data.put("monitorId", realHisCfgDevice.id);
 				data.put("monitorName", CommonUtils.isNullOrEmpty(realHisCfgDevice.ref_alais) ? realHisCfgDevice.name
 						: realHisCfgDevice.ref_alais);
-				data.put("value", 0);
+				data.put("value", "");
 				data.put("dataId", realHisCfgDevice.data_id);
 				data.put("digitCount", realHisCfgDevice.digit_count);
 				int state = 0;

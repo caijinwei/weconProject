@@ -196,9 +196,10 @@ public class BusDataAction {
                 data.put("digitBinary", realHisCfgDevice.digit_binary);
                 data.put("dataLimit", realHisCfgDevice.data_limit);
                 data.put("rid", realHisCfgDevice.rid);
+                data.put("roleType", client.userInfo.getUserType() == 1 ? 3 : realHisCfgDevice.role_type);
                 arr.add(data);
             }
-            json.put("cfg_list", arr);
+            json.put("cfgList", arr);
             json.put("totalPage", realHisCfgDevicePage.getTotalPage());
             json.put("totalRecord", realHisCfgDevicePage.getTotalRecord());
             json.put("currentPage", realHisCfgDevicePage.getCurrentPage());
