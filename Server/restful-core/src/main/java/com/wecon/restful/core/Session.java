@@ -216,7 +216,7 @@ public class Session {
         }
 
         //第三方接口comid,compvtkey验证
-        if(!AuthComHelper.isRight(client.comid,client.compvtkey)){
+        if (!AuthComHelper.isRight(client.comid, client.compvtkey)) {
             throw new DeniedException("company private key is error");
         }
 
@@ -270,8 +270,12 @@ public class Session {
         //时间戳验证
         if (client.timestamp > 0) {
             //原时间戳和当前时间戳中间相隔的分钟数
-            Long s = (System.currentTimeMillis() - client.timestamp) / (1000 * 60);
-            if (s > 3) {
+//            Long s = (System.currentTimeMillis() - client.timestamp) / (1000 * 60);
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            Long serverTs = cal.getTimeInMillis();
+            Long s = (serverTs - client.timestamp) / (1000 * 60);
+            if (s > 10) {
+                logger.info("client ts:" + client.timestamp + ",server ts:" + serverTs + ",diff(min):" + s);
                 throw new DeniedException("ts is time out");
             }
         } else {
