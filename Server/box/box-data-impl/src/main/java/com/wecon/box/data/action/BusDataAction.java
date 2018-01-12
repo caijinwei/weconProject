@@ -188,17 +188,18 @@ public class BusDataAction {
                 data.put("monitorId", realHisCfgDevice.id);
                 data.put("monitorName", CommonUtils.isNullOrEmpty(realHisCfgDevice.ref_alais) ? realHisCfgDevice.name
                         : realHisCfgDevice.ref_alais);
-                data.put("upd_time", realHisCfgDevice.update_date);
-                data.put("data_id", realHisCfgDevice.data_id);
+                data.put("updTime", realHisCfgDevice.update_date);
+                data.put("dataId", realHisCfgDevice.data_id);
                 data.put("addr", realHisCfgDevice.addr);
-                data.put("addr_type", realHisCfgDevice.addr_type);
-                data.put("digit_count", realHisCfgDevice.digit_count);
-                data.put("digit_binary", realHisCfgDevice.digit_binary);
-                data.put("data_limit", realHisCfgDevice.data_limit);
+                data.put("addrType", realHisCfgDevice.addr_type);
+                data.put("digitCount", realHisCfgDevice.digit_count);
+                data.put("digitBinary", realHisCfgDevice.digit_binary);
+                data.put("dataLimit", realHisCfgDevice.data_limit);
                 data.put("rid", realHisCfgDevice.rid);
+                data.put("roleType", client.userInfo.getUserType() == 1 ? 3 : realHisCfgDevice.role_type);
                 arr.add(data);
             }
-            json.put("cfg_list", arr);
+            json.put("cfgList", arr);
             json.put("totalPage", realHisCfgDevicePage.getTotalPage());
             json.put("totalRecord", realHisCfgDevicePage.getTotalRecord());
             json.put("currentPage", realHisCfgDevicePage.getCurrentPage());

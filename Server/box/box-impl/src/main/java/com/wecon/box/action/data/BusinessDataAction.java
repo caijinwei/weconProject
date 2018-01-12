@@ -96,7 +96,7 @@ public class BusinessDataAction {
             data.put("monitorId", realHisCfgDevice.id);
             data.put("state", realHisCfgDevice.state);
             data.put("monitorName", realHisCfgDevice.name);
-            data.put("number", 0);
+            data.put("value", "");
             data.put("com", realHisCfgDevice.plc_id);
             data.put("groupId", realHisCfgDevice.dir_id);
             if(null != actTimeDataList){
@@ -108,7 +108,7 @@ public class BusinessDataAction {
                             PiBoxComAddr piBoxComAddr = addrList.get(k);
                             if (Long.parseLong(piBoxComAddr.addr_id) == realHisCfgDevice.id) {
                                 data.put("state", piBoxComAddr.state);
-                                data.put("number", piBoxComAddr.value);
+                                data.put("value", piBoxComAddr.value);
                             }
                         }
                     }
@@ -171,7 +171,7 @@ public class BusinessDataAction {
         for(Map<String, Object> row : realHisCfgDataList){
             JSONObject data = new JSONObject();
             data.put("monitorName", row.get("monitorName"));
-            data.put("number", row.get("number"));
+            data.put("value", row.get("value"));
             data.put("monitorTime", row.get("monitorTime"));
             arr.add(data);
         }
@@ -224,7 +224,7 @@ public class BusinessDataAction {
                 data.put("monitorId", alarmCfg.alarm_cfg_id);
                 data.put("monitorName", alarmCfg.name);
                 data.put("state", alarmCfg.state);
-                data.put("number", alarmCfg.value);
+                data.put("value", alarmCfg.value);
                 data.put("monitorTime", alarmCfg.monitor_time);
                 data.put("alarmType", alarmCfg.alarm_type);
                 data.put("alarmLevel", alarmCfg.alarm_level);
@@ -384,6 +384,7 @@ public class BusinessDataAction {
                 }
             }
             data.put("describe", realCfgMap.get("describe"));
+            data.put("value", "");
             if(null != actTimeDataList){
                 for (int j = 0; j < actTimeDataList.size(); j++) {
                     PiBoxCom piBoxCom = actTimeDataList.get(j);
@@ -393,7 +394,7 @@ public class BusinessDataAction {
                             PiBoxComAddr piBoxComAddr = addrList.get(k);
                             if (piBoxComAddr.addr_id.equals(realCfgMap.get("id").toString())) {
                                 data.put("state", piBoxComAddr.state);
-                                data.put("number", piBoxComAddr.value);
+                                data.put("value", piBoxComAddr.value);
                             }
                         }
                     }
