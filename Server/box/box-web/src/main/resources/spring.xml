@@ -58,32 +58,25 @@
         </property>
     </bean>
 
-    <!--redis cluster 内网测试-->、
-    <!-- 连接池配置 -->
-    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
-        <!-- 连接池中最大空闲的连接数 -->
-        <property name="maxIdle" value="${jedis.maxIdle}"></property>
-        <!-- 连接空闲的最小时间，达到此值后空闲连接将可能会被移除。负值(-1)表示不移除. -->
-        <property name="minEvictableIdleTimeMillis" value="${jedis.minEvictableIdleTimeMillis}"></property>
-        <!-- 对于“空闲链接”检测线程而言，每次检测的链接资源的个数。默认为3 -->
-        <property name="numTestsPerEvictionRun" value="${jedis.numTestsPerEvictionRun}"></property>
-        <!-- “空闲链接”检测线程，检测的周期，毫秒数。如果为负值，表示不运行“检测线程”。默认为-1. -->
-        <property name="timeBetweenEvictionRunsMillis" value="${jedis.timeBetweenEvictionRunsMillis}"></property>
-    </bean>
+    <!-- redis cluster 测试-->
 
-    <!-- 集群配置 -->
-    <bean id="jedisCluster" class="redis.clients.jedis.JedisCluster">
-        <constructor-arg>
-            <set>
-                <bean class="redis.clients.jedis.HostAndPort">
-                    <constructor-arg name="host" value="${redis.host1}"/>
-                    <constructor-arg name="port" value="${redis.port1}"/>
-                </bean>
-            </set>
-        </constructor-arg>
-        <constructor-arg name="poolConfig" ref="jedisPoolConfig"/>
-    </bean>
+    <!--<bean name="genericObjectPoolConfig" class="org.apache.commons.pool2.impl.GenericObjectPoolConfig" >-->
+        <!--<property name="maxWaitMillis" value="-1" />-->
+        <!--<property name="maxTotal" value="1000" />-->
+        <!--<property name="minIdle" value="8" />-->
+        <!--<property name="maxIdle" value="100" />-->
+    <!--</bean>-->
 
+    <!--<bean id="jedisCluster" class="com.wecon.box.util.JedisClusterFactory">-->
+        <!--<property name="addressConfig">-->
+            <!--<value>classpath:connect-redis.properties</value>-->
+        <!--</property>-->
+        <!--<property name="addressKeyPrefix" value="address" />   &lt;!&ndash;  属性文件里  key的前缀 &ndash;&gt;-->
+
+        <!--<property name="timeout" value="300000" />-->
+        <!--<property name="maxRedirections" value="6" />-->
+        <!--<property name="genericObjectPoolConfig" ref="genericObjectPoolConfig" />-->
+    <!--</bean>-->
 
 
     <!-- 数据源定义 -->
