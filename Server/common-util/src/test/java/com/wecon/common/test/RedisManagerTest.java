@@ -37,7 +37,7 @@ public class RedisManagerTest {
 
         Map<String, RedisConfig> configMap = new HashMap<>();
         RedisConfig configPassword = new RedisConfig();
-        configPassword.setHost("192.168.29.186");
+        configPassword.setHost("192.168.45.186");
         configPassword.setPort("6379");
 //        //configPassword.setPassword("n66j!rVM");
 //
