@@ -625,55 +625,61 @@ public class DeviceAction {
         Map<Long, Long> fromtoPlcMap = null;
         long accountId = AppContext.getSession().client.userId;
 
-        try {
-            if (isCopyBaseInfo == 1) {
-                resultMap.put("基本信息复制状态", "失败");
-                deviceApi.copyDeviceBaseinfo(fromDeviceId, toDeviceId);
-                resultMap.put("基本信息复制状态", "成功");
-            }
-            if (isCopyCom == 1) {
-                resultMap.put("通讯口复制状态", "失败");
-                fromtoPlcMap = plcInfoApi.copyDeviceCom(fromDeviceId, toDeviceId);
-                resultMap.put("通讯口复制状态", "成功");
-
-
-                if (fromtoPlcMap != null && fromtoPlcMap.size() > 0) {
-                    if (isCopyReal == 1) {
-                        resultMap.put("实时配置复制状态", "失败");
-                        realHisCfgApi.copyRealHis(accountId, fromDeviceId, toDeviceId, 0, fromtoPlcMap);
-                        resultMap.put("实时配置复制状态", "成功");
-                    }
-
-                    if (isCopyHis == 1) {
-                        resultMap.put("历史配置复制状态", "失败");
-                        realHisCfgApi.copyRealHisCfg(fromtoPlcMap, 1, toDeviceId);
-                        resultMap.put("历史配置复制状态", "成功");
-                    }
-                    if (isCopyAlarm == 1) {
-                        resultMap.put("报警配置复制状态", "失败");
-                        alarmCfgApi.copyAlarm(accountId, fromDeviceId, toDeviceId, fromtoPlcMap);
-                        resultMap.put("报警配置复制状态", "成功");
-                    }
-                }
-            }
-        } catch (BusinessException be) {
-            currentException = be;
-
-        } catch (Exception e) {
-            currentException = e;
-            e.printStackTrace();
-        } finally {
-            if (currentException != null) {
-                for (Map.Entry<String, String> entry : resultMap.entrySet()) {
-                    if (entry.getValue().equals("失败")) {
-                        entry.setValue(entry.getValue() + currentException.getMessage());
-                    }
-                }
-            }
-            data.put("data", resultMap);
-            System.out.println("获取得到的结果集是: " + data.toJSONString());
-            return new Output(data);
+        if (isCopyBaseInfo == 1) {
+            resultMap.put("基本信息复制状态", "失败");
+            deviceApi.copyDeviceBaseinfo(fromDeviceId, toDeviceId);
+            resultMap.put("基本信息复制状态", "成功");
         }
-    }
+        if (isCopyCom == 1) {
+            try {
+                resultMap.put("通讯口复制状态", "成功");
+                fromtoPlcMap = plcInfoApi.copyDeviceCom(fromDeviceId, toDeviceId);
 
+                try {
+                    if (isCopyReal == 1) {
+                        resultMap.put("实时配置复制状态", "成功");
+                        realHisCfgApi.copyRealHis(accountId, fromDeviceId, toDeviceId, 0, fromtoPlcMap);
+                    }
+                } catch (BusinessException be) {
+                    resultMap.put("实时配置复制状态", be.getMessage());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    resultMap.put("实时配置复制状态", "失败");
+                }
+
+                try {
+                    if (isCopyHis == 1) {
+                        resultMap.put("历史配置复制状态", "成功");
+                        realHisCfgApi.copyRealHisCfg(fromtoPlcMap, 1, toDeviceId);
+                    }
+                } catch (BusinessException be) {
+                    resultMap.put("历史配置复制状态", be.getMessage());
+                } catch (Exception e) {
+                    resultMap.put("历史配置复制状态", "失败");
+                }
+
+                try {
+                    if (isCopyAlarm == 1) {
+                        resultMap.put("报警配置复制状态", "成功");
+                        alarmCfgApi.copyAlarm(accountId, fromDeviceId, toDeviceId, fromtoPlcMap);
+                    }
+                } catch (BusinessException be) {
+                    resultMap.put("报警配置复制状态", be.getMessage());
+                } catch (Exception e) {
+                    resultMap.put("报警配置复制状态", "成功");
+                }
+
+            } catch (BusinessException be) {
+                resultMap.put("通讯口复制状态", be.getMessage());
+            } catch (Exception e) {
+                resultMap.put("通讯口复制状态", "失败");
+            }
+
+        }
+
+        data.put("data", resultMap);
+        System.out.println("获取得到的结果集是: " + data.toJSONString());
+        return new Output(data);
+    }
 }
+

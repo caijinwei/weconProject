@@ -60,23 +60,23 @@
 
     <!-- redis cluster 测试-->
 
-    <!--<bean name="genericObjectPoolConfig" class="org.apache.commons.pool2.impl.GenericObjectPoolConfig" >-->
-        <!--<property name="maxWaitMillis" value="-1" />-->
-        <!--<property name="maxTotal" value="1000" />-->
-        <!--<property name="minIdle" value="8" />-->
-        <!--<property name="maxIdle" value="100" />-->
-    <!--</bean>-->
+    <bean name="genericObjectPoolConfig" class="org.apache.commons.pool2.impl.GenericObjectPoolConfig" >
+        <property name="maxWaitMillis" value="-1" />
+        <property name="maxTotal" value="1000" />
+        <property name="minIdle" value="8" />
+        <property name="maxIdle" value="100" />
+    </bean>
 
-    <!--<bean id="jedisCluster" class="com.wecon.box.util.JedisClusterFactory">-->
-        <!--<property name="addressConfig">-->
-            <!--<value>classpath:connect-redis.properties</value>-->
-        <!--</property>-->
-        <!--<property name="addressKeyPrefix" value="address" />   &lt;!&ndash;  属性文件里  key的前缀 &ndash;&gt;-->
+    <bean id="jedisCluster" class="com.wecon.common.redis.JedisClusterFactory">
+        <property name="addressConfig">
+            <value>classpath:connect-redis.properties</value>
+        </property>
+        <property name="addressKeyPrefix" value="address" />   <!--  属性文件里  key的前缀 -->
 
-        <!--<property name="timeout" value="300000" />-->
-        <!--<property name="maxRedirections" value="6" />-->
-        <!--<property name="genericObjectPoolConfig" ref="genericObjectPoolConfig" />-->
-    <!--</bean>-->
+        <property name="timeout" value="300000" />
+        <property name="maxRedirections" value="6" />
+        <property name="genericObjectPoolConfig" ref="genericObjectPoolConfig" />
+    </bean>
 
 
     <!-- 数据源定义 -->
