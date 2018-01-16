@@ -655,6 +655,7 @@ public class DeviceAction {
                 } catch (BusinessException be) {
                     resultMap.put("历史配置复制状态", be.getMessage());
                 } catch (Exception e) {
+                    e.printStackTrace();
                     resultMap.put("历史配置复制状态", "失败");
                 }
 
@@ -666,12 +667,14 @@ public class DeviceAction {
                 } catch (BusinessException be) {
                     resultMap.put("报警配置复制状态", be.getMessage());
                 } catch (Exception e) {
-                    resultMap.put("报警配置复制状态", "成功");
+                    e.printStackTrace();
+                    resultMap.put("报警配置复制状态", "失败");
                 }
 
             } catch (BusinessException be) {
                 resultMap.put("通讯口复制状态", be.getMessage());
             } catch (Exception e) {
+                e.printStackTrace();
                 resultMap.put("通讯口复制状态", "失败");
             }
 
