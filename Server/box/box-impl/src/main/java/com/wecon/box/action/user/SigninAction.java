@@ -15,13 +15,10 @@ import com.wecon.restful.core.Client;
 import com.wecon.restful.core.Output;
 import com.wecon.restful.doc.Label;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.Range;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 /**
  * Created by zengzhipeng on 2017/8/2.

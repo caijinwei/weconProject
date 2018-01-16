@@ -661,8 +661,8 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 					if(fromtoPlcIdMap != null) {
 						 fromtoAlarmCfgIdMap = copyAlarmCfg(accountId, toDeviceId, fromtoPlcIdMap);
 					}
+					Map<Long, Long> fromtoAccountDirMap = accountDirApi.copyAccountDir(accountId, fromDeviceId, toDeviceId, TYPE);
 					if(fromtoAlarmCfgIdMap != null && fromtoAlarmCfgIdMap.size() >0) {
-						Map<Long, Long> fromtoAccountDirMap = accountDirApi.copyAccountDir(accountId, fromDeviceId, toDeviceId, TYPE);
 						accountDirRelApi.copyAccDeviceRel(fromtoAlarmCfgIdMap, fromtoAccountDirMap);
 						alarmTriggerApi.copyAlarmTrigger(fromtoAlarmCfgIdMap);
 					}

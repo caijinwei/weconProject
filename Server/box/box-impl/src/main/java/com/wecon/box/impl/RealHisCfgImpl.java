@@ -1210,7 +1210,9 @@ public class RealHisCfgImpl implements RealHisCfgApi {
                         fromtoRealHisCfgMap = copyRealHisCfg(fromtoPlcMap, 0, toDeviceId);
                     }
                     Map<Long, Long> fromtoAccountDirMap = accountDirApi.copyAccountDir(accountId, fromDeviceId, toDeviceId, 1);
-                    accountDirRelApi.copyAccDeviceRel(fromtoRealHisCfgMap, fromtoAccountDirMap);
+                    if(fromtoRealHisCfgMap != null) {
+                        accountDirRelApi.copyAccDeviceRel(fromtoRealHisCfgMap, fromtoAccountDirMap);
+                    }
                     return true;
                 }
             });
