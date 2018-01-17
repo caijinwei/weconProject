@@ -78,8 +78,6 @@ public class SendvalueCallback implements MqttCallback {
 				logger.info("data为空！");
 				return;
 			}
-			System.out.println("选中的addrid==" + addr_id);
-			System.out.println("接收的消息==" + reMessage);
 			JSONObject jsonBase = jsonObject.getJSONObject("data");
 			if (!CommonUtils.isNullOrEmpty(addr_id) && !CommonUtils.isNullOrEmpty(jsonBase.getInteger("addr_id"))) {
 				if (Integer.parseInt(addr_id) == jsonBase.getInteger("addr_id")) {
