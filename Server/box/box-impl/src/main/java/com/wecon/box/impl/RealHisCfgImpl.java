@@ -1020,10 +1020,10 @@ public class RealHisCfgImpl implements RealHisCfgApi {
     }
 
     @Override
-    public void updateRealHisState(long plc_id, int state) {
+    public void updateRealHisState(long plc_id, int state,int bindstate) {
         if (plc_id > 0) {
-            String sql = "UPDATE real_his_cfg a SET a.state=? WHERE a.plc_id=?";
-            jdbcTemplate.update(sql, new Object[]{state, plc_id});
+            String sql = "UPDATE real_his_cfg  SET state= ? ,bind_state = ? WHERE plc_id=?";
+            jdbcTemplate.update(sql, new Object[]{state ,bindstate, plc_id});
         }
     }
 

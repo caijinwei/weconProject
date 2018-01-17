@@ -182,7 +182,7 @@ public interface RealHisCfgApi {
 	/*
 	* 删除 plc_id下的监控点
 	* */
-	public void updateRealHisState(long plc_id,int state);
+	public void updateRealHisState(long plc_id,int state,int bindstate);
 
 	/*
 	* 根据plc_id找realHis

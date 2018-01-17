@@ -550,9 +550,9 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 	}
 
 	@Override
-	public void updateAlarmCfgState(long plc_id, int state) {
-		Object[] args = new Object[] { state, plc_id };
-		String sql = "UPDATE alarm_cfg a SET a.state=? WHERE a.plc_id=?";
+	public void updateAlarmCfgState(long plc_id, int state,int bindstate) {
+		Object[] args = new Object[] { state, bindstate ,plc_id };
+		String sql = "UPDATE alarm_cfg a SET a.state = ? , bind_state = ? WHERE a.plc_id=?";
 		jdbcTemplate.update(sql, args);
 	}
 
