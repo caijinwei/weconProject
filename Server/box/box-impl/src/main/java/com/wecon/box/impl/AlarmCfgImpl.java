@@ -550,9 +550,9 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 	}
 
 	@Override
-	public void updateAlarmCfgState(long plc_id, int state) {
-		Object[] args = new Object[] { state, plc_id };
-		String sql = "UPDATE alarm_cfg a SET a.state=? WHERE a.plc_id=?";
+	public void updateAlarmCfgState(long plc_id, int state,int bindstate) {
+		Object[] args = new Object[] { state, bindstate ,plc_id };
+		String sql = "UPDATE alarm_cfg a SET a.state = ? , bind_state = ? WHERE a.plc_id=?";
 		jdbcTemplate.update(sql, args);
 	}
 
@@ -617,18 +617,17 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 		for (Map.Entry<Long, Long> entry : fromtoPlcIdMap.entrySet()) {
 			List<AlarmCfg> fromAlarmCfgList = getAlarmByPlcId(entry.getKey());
 
-			if(fromAlarmCfgList == null|| fromAlarmCfgList.size()<=0){
-					throw new BusinessException(ErrorCodeOption.AlarmCfg_Is_Empty.key,ErrorCodeOption.AlarmCfg_Is_Empty.value);
-			}
-
-
-			for (AlarmCfg alarmCfg : fromAlarmCfgList) {
-				if (alarmCfg.state != 3) {
-					alarmCfg.device_id = toDeviceId;
-					alarmCfg.plc_id = entry.getValue();
-					resultMap.put(alarmCfg.alarmcfg_id,saveAlarmCfg(alarmCfg));
+			if(fromAlarmCfgList != null && fromAlarmCfgList.size()>=0){
+				for (AlarmCfg alarmCfg : fromAlarmCfgList) {
+					if (alarmCfg.state != 3) {
+						alarmCfg.device_id = toDeviceId;
+						alarmCfg.state = 1;
+						alarmCfg.plc_id = entry.getValue();
+						resultMap.put(alarmCfg.alarmcfg_id,saveAlarmCfg(alarmCfg));
+					}
 				}
 			}
+
 		}
 		if(resultMap.size() >0){
 			return resultMap;
@@ -658,10 +657,12 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			tt.execute(new TransactionCallback() {
 				@Override
 				public Object doInTransaction(TransactionStatus ts) {
-
-					Map<Long,Long> fromtoAlarmCfgIdMap =copyAlarmCfg(accountId,toDeviceId,fromtoPlcIdMap);
+					Map<Long, Long> fromtoAlarmCfgIdMap = null;
+					if(fromtoPlcIdMap != null) {
+						 fromtoAlarmCfgIdMap = copyAlarmCfg(accountId, toDeviceId, fromtoPlcIdMap);
+					}
+					Map<Long, Long> fromtoAccountDirMap = accountDirApi.copyAccountDir(accountId, fromDeviceId, toDeviceId, TYPE);
 					if(fromtoAlarmCfgIdMap != null && fromtoAlarmCfgIdMap.size() >0) {
-						Map<Long, Long> fromtoAccountDirMap = accountDirApi.copyAccountDir(accountId, fromDeviceId, toDeviceId, TYPE);
 						accountDirRelApi.copyAccDeviceRel(fromtoAlarmCfgIdMap, fromtoAccountDirMap);
 						alarmTriggerApi.copyAlarmTrigger(fromtoAlarmCfgIdMap);
 					}

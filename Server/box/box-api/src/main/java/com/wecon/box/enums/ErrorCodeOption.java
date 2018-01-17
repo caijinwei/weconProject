@@ -100,7 +100,7 @@ public enum ErrorCodeOption {
     AlarmCfg_Is_Empty("待复制的报警配置为空！",30043),
     RealCfg_Is_Empty("待复制的实时配置为空！",30044),
     HisCfg_Is_Empty("待复制的历史配置为空！",30045),
-
+    ComConfig_IsNot_Del("删除通讯口指令下发，通讯口配置复制失败！",30046),
 
 
     Get_Groupid_Error("获取数组ID错误",50001),

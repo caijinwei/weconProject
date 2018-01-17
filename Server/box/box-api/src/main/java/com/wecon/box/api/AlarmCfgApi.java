@@ -131,7 +131,7 @@ public interface AlarmCfgApi {
 	/*
 	 * 修改通讯口下的实时监控点的state
 	 */
-	public void updateAlarmCfgState(long plc_id, int state);
+	public void updateAlarmCfgState(long plc_id, int state ,int bindState);
 
 	/*
 	 * 根据通讯口plcId查找监控点

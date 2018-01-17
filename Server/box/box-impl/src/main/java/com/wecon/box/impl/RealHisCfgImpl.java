@@ -1026,10 +1026,10 @@ public static void main(String[] a){
     }
 
     @Override
-    public void updateRealHisState(long plc_id, int state) {
+    public void updateRealHisState(long plc_id, int state,int bindstate) {
         if (plc_id > 0) {
-            String sql = "UPDATE real_his_cfg a SET a.state=? WHERE a.plc_id=?";
-            jdbcTemplate.update(sql, new Object[]{state, plc_id});
+            String sql = "UPDATE real_his_cfg  SET state= ? ,bind_state = ? WHERE plc_id=?";
+            jdbcTemplate.update(sql, new Object[]{state ,bindstate, plc_id});
         }
     }
 
@@ -1143,52 +1143,52 @@ public static void main(String[] a){
     * */
     @Override
     public Map<Long, Long> copyRealHisCfg(Map<Long, Long> fromtoPlcId, int dataType, long toDeviceId) {
+        if(fromtoPlcId == null){
+            return null;
+        }
         /*
         * 判断目标device是否已经存在里 实时历史配置
         * */
-        RealHisConfigFilter realHisConfigFilter = new RealHisConfigFilter();
-        realHisConfigFilter.data_type = dataType;
-        realHisConfigFilter.device_id = toDeviceId;
-        List<RealHisCfg> toCfgList = findRealHisCfgs(realHisConfigFilter);
-        if (toCfgList != null) {
-            for (RealHisCfg c : toCfgList) {
-                if (c.state != 3) {
-                    throw new BusinessException(ErrorCodeOption.RealHisConfig_Is_Exist.key, ErrorCodeOption.RealHisConfig_Is_Exist.value);
+            RealHisConfigFilter realHisConfigFilter = new RealHisConfigFilter();
+            realHisConfigFilter.data_type = dataType;
+            realHisConfigFilter.device_id = toDeviceId;
+            List<RealHisCfg> toCfgList = findRealHisCfgs(realHisConfigFilter);
+            if (toCfgList != null) {
+                for (RealHisCfg c : toCfgList) {
+                    if (c.state != 3) {
+                        throw new BusinessException(ErrorCodeOption.RealHisConfig_Is_Exist.key, ErrorCodeOption.RealHisConfig_Is_Exist.value);
+                    }
                 }
             }
-        }
 
 
         /*
         * 新增  配置
         * */
-        Map<Long, Long> resultFromToRealHisCfgMap = new HashMap<Long, Long>();
-        realHisConfigFilter = new RealHisConfigFilter();
-        for (Map.Entry<Long, Long> entry : fromtoPlcId.entrySet()) {
-            realHisConfigFilter.plc_id = entry.getKey();
-            realHisConfigFilter.bind_state = 1;
-            realHisConfigFilter.data_type = dataType;
-            List<RealHisCfg> realHisCfgs = findRealHisCfgs(realHisConfigFilter);
+            Map<Long, Long> resultFromToRealHisCfgMap = new HashMap<Long, Long>();
+            realHisConfigFilter = new RealHisConfigFilter();
+            for (Map.Entry<Long, Long> entry : fromtoPlcId.entrySet()) {
+                realHisConfigFilter.plc_id = entry.getKey();
+                realHisConfigFilter.bind_state = 1;
+                realHisConfigFilter.data_type = dataType;
+                List<RealHisCfg> realHisCfgs = findRealHisCfgs(realHisConfigFilter);
 
-            if(realHisCfgs == null|| realHisCfgs.size()<=0){
-                if(dataType ==0) {
-                    throw new BusinessException(ErrorCodeOption.RealCfg_Is_Empty.key,ErrorCodeOption.RealCfg_Is_Empty.value);
-                }else{
-                    throw new BusinessException(ErrorCodeOption.HisCfg_Is_Empty.key,ErrorCodeOption.HisCfg_Is_Empty.value);
+                if (realHisCfgs != null && realHisCfgs.size() >= 0) {
+                    for (RealHisCfg realHisCfg : realHisCfgs) {
+                        if (realHisCfg.state != 3) {
+                            realHisCfg.device_id = toDeviceId;
+                            realHisCfg.plc_id = entry.getValue();
+                            realHisCfg.state = 1;
+                            resultFromToRealHisCfgMap.put(realHisCfg.id, saveRealHisCfg(realHisCfg));
+                        }
+                    }
                 }
+
             }
-            for (RealHisCfg realHisCfg : realHisCfgs) {
-                if (realHisCfg.state != 3) {
-                    realHisCfg.device_id = toDeviceId;
-                    realHisCfg.plc_id = entry.getValue();
-                    resultFromToRealHisCfgMap.put(realHisCfg.id, saveRealHisCfg(realHisCfg));
-                }
+            if (resultFromToRealHisCfgMap.size() > 0) {
+                return resultFromToRealHisCfgMap;
             }
-        }
-        if (resultFromToRealHisCfgMap.size() > 0) {
-            return resultFromToRealHisCfgMap;
-        }
-        return null;
+            return null;
     }
 
 
@@ -1211,9 +1211,14 @@ public static void main(String[] a){
             tt.execute(new TransactionCallback() {
                 @Override
                 public Object doInTransaction(TransactionStatus ts) {
-                    Map<Long, Long> fromtoRealHisCfgMap = copyRealHisCfg(fromtoPlcMap, 0, toDeviceId);
+                    Map<Long, Long> fromtoRealHisCfgMap = null;
+                    if(fromtoPlcMap != null && fromtoPlcMap.size() >0) {
+                        fromtoRealHisCfgMap = copyRealHisCfg(fromtoPlcMap, 0, toDeviceId);
+                    }
                     Map<Long, Long> fromtoAccountDirMap = accountDirApi.copyAccountDir(accountId, fromDeviceId, toDeviceId, 1);
-                    accountDirRelApi.copyAccDeviceRel(fromtoRealHisCfgMap, fromtoAccountDirMap);
+                    if(fromtoRealHisCfgMap != null) {
+                        accountDirRelApi.copyAccDeviceRel(fromtoRealHisCfgMap, fromtoAccountDirMap);
+                    }
                     return true;
                 }
             });

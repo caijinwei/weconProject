@@ -51,7 +51,7 @@ public class PlcInfoImpl implements PlcInfoApi {
 
         if (!model.port.equals("Ethernet")) {
             List<Integer> plc_StateList = getPortState(model.device_id, model.port);
-            if(plc_StateList.size() > 0) {
+            if (plc_StateList.size() > 0) {
                 if (plc_StateList.get(0) == 3) {
                     throw new BusinessException(ErrorCodeOption.PlcInfo_Port_IsExist.key, ErrorCodeOption.PlcInfo_Port_IsExist.value);
                 } else {
@@ -176,28 +176,31 @@ public class PlcInfoImpl implements PlcInfoApi {
     }
 
     @Override
-    public Map<Long,Long> copyDeviceCom(long fromDeviceId, long toDeviceId) {
-        Map<Long,Long> resultMap = new HashMap<Long,Long>();
+    public Map<Long, Long> copyDeviceCom(long fromDeviceId, long toDeviceId) {
+        Map<Long, Long> resultMap = new HashMap<Long, Long>();
 
         /*
         * 判断是否已经存在通讯口配置
         * */
         List<PlcInfo> toinfoList = getListPlcInfo(toDeviceId);
-        if(toinfoList != null && toinfoList.size() >0){
-            for(PlcInfo plcInfo:toinfoList){
-                if(plcInfo.state!=3){
-                    throw new BusinessException(ErrorCodeOption.ComConfig_Is_Exist.key,ErrorCodeOption.ComConfig_Is_Exist.value);
+        if (toinfoList != null && toinfoList.size() > 0) {
+            for (PlcInfo plcInfo : toinfoList) {
+                if (plcInfo.state != 3) {
+                    throw new BusinessException(ErrorCodeOption.ComConfig_Is_Exist.key, ErrorCodeOption.ComConfig_Is_Exist.value);
+                }else{
+                    throw new BusinessException(ErrorCodeOption.ComConfig_IsNot_Del.key,ErrorCodeOption.ComConfig_IsNot_Del.value);
                 }
             }
         }
 
 
         List<PlcInfo> frominfoList = getListPlcInfo(fromDeviceId);
-        if( frominfoList!=null && frominfoList.size() >= 0 ){
-            for(PlcInfo p : frominfoList){
-                if(p.state != 3){
-                p.device_id=toDeviceId;
-                resultMap.put(p.plc_id,savePlcInfo(p));
+        if (frominfoList != null && frominfoList.size() >= 0) {
+            for (PlcInfo p : frominfoList) {
+                if (p.state != 3) {
+                    p.device_id = toDeviceId;
+                    p.state = 1;
+                    resultMap.put(p.plc_id, savePlcInfo(p));
                 }
             }
         }
@@ -462,18 +465,18 @@ public class PlcInfoImpl implements PlcInfoApi {
 
     @Override
     public List<Integer> getPortState(long device_id, String port) {
-        List<Integer> resultList =new ArrayList<Integer>();
+        List<Integer> resultList = new ArrayList<Integer>();
 
         Object args[] = {device_id, port};
         String sql = "SELECT state FROM plc_info WHERE device_id=? AND port=? GROUP BY state";
         List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, args);
 
 
-        for(Map<String,Object>map :result){
+        for (Map<String, Object> map : result) {
             resultList.add(Integer.parseInt(map.get("state").toString()));
         }
 
-       return resultList;
+        return resultList;
     }
 
     public void unBundledPlc(final Integer plcId) {

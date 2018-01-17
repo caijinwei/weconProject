@@ -237,8 +237,8 @@ public class PlcInfoSettingAction {
 //                List<RealHisCfg> oldRealHisCfgs=realHisCfgApi.findRealHisCfgsByPlcId(plcInfo.plc_id);
 //                List<AlarmCfg> oldAlarmCfgs=alarmCfgApi.getAlarmByPlcId(plcInfo.plc_id);
 
-                realHisCfgApi.updateRealHisState(plcInfo.plc_id,3);
-                alarmCfgApi.updateAlarmCfgState(plcInfo.plc_id,3);
+                realHisCfgApi.updateRealHisState(plcInfo.plc_id,3,0);
+                alarmCfgApi.updateAlarmCfgState(plcInfo.plc_id,3,0);
 
                 // <editor - fold desc = "操作日志" >
 //                List<RealHisCfg> newRealHisCfgs=realHisCfgApi.findRealHisCfgsByPlcId(plcInfo.plc_id);
