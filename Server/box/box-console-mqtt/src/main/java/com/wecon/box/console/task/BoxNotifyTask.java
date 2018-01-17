@@ -132,6 +132,7 @@ public class BoxNotifyTask extends Thread {
 					.getRealHisCfgListByState(Constant.State.STATE_UPDATE_CONFIG, Constant.State.STATE_NEW_CONFIG);
 			logger.info("updateRealHisCfgHandle，获取更新条数：" + (null == realHisCfgList ? "0" : realHisCfgList.size()));
 			if (null != realHisCfgList) {
+				RedisManager.publish(ConstKey.REDIS_GROUP_NAME, "update_realcfg", JSON.toJSONString(realHisCfgList));
 				Map<String, List<Map>> groupRealHisCfg = GroupOp.groupCfgByMachineCode(
 						Converter.convertListOjToMap(realHisCfgList), RealHisCfgExtend.UPDATE_REAL_HIS_FIELD_FILTER);
 				if (null != groupRealHisCfg) {
@@ -239,6 +240,7 @@ public class BoxNotifyTask extends Thread {
 						hisCfgList.add(r);
 					}
 				}
+				RedisManager.publish(ConstKey.REDIS_GROUP_NAME, "delete_realcfg", JSON.toJSONString(realCfgList));
 				deleteRealHisCfgPublish(Converter.convertListOjToMap(realCfgList), Constant.DataType.DATA_TYPE_REAL);
 				deleteRealHisCfgPublish(Converter.convertListOjToMap(hisCfgList), Constant.DataType.DATA_TYPE_HISTORY);
 			}

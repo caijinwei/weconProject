@@ -81,7 +81,13 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 			Map<String, Object> bParams = JSON.parseObject(params, new TypeReference<Map<String, Object>>() {});
 			String markId = null != bParams.get("markId") ? bParams.get("markId").toString() : null;
 			if(markId != null){
-				if("2".equals(markId)){
+				if("3".equals(markId)){
+					paramMap.put(session.getId(), params);
+					Set<String> channelSet = new HashSet<>();
+					channelSet.add("update_realcfg");
+					channelSet.add("delete_realcfg");
+					subscribeRealData(session, channelSet);
+				}else if("2".equals(markId)){
 					paramMap.put(session.getId(), params);
 					List<String> machineCodeList = null;
 					/** 管理者账号 **/
@@ -227,9 +233,15 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 										data.put("monitorId", piBoxComAddr.addr_id);
 										data.put("state", piBoxComAddr.state);
 										data.put("value", piBoxComAddr.value);
-										data.put("addrType", realCfgList.get(i).addr_type);
-										data.put("dataId", realCfgList.get(i).data_id);
-										data.put("digitCount", realCfgList.get(i++).digit_count);
+										for(RealHisCfg cfg : realCfgList){
+											if(cfg.id == Long.parseLong(piBoxComAddr.addr_id)){
+												data.put("addrType", cfg.addr_type);
+												data.put("dataId", cfg.data_id);
+												data.put("digitCount", cfg.digit_count);
+												break;
+											}
+										}
+
 										arr.add(data);
 									}
 								}
@@ -244,6 +256,46 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 					}catch (Exception e){
 						e.printStackTrace();
 					}
+				}else if("3".equals(bParams.get("markId").toString())){
+					try {
+						Client client = clientMap.get(session.getId());
+						List<RealHisCfgExtend> realHisCfgList = JSON.parseArray(message, RealHisCfgExtend.class);
+						if(null != realHisCfgList){
+							JSONObject list = new JSONObject();
+							JSONArray arr = new JSONArray();
+							for(RealHisCfgExtend cfg : realHisCfgList){
+								JSONObject data = new JSONObject();
+								if("update_realcfg".equals(channel)){
+									data.put("monitorId", cfg.id);
+									data.put("monitorName", CommonUtils.isNullOrEmpty(cfg.ref_alais) ? cfg.name
+											: cfg.ref_alais);
+									data.put("updTime", cfg.update_date);
+									data.put("dataId", cfg.data_id);
+									data.put("addr", cfg.addr);
+									data.put("addrType", cfg.addr_type);
+									data.put("digitCount", cfg.digit_count);
+									data.put("digitBinary", cfg.digit_binary);
+									data.put("dataLimit", cfg.data_limit);
+									data.put("rid", cfg.rid);
+									data.put("roleType", client.userInfo.getUserType() == 1 ? 3 : cfg.role_type);
+								}else if("delete_realcfg".equals(channel)){
+									data.put("monitorId", cfg.id);
+								}
+								data.put("operType", cfg.state);
+								arr.add(data);
+							}
+							list.put("list", arr);
+							JSONObject respone = new JSONObject();
+							respone.put("msg", "修改监控点");
+							respone.put("markId", 3);
+							respone.put("result", list);
+							session.sendMessage(new TextMessage(respone.toJSONString()));
+						}
+
+					}catch (Exception e){
+						e.printStackTrace();
+					}
+
 				}
 			}
 		}

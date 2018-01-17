@@ -786,7 +786,13 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 		return realCfgList;
 	}
-
+public static void main(String[] a){
+    StringBuilder idSb = new StringBuilder();
+    idSb.append(",");
+    idSb.append(",");
+    idSb.substring(1);
+    System.out.print(idSb);
+}
     @Override
     public List<Long> getRealHisCfgIdsByPlcIds(List<Long> plcIds) {
         if (null == plcIds || plcIds.size() == 0) {
