@@ -559,7 +559,7 @@ public class AlarmDataAction {
 	@Description("删除报警配置")
 	@WebApi(forceAuth = true, master = true, authority = { "1" })
 	@RequestMapping(value = "/delAlrmCfg")
-	public Output delAlrmCfg(@RequestParam("alarmcfg_id") String alarmcfg_id) {
+	public Output delAlrmCfg(@RequestParam("alarmcfg_id") String alarmcfg_id,@RequestParam("alarm_dir_id") String alarm_dir_id) {
 		long account_id = AppContext.getSession().client.userId;
 		if (!CommonUtils.isNullOrEmpty(alarmcfg_id)) {
 			AlarmCfg alarmCfg = alarmCfgApi.getAlarmcfg(Long.parseLong(alarmcfg_id));
@@ -576,6 +576,7 @@ public class AlarmDataAction {
 			// 2.更改配置状态，等待盒子发送数据把配置物理删除
 			alarmCfg.state = 3;// 删除配置状态
 			alarmCfgApi.upAlarmCfg(alarmCfg);
+			accountDirRelApi.delAccountDir(Long.parseLong(alarm_dir_id), Long.parseLong(alarmcfg_id));
 			dbLogUtil.addOperateLog(OpTypeOption.DelAlarm, ResTypeOption.Alarm, alarmCfg.alarmcfg_id, alarmCfg);
 		}
 

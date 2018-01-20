@@ -1321,6 +1321,7 @@ appModule
 					}
 
 					var alarmid = -1;
+					var dirid=-1;
 					var alarmfo = null;
 					// 获取修改报警配置信息
 					$scope.editmonitor = function(model) {
@@ -1338,13 +1339,15 @@ appModule
 					// 获取删除监控点信息
 					$scope.delmonitor = function(model) {
 						alarmid = model.alarmcfg_id;
+						dirid=model.dirId;
 						$("#delid").html("确定要删除【" + model.name + "】报警条目吗？");
 					}
 					// 删除报警条目
 					$scope.del_alarmcfg = function() {
 
 						var params = {
-							alarmcfg_id : alarmid
+							alarmcfg_id : alarmid,
+							alarm_dir_id:dirid
 						};
 
 						T.common.ajax
