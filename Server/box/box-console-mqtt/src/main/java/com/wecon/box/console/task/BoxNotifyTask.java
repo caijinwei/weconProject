@@ -131,7 +131,7 @@ public class BoxNotifyTask extends Thread {
 			List<RealHisCfgExtend> realHisCfgList = realHisCfgApi
 					.getRealHisCfgListByState(Constant.State.STATE_UPDATE_CONFIG, Constant.State.STATE_NEW_CONFIG);
 			logger.info("updateRealHisCfgHandle，获取更新条数：" + (null == realHisCfgList ? "0" : realHisCfgList.size()));
-			if (null != realHisCfgList) {
+			if (null != realHisCfgList && realHisCfgList.size() > 0) {
 				RedisManager.publish(ConstKey.REDIS_GROUP_NAME, "update_realcfg", JSON.toJSONString(realHisCfgList));
 				Map<String, List<Map>> groupRealHisCfg = GroupOp.groupCfgByMachineCode(
 						Converter.convertListOjToMap(realHisCfgList), RealHisCfgExtend.UPDATE_REAL_HIS_FIELD_FILTER);
@@ -230,7 +230,7 @@ public class BoxNotifyTask extends Thread {
 					.getRealHisCfgListByState(Constant.State.STATE_DELETE_CONFIG);
 			List<AlarmCfgExtend> alarmCfgExtendList = alarmCfgApi
 					.getAlarmCfgExtendListByState(Constant.State.STATE_DELETE_CONFIG);
-			if (null != realHisCfgList) {
+			if (null != realHisCfgList && realHisCfgList.size() > 0) {
 				List<RealHisCfgDevice> realCfgList = new ArrayList<RealHisCfgDevice>();
 				List<RealHisCfgDevice> hisCfgList = new ArrayList<RealHisCfgDevice>();
 				for (RealHisCfgDevice r : realHisCfgList) {

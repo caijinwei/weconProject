@@ -164,6 +164,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 						session.sendMessage(new TextMessage(oj[0].toString()));
 					}
 					if (null != clientMQTTs.get(session.getId())) {
+
 						clientMQTTs.get(session.getId()).close();
 						clientMQTTs.remove(session.getId());
 					}
