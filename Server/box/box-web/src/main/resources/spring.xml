@@ -58,6 +58,7 @@
         </property>
     </bean>
 
+
     <!-- redis cluster 测试-->
 
     <bean name="genericObjectPoolConfig" class="org.apache.commons.pool2.impl.GenericObjectPoolConfig" >

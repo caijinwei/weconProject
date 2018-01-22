@@ -2,12 +2,17 @@ package com.wecon.box.action;
 
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.*;
+import com.wecon.box.entity.AlarmCfg;
 import com.wecon.box.entity.PlcInfo;
+import com.wecon.box.entity.RealHisCfg;
+import com.wecon.box.entity.RealHisCfgDevice;
 import com.wecon.box.enums.ErrorCodeOption;
 import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.enums.ResTypeOption;
+import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.param.PlcInfoData;
 import com.wecon.box.param.PlcInfoSettingParam;
+import com.wecon.box.redis.RedisUpdDeviceCfg;
 import com.wecon.box.util.DbLogUtil;
 import com.wecon.box.util.PlcListByType;
 import com.wecon.restful.annotation.WebApi;
@@ -47,6 +52,12 @@ public class PlcInfoSettingAction {
     RealHisCfgApi realHisCfgApi;
     @Autowired
     AlarmCfgApi alarmCfgApi;
+    @Autowired
+    DeviceApi deviceApi;
+
+    @Autowired
+    RedisUpdDeviceCfg redisUpdDeviceCfg;
+
 
 //    @Description("新增plc配置")
 //    @RequestMapping(value = "/addPlcInfo")
@@ -105,7 +116,7 @@ public class PlcInfoSettingAction {
         List<PlcInfoData> infoDatas = new ArrayList<PlcInfoData>();
         for (PlcInfo info : showAllPlcConf) {
             //过滤掉删除配置的plc
-            if(info.state==3){
+            if (info.state == 3) {
                 continue;
             }
             PlcInfoData plcInfoData = new PlcInfoData();
@@ -172,6 +183,7 @@ public class PlcInfoSettingAction {
     @WebApi(forceAuth = true, master = true, authority = {"1"})
     @RequestMapping("savePlcInfo")
     public Output savePlcInfo(@Valid PlcInfoSettingParam param) {
+        long currentPlcId = param.plc_id;
         PlcInfo plcInfo = new PlcInfo();
         plcInfo.plc_id = param.plc_id;
         plcInfo.type = param.type;
@@ -199,46 +211,62 @@ public class PlcInfoSettingAction {
         plcInfo.wait_timeout = param.wait_timeout;
         if (plcInfo.plc_id <= 0) {
             if (!plcInfo.port.equals("Ethernet")) {
-                List<Integer> plcStateList=plcInfoApi.getPortState(plcInfo.device_id, plcInfo.port);
-                if(plcStateList.size() > 0){
-                if (plcStateList.get(0)==3) {
-                    throw new BusinessException(ErrorCodeOption.PlcInfo_Port_IsExist.key, ErrorCodeOption.PlcInfo_Port_IsExist.value);
-                }else {
-                    throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
-                }
+                List<Integer> plcStateList = plcInfoApi.getPortState(plcInfo.device_id, plcInfo.port);
+                if (plcStateList.size() > 0) {
+                    if (plcStateList.get(0) == 3) {
+                        throw new BusinessException(ErrorCodeOption.PlcInfo_Port_IsExist.key, ErrorCodeOption.PlcInfo_Port_IsExist.value);
+                    } else {
+                        throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
+                    }
                 }
             }
         } else {
             if (!plcInfo.port.equals(plcInfoApi.findPlcInfoByPlcId((int) plcInfo.plc_id).port)) {
                 if (!plcInfo.port.equals("Ethernet")) {
-                    List<Integer> plcStateList=plcInfoApi.getPortState(plcInfo.device_id, plcInfo.port);
-                   if(plcStateList.size() > 0) {
-                       if (plcStateList.get(0) == 3) {
-                           throw new BusinessException(ErrorCodeOption.PlcInfo_Port_IsExist.key, ErrorCodeOption.PlcInfo_Port_IsExist.value);
-                       } else {
-                           throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
-                       }
-                   }
+                    List<Integer> plcStateList = plcInfoApi.getPortState(plcInfo.device_id, plcInfo.port);
+                    if (plcStateList.size() > 0) {
+                        if (plcStateList.get(0) == 3) {
+                            throw new BusinessException(ErrorCodeOption.PlcInfo_Port_IsExist.key, ErrorCodeOption.PlcInfo_Port_IsExist.value);
+                        } else {
+                            throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
+                        }
+                    }
                 }
             }
         }
-        if(driverApi.getDriverBydriver(plcInfo.driver)==null){
-            throw new BusinessException(ErrorCodeOption.Driver_IsNot_Fount.key,ErrorCodeOption.Device_NotFound.value);
+        if (driverApi.getDriverBydriver(plcInfo.driver) == null) {
+            throw new BusinessException(ErrorCodeOption.Driver_IsNot_Fount.key, ErrorCodeOption.Device_NotFound.value);
         }
         //更新操作
+
         if (plcInfo.plc_id > 0) {
-            PlcInfo oldPlc=plcInfoApi.findPlcInfoByPlcId(plcInfo.plc_id);
+            PlcInfo oldPlc = plcInfoApi.findPlcInfoByPlcId(plcInfo.plc_id);
             //修改驱动名称
             //设置state为3  且  将通讯口下的监控点全部删除掉
-            plcInfo.state=2;
-            if(!oldPlc.type.equals(plcInfo.type)){
+            plcInfo.state = 2;
+            if (!oldPlc.type.equals(plcInfo.type)) {
                 plcInfoApi.updatePlcInfo(plcInfo);
 
 //                List<RealHisCfg> oldRealHisCfgs=realHisCfgApi.findRealHisCfgsByPlcId(plcInfo.plc_id);
 //                List<AlarmCfg> oldAlarmCfgs=alarmCfgApi.getAlarmByPlcId(plcInfo.plc_id);
 
-                realHisCfgApi.updateRealHisState(plcInfo.plc_id,3,0);
-                alarmCfgApi.updateAlarmCfgState(plcInfo.plc_id,3,0);
+                realHisCfgApi.updateRealHisState(plcInfo.plc_id, 3, 0);
+                alarmCfgApi.updateAlarmCfgState(plcInfo.plc_id, 3, 0);
+
+                //实时历史消息推送
+                RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
+                realHisCfgFilter.plc_id = plcInfo.plc_id;
+                List<RealHisCfgDevice> realHisCfgList = realHisCfgApi.getRealHisCfg(realHisCfgFilter);
+                for (RealHisCfgDevice realHisCfgDevice : realHisCfgList) {
+                    redisUpdDeviceCfg.pubDelRealHisCfg(realHisCfgDevice.id, plcInfo.plc_id);
+                }
+
+                //报警消息推送
+                List<AlarmCfg> alarmCfgList = alarmCfgApi.getAlarmByPlcId(plcInfo.plc_id);
+                for (AlarmCfg alarmCfg : alarmCfgList) {
+                    redisUpdDeviceCfg.pubDelAlarmCfg(alarmCfg.alarmcfg_id, plcInfo.plc_id);
+                }
+
 
                 // <editor - fold desc = "操作日志" >
 //                List<RealHisCfg> newRealHisCfgs=realHisCfgApi.findRealHisCfgsByPlcId(plcInfo.plc_id);
@@ -247,20 +275,26 @@ public class PlcInfoSettingAction {
 //                List<AlarmCfg> alarmCfgs=alarmCfgApi.getAlarmByPlcId(plcInfo.plc_id);
 //                dbLogUtil.updOperateLog(OpTypeOption.DelRealHis,ResTypeOption.Plc,plcInfo.plc_id,oldAlarmCfgs,newRealHisCfgs);
                 //</editor-fold>
-            }else {
+            } else {
                 //没有修改驱动名称
                 plcInfoApi.updatePlcInfo(plcInfo);
             }
             // <editor - fold desc = "操作日志" >
-            dbLogUtil.updOperateLog(OpTypeOption.UpdatePlc,ResTypeOption.Plc,oldPlc.plc_id,oldPlc,plcInfo);
+            dbLogUtil.updOperateLog(OpTypeOption.UpdatePlc, ResTypeOption.Plc, oldPlc.plc_id, oldPlc, plcInfo);
             //</editor-fold>
         } else {
             plcInfo.state = 1;
-            long newPlcInfoId=plcInfoApi.savePlcInfo(plcInfo);
+            long newPlcInfoId = plcInfoApi.savePlcInfo(plcInfo);
+            currentPlcId = newPlcInfoId;
+
             // <editor - fold desc = "操作日志" >
-            dbLogUtil.addOperateLog(OpTypeOption.AddPlc,ResTypeOption.Plc,newPlcInfoId,plcInfo);
+            dbLogUtil.addOperateLog(OpTypeOption.AddPlc, ResTypeOption.Plc, newPlcInfoId, plcInfo);
             //</editor-fold>
         }
+
+        //消息推送给redis 提高实时性
+        redisUpdDeviceCfg.pubUpdPlcInfo(currentPlcId);
+
         return new Output();
     }
 
@@ -321,8 +355,29 @@ public class PlcInfoSettingAction {
             throw new BusinessException(ErrorCodeOption.Is_Not_Params_DeviceID.key, ErrorCodeOption.Is_Not_Params_DeviceID.value);
         }
         plcInfoApi.unBundledPlc(plcId);
+
+        //解绑消息推送redis
+        if (redisUpdDeviceCfg.pubDelPlcInfo(plcId) == true) {
+            //实时历史消息推送
+
+          List<RealHisCfg> realHisCfgList = realHisCfgApi.getRealHisCfgList(Long.parseLong(plcId+""));
+            if (realHisCfgList != null) {
+                for (RealHisCfg realHisCfg : realHisCfgList) {
+                    redisUpdDeviceCfg.pubDelRealHisCfg(realHisCfg.id, plcId);
+                }
+            }
+
+            //报警消息推送
+            List<AlarmCfg> alarmCfgList = alarmCfgApi.getAlarmByPlcId(plcId);
+            if (alarmCfgList != null) {
+                for (AlarmCfg alarmCfg : alarmCfgList) {
+                    redisUpdDeviceCfg.pubDelAlarmCfg(alarmCfg.alarmcfg_id, plcId);
+                }
+            }
+        }
+
         // <editor - fold desc = "操作日志" >
-        dbLogUtil.addOperateLog(OpTypeOption.DelPlc,ResTypeOption.Plc,plcId,plcInfoApi.findPlcInfoByPlcId(plcId));
+        dbLogUtil.addOperateLog(OpTypeOption.DelPlc, ResTypeOption.Plc, plcId, plcInfoApi.findPlcInfoByPlcId(plcId));
         //</editor-fold>
         return new Output();
     }
