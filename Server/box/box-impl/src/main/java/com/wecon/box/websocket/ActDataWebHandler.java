@@ -360,7 +360,11 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 				clientMQTTs.remove(session.getId());
 
 			}
-			machineCodeCache.get(session.getId()).clear();
+			if(machineCodeCache.containsKey(session.getId())){
+				machineCodeCache.get(session.getId()).clear();
+			}
+			
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.debug("afterConnectionClosed，" + e.getMessage());

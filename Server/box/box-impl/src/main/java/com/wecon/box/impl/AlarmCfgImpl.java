@@ -250,7 +250,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 
 	@Override
 	public AlarmCfg getAlarmcfg(long device_id, String name) {
-		String sql = "select " + SEL_COL + " from alarm_cfg a where device_id=? and name=?";
+		String sql = "select " + SEL_COL + " from alarm_cfg a where state!=3 and device_id=? and name=?";
 		List<AlarmCfg> list = jdbcTemplate.query(sql, new Object[] { device_id, name }, new DefaultAlarmCfgRowMapper());
 		if (!list.isEmpty()) {
 			return list.get(0);

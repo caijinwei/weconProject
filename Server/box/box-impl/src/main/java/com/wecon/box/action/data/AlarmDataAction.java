@@ -12,6 +12,7 @@ import com.wecon.box.filter.AlarmTriggerFilter;
 import com.wecon.box.filter.DevBindUserFilter;
 import com.wecon.box.param.AlarmCfgParam;
 import com.wecon.box.param.AlarmDataParam;
+import com.wecon.box.redis.RedisUpdDeviceCfg;
 import com.wecon.box.util.DbLogUtil;
 import com.wecon.box.util.OptionUtil;
 import com.wecon.common.util.CommonUtils;
@@ -60,6 +61,8 @@ public class AlarmDataAction {
 	protected DbLogUtil dbLogUtil;
 	@Autowired
 	private OptionUtil optionService;
+	@Autowired
+	private RedisUpdDeviceCfg redisUpdDeviceCfg;
 
 	@WebApi(forceAuth = true, master = true)
 	@Description("获取当前/历史报警")
@@ -172,6 +175,12 @@ public class AlarmDataAction {
 				if (null != alarmCfg) {
 					alarmCfg.state = 3;
 					alarmCfgApi.upAlarmCfg(alarmCfg);// 删除分组下的报警配置
+					// 1.删除分配给视图账号的配置
+					viewAccountRoleApi.deletePoint(2, alarmCfg.alarmcfg_id);
+					accountDirRelApi.delAccountDir(id, alarmCfg.alarmcfg_id);
+					dbLogUtil.addOperateLog(OpTypeOption.DelAlarm, ResTypeOption.Alarm, alarmCfg.alarmcfg_id, alarmCfg);
+					// 消息推送到redis
+					redisUpdDeviceCfg.pubDelAlarmCfg(alarmCfg.alarmcfg_id, 0);
 				}
 
 			}
@@ -476,6 +485,8 @@ public class AlarmDataAction {
 					}
 
 				}
+				//消息推送到redis
+				redisUpdDeviceCfg.pubUpdAlarmCfg(alarmCfg.alarmcfg_id, 0);
 
 			} else {
 				AlarmCfg newarm = alarmCfgApi.getAlarmcfg(alarmCfgParam.device_id, alarmCfgParam.name);
@@ -483,7 +494,7 @@ public class AlarmDataAction {
 					throw new BusinessException(ErrorCodeOption.Name_Repetition.key,
 							ErrorCodeOption.Name_Repetition.value);
 				}
-				//判断报警配置是否达到上限
+				// 判断报警配置是否达到上限
 				List<AlarmCfg> listAlarmCfg = alarmCfgApi.getAlarmCfg(account_id, alarmCfgParam.device_id);
 				if (listAlarmCfg != null && listAlarmCfg.size() >= Constant.AddNum.ALARM_SET_NUM) {
 					throw new BusinessException(ErrorCodeOption.Alarm_add_Beyond.key,
@@ -546,10 +557,12 @@ public class AlarmDataAction {
 						alarmTriggerApi.saveAlarmTrigger(alarmTriggerList);
 
 					}
-
+					//消息推送到redis
+					redisUpdDeviceCfg.pubUpdAlarmCfg(id, 0);
 				}
 
 			}
+		
 
 		}
 
@@ -559,7 +572,8 @@ public class AlarmDataAction {
 	@Description("删除报警配置")
 	@WebApi(forceAuth = true, master = true, authority = { "1" })
 	@RequestMapping(value = "/delAlrmCfg")
-	public Output delAlrmCfg(@RequestParam("alarmcfg_id") String alarmcfg_id,@RequestParam("alarm_dir_id") String alarm_dir_id) {
+	public Output delAlrmCfg(@RequestParam("alarmcfg_id") String alarmcfg_id,
+			@RequestParam("alarm_dir_id") String alarm_dir_id) {
 		long account_id = AppContext.getSession().client.userId;
 		if (!CommonUtils.isNullOrEmpty(alarmcfg_id)) {
 			AlarmCfg alarmCfg = alarmCfgApi.getAlarmcfg(Long.parseLong(alarmcfg_id));
@@ -578,6 +592,8 @@ public class AlarmDataAction {
 			alarmCfgApi.upAlarmCfg(alarmCfg);
 			accountDirRelApi.delAccountDir(Long.parseLong(alarm_dir_id), Long.parseLong(alarmcfg_id));
 			dbLogUtil.addOperateLog(OpTypeOption.DelAlarm, ResTypeOption.Alarm, alarmCfg.alarmcfg_id, alarmCfg);
+			// 消息推送到redis
+			redisUpdDeviceCfg.pubDelAlarmCfg(alarmCfg.alarmcfg_id, 0);
 		}
 
 		return new Output();
