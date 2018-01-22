@@ -205,4 +205,6 @@ public interface RealHisCfgApi {
 	public List<RealHisCfg> findRealHisCfgs(RealHisConfigFilter filter);
 
 	public List<RealHisCfg> getRealCfgByIds(final List<Long> ids);
+
+	public List<RealHisCfg> getRealHisCfgList(Long plcId);
 	}

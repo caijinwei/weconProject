@@ -786,7 +786,18 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
 		return realCfgList;
 	}
-public static void main(String[] a){
+
+    @Override
+    public List<RealHisCfg> getRealHisCfgList(Long plcId) {
+        if(plcId != null) {
+            String sql = "SELECT "+SEL_COL+" from real_his_cfg r where r.plc_id = ?";
+            return jdbcTemplate.query(sql,new Object[]{plcId},new DefaultRealHisCfgRowMapper());
+        }
+        return null;
+
+    }
+
+    public static void main(String[] a){
     StringBuilder idSb = new StringBuilder();
     idSb.append(",");
     idSb.append(",");

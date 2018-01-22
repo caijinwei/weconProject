@@ -53,4 +53,9 @@ public class ConstKey {
      * 保存帐号登陆失败次数，过期时间设置为30分钟，默认失败5次后，需要等待30分钟才能登陆
      */
     public final static String REDIS_SIGNIN_ERROR_TIMES = "pibox:signinerror:%s";
+
+    /*
+    * redis 提高配置同步的实时性的频道
+    * */
+    public final static  String REDIS_CHANNEL_UPD_DEVICE_CFG = "upd_device_cfg";
 }
