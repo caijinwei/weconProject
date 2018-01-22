@@ -21,8 +21,22 @@
     <bean id="authcom" class="com.wecon.restful.authcompany.AuthComHelper">
         <property name="comMap">
             <map key-type="java.lang.Integer">
+                <!-- OPC 、 测试使用 -->
                 <entry key="1" value="27a010966282423fbd202bf3f45267c0"/>
                 <entry key="2" value="589625dce895454dbff9782c299db156"/>
+
+                <!-- 未使用 -->
+                <entry key="100" value="8919244ff15d441bae4b944b112a33ea"/>
+                <!-- 未使用 -->
+                <entry key="101" value="74efb9140384452bbf97f7bf65060d65"/>
+                <!-- 未使用 -->
+                <entry key="102" value="91a9ab4f0f8948fba7478d8b35a64f0a"/>
+                <!-- 未使用 -->
+                <entry key="103" value="933622d6793548aa9186abc7bb0fa1b6"/>
+                <!-- 未使用 -->
+                <entry key="104" value="7feff0d8c65443edb0ecb4df7f1b438a"/>
+                <!-- 未使用 -->
+                <entry key="105" value="b805da6f833e4af8ae88789c38f59b97"/>
             </map>
         </property>
     </bean>
