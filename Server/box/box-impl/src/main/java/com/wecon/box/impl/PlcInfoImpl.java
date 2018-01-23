@@ -36,10 +36,9 @@ public class PlcInfoImpl implements PlcInfoApi {
     public PlatformTransactionManager transactionManager;
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    private final String SEL_COL = "plc_id,device_id,type,driver,box_stat_no,plc_stat_no,port,comtype,baudrate,stop_bit,data_length,check_bit,retry_times,wait_timeout,rev_timeout,com_stepinterval,com_iodelaytime,retry_timeout,net_port,net_type,net_isbroadcast,net_broadcastaddr,net_ipaddr,state,create_date,update_date";
+    private final String SEL_COL = "plc_id,device_id,type,driver,box_stat_no,plc_stat_no,port,comtype,baudrate,stop_bit,data_length,check_bit,retry_times,wait_timeout,rev_timeout,com_stepinterval,com_iodelaytime,retry_timeout,net_port,net_type,net_isbroadcast,net_broadcastaddr,net_ipaddr,state,create_date,update_date,is_sync";
 
     /*
-
     通讯口配置
     * */
     @Override
@@ -50,11 +49,9 @@ public class PlcInfoImpl implements PlcInfoApi {
         * */
 
         if (!model.port.equals("Ethernet")) {
-            List<Integer> plc_StateList = getPortState(model.device_id, model.port);
-            if (plc_StateList.size() > 0) {
-                if (plc_StateList.get(0) == 3) {
-                    throw new BusinessException(ErrorCodeOption.PlcInfo_Port_IsExist.key, ErrorCodeOption.PlcInfo_Port_IsExist.value);
-                } else {
+            List<PlcInfo> plc_InfoList = getPortState(model.device_id, model.port);
+            if (plc_InfoList.size() > 0) {
+                if (plc_InfoList.get(0).state != 3) {
                     throw new BusinessException(ErrorCodeOption.Is_Exist_PlcPort.key, ErrorCodeOption.Is_Exist_PlcPort.value);
                 }
             }
@@ -76,7 +73,7 @@ public class PlcInfoImpl implements PlcInfoApi {
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 String sql = "INSERT INTO plc_info (device_id,type,driver,box_stat_no,plc_stat_no,port,comtype,baudrate,stop_bit, " +
                         "data_length,check_bit,retry_times,wait_timeout,rev_timeout,com_stepinterval,com_iodelaytime,retry_timeout,net_port,net_type,net_isbroadcast,net_broadcastaddr  " +
-                        ",net_ipaddr,state,create_date,update_date) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP(),CURRENT_TIMESTAMP())";
+                        ",net_ipaddr,state,is_sync,create_date,update_date) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP(),CURRENT_TIMESTAMP())";
                 PreparedStatement preState = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                 preState.setLong(1, model.device_id);
                 preState.setString(2, model.type);
@@ -102,6 +99,7 @@ public class PlcInfoImpl implements PlcInfoApi {
                 preState.setInt(21, model.net_broadcastaddr);
                 preState.setString(22, model.net_ipaddr);
                 preState.setInt(23, model.state);
+                preState.setInt(24, model.is_sync);
                 return preState;
             }
         }, key);
@@ -187,8 +185,8 @@ public class PlcInfoImpl implements PlcInfoApi {
             for (PlcInfo plcInfo : toinfoList) {
                 if (plcInfo.state != 3) {
                     throw new BusinessException(ErrorCodeOption.ComConfig_Is_Exist.key, ErrorCodeOption.ComConfig_Is_Exist.value);
-                }else{
-                    throw new BusinessException(ErrorCodeOption.ComConfig_IsNot_Del.key,ErrorCodeOption.ComConfig_IsNot_Del.value);
+                } else {
+                    throw new BusinessException(ErrorCodeOption.ComConfig_IsNot_Del.key, ErrorCodeOption.ComConfig_IsNot_Del.value);
                 }
             }
         }
@@ -200,6 +198,7 @@ public class PlcInfoImpl implements PlcInfoApi {
                 if (p.state != 3) {
                     p.device_id = toDeviceId;
                     p.state = 1;
+                    p.is_sync = 0;
                     resultMap.put(p.plc_id, savePlcInfo(p));
                 }
             }
@@ -210,7 +209,9 @@ public class PlcInfoImpl implements PlcInfoApi {
 
     @Override
     public void delPlcInfo(long plc_id) {
+        String sql = "delete from plc_info where plc_id = ? ";
 
+        jdbcTemplate.update(sql, new Object[]{plc_id});
     }
 
     @Override
@@ -423,6 +424,7 @@ public class PlcInfoImpl implements PlcInfoApi {
             model.state = rs.getInt("state");
             model.create_date = rs.getTimestamp("create_date");
             model.update_date = rs.getTimestamp("update_date");
+            model.is_sync = rs.getInt("is_sync");
             return model;
         }
     }
@@ -464,19 +466,14 @@ public class PlcInfoImpl implements PlcInfoApi {
 
 
     @Override
-    public List<Integer> getPortState(long device_id, String port) {
+    public List<PlcInfo> getPortState(long device_id, String port) {
         List<Integer> resultList = new ArrayList<Integer>();
 
         Object args[] = {device_id, port};
-        String sql = "SELECT state FROM plc_info WHERE device_id=? AND port=? GROUP BY state";
-        List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, args);
+        String sql = "SELECT "+ SEL_COL +" FROM plc_info WHERE device_id=? AND port=? ";
+        List<PlcInfo> result = jdbcTemplate.query(sql, args, new DefaultPlcInfoRowMapper());
 
-
-        for (Map<String, Object> map : result) {
-            resultList.add(Integer.parseInt(map.get("state").toString()));
-        }
-
-        return resultList;
+        return result;
     }
 
     public void unBundledPlc(final Integer plcId) {
