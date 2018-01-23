@@ -124,11 +124,8 @@ public class PlcInfoSettingAction {
 
         List<PlcInfo> showAllPlcConf = plcInfoApi.showAllPlcInfoByDeviceId(device_id);
         List<PlcInfoData> infoDatas = new ArrayList<PlcInfoData>();
+        List<PlcInfoData> delInfoDatas = new ArrayList<>();
         for (PlcInfo info : showAllPlcConf) {
-            //过滤掉删除配置的plc
-            if (info.state == 3) {
-                continue;
-            }
             PlcInfoData plcInfoData = new PlcInfoData();
 //            if (info.comtype == 1) {
 //                plcInfoData.comtype = "RS232";
@@ -142,10 +139,16 @@ public class PlcInfoSettingAction {
             plcInfoData.port = info.port;
             plcInfoData.type = info.type;
             plcInfoData.state = info.state;
-            infoDatas.add(plcInfoData);
+            //过滤掉删除配置的plc
+            if (info.state != 3) {
+                infoDatas.add(plcInfoData);
+            } else {
+                delInfoDatas.add(plcInfoData);
+            }
         }
 
         data.put("infoDatas", infoDatas);
+        data.put("delInfoDatas",delInfoDatas);
 
         return new Output(data);
     }
@@ -374,7 +377,7 @@ public class PlcInfoSettingAction {
         PlcInfo plcInfo = plcInfoApi.getPlcInfo(plcId);
         if (plcInfo.is_sync == 0) {
             plcInfoApi.delPlcInfo(plcId);
-            delPlcRelation(Long.parseLong(plcId+""));
+            delPlcRelation(Long.parseLong(plcId + ""));
         } else {
             plcInfoApi.unBundledPlc(plcId);
 

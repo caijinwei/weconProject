@@ -194,6 +194,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             var test = 1;
             if (code == 200) {
                 $scope.infoDatas = data.infoDatas;
+                $scope.delinfoDatas = data.delInfoDatas;
                 $(function () {
                     $("[data-toggle='tooltip']").tooltip();
                 });
