@@ -125,6 +125,36 @@
                         </ul>
                     </li>
                 </ul>
+
+                <ul class="nav leftmenu" role="tablist"
+                    id="overviewtab" ng-cloak ng-if="type==2">
+                    <li class="active" style="margin-top:25px;">
+                        <a class="J_menuItem" href="webref/html/boxtitle2.html" target="content_frame"><i
+                                class="glyphicon glyphicon-eye-open"></i><span class="nav-label">自定义监控点</span></a>
+                    </li>
+                </ul>
+
+                <ul class=" nav nav-pills nav-stacked" role="tablist"
+                    id="hosttab" ng-cloak ng-if="type==0">
+                    <li style="margin-top:25px;">
+                        <a class="J_menuItem" href="webref/html/user/allusers.html"><i class="glyphicon glyphicon-user"></i><span class="nav-label">&nbsp;&nbsp;用户管理</span></a>
+                    </li>
+                    <li>
+                        <a class="J_menuItem" href="webref/html/user/log-list.html"><i class="glyphicon glyphicon-tasks"></i><span class="nav-label">&nbsp;&nbsp;操作日志</span></a>
+                    </li>
+                    <li>
+                        <a class="J_menuItem" href="webref/html/user/allDevice.html"><i class="glyphicon glyphicon-inbox"></i><span class="nav-label">&nbsp;&nbsp;盒子列表</span></a>
+                    </li>
+                    <li>
+                        <a class="J_menuItem" href="webref/html/user/firmware-list.html"><i class="fa fa-archive"></i><span class="nav-label">&nbsp;&nbsp;固件管理</span></a>
+                    </li>
+                    <li>
+                        <a class="J_menuItem" href="webref/html/user/driver-list.html"><i class="fa fa-building"></i><span class="nav-label">&nbsp;&nbsp;驱动管理</span></a>
+                    </li>
+                    <li>
+                        <a class="J_menuItem" href="webref/html/user/app-version-mgr.html"><i class="fa fa-android"></i><span class="nav-label">&nbsp;&nbsp;APP版本管理</span></a>
+                    </li>
+                </ul>
             </ul>
 
         </div>
