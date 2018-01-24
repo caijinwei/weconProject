@@ -63,7 +63,7 @@ public class SmsUtil {
     public static void main(String args[]){
     	
     	try {
-			String a=sendSMS("15959010890","2222");
+			String a=sendSMS("13655099598","2222");
 			System.out.println(a);
 		} catch (Exception e) {
 			e.printStackTrace();

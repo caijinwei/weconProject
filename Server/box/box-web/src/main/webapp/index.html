@@ -1,6 +1,247 @@
 <!DOCTYPE html>
-<html>
-	<head>
-	</head>
-	<body>hello 11111</body>
+<html lang="en" ng-app="weconweb">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <title>慧网物联系统 - V-BOX</title>
+    <meta name="keywords" content="慧网物联系统,V-BOX,物联网,工业控制"/>
+    <meta name="description" content="慧网物联系统,V-BOX,物联网,工业控制"/>
+    <link rel="stylesheet" type="text/css" href="webref/lib/bootstrap/css/bootstrap.css"/>
+    <link rel="stylesheet" type="text/css" href="webref/lib/font-awesome/css/font-awesome.min.css"/>
+    <link rel="stylesheet" type="text/css" href="webref/lib/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="webref/lib/base.css"/>
+    <link rel="stylesheet" type="text/css" href="webref/css/style.css"/>
+    <!--低版本浏览器识别HTML5标签--><!--低版本浏览器支持CSS媒体查询--><!--[if lt IE 9]>
+    <script type="text/javascript" src="lib/html5shiv/html5shiv-printshiv.min.js"></script>
+    <script type="text/javascript" src="lib/respond/respond.min.js"></script>
+    <![endif]-->
+    <style>
+        [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak,
+        .x-ng-cloak {
+            display: none !important;
+        }
+    </style>
+</head>
+<body ng-controller="infoController" ng-init="onInit()" class="fixed-sidebar full-height-layout gray-bg"
+      style="overflow:hidden">
+<div id="wrapper">
+
+    <!--左侧导航开始-->
+    <nav class="navbar-default navbar-static-side" role="navigation">
+
+        <div class="nav-close">
+            <i class="fa fa-times-circle"></i>
+        </div>
+        <div class="sidebar-collapse">
+            <!--左侧缩起按钮-->
+            <div class="row fixed-top-nav">
+                <nav class="navbar-static-top" role="navigation">
+                    <div class="navbar-header" style="padding-top: 10px;">
+                        <a class="navbar-minimalize btn btn-primary " href="#"><i class="fa fa-bars"></i></a>
+                    </div>
+                </nav>
+            </div>
+
+            <ul class="nav" id="side-menu">
+                <li class="nav-header">
+                    <div class="dropdown profile-element">
+
+                        <a class="J_menuItem" href="webref/html/user/info.html" target="content_frame"><img alt="image"
+                                                                                                            class="img-circle"
+                                                                                                            src="webref/img/profile.jpg"/></a>
+                        <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+				<span class="clear">
+				<span class="block m-t-xs"><a href="webref/html/user/info.html" target="content_frame"><strong
+                        class="font-bold" ng-bind="username"></strong></a>&nbsp;&nbsp;&nbsp;&nbsp;<a
+                        href="#" ng-click="logout()"><i class="fa fa-power-off"></i>&nbsp;注销</a></span>
+				</span>
+                        </a>
+
+                        <div class="nav-search" ng-if="type==1">
+                            <div class="input-group">
+                                <input id="searchinput" type="text" placeholder="搜索：V-BOX名称"
+                                       class="input-sm form-control"><span
+                                    class="input-group-btn">
+						<button type="button" class="btn btn-sm btn-primary"><span
+                                class="glyphicon glyphicon-search"></span></button></span>
+                            </div>
+                        </div>
+                        <div class="nav-button" ng-if="type==1">
+                            <a href="webref/html/overview.html" target="content_frame" title="主页">
+                                <button class="nav-btn btn-circle btn-primary main-list" type="button"><i
+                                        class="fa fa-home"></i>
+                                </button>
+                            </a>
+                            <a class="J_menuItem" href="webref/html/groupmgr.html" target="content_frame" title="分组管理">
+                                <button class="nav-btn btn-circle btn-primary main-list" type="button"><i
+                                        class="fa fa-bars"></i>
+                                </button>
+                            </a>
+                            <a title="添加盒子">
+                                <button class="nav-btn btn-circle btn-primary main-list" type="button"
+                                        data-toggle="modal" data-target="#addPIBox"><i class="fa fa-plus-square"></i>
+                                </button>
+                            </a>
+                            <a class="J_menuItem" href="webref/html/user/viewaccountmgr.html" target="content_frame"
+                               title="视图账号管理">
+                                <button class="nav-btn btn-circle btn-primary main-list" type="button"><i
+                                        class="fa fa-user"></i>
+                                </button>
+                            </a>
+                            <a href="#" title="刷新盒子列表" ng-click="searchbox();">
+                                <button class="nav-btn btn-circle btn-primary main-list" type="button"><i
+                                        class="fa fa-refresh"></i>
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+
+                <ul class="nav leftmenu" id="side_nav" ng-cloak ng-if="type==1">
+                    <li style="margin-top:25px;">
+                        <a class="J_menuItem" href="webref/html/boxtitle2.html" target="content_frame"><i
+                                class="glyphicon glyphicon-eye-open"></i><span class="nav-label">自定义监控点</span></a>
+                    </li>
+                    <li ng-repeat="x in allDatas">
+                        <a href="#" ng-click="sideclick(x);" id="dir_a_{{x.accountdirId}}" ondrop="drop(event)"
+                           ondragover="allowDrop(event)">
+                            <i class="fa fa-folder-o"></i>
+                            <span class="nav-label" id="spanid_{{x.accountdirId}}"> {{x.accountdirName}} </span>
+                            <span class="fa arrow"></span>
+                        </a>
+                        <ul class="nav nav-second-level" id="dir_ul_{{x.accountdirId}}" sid="{{x.accountdirId}}">
+                            <li>
+                                <a class="J_menuItem" id="box_{{y.deviceId}}" target="content_frame" map="{{y.deviceMap}}"
+                                   href="webref/html/boxtitle.html?device_id={{y.deviceId}}&device_name={{y.deviceName}}"
+                                   data_devid="{{y.deviceId}}" draggable="true" ondragstart="drag(event)"
+                                   ng-click="selectbox(y.deviceId)" class="list-group-item"
+                                   ng-repeat="y in x.deviceList"><i name="i_box"
+                                                                    ng-class="{true:'fa fa-circle using-icon',false:'fa fa-ban unusing-icon'}[y.deviceState==1]"
+                                                                    data-toggle="tooltip"
+                                                                    title="{{y.deviceState==1?'在线':'离线'}}"></i>{{y.deviceName}}</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </ul>
+
+        </div>
+    </nav>
+    <!--左侧导航结束-->
+    <!--右侧部分开始-->
+    <div id="page-wrapper" class="gray-bg dashbard-1">
+
+        <!--主题那一栏 缩放选项卡-->
+
+        <div class="row J_mainContent" id="content-main">
+            <!--内容-->
+            <iframe class="J_iframe" id="ifmain" name="content_frame" width="100%" height="100%" frameborder="0"
+                    seamless>
+            </iframe>
+            <!--/内容结束-->
+        </div>
+        <div class="footer">
+            <div class="pull-right">
+                &copy; 2018
+                <a href="" target="_blank">维控慧网物联系统</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+<!--模态框-->
+<div class="modal inmodal fade" id="addPIBox" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header" style="padding: 15px 10px;">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">添加V-BOX</h4>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="form-group">
+                            <i class="fa fa-code icon"></i>
+                            <input type="text" class="form-control form-pading" placeholder="PIBox序列号"
+                                   id="machine_code"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <i class="fa fa-lock icon"></i>
+                            <input type="password" class="form-control form-pading" placeholder="PIBox密码"
+                                   id="dev_password"/>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <i class="fa fa-user icon"></i>
+                            <input type="text" class="form-control form-pading" placeholder="PIBox别名" id="dev_name"/>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 20px;">
+                        <select id="acc_dir_id" class="form-control form-inline">
+                            <option>默认分组</option>
+                            <option>分组1</option>
+                            <option>分组2</option>
+                            <option>分组3</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <select class="form-control" id="deviceUse" name="deviceUse"
+                                value="[{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:1,&quot;useName&quot;:&quot;智能家居&quot;},{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:2,&quot;useName&quot;:&quot;车联网&quot;},{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:3,&quot;useName&quot;:&quot;智能安防&quot;},{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:4,&quot;useName&quot;:&quot;智能电网&quot;},{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:5,&quot;useName&quot;:&quot;智能交通&quot;},{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:6,&quot;useName&quot;:&quot;智能工业&quot;},{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:7,&quot;useName&quot;:&quot;智能农业&quot;},{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:8,&quot;useName&quot;:&quot;智能物流&quot;},{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:9,&quot;useName&quot;:&quot;人工智能&quot;},{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:10,&quot;useName&quot;:&quot;节能环保市场&quot;},{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:999,&quot;useName&quot;:&quot;其他行业&quot;}]">
+                            <!-- ngRepeat: use in deviceUseOptions -->
+                            <option ng-repeat="use in deviceUseOptions" value="1" class="ng-binding ng-scope">智能家居
+                            </option><!-- end ngRepeat: use in deviceUseOptions -->
+                            <option ng-repeat="use in deviceUseOptions" value="2" class="ng-binding ng-scope">车联网
+                            </option><!-- end ngRepeat: use in deviceUseOptions -->
+                            <option ng-repeat="use in deviceUseOptions" value="3" class="ng-binding ng-scope">智能安防
+                            </option><!-- end ngRepeat: use in deviceUseOptions -->
+                            <option ng-repeat="use in deviceUseOptions" value="4" class="ng-binding ng-scope">智能电网
+                            </option><!-- end ngRepeat: use in deviceUseOptions -->
+                            <option ng-repeat="use in deviceUseOptions" value="5" class="ng-binding ng-scope">智能交通
+                            </option><!-- end ngRepeat: use in deviceUseOptions -->
+                            <option ng-repeat="use in deviceUseOptions" value="6" class="ng-binding ng-scope">智能工业
+                            </option><!-- end ngRepeat: use in deviceUseOptions -->
+                            <option ng-repeat="use in deviceUseOptions" value="7" class="ng-binding ng-scope">智能农业
+                            </option><!-- end ngRepeat: use in deviceUseOptions -->
+                            <option ng-repeat="use in deviceUseOptions" value="8" class="ng-binding ng-scope">智能物流
+                            </option><!-- end ngRepeat: use in deviceUseOptions -->
+                            <option ng-repeat="use in deviceUseOptions" value="9" class="ng-binding ng-scope">人工智能
+                            </option><!-- end ngRepeat: use in deviceUseOptions -->
+                            <option ng-repeat="use in deviceUseOptions" value="10" class="ng-binding ng-scope">节能环保市场
+                            </option><!-- end ngRepeat: use in deviceUseOptions -->
+                            <option ng-repeat="use in deviceUseOptions" value="999" class="ng-binding ng-scope">其他行业
+                            </option><!-- end ngRepeat: use in deviceUseOptions -->
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--/模态框结束-->
+
+<script type="text/javascript" src="webref/lib/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="webref/lib/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="webref/lib/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script type="text/javascript" src="webref/lib/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<script type="text/javascript" src="webref/lib/layer/layer.min.js"></script>
+<script type="text/javascript" src="webref/lib/hplus.min.js"></script>
+<script type="text/javascript" src="webref/lib/contabs.min.js"></script>
+<script type="text/javascript" src="webref/lib/plugins/pace/pace.min.js"></script>
+<script type="text/javascript" src="../../lib/sweetalert.min.js"></script>
+<script src="webref/lib/angular/angular.min.js" type="text/javascript"></script>
+<script src="webref/lib/wecon-common.js" type="text/javascript"></script>
+<script src="webref/lib/jquery/context/js/context.js"></script>
+<script src="webref/js/index.js" type="text/javascript"></script>
+
+</body>
 </html>
