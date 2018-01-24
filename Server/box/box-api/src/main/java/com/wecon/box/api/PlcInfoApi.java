@@ -75,6 +75,13 @@ public interface PlcInfoApi {
 	boolean batchUpdateState(final List<String[]> updList);
 
 	/**
+	 * 批量更新成功状态和is_sync字段为1
+	 * @param updList
+	 * @return
+	 */
+	boolean batchUpdateStateAndSync(final List<String[]> updList);
+
+	/**
 	 * 批量更新file_md5
 	 * @param updList
 	 * @return

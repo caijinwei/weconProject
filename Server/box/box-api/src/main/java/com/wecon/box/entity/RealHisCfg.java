@@ -44,6 +44,7 @@ public class RealHisCfg {
 	public int bind_state;//1.绑定状态 0.解绑状态
 	public String rid;//寄存器类型
 	public String ext_unit;//单位
+	public String dead_set;//死区设置(只有实时数据) 16位无符号 16位有符号 32位无符号 32位有符号 16位BCD 32位BCD--整型  64位双精度--浮点型
 	public Timestamp create_date;
 	public Timestamp update_date;
 	
