@@ -105,7 +105,7 @@ public interface PlcInfoApi {
 	/*
 	* 通讯协议是否已经存在
 	* */
-	public List<Integer> getPortState(long device_id, String port);
+	public List<PlcInfo> getPortState(long device_id, String port);
 
 	/*
 	* 解绑plc

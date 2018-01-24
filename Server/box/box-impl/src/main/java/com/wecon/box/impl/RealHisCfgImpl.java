@@ -88,10 +88,10 @@ public class RealHisCfgImpl implements RealHisCfgApi {
     public boolean updateRealHisCfg(RealHisCfg model) {
         String sql = "update real_his_cfg SET data_id=?,account_id=?,plc_id=?,`name`=?,addr=?,addr_type=?,`describe`=?,digit_count=?,data_limit=?,his_cycle=?,data_type=?,state=?,update_date=current_timestamp(),bind_state=?,device_id=?,rid=?,digit_binary=?,ext_unit=? where id=?";
         jdbcTemplate.update(sql,
-                new Object[]{model.data_id, model.account_id, model.plc_id, model.name, model.addr, model.addr_type,
+                new Object[] { model.data_id, model.account_id, model.plc_id, model.name, model.addr, model.addr_type,
                         model.describe, model.digit_count, model.data_limit, model.his_cycle, model.data_type,
                         model.state, model.bind_state, model.device_id, model.rid, model.digit_binary, model.ext_unit,
-                        model.id});
+                        model.id });
 
         return true;
     }
@@ -100,7 +100,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
     public RealHisCfg getRealHisCfg(long id) {
 
         String sql = "select " + SEL_COL + " from real_his_cfg r where r.id=?";
-        List<RealHisCfg> list = jdbcTemplate.query(sql, new Object[]{id}, new DefaultRealHisCfgRowMapper());
+        List<RealHisCfg> list = jdbcTemplate.query(sql, new Object[] { id }, new DefaultRealHisCfgRowMapper());
         if (!list.isEmpty()) {
             return list.get(0);
         }
@@ -153,10 +153,13 @@ public class RealHisCfgImpl implements RealHisCfgApi {
         return null;
     }
 
+    /**
+     * 获取非删除状态的监控点名称
+     */
     @Override
     public RealHisCfg getRealHisCfg(long device_id, String name, int data_type) {
         List<Object> params = new ArrayList<Object>();
-        String sql = "select " + SEL_COL + " from real_his_cfg r where r.device_id=?";
+        String sql = "select " + SEL_COL + " from real_his_cfg r where r.device_id=? and r.state!=3";
         params.add(device_id);
 
         StringBuffer condition = new StringBuffer("");
@@ -184,7 +187,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
     public void delRealHisCfg(long id) {
 
         String sql = "delete from  real_his_cfg r where r.id=?";
-        jdbcTemplate.update(sql, new Object[]{id});
+        jdbcTemplate.update(sql, new Object[] { id });
     }
 
     @Override
@@ -615,8 +618,8 @@ public class RealHisCfgImpl implements RealHisCfgApi {
         }
         String sqlCount = "select count(distinct r.id, ad.id) " + fromStr
                 + " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and r.id=adr.ref_id and r.bind_state=1";
-        String sql = "select distinct " + SEL_COL + ",d.machine_code, d.state as dstate, adr.ref_alais,adr.acc_dir_id,v.role_type"
-                + "  " + fromStr
+        String sql = "select distinct " + SEL_COL
+                + ",d.machine_code, d.state as dstate, adr.ref_alais,adr.acc_dir_id,v.role_type" + "  " + fromStr
                 + " where adr.acc_dir_id=ad.id and  p.`plc_id`=r.plc_id and p.`device_id`=d.device_id and v.cfg_id=r.id and v.cfg_type=1 and r.id=adr.ref_id and r.bind_state=1";
         sqlCount += condition;
         int totalRecord = jdbcTemplate.queryForObject(sqlCount, params.toArray(), Integer.class);
@@ -633,7 +636,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
     public Map getRealCfgDetail(long id) {
         String sql = "select " + SEL_COL + ",d.machine_code, p.port from real_his_cfg r ,device d, plc_info p"
                 + " where  r.device_id=d.device_id and r.id = ? and p.device_id=r.device_id";
-        List<Map> list = jdbcTemplate.query(sql, new Object[]{id}, new RowMapper<Map>() {
+        List<Map> list = jdbcTemplate.query(sql, new Object[] { id }, new RowMapper<Map>() {
             @Override
             public Map mapRow(ResultSet rs, int i) throws SQLException {
                 Map model = new HashMap();
@@ -772,39 +775,31 @@ public class RealHisCfgImpl implements RealHisCfgApi {
         return null;
     }
 
-	@Override
-	public List<RealHisCfg> getRealCfgByIds(final List<Long> ids) {
-		if (null == ids || ids.size() == 0) {
-			return null;
-		}
-
-		StringBuilder idSb = new StringBuilder();
-		for (long id : ids) {
-			idSb.append(",").append(id);
-		}
-		String sql = "select " + SEL_COL + " from real_his_cfg r where r.id in(" + idSb.substring(1) + ") order by field(r.id,"+idSb.substring(1)+");";
-		List<RealHisCfg> realCfgList = jdbcTemplate.query(sql, new DefaultRealHisCfgRowMapper());
-
-		return realCfgList;
-	}
-
     @Override
-    public List<RealHisCfg> getRealHisCfgList(Long plcId) {
-        if(plcId != null) {
-            String sql = "SELECT "+SEL_COL+" from real_his_cfg r where r.plc_id = ?";
-            return jdbcTemplate.query(sql,new Object[]{plcId},new DefaultRealHisCfgRowMapper());
+    public List<RealHisCfg> getRealCfgByIds(final List<Long> ids) {
+        if (null == ids || ids.size() == 0) {
+            return null;
         }
-        return null;
 
+        StringBuilder idSb = new StringBuilder();
+        for (long id : ids) {
+            idSb.append(",").append(id);
+        }
+        String sql = "select " + SEL_COL + " from real_his_cfg r where r.id in(" + idSb.substring(1)
+                + ") order by field(r.id," + idSb.substring(1) + ");";
+        List<RealHisCfg> realCfgList = jdbcTemplate.query(sql, new DefaultRealHisCfgRowMapper());
+
+        return realCfgList;
     }
 
-    public static void main(String[] a){
-    StringBuilder idSb = new StringBuilder();
-    idSb.append(",");
-    idSb.append(",");
-    idSb.substring(1);
-    System.out.print(idSb);
-}
+    public static void main(String[] a) {
+        StringBuilder idSb = new StringBuilder();
+        idSb.append(",");
+        idSb.append(",");
+        idSb.substring(1);
+        System.out.print(idSb);
+    }
+
     @Override
     public List<Long> getRealHisCfgIdsByPlcIds(List<Long> plcIds) {
         if (null == plcIds || plcIds.size() == 0) {
@@ -997,7 +992,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
      * 查询盒子下的监控点
      */
     public ArrayList<Integer> findRealHisCfgIdSBydevice_id(Integer device_id) {
-        Object[] args = new Object[]{device_id};
+        Object[] args = new Object[] { device_id };
         String sql = "SELECT id FROM real_his_cfg WHERE device_id=?";
         ArrayList<Integer> list = null;
         list = (ArrayList<Integer>) jdbcTemplate.query(sql, args, new RowMapper<Integer>() {
@@ -1010,14 +1005,13 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 
     }
 
-
     /*
      * 设置bind_state=0 解绑
      */
     public void setBind_state(int[] realHisCfg, Integer state) {
         String sql = "UPDATE real_his_cfg SET bind_state=? where id =?";
         for (int i = 0; i < realHisCfg.length; i++) {
-            Object[] args = new Object[]{state, realHisCfg[i]};
+            Object[] args = new Object[] { state, realHisCfg[i] };
             jdbcTemplate.update(sql, args);
         }
     }
@@ -1028,7 +1022,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
     public boolean updatePointAccAndState(long accountId, long deviceId, int state) {
 
         String sql = "UPDATE real_his_cfg a SET a.account_id=?,a.bind_state=? WHERE a.device_id=?;";
-        Object[] args = new Object[]{accountId, state, deviceId};
+        Object[] args = new Object[] { accountId, state, deviceId };
         Integer count = jdbcTemplate.update(sql, args);
         if (count <= 0) {
             return false;
@@ -1038,10 +1032,10 @@ public class RealHisCfgImpl implements RealHisCfgApi {
     }
 
     @Override
-    public void updateRealHisState(long plc_id, int state,int bindstate) {
+    public void updateRealHisState(long plc_id, int state, int bindstate) {
         if (plc_id > 0) {
             String sql = "UPDATE real_his_cfg  SET state= ? ,bind_state = ? WHERE plc_id=?";
-            jdbcTemplate.update(sql, new Object[]{state ,bindstate, plc_id});
+            jdbcTemplate.update(sql, new Object[] { state, bindstate, plc_id });
         }
     }
 
@@ -1051,7 +1045,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
             return null;
         }
         String sql = "select " + SEL_COL + " from real_his_cfg r where r.plc_id=?";
-        List<RealHisCfg> list = jdbcTemplate.query(sql, new Object[]{plc_id}, new DefaultRealHisCfgRowMapper());
+        List<RealHisCfg> list = jdbcTemplate.query(sql, new Object[] { plc_id }, new DefaultRealHisCfgRowMapper());
         if (!list.isEmpty()) {
             return list;
         }
@@ -1144,76 +1138,76 @@ public class RealHisCfgImpl implements RealHisCfgApi {
         return resultList;
     }
 
-    /*
-    *
-    *
-    * */
+	/*
+	*
+	*
+	* */
 
     /*
-    *
-    *    dataType   0 实时配置    1 历史配置
-    * */
+     *
+     * dataType 0 实时配置 1 历史配置
+     */
     @Override
     public Map<Long, Long> copyRealHisCfg(Map<Long, Long> fromtoPlcId, int dataType, long toDeviceId) {
-        if(fromtoPlcId == null){
+        if (fromtoPlcId == null) {
             return null;
         }
-        /*
-        * 判断目标device是否已经存在里 实时历史配置
-        * */
-            RealHisConfigFilter realHisConfigFilter = new RealHisConfigFilter();
+		/*
+		 * 判断目标device是否已经存在里 实时历史配置
+		 */
+        RealHisConfigFilter realHisConfigFilter = new RealHisConfigFilter();
+        realHisConfigFilter.data_type = dataType;
+        realHisConfigFilter.device_id = toDeviceId;
+        List<RealHisCfg> toCfgList = findRealHisCfgs(realHisConfigFilter);
+        if (toCfgList != null) {
+            for (RealHisCfg c : toCfgList) {
+                if (c.state != 3) {
+                    throw new BusinessException(ErrorCodeOption.RealHisConfig_Is_Exist.key,
+                            ErrorCodeOption.RealHisConfig_Is_Exist.value);
+                }
+            }
+        }
+
+		/*
+		 * 新增 配置
+		 */
+        Map<Long, Long> resultFromToRealHisCfgMap = new HashMap<Long, Long>();
+        realHisConfigFilter = new RealHisConfigFilter();
+        for (Map.Entry<Long, Long> entry : fromtoPlcId.entrySet()) {
+            realHisConfigFilter.plc_id = entry.getKey();
+            realHisConfigFilter.bind_state = 1;
             realHisConfigFilter.data_type = dataType;
-            realHisConfigFilter.device_id = toDeviceId;
-            List<RealHisCfg> toCfgList = findRealHisCfgs(realHisConfigFilter);
-            if (toCfgList != null) {
-                for (RealHisCfg c : toCfgList) {
-                    if (c.state != 3) {
-                        throw new BusinessException(ErrorCodeOption.RealHisConfig_Is_Exist.key, ErrorCodeOption.RealHisConfig_Is_Exist.value);
+            List<RealHisCfg> realHisCfgs = findRealHisCfgs(realHisConfigFilter);
+
+            if (realHisCfgs != null && realHisCfgs.size() >= 0) {
+                for (RealHisCfg realHisCfg : realHisCfgs) {
+                    if (realHisCfg.state != 3) {
+                        realHisCfg.device_id = toDeviceId;
+                        realHisCfg.plc_id = entry.getValue();
+                        realHisCfg.state = 1;
+                        resultFromToRealHisCfgMap.put(realHisCfg.id, saveRealHisCfg(realHisCfg));
                     }
                 }
             }
 
-
-        /*
-        * 新增  配置
-        * */
-            Map<Long, Long> resultFromToRealHisCfgMap = new HashMap<Long, Long>();
-            realHisConfigFilter = new RealHisConfigFilter();
-            for (Map.Entry<Long, Long> entry : fromtoPlcId.entrySet()) {
-                realHisConfigFilter.plc_id = entry.getKey();
-                realHisConfigFilter.bind_state = 1;
-                realHisConfigFilter.data_type = dataType;
-                List<RealHisCfg> realHisCfgs = findRealHisCfgs(realHisConfigFilter);
-
-                if (realHisCfgs != null && realHisCfgs.size() >= 0) {
-                    for (RealHisCfg realHisCfg : realHisCfgs) {
-                        if (realHisCfg.state != 3) {
-                            realHisCfg.device_id = toDeviceId;
-                            realHisCfg.plc_id = entry.getValue();
-                            realHisCfg.state = 1;
-                            resultFromToRealHisCfgMap.put(realHisCfg.id, saveRealHisCfg(realHisCfg));
-                        }
-                    }
-                }
-
-            }
-            if (resultFromToRealHisCfgMap.size() > 0) {
-                return resultFromToRealHisCfgMap;
-            }
-            return null;
+        }
+        if (resultFromToRealHisCfgMap.size() > 0) {
+            return resultFromToRealHisCfgMap;
+        }
+        return null;
     }
 
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public void copyRealHis(final Long accountId, final Long fromDeviceId, final Long toDeviceId, int dataType, final Map<Long, Long> fromtoPlcMap) {
+    public void copyRealHis(final Long accountId, final Long fromDeviceId, final Long toDeviceId, int dataType,
+                            final Map<Long, Long> fromtoPlcMap) {
         TransactionTemplate tt = new TransactionTemplate(transactionManager);
-         /*
-            * 先删除 目标设备的默认分组
-            * */
-        List<AccountDir> toAccountDir=accountDirApi.getAccountDirList(accountId,1,toDeviceId);
-        for(AccountDir accountDir :toAccountDir){
-            if(accountDir.name.equals("默认组")){
+		/*
+		 * 先删除 目标设备的默认分组
+		 */
+        List<AccountDir> toAccountDir = accountDirApi.getAccountDirList(accountId, 1, toDeviceId);
+        for (AccountDir accountDir : toAccountDir) {
+            if (accountDir.name.equals("默认组")) {
                 accountDirApi.delAccountDir(accountDir.id);
                 break;
             }
@@ -1224,23 +1218,33 @@ public class RealHisCfgImpl implements RealHisCfgApi {
                 @Override
                 public Object doInTransaction(TransactionStatus ts) {
                     Map<Long, Long> fromtoRealHisCfgMap = null;
-                    if(fromtoPlcMap != null && fromtoPlcMap.size() >0) {
+                    if (fromtoPlcMap != null && fromtoPlcMap.size() > 0) {
                         fromtoRealHisCfgMap = copyRealHisCfg(fromtoPlcMap, 0, toDeviceId);
                     }
-                    Map<Long, Long> fromtoAccountDirMap = accountDirApi.copyAccountDir(accountId, fromDeviceId, toDeviceId, 1);
-                    if(fromtoRealHisCfgMap != null) {
+                    Map<Long, Long> fromtoAccountDirMap = accountDirApi.copyAccountDir(accountId, fromDeviceId,
+                            toDeviceId, 1);
+                    if (fromtoRealHisCfgMap != null) {
                         accountDirRelApi.copyAccDeviceRel(fromtoRealHisCfgMap, fromtoAccountDirMap);
                     }
                     return true;
                 }
             });
-        }catch (BusinessException e){
+        } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
             Logger.getLogger(AccountImpl.class.getName()).log(Level.SEVERE, null, e);
-            throw new BusinessException(ErrorCodeOption.RealCfg_Copy_Faile.key,ErrorCodeOption.RealCfg_Copy_Faile.value);
+            throw new BusinessException(ErrorCodeOption.RealCfg_Copy_Faile.key,
+                    ErrorCodeOption.RealCfg_Copy_Faile.value);
         }
     }
 
+    @Override
+    public List<RealHisCfg> getRealHisCfgList(Long plcId) {
+        if (plcId != null) {
+            String sql = "SELECT " + SEL_COL + " from real_his_cfg r where r.plc_id = ?";
+            return jdbcTemplate.query(sql, new Object[] { plcId }, new DefaultRealHisCfgRowMapper());
+        }
+        return null;
+    }
 
 }

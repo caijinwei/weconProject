@@ -2,7 +2,6 @@ package com.wecon.box.action.data;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.mysql.jdbc.log.Log;
 import com.wecon.box.api.*;
 import com.wecon.box.constant.Constant;
 import com.wecon.box.entity.*;
@@ -16,6 +15,7 @@ import com.wecon.box.filter.DevBindUserFilter;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.box.param.RealHisCfgParam;
+import com.wecon.box.redis.RedisUpdDeviceCfg;
 import com.wecon.box.util.DbLogUtil;
 import com.wecon.box.util.OptionUtil;
 import com.wecon.box.util.PlcTypeParser;
@@ -31,11 +31,7 @@ import org.springframework.context.annotation.Description;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.validation.Valid;
-
-import static org.hamcrest.CoreMatchers.endsWith;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -64,6 +60,8 @@ public class ActDataAction {
 	private DevBindUserApi devBindUserApi;
 	@Autowired
 	protected DbLogUtil dbLogUtil;
+	@Autowired
+	private RedisUpdDeviceCfg redisUpdDeviceCfg;
 
 	/**
 	 * 通过机器码获取对应的实时数据组
@@ -121,6 +119,8 @@ public class ActDataAction {
 					if (realHisCfg != null) {
 						realHisCfg.state = 3;
 						realHisCfgApi.updateRealHisCfg(realHisCfg);// 删除分组下的监控点
+						// 消息推到redis
+						redisUpdDeviceCfg.pubDelRealHisCfg(realHisCfg.id, 0);
 					}
 
 				}
@@ -280,6 +280,8 @@ public class ActDataAction {
 				dbLogUtil.addOperateLog(OpTypeOption.DelHis, ResTypeOption.His, realHisCfg.id, realHisCfg);
 			}
 
+			// 消息推到redis
+			redisUpdDeviceCfg.pubDelRealHisCfg(realHisCfg.id, 0);
 		}
 
 		return new Output();
@@ -375,7 +377,7 @@ public class ActDataAction {
 	public Output getDataType() {
 		JSONObject json = new JSONObject();
 		json.put("DataTypeOption", optionService.getDataTypeOptionOptions());
-		System.out.println("显示数据类型=="+json.toString());
+		System.out.println("显示数据类型==" + json.toString());
 
 		return new Output(json);
 
@@ -648,7 +650,8 @@ public class ActDataAction {
 			RealHisCfg oldrealHisCfg = null;
 			RealHisCfg realHisCfg = null;
 			if (realHisCfgParam.id > 0) {
-				RealHisCfg oldre = realHisCfgApi.getRealHisCfg(realHisCfgParam.device_id, realHisCfgParam.name,realHisCfgParam.data_type);
+				RealHisCfg oldre = realHisCfgApi.getRealHisCfg(realHisCfgParam.device_id, realHisCfgParam.name,
+						realHisCfgParam.data_type);
 				if (oldre != null && oldre.id != realHisCfgParam.id) {
 					throw new BusinessException(ErrorCodeOption.Name_Repetition.key,
 							ErrorCodeOption.Name_Repetition.value);
@@ -659,7 +662,7 @@ public class ActDataAction {
 				realHisCfg.addr = realHisCfgParam.addr;
 				realHisCfg.addr_type = realHisCfgParam.addr_type;
 				realHisCfg.data_id = realHisCfgParam.data_id;
-				realHisCfg.ext_unit=realHisCfgParam.unit;
+				realHisCfg.ext_unit = realHisCfgParam.unit;
 				if (realHisCfgParam.name.length() > 64) {
 					realHisCfg.name = realHisCfgParam.name.substring(0, 64);
 				} else {
@@ -725,9 +728,12 @@ public class ActDataAction {
 					}
 				}
 				json.put("success", 0);
+				// 消息推到redis
+				redisUpdDeviceCfg.pubUpdRealHisCfg(realHisCfg.id, 0);
 
 			} else {
-				RealHisCfg newre = realHisCfgApi.getRealHisCfg(realHisCfgParam.device_id, realHisCfgParam.name,realHisCfgParam.data_type);
+				RealHisCfg newre = realHisCfgApi.getRealHisCfg(realHisCfgParam.device_id, realHisCfgParam.name,
+						realHisCfgParam.data_type);
 				if (newre != null) {
 					throw new BusinessException(ErrorCodeOption.Name_Repetition.key,
 							ErrorCodeOption.Name_Repetition.value);
@@ -742,7 +748,7 @@ public class ActDataAction {
 				realHisCfg.data_limit = realHisCfgParam.rang;
 				realHisCfg.digit_count = realHisCfgParam.digit_count;
 				realHisCfg.digit_binary = realHisCfgParam.digit_binary;
-				realHisCfg.ext_unit=realHisCfgParam.unit;
+				realHisCfg.ext_unit = realHisCfgParam.unit;
 				realHisCfg.state = 1;// 0：已同步给盒子1：新增配置2：更新配置3：删除配置，如果同步成功再做物理删除，同时需要删除监控点绑定和权限的分配，和其他相关数据
 				if (!CommonUtils.isNullOrEmpty(realHisCfgParam.describe)) {
 					if (realHisCfgParam.describe.length() > 64) {
@@ -995,7 +1001,7 @@ public class ActDataAction {
 							}
 
 							long id = realHisCfgApi.saveRealHisCfg(realHisCfg);
-
+							
 							if (id > 0) {
 								if (realHisCfg.data_type == 0) {// 实时数据配置
 									dbLogUtil.addOperateLog(OpTypeOption.AddAct, ResTypeOption.Act, realHisCfg.id,
@@ -1018,6 +1024,8 @@ public class ActDataAction {
 										accountDirRelApi.saveAccountDirRel(accountDirRel);
 									}
 								}
+								// 消息推到redis
+								redisUpdDeviceCfg.pubUpdRealHisCfg(realHisCfg.id, 0);
 							}
 						}
 
@@ -1052,6 +1060,8 @@ public class ActDataAction {
 								accountDirRelApi.saveAccountDirRel(accountDirRel);
 							}
 						}
+						// 消息推到redis
+						redisUpdDeviceCfg.pubUpdRealHisCfg(reid, 0);
 					}
 				}
 

@@ -60,6 +60,7 @@ public class PlcInfo {
 	public int net_broadcastaddr;
 	public String net_ipaddr;
 	public int state;
+	public int is_sync;
 	public Timestamp create_date;
 	public Timestamp update_date;
 

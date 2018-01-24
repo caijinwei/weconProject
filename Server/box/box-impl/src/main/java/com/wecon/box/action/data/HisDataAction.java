@@ -24,6 +24,7 @@ import com.wecon.box.filter.DevBindUserFilter;
 import com.wecon.box.filter.RealHisCfgDataFilter;
 import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
+import com.wecon.box.redis.RedisUpdDeviceCfg;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
@@ -47,6 +48,8 @@ public class HisDataAction {
 	private ViewAccountRoleApi viewAccountRoleApi;
 	@Autowired
 	private DevBindUserApi devBindUserApi;
+	@Autowired
+	private RedisUpdDeviceCfg redisUpdDeviceCfg;
 
 	@WebApi(forceAuth = true, master = true)
 	@Description("获取改账户下的plc和对应的监控点")
@@ -236,19 +239,19 @@ public class HisDataAction {
 		if (!CommonUtils.isNullOrEmpty(monitorid)) {
 			Client client = AppContext.getSession().client;
 			RealHisCfg realHisCfg = realHisCfgApi.getRealHisCfg(Long.parseLong(monitorid));
-			DevBindUserFilter devBindUser=new DevBindUserFilter();
-			devBindUser.account_id=client.userId;
-			devBindUser.device_id=realHisCfg.device_id;
-			List<DevBindUser> listDeviceBindUser=devBindUserApi.getDevBindUser(devBindUser);
-			if(listDeviceBindUser.size()!=1){
+			DevBindUserFilter devBindUser = new DevBindUserFilter();
+			devBindUser.account_id = client.userId;
+			devBindUser.device_id = realHisCfg.device_id;
+			List<DevBindUser> listDeviceBindUser = devBindUserApi.getDevBindUser(devBindUser);
+			if (listDeviceBindUser.size() != 1) {
 				throw new BusinessException(ErrorCodeOption.Device_AlreadyBind.key,
 						ErrorCodeOption.Device_AlreadyBind.value);
 			}
 			viewAccountRoleApi.deletePoint(1, Long.parseLong(monitorid));
-
-		
 			realHisCfg.state = 3;// 删除配置状态
 			realHisCfgApi.updateRealHisCfg(realHisCfg);
+			// 消息推到redis
+			redisUpdDeviceCfg.pubDelRealHisCfg(realHisCfg.id, 0);
 		}
 
 		return new Output();
