@@ -671,6 +671,7 @@ public class RealHisCfgImpl implements RealHisCfgApi {
             sql += inSb.substring(1);
             sql += ")";
         }
+        sql += " order by r.update_date";
         List<RealHisCfgExtend> list = jdbcTemplate.query(sql, state, new DefaultRealCfgExtendRowMapper());
         return list;
     }

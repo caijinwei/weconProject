@@ -277,6 +277,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			sql += ")";
 			triSql += ")";
 		}
+		sql += " order by a.update_date";
 		List<AlarmCfgExtend> alarmCfgExtendLst = jdbcTemplate.query(sql, state, new DefaultAlarmCfgExtendRowMapper());
 		List<AlarmTrigger> alarmCfgTriggerLst = jdbcTemplate.query(triSql, state, new DefaultAlarmTriggerRowMapper());
 

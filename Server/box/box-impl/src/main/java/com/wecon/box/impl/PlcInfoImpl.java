@@ -268,6 +268,7 @@ public class PlcInfoImpl implements PlcInfoApi {
             sql += inSb.substring(1);
             sql += ")";
         }
+        sql += " order by p.update_date";
         List<PlcExtend> list = jdbcTemplate.query(sql, state, new DefaultPlcExtendRowMapper());
         if (!list.isEmpty()) {
             return list;
@@ -293,6 +294,33 @@ public class PlcInfoImpl implements PlcInfoApi {
                     ps.setInt(1, Integer.parseInt(arg[0]));
                     ps.setInt(2, Integer.parseInt(arg[1]));
                     ps.setString(3, arg[2]);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        return true;
+    }
+
+    @Override
+    public boolean batchUpdateStateAndSync(final List<String[]> updList) {
+        if (null == updList || updList.size() == 0) {
+            return false;
+        }
+        String sql = "update plc_info set state = ?, is_sync = ? where plc_id = ? and date_format(update_date,'%Y-%m-%d %H:%i:%s') = ?";
+        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            public int getBatchSize() {
+                return updList.size();
+                //这个方法设定更新记录数，通常List里面存放的都是我们要更新的，所以返回list.size();
+            }
+
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                try {
+                    String[] arg = updList.get(i);
+                    ps.setInt(1, Integer.parseInt(arg[0]));
+                    ps.setInt(1, 1);
+                    ps.setInt(3, Integer.parseInt(arg[1]));
+                    ps.setString(4, arg[2]);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
