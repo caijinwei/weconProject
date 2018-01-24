@@ -319,7 +319,7 @@ public class PlcInfoImpl implements PlcInfoApi {
                 try {
                     String[] arg = updList.get(i);
                     ps.setInt(1, Integer.parseInt(arg[0]));
-                    ps.setInt(1, 1);
+                    ps.setInt(2, 1);
                     ps.setInt(3, Integer.parseInt(arg[1]));
                     ps.setString(4, arg[2]);
                 } catch (Exception e) {
