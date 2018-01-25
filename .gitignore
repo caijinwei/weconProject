@@ -57,6 +57,11 @@ Server/box/box-web/.settings/
 Server/box/box-web/build/
 Server/box/box-web/target/
 
+
+Server/box/box-data-web/.settings/
+Server/box/box-data-web/build/
+Server/box/box-data-web/target/
+
 Server/box/box-data-impl/.settings/
 Server/box/box-data-impl/build/
 Server/box/box-data-impl/target/
