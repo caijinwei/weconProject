@@ -19,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -653,7 +654,7 @@ public class BoxNotifyTask extends Thread {
 		MqttMessage mqttMessage = new MqttMessage();
 		mqttMessage.setQos(0);
 		mqttMessage.setRetained(true);
-		mqttMessage.setPayload(message.getBytes());
+		mqttMessage.setPayload(message.getBytes(Charset.forName("utf-8")));//下发给盒子端统一使用utf8编码
 		PublishTask publishTask = new PublishTask(mqttTopic, mqttMessage);
 		publishTask.start();
 	}
