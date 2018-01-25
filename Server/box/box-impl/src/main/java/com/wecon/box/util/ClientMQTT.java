@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
@@ -138,7 +139,7 @@ public class ClientMQTT {
         MqttMessage mqttMessage = new MqttMessage();
         mqttMessage.setQos(2);
         mqttMessage.setRetained(true);
-        mqttMessage.setPayload(message.getBytes());
+        mqttMessage.setPayload(message.getBytes(Charset.forName("utf-8")));
         mqttTopic.publish(mqttMessage);
     }
 
