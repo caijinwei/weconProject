@@ -37,7 +37,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                         $("#otherDeviceUseName").show();
                         $scope.$apply();
                         $("#otherDeviceUseName").val(deviceUse.otherUseName);
-                    }else{
+                    } else {
                         $("#deviceUse").val(deviceUse.useCode);
                     }
                 }
@@ -82,6 +82,23 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     }
 
     /*
+     *   盒子与账户解除绑定提示
+     *   sweetalart
+     * */
+    $scope.deletePIBox = function () {
+        var infoDataName = $scope.infoData.name;
+        swal({
+            title: "确定解绑盒子:" + infoDataName + "?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then(function (isok) {
+            if (isok) {
+                $scope.deletePIBoxBtn(device_id);
+            }
+        });
+    }
+    /*
      * 盒子与账户解除关联
      * */
     $scope.deletePIBoxBtn = function (device_id) {
@@ -107,12 +124,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         });
     }
 
-    $scope.getDeviceByAccId = function(){
+    $scope.getDeviceByAccId = function () {
         cleanCopyCheccbox();
-        var params = {currentDeviceId:$scope.infoData.device_id};
+        var params = {currentDeviceId: $scope.infoData.device_id};
         T.common.ajax.request("WeconBox", "baseInfoAction/getOtherDeviceByAccId", params, function (data, code, msg) {
             if (code == 200) {
-                $scope.devices=data.deviceList;
+                $scope.devices = data.deviceList;
                 $scope.$apply();
                 $("#copyConfigModal").modal("show");
             }
@@ -123,44 +140,44 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             console.log("ajax error");
         });
     }
-    $scope.copyDeviceConfig = function(){
+    $scope.copyDeviceConfig = function () {
 
-        var fromDeviceId=$("#fromDeviceId").val();
-        var baseInfoChck = ($("#baseInfoChck").get(0).checked == true ?  1 : 0) +"";
-        var comSelCheck = ($("#comSelCheck").get(0).checked == true ?  1 : 0)+"";
-        var isRealSelCheck = ($("#isRealSelCheck").get(0).checked == true ?  1 : 0+"");
-        var isAlarmSelCheck = ($("#isAlarmSelCheck").get(0).checked == true ?  1 : 0+"");
-        var isHisSelCheck = ($("#isHisSelCheck").get(0).checked == true ?  1 : 0)+"";
+        var fromDeviceId = $("#fromDeviceId").val();
+        var baseInfoChck = ($("#baseInfoChck").get(0).checked == true ? 1 : 0) + "";
+        var comSelCheck = ($("#comSelCheck").get(0).checked == true ? 1 : 0) + "";
+        var isRealSelCheck = ($("#isRealSelCheck").get(0).checked == true ? 1 : 0 + "");
+        var isAlarmSelCheck = ($("#isAlarmSelCheck").get(0).checked == true ? 1 : 0 + "");
+        var isHisSelCheck = ($("#isHisSelCheck").get(0).checked == true ? 1 : 0) + "";
         var params = {
-            fromDeviceId: fromDeviceId+"",
-            toDeviceId : $scope.infoData.device_id,
-            isCopyBaseInfo : baseInfoChck,
-            isCopyCom : comSelCheck,
-            isCopyReal : isRealSelCheck,
-            isCopyHis : isHisSelCheck,
-            isCopyAlarm:isAlarmSelCheck
+            fromDeviceId: fromDeviceId + "",
+            toDeviceId: $scope.infoData.device_id,
+            isCopyBaseInfo: baseInfoChck,
+            isCopyCom: comSelCheck,
+            isCopyReal: isRealSelCheck,
+            isCopyHis: isHisSelCheck,
+            isCopyAlarm: isAlarmSelCheck
         };
         /*
-        * isCopyBaseInfo='null', isCopyCom='null', isCopyReal='null', isCopyHis='null', isCopyAlarm='null'
-        * */
+         * isCopyBaseInfo='null', isCopyCom='null', isCopyReal='null', isCopyHis='null', isCopyAlarm='null'
+         * */
         T.common.ajax.request("WeconBox", "baseInfoAction/copyDeviceConfig", params, function (data, code, msg) {
             if (code == 200) {
-                var alarmMes ="";
+                var alarmMes = "";
                 $("#copyConfigModal").modal("hide");
 
-                $scope.copyMessage=data.data;
-                $.each(data.data,function(name,value){
-                    if(value == "成功"){
-                        alarmMes += name+"&nbsp;&nbsp;&nbsp;&nbsp;<span  style='color: green;'>"+value+"</span></br>";
+                $scope.copyMessage = data.data;
+                $.each(data.data, function (name, value) {
+                    if (value == "成功") {
+                        alarmMes += name + "&nbsp;&nbsp;&nbsp;&nbsp;<span  style='color: green;'>" + value + "</span></br>";
 
-                    }else{
-                        alarmMes += name+"&nbsp;&nbsp;&nbsp;&nbsp;<span  style='color: red;'>"+value+"</span></br>";
+                    } else {
+                        alarmMes += name + "&nbsp;&nbsp;&nbsp;&nbsp;<span  style='color: red;'>" + value + "</span></br>";
 
                     }
                 });
                 $("#noticeMessage").empty();
                 $("#noticeMessage").append(alarmMes);
-                console.log("消息是:   "+alarmMes);
+                console.log("消息是:   " + alarmMes);
                 $("#noticeCopy").modal("show");
             }
             else {
@@ -194,7 +211,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             var test = 1;
             if (code == 200) {
                 $scope.infoDatas = data.infoDatas;
-                $scope.delinfoDatas = data.infoDatas;
+                $scope.delinfoDatas = data.delInfoDatas;
                 $(function () {
                     $("[data-toggle='tooltip']").tooltip();
                 });
@@ -312,9 +329,9 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             var oldType = $scope.plcInfoById.type;
             var oldPort = $scope.plcInfoById.port;
 
-            if($("#port").val() != oldPort ){
+            if ($("#port").val() != oldPort) {
                 $("#noticeType").modal("show");
-            }else {
+            } else {
                 if ($('#type').val() != oldType) {
                     $("#noticeType").modal("show");
                 } else {
@@ -570,8 +587,8 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         var map_a = $("#map_a").val();
         var map_o = $("#map_o").val();
         var maxHisDataCount = $("#maxHisDataCount").val();
-        var regMaxHisCount=/^[1-9]{1}[0-9]{0,4}$/
-        if(!regMaxHisCount.test(maxHisDataCount)||maxHisDataCount>50000){
+        var regMaxHisCount = /^[1-9]{1}[0-9]{0,4}$/
+        if (!regMaxHisCount.test(maxHisDataCount) || maxHisDataCount > 50000) {
             alert("历史数据最多保存条数设置错误,请输入1-50000");
             return;
         }
@@ -613,7 +630,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             remark: remark,
             deviceUseCode: deviceUseCode,
             deviceUseName: deviceUseName,
-            maxHisDataCount:maxHisDataCount,
+            maxHisDataCount: maxHisDataCount,
             map: map
         }
         T.common.ajax.request("WeconBox", "baseInfoAction/chgPiboxInFoName", params, function (data, code, msg) {
@@ -1234,22 +1251,23 @@ var isOtherOption = function () {
     }
 }
 
-var cleanCopyCheccbox =function(){
-    $("input[name= copyCheckbox]").each(function (index,element) {
-        element.checked =false;
+var cleanCopyCheccbox = function () {
+    $("input[name= copyCheckbox]").each(function (index, element) {
+        element.checked = false;
     });
     isShowOtherSel();
 }
 
 
-var isShowOtherSel = function(){
-    if(($("#comSelCheck").get(0).checked)){
-        $("tr[name='otherSel']").each(function(index,element){
+var isShowOtherSel = function () {
+    if (($("#comSelCheck").get(0).checked)) {
+        $("tr[name='otherSel']").each(function (index, element) {
             $(element).show();
         });
-    }else{
-        $("tr[name='otherSel']").each(function(index,element){
+    } else {
+        $("tr[name='otherSel']").each(function (index, element) {
             $(element).hide();
         });
     }
 }
+
