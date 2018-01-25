@@ -232,7 +232,7 @@ public class BusDataAction {
             reclient.start();
 
             // 发送数据
-            sendValue.putMQTTMess(value, null, monitorId, OpTypeOption.WriteActPhone, reclient);
+            sendValue.putMQTTMess(value, null, monitorId, OpTypeOption.WriteActPhone, reclient,true);
         }
         return new Output(new JSONObject());
     }
