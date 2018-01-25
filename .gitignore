@@ -32,6 +32,10 @@ Server/box/box-api/.settings/
 Server/box/box-api/build/
 Server/box/box-api/target/
 
+Server/box/box-data-api/.settings/
+Server/box/box-data-api/build/
+Server/box/box-data-api/target/
+
 Server/box/box-context/.settings/
 Server/box/box-context/build/
 Server/box/box-context/target/
@@ -52,6 +56,10 @@ Server/box/box-web/.settings/
 Server/box/box-web/build/
 Server/box/box-web/target/
 
+Server/box/box-data-impl/.settings/
+Server/box/box-data-impl/build/
+Server/box/box-data-impl/target/
+
 Server/common-util/.settings/
 Server/common-util/.idea/
 Server/common-util/build/
@@ -64,5 +72,10 @@ Server/restful-core/target/
 #ignore file 
 Server/box/box-web/src/test/java/com/wecon/box/utils/JettyFactory.java
 Server/box/box-web/src/main/webapp/web/lib/wecon-common.js
+Server/box/box-web/src/main/webapp/webref/lib/wecon-common.js
+
+#ignore file 
+Server/box/box-data-web/src/test/java/com/wecon/box/utils/JettyFactory.java
+Server/box/box-data-web/src/main/webapp/web/lib/wecon-common.js
 
 
