@@ -1,35 +1,41 @@
 /**
- * Created by zengzhipeng on 2017/9/8.
+ * Created by whp on 2017/10/16.
  */
 var appModule = angular.module('weconweb', []);
 appModule.controller("infoController", function ($scope, $http, $compile) {
-    var uploader;
     $scope.onInit = function () {
-        var id = T.common.util.getParameter("id");
-        if (id > 0) {
-            var params = {
-                id: id
-            };
-            //加载基本信息
-            T.common.ajax.request("WeconBox", "firmwareaction/getfirmware", params, function (data, code, msg) {
-                if (code == 200) {
-                    if (data.firmware != null) {
-                        for (var p in data.firmware) {
-                            $('#' + p).val(data.firmware[p]);
+        $(".i-checks").iCheck({checkboxClass: "icheckbox_square-green", radioClass: "iradio_square-green",});
+        var uploader;
+        var params = {};
+        //加载基本信息
+        T.common.ajax.request("WeconBox", "appveraction/getversion", params, function (data, code, msg) {
+            if (code == 200) {
+                if (data.versions != null) {
+                    $('#androidVersion').val(data.versions[0]);
+                    $('#iosVersion').val(data.versions[1]);
+                    $('#updateContent').val(data.versions[2]);
+                    var isforce = data.versions[3];
+                    if (isforce != null && "" != isforce) {
+                        if (1 == isforce) {
+                            $('#isforce1').attr("checked", true);
+                            $('#isforce2').attr("checked", false);
+                        } else if (2 == isforce) {
+                            $('#isforce1').attr("checked", false);
+                            $('#isforce2').attr("checked", true);
                         }
-                    } else {
-                        swal({
-                            title: "参数异常",
-                            icon: "error"
+                        $(".i-checks").iCheck({
+                            checkboxClass: "icheckbox_square-green",
+                            radioClass: "iradio_square-green",
                         });
-                        return;
                     }
-                }
-            }, function () {
-                console.log("ajax error");
-            });
-        }
 
+                } else {
+                    return;
+                }
+            }
+        }, function () {
+            console.log("ajax error");
+        });
 
         //<editor-fold desc="固件文件上传">
         uploader = WebUploader.create({
@@ -38,14 +44,14 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             // swf文件路径
             swf: '/box-web/web/lib/webuploader/Uploader.swf',
             // 文件接收服务端。
-            server: T.common.config.getRequestUrl("WeconBox") + 'fileact/fileupload?act=firm',
+            server: T.common.config.getRequestUrl("WeconBox") + 'fileact/apkupload?act=driver',
             // 选择文件的按钮。可选。
             // 内部根据当前运行是创建，可能是input元素，也可能是flash.
             pick: '#pickerFile',
             // 只允许选择图片文件。
             accept: {
-                title: '固件升级文件上传',
-                extensions: '*',
+                title: 'Apk文件上传',
+                extensions: 'apk',
                 mimeTypes: '*/*'
             },
             compress: false,
@@ -61,7 +67,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         //添加header内容
         uploader.on('uploadBeforeSend', function (object, data, headers) {
             var paramsverify = {
-                act: "firm"
+                act: "driver"
             };
             headers['common'] = JSON.stringify(T.common.ajax.getHead(paramsverify));
         });
@@ -85,18 +91,10 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         //成功前会派送一个事件
         uploader.on('uploadAccept', function (file, response) {
             if (response.code == 200) {
-                /*var model = {
-                 file_id: response.result.file_id,
-                 file_name: response.result.file_name,
-                 file_md5: response.result.file_md5,
-                 file_size: response.result.file_size,
-                 file_url: response.result.file_url
-                 }
-                 $scope.fileInfo = model;
-                 $scope.$apply();*/
                 for (var p in response.result) {
                     $('#' + p).val(response.result[p]);
                 }
+                $("#type").val(response.result.driver_name);
                 return true;
             }
             else {
@@ -121,7 +119,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $error = $('<div class="error"></div>').appendTo($li);
             }
 
-            $error.text('上传失败');
+            $error.text('上传失败，请检查是否为正确的apk文件');
         });
 
         // 完成上传完了，成功或者失败，先删除进度条。
@@ -131,48 +129,31 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         //</editor-fold>
     }
 
-    /**
-     * 保存操作
-     */
-    $scope.save = function () {
-        var id = T.common.util.getParameter("id");
-        var params = new Object();
-        var fields = $('#info .form-control');
+    $scope.updateVersion = function () {
+        var params = {};
+        var fields = $('#search-div .form-control');
         for (var i = 0; i < fields.length; i++) {
             var f = $(fields[i]);
-            if (f.attr('required') == 'required' && $.trim(f.val()) == "") {
-                alert("[" + f.attr('placeholder') + "] 为必填选项");
-                return;
-            }
             params[f.attr('id')] = f.val();
         }
-        if (id != null) {
-            params['firmware_id'] = id;
-        }
-        else {
-            params['firmware_id'] = -1;
-        }
+        params['isforce'] = $("input[name='isforce']:checked").val()
 
-        T.common.ajax.request("WeconBox", "firmwareaction/savefirmware", params, function (data, code, msg) {
+        T.common.ajax.request("WeconBox", "appveraction/updateversion", params, function (data, code, msg) {
             if (code == 200) {
-                alert("操作成功");
-                location.href = "firmware-info.html?id=" + data.id;
+                swal({
+                    title: "保存成功",
+                    icon: "success",
+                });
+                $scope.$apply();
             } else {
                 swal({
-                    title: msg,
-                    icon: "error"
+                    title: code + " " + msg,
+                    icon: "error",
                 });
             }
         }, function () {
             console.log("ajax error");
         });
-
     }
 
-    /**
-     * 返回列表
-     */
-    $scope.backList = function () {
-        location.href = "firmware-list.html";
-    }
 })
