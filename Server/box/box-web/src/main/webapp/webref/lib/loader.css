@@ -102,12 +102,10 @@
 
 
 .loaded #loader {
-        opacity: 0;
-        -webkit-transition: all 0.3s ease-out;  
-                transition: all 0.3s ease-out;}
-.loaded #loader-wrapper {
+        opacity: 1;  }
+/*.loaded #loader-wrapper {
         visibility: hidden;
-        }
+        }*/
 /* JavaScript Turned Off */
 .no-js #loader-wrapper {display: none;}
 .no-js h1 {color: #222222;}
