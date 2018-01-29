@@ -11,13 +11,15 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      * 盒子基本信息展示
      * */
     $scope.onInit = function () {
-        $("#loadingModal").modal("hide");
+
         $scope.device_id = T.common.util.getParameter("device_id");
         $scope.device_name = T.common.util.getParameter("device_name");
-        $("#loadingModal").modal("show");
         $scope.showBaseInfo();
         $scope.showPlcSetDefault();
-        $("#loadingModal").modal("hide");
+
+        $('#loader-wrapper').css("display", "none");
+
+
         $("#map_body").css("display", "none");
     }
     $scope.showBaseInfo = function () {
@@ -28,7 +30,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $scope.deviceUseOptions = data.deviceUseOptions;
                 $scope.$apply();
                 $scope.infoData = data.device;
-                $("#maxHisDataCount").val($scope.infoData.max_his_data_count);
                 //行业类型对象
                 var deviceUse = data.deviceUse;
                 if (deviceUse != null) {
@@ -55,7 +56,8 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $scope.$apply();
             }
             else {
-                alert(code + "-" + msg);
+
+                swal(code+ '-' + msg,"","error");
             }
         }, function () {
             console.log("ajax error");
@@ -74,7 +76,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $scope.$apply();
             }
             else {
-                alert(code + "-" + msg);
+                swal(code + "-" + msg,"","error");
             }
         }, function () {
             console.log("ajax error");
@@ -110,14 +112,14 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         T.common.ajax.request("WeconBox", "baseInfoAction/deletePIBox", parmas, function (data, code, msg) {
             if (code == 200) {
                 $("#deletePIBox").modal('hide');
-                alert("解除绑定成功！");
+                swal("解除绑定成功！","","success");
                 if (self != top) {
                     window.parent.reloadBoxList();
                 }
                 window.location.href = "overview.html";
             }
             else {
-                alert(code + "-" + msg);
+                swal(code + "-" + msg,"","error");
             }
         }, function () {
             console.log("ajax error");
@@ -126,6 +128,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 
     $scope.getDeviceByAccId = function () {
         cleanCopyCheccbox();
+        $("#copyConfigModal").modal("show");
         var params = {currentDeviceId: $scope.infoData.device_id};
         T.common.ajax.request("WeconBox", "baseInfoAction/getOtherDeviceByAccId", params, function (data, code, msg) {
             if (code == 200) {
@@ -134,7 +137,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $("#copyConfigModal").modal("show");
             }
             else {
-                alert(code + "-" + msg);
+                swal(code + "-" + msg,"","error");
             }
         }, function () {
             console.log("ajax error");
@@ -181,7 +184,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $("#noticeCopy").modal("show");
             }
             else {
-                alert(code + "-" + msg);
+                swal(code + "-" + msg,"","error");
             }
         }, function () {
             console.log("ajax error");
@@ -218,7 +221,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $scope.$apply();
             }
             else {
-                alert(code + "-" + msg);
+                swal(code + "-" + msg,"","error");
             }
         }, function () {
             console.log("ajax error");
@@ -291,21 +294,19 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $("#retry_timeout").val($scope.plcInfoById.retry_timeout);
                 $('#box_stat_no').val($scope.plcInfoById.box_stat_no);
                 $('#plc_stat_no').val($scope.plcInfoById.plc_stat_no);
-                $scope.createSwitchState();
                 if ($scope.plcInfoById.net_isbroadcast == 1) {
+                    console.log("----");
                     $("#net_isbroadcast").attr("checked", "true");
-                    $('[name="switch-state"]').bootstrapSwitch('state', true, true);
-                    $('#net_broadcastaddr').removeAttr('disabled');
                 } else {
                     $("#net_isbroadcast").attr("checked", "false");
-                    $('[name="switch-state"]').bootstrapSwitch('state', false, true);
-                    $('#net_broadcastaddr').attr("disabled", "disabled");
                 }
+                $scope.isBroadcast();
+
                 $scope.selectedType = temType;
                 $scope.$apply();
             }
             else {
-                alert(code + "-" + msg);
+                swal(code + "-" + msg,"","","error");
             }
         }, function () {
             console.log("ajax error");
@@ -329,19 +330,23 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             var oldType = $scope.plcInfoById.type;
             var oldPort = $scope.plcInfoById.port;
 
-            if ($("#port").val() != oldPort) {
-                $("#noticeType").modal("show");
+            if ($("#port").val() != oldPort || $('#type').val() != oldType) {
+                swal({
+                    title: "修改驱动名称，通讯口下的监控点也会删除！",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true,
+                }).then(function (isok) {
+                    if (isok) {
+                        $scope.addPlcInfosetting_submit();
+                    }
+                });
             } else {
-                if ($('#type').val() != oldType) {
-                    $("#noticeType").modal("show");
-                } else {
-                    $scope.addPlcInfosetting_submit();
-                }
+                $scope.addPlcInfosetting_submit();
             }
-
         }
     }
-    //提交后台
+//提交后台
     $scope.addPlcInfosetting_submit = function () {
         var params = {
             plc_id: $("#plc_id").val(),
@@ -372,17 +377,17 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         var selectport = $("#port").val();
         if (params.device_id == "" || params.type == "" || $scope.selectedType == "" || $scope.selectedPtype == "" || $("#ptype").val() == "" || params.driver == "" || params.box_stat_no == "" || params.plc_stat_no == "" || params.port == "" || params.retry_times == ""
             || params.wait_timeout == "" || params.rev_timeout == "" || params.com_stepinterval == "" || params.com_iodelaytime == "" || params.retry_timeout == "") {
-            alert("配置参数未填写");
+            swal("配置参数未填写","","warning");
             $("#btn_plcInfo_submit").removeAttr("disabled");
             return;
         }
         if (selectport == 'Ethernet') {
             if (params.net_port == "" || params.net_type == "" || params.net_isbroadcast == "" || params.net_broadcastaddr == "" || params.net_ipaddr == "") {
-                alert("配置参数未填写");
+                swal("配置参数未填写","","warning");
                 $("#btn_plcInfo_submit").removeAttr("disabled");
                 return;
                 if (isValidIP(params.net_ipaddr) != true) {
-                    alert("情输入正确的IP地址");
+                    swal("情输入正确的IP地址","","warning");
                     $("#btn_plcInfo_submit").removeAttr("disabled");
                     return;
                 }
@@ -400,7 +405,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             params.net_ipaddr = "0";
             //params.state = "0";
             if (params.baudrate == "" || params.stop_bit == "" || params.data_length == "" || params.check_bit == "" || params.comtype == "") {
-                alert("配置参数填未填写");
+                swal("配置参数填未填写");
                 return;
             }
         } else {
@@ -422,14 +427,14 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
          * */
         T.common.ajax.request("WeconBox", "plcInfoAction/savePlcInfo", params, function (data, code, msg) {
             if (code == 200) {
-                alert("操作成功");
+                swal("操作成功","","success");
                 $("#addConfig").modal("hide");
                 $("#btn_plcInfo_submit").removeAttr("disabled");
                 $scope.showPlcList();
                 $scope.$apply();
             }
             else {
-                alert(code + "-" + msg);
+                swal(code + "-" + msg,"","error");
                 $("#btn_plcInfo_submit").removeAttr("disabled");
             }
         }, function () {
@@ -468,7 +473,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $scope.$apply();
             }
             else {
-                alert(code + "-" + msg);
+                swal(code + "-" + msg,"","error");
             }
         }, function () {
             console.log("ajax error");
@@ -560,10 +565,13 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             $('#net_broadcastaddr').attr("disabled", "disabled");
             $('#net_broadcastaddr').val(type[0].net_broadcastaddr);
             //默认设置
-            $scope.createSwitchState();
-            $('[name="switch-state"]').bootstrapSwitch('state', false, true);
-            $('#net_broadcastaddr').attr("disabled", "disabled");
 
+            if($("#net_isbroadcast").val() == 1){
+                $("#net_isbroadcast").attr("checked","true");
+            }else{
+                $("#net_isbroadcast").attr("checked","false");
+            }
+            $scope.isBroadcast();
         } else if ($('#port').val() == 'COM1' || $('#port').val() == "COM2") {
             $scope.portIfShow = 1;
             $scope.ethernetShow = 0;
@@ -589,22 +597,22 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         var maxHisDataCount = $("#maxHisDataCount").val();
         var regMaxHisCount = /^[1-9]{1}[0-9]{0,4}$/
         if (!regMaxHisCount.test(maxHisDataCount) || maxHisDataCount > 50000) {
-            alert("历史数据最多保存条数设置错误,请输入1-50000");
+            swal("历史数据最多保存条数设置错误,请输入1-50000","","error");
             return;
         }
         if (map_a != "" || map_o != "") {
             if (isNaN(map_a) || isNaN(map_o)) {
-                alert("地图坐标格式错误");
+                swal("地图坐标格式错误","","error");
                 return;
             }
             var reg_a = /^[\-\+]?(0|0\.\d{1,6}|\d{1}|\d{1}\.\d{1,6}|[1-9]{1}\d{1}|[1-9]{1}\d{1}\.\d{1,6}|1[0-7]{1}\d{1}\.\d{1,6}|1[0-7]{1}\d{1}|180\.[0]{1,6}|180)$/;
             if (!reg_a.test(map_a)) {
-                alert("经度输入错误，请输入经度-180.000000~180.000000的数");
+                swal("经度输入错误，请输入经度-180.000000~180.000000的数!","","error");
                 return;
             }
             var reg_o = /^[\-\+]?(0|0\.\d{1,6}|\d{1}|\d{1}\.\d{1,6}|[1-8]\d{1}|[1-8]\d{1}\.\d{1,6}|90|90\.[0]{1,6})$/;
             if (!reg_o.test(map_o)) {
-                alert("纬度输入错误，请输入纬度-90.000000~90.000000的数");
+                swal("纬度输入错误，请输入纬度-90.000000~90.000000的数!","","error");
                 return;
             }
         }
@@ -616,7 +624,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         if (deviceUseCode == 999) {
             deviceUseName = $("#otherDeviceUseName").val();
             if (deviceUseName == "" || deviceUseName == undefined) {
-                alert("其他行业参数未填写！");
+                swal("其他行业参数未填写!");
                 return false;
             }
         } else {
@@ -635,12 +643,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         }
         T.common.ajax.request("WeconBox", "baseInfoAction/chgPiboxInFoName", params, function (data, code, msg) {
             if (code == 200) {
-                alert("保存成功！");
+                swal("保存成功！","","success");
                 window.parent.reloadBoxList();
                 //$scope.$apply();
             }
             else {
-                alert(code + "-" + msg);
+                swal(code + "-" + msg,"","error");
             }
         }, function () {
             console.log("ajax error");
@@ -652,6 +660,16 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     $scope.deletePlc = function (plc_id) {
         $scope.deletePlc_id = "";
         $scope.deletePlc_id = plc_id;
+        swal({
+            title: "您确定删除此配置吗?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then(function (isok) {
+            if (isok) {
+                $scope.unbundledPlc(plc_id);
+            }
+        });
     }
     $scope.unbundledPlc = function (plc_id) {
         var params = {plc_id: plc_id}
@@ -663,7 +681,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             }
             else {
                 $("#deletePlc").modal("hide");
-                alert(code + "-" + msg);
+                swal(code + "-" + msg,"","error");
             }
         }, function () {
             console.log("ajax error");
@@ -701,50 +719,50 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         });
     };
 
-    //--------------------------------------------------------------------debugInfo上报调试信息-------------------------------------------------------------------------------------------------------------------------------
-    //var ws;
-    //$scope.ws_send = function (msg) {
-    //    ws.send(msg);
-    //}
-    //$scope.ws_close = function (state) {
-    //    if (state != 1) {
-    //        alert("盒子已经离线");
-    //        return;
-    //    }
-    //    ws.close();
-    //    ws = "";
-    //}
-    //$scope.ws_log = function (data) {
-    //    $('#wsLog').prepend('<p>' + data + '</p>');
-    //}
-    //$scope.ws_clear = function () {
-    //    $("#wsLog").empty();
-    //    $scope.ws_log("Clear :)");
-    //}
-    //$scope.ws_connect = function (machine_code) {
-    //    if ("WebSocket" in window) {
-    //        ws = new WebSocket(T.common.requestUrl['WeconBoxWs'] + 'debugInfo-websocket/websocket?' + T.common.websocket.getParams());
-    //        ws.onopen = function () {
-    //            $scope.ws_send(machine_code);
-    //        };
-    //        ws.onmessage = function (evt) {
-    //            $scope.ws_log(evt.data);
-    //        };
-    //        ws.onclose = function (evt) {
-    //            $scope.ws_log('>>>关闭获取调试' + " ");
-    //            console.log(evt);
-    //        };
-    //        ws.onerror = function (evt) {
-    //            $scope.ws_log('>>>error' + " " + evt.data);
-    //            console.log(evt);
-    //        };
-    //    } else {
-    //        alert("WebSocket isn't supported by your Browser!");
-    //    }
-    //}
+//--------------------------------------------------------------------debugInfo上报调试信息-------------------------------------------------------------------------------------------------------------------------------
+//var ws;
+//$scope.ws_send = function (msg) {
+//    ws.send(msg);
+//}
+//$scope.ws_close = function (state) {
+//    if (state != 1) {
+//        alert("盒子已经离线");
+//        return;
+//    }
+//    ws.close();
+//    ws = "";
+//}
+//$scope.ws_log = function (data) {
+//    $('#wsLog').prepend('<p>' + data + '</p>');
+//}
+//$scope.ws_clear = function () {
+//    $("#wsLog").empty();
+//    $scope.ws_log("Clear :)");
+//}
+//$scope.ws_connect = function (machine_code) {
+//    if ("WebSocket" in window) {
+//        ws = new WebSocket(T.common.requestUrl['WeconBoxWs'] + 'debugInfo-websocket/websocket?' + T.common.websocket.getParams());
+//        ws.onopen = function () {
+//            $scope.ws_send(machine_code);
+//        };
+//        ws.onmessage = function (evt) {
+//            $scope.ws_log(evt.data);
+//        };
+//        ws.onclose = function (evt) {
+//            $scope.ws_log('>>>关闭获取调试' + " ");
+//            console.log(evt);
+//        };
+//        ws.onerror = function (evt) {
+//            $scope.ws_log('>>>error' + " " + evt.data);
+//            console.log(evt);
+//        };
+//    } else {
+//        alert("WebSocket isn't supported by your Browser!");
+//    }
+//}
     $scope.openGetDeviceDebugInfo = function (machine_code, state) {
         if (state != 1) {
-            alert("盒子已经离线");
+            swal("盒子已经离线","","warning");
             return;
         }
         if (ws == "" || ws == undefined) {
@@ -752,7 +770,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         }
     };
 
-    //--------------------------------------------------------------------------固件信息------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------固件信息------------------------------------------------------------------------------------------------------------
 
     $scope.dev_firmShow = function (state) {
         var device_id = T.common.util.getParameter("device_id");
@@ -770,28 +788,28 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             }
             else {
                 $("#deletePlc").modal("hide");
-                alert(code + "-" + msg);
+                swal(code + "-" + msg,"","error");
             }
         }, function () {
             console.log("ajax error");
         });
     }
 
-    //检查更新
+//检查更新
     $scope.checkUpdate = function () {
         var localVersionCode = $scope.localVersionCode;
         var dev_model = $scope.dev_model;
         if (dev_model == "" || dev_model == undefined) {
-            alert("无法获取可更新设备类型");
+            swal("无法获取可更新设备类型","","error");
             return;
         }
         if (localVersionCode == "" || localVersionCode == undefined) {
-            alert("无法获取本地版本号");
+            swal("无法获取本地版本号","","error");
             return;
         }
         var device_id = $scope.device_id;
         if (device_id == "" || device_id == undefined) {
-            alert("系统忙，稍后操作");
+            swal("系统忙，稍后操作","","warning");
             return;
         }
         var params = {
@@ -822,13 +840,13 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 }
             }
             else {
-                alert(code + "-" + msg);
+                swal(code+ '-' + msg,"","error");
             }
         }, function () {
             console.log("ajax error");
         });
     }
-    //更新操作
+//更新操作
     $scope.update = function () {
         var device_id = $scope.device_id;
         var updateType = 0;
@@ -871,18 +889,18 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 }
             }
             else {
-                alert(code + "-" + msg);
+                swal(code+ '-' + msg,"","error");
             }
         }, function () {
             console.log("ajax error");
         });
     }
 
-    //检查更新所有驱动文件
+//检查更新所有驱动文件
     $scope.chkUpdateDriver = function () {
         var device_id = $scope.device_id;
         if (device_id == "" || device_id == undefined) {
-            alert("系统忙，稍后操作");
+            swal("系统忙,稍后操作");
             return;
         }
         var params = {
@@ -901,17 +919,17 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 }
             }
             else {
-                alert(code + "-" + msg);
+                swal(code+ "-" + msg ,"","error");
             }
         }, function () {
             console.log("ajax error");
         });
     }
-    //更新 plc全部驱动
+//更新 plc全部驱动
     $scope.updateAllDriver = function (machine_code) {
         var device_id = $scope.device_id;
         if (device_id == "" || device_id == undefined) {
-            alert("系统忙，稍后操作");
+            swal("系统忙，稍后操作","","warning");
             return;
         }
         var params = {
@@ -920,22 +938,23 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         }
         T.common.ajax.request("WeconBox", "driveraction/updateAllDriver", params, function (data, code, msg) {
             if (code == 200) {
-                alert("指令已下发盒子成功！");
+                swal("指令下盒子成功！","","success");
             }
             else {
-                alert(code + "-" + msg);
+                swal(code+ '-' + msg,"","error");
+
             }
         }, function () {
             console.log("ajax error");
         });
     }
 
-    //检查更新驱动文件
+//检查更新驱动文件
     $scope.checkUpdateFir = function () {
         var localVersionCode = $scope.localVersionCode;
         var dev_model = $scope.dev_model;
         if (dev_model == "" || dev_model == undefined || localVersionCode == "" || localVersionCode == undefined) {
-            alert("系统错误");
+            swal("系统错误","error");
             return;
         }
         var params = {
@@ -961,7 +980,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             }
             else {
                 $("#deletePlc").modal("hide");
-                alert(code + "-" + msg);
+                swal(code + "-" + msg,"error");
             }
         }, function () {
             console.log("ajax error");
@@ -980,11 +999,11 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         }
         if (machine_code == "" || machine_code == undefined || versionName == "" || versionName == undefined || version_code == "" || version_code == undefined || file_id == "" || file_id == undefined) {
             $("#checkUpdateFir").modal("hide");
-            alert("系统忙，稍后操作！");
+            swal("系统忙，稍后操作！","","warning");
         }
         T.common.ajax.request("WeconBox", "dirFirmAction/updateFirmFile", params, function (data, code, msg) {
             $("#checkUpdateFir").modal("hide");
-            alert("指令已下发盒子成功！");
+            swal("指令已下发盒子成功！","","success");
         }, function () {
             console.log("ajax error");
         });
@@ -994,32 +1013,21 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     /*
      * 是否使用广播地址
      * */
-    //$scope.isBroadcast = function () {
-    //    if ($('#net_isbroadcast').is(':checked')) {
-    //        $('#net_broadcastaddr').attr("disabled", "disabled");
-    //        //$('#net_broadcastaddr').css('','');
-    //    } else {
-    //        $('#net_broadcastaddr').removeAttr('disabled');
-    //    }
-    //}
-    //使用广播地址  js方法
-    $scope.createSwitchState = function () {
-        $('[name="switch-state"]').bootstrapSwitch({
-            onText: "启用",
-            offText: "禁用",
-            onColor: "success",
-            offColor: "danger",
-            size: "small",
-            onSwitchChange: function (event, state) {
-                if (state == false) {
-                    $('#net_broadcastaddr').attr("disabled", "disabled");
-                    $('#net_isbroadcast').val(0);
-                } else {
-                    $('#net_broadcastaddr').removeAttr('disabled');
-                    $('#net_isbroadcast').val(1);
-                }
-            }
-        })
+//$scope.isBroadcast = function () {
+//    if ($('#net_isbroadcast').is(':checked')) {
+//        $('#net_broadcastaddr').attr("disabled", "disabled");
+//        //$('#net_broadcastaddr').css('','');
+//    } else {
+//        $('#net_broadcastaddr').removeAttr('disabled');
+//    }
+//}
+//使用广播地址  js方法createSwitchState
+    $scope.isBroadcast = function () {
+        if ($('#net_isbroadcast').is(":checked") == true) {
+            $('#net_broadcastaddr').removeAttr('disabled');
+        } else {
+            $('#net_broadcastaddr').attr("disabled", "disabled");
+        }
     }
 
 //-----------------------------------------------------更新 等待反馈------------------------------------------------------------------
@@ -1027,7 +1035,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 
     $scope.wsf_close = function (state) {
         if (state != 1) {
-            alert("盒子已经离线");
+            swal("盒子已经离线！","","warning");
             return;
         }
         wsf.close();
@@ -1057,7 +1065,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 
                 //离线判断
                 if (jsonResult.errorMsg != undefined) {
-                    alert("盒子已经离线！");
+                    swal("盒子已经离线！","","warning");
                     $("#loadingModal").modal("hide");
                     wsf.onclose();
                     return;
@@ -1087,7 +1095,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 console.log(evt);
             };
         } else {
-            alert("WebSocket isn't supported by your Browser!");
+            swal("WebSocket isn't supported by your Browser!");
         }
     }
 
@@ -1237,7 +1245,8 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         });
         local.search($("#suggestId").val());
     }
-});
+})
+;
 
 /*
  * 是否选择了其他行业;
@@ -1252,22 +1261,38 @@ var isOtherOption = function () {
 }
 
 var cleanCopyCheccbox = function () {
-    $("input[name= copyCheckbox]").each(function (index, element) {
-        element.checked = false;
+    $("input[name = copyCheckbox]").each(function (index, element) {
+        $(element).iCheck('uncheck');
     });
-    isShowOtherSel();
+    $("tr[name='otherSel']").css("display","none");
 }
 
-
-var isShowOtherSel = function () {
-    if (($("#comSelCheck").get(0).checked)) {
-        $("tr[name='otherSel']").each(function (index, element) {
-            $(element).show();
-        });
-    } else {
-        $("tr[name='otherSel']").each(function (index, element) {
-            $(element).hide();
-        });
+$('#comSelCheck').on('ifClicked', function (event) {
+    if(!$('#comSelCheck').is(':checked')) {
+        $("tr[name='otherSel']").css("display","table-row");
+    }else{
+        $("tr[name='otherSel']").css("display","none");
     }
-}
+
+});
+
+
+//var isShowOtherSel = function () {
+//    if (($("#comSelCheck").get(0).checked)) {
+//        $("tr[name='otherSel']").each(function (index, element) {
+//            $(element).show();
+//        });
+//    } else {
+//        $("tr[name='otherSel']").each(function (index, element) {
+//            $(element).hide();
+//        });
+//    }
+//}
+
+
+$("#comSelCheck").change(function() {
+    alert("checked");
+});
+
+
 
