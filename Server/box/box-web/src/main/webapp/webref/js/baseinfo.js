@@ -175,7 +175,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 
                     } else {
                         alarmMes += name + "&nbsp;&nbsp;&nbsp;&nbsp;<span  style='color: red;'>" + value + "</span></br>";
-
                     }
                 });
                 $("#noticeMessage").empty();
