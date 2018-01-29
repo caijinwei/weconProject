@@ -2,7 +2,7 @@ var appModule = angular.module('weconweb', []);
 appModule
 		.controller(
 				"infoController",
-				function($scope, $http, $compile) {
+				function($scope, $http, $compile, $filter) {
 					$scope.onInit = function() {
 						$scope.deviceid = T.common.util
 								.getParameter("device_id");
@@ -16,758 +16,242 @@ appModule
 									$("body").css("display", "block");
 								});
 
-						$scope.type = 0;
-						$scope.getDataType();
-						$scope.act_group($scope.deviceid);
+						$scope.commointor_submit();
+
+					/*
+					 * $('.form_datetime').datetimepicker({ // language: 'fr',
+					 * weekStart : 1, todayBtn : 1, autoclose : 1,
+					 * todayHighlight : 1, startView : 2, forceParse : 0,
+					 * showMeridian : 1, pickerPosition : "bottom-left" });
+					 */
 
 					}
 
-					// 获取分组
-					$scope.act_group = function(deviceid) {
-						inivalize = 0;
+					/**
+					 * 提交接口请求
+					 */
+					$scope.commointor_submit = function() {
+						// $("#loadingModal").modal("show");
+						$('#loader-wrapper').css("display", "block");
 						var params = {
-							device_id : deviceid
+							device_id : $scope.deviceid
+
 						};
-						T.common.ajax
-								.request(
-										"WeconBox",
-										"actDataAction/getActGroup",
-										params,
-										function(data, code, msg) {
-											if (code == 200) {
-												$scope.dir_list = data.ActGroup;
-												$scope.$apply();
-												if (data.ActGroup != null
-														&& $scope.type == 0) {
-													var fristGroupId = data.ActGroup[0].id;
-
-													actgroupId = fristGroupId;
-													$scope.createWebSocket();
+						T.common.ajax.request("WeconBox",
+								"hisDataAction/getComMonitor", params,
+								function(data, code, msg) {
+									if (code == 200) {
+										$scope.commonitors = data.monitors;
+										$("#searchid").attr("disabled",
+												$scope.commonitors == "");
+										$scope.$apply();
+										$scope.searchHisData(1, 5);
+										$scope.paginationConf = {
+											currentPage : 1,
+											itemsPerPage : 5,
+											totalItems : $scope.count,
+											pagesLength : 15,
+											perPageOptions : [ 5, 10, 20, 50,
+													100 ],
+											onChange : function() {
+												if (this.currentPage != 0) {
+													$scope.searchHisData(
+															this.currentPage,
+															this.itemsPerPage);
 												}
-
-											} else {
-
-												alert(code + "-" + msg);
 											}
-										}, function() {
-											console.log("ajax error");
-										});
-					}
+										}
+										$scope.paginationConf_register = {
+											currentPage : 1,
+											itemsPerPage : 10,
+											totalItems : $scope.count,
+											pagesLength : 15,
+											perPageOptions : [ 5, 10, 20, 50,
+													100 ],
+											rememberPerPage : 'perPageItems',
+											onChange : function() {
+												if (this.currentPage != 0) {
+													$scope.showhisconf(
+															this.currentPage,
+															this.itemsPerPage);
+												}
+											}
+										}
 
+										// $("#loadingModal").modal("hide");
+										$('#loader-wrapper').css("display", "none");
+
+									} else {
+										// $("#loadingModal").modal("hide");
+										$('#loader-wrapper').css("display", "none");
+									       swal({
+							                    title: code + "-" + msg,
+							                    icon: "error"
+							                });
+											
+									}
+								}, function() {
+									// $("#loadingModal").modal("hide");
+									$('#loader-wrapper').css("display", "none");
+
+									console.log("ajax error");
+								});
+					}
 					$scope.paginationConf = {
 						totalItems : $scope.count,
 					}
-
-					var ws;// websocket实例
-					var actgroupId;// 分组id
-					var lockReconnect = false;// 避免重复连接
-					var inivalize = 0;
-					var isclick = false;// 下发数据是否点击确定键
-
-					$scope.createWebSocket = function() {
-						try {
-							ws = new WebSocket(
-									T.common.requestUrl['WeconBoxWs']
-											+ '/actdataweb-websocket/websocket?'
-											+ T.common.websocket.getParams());
-							console.log("run createWebSocket");
-							$scope.initEventHandle();
-						} catch (e) {
-							$scope.reconnect();
-						}
+					$scope.paginationConf_register = {
+						totalItems : $scope.count,
 					}
-
-					$scope.initEventHandle = function() {
-						ws.onclose = function() {
-							$scope.reconnect();
-						};
-						ws.onerror = function() {
-							$scope.reconnect();
-						};
-						ws.onopen = function() {
-							console.log("ws.onopen");
-							$scope.paginationConf = {
-								currentPage : 1,
-								itemsPerPage : 10,
-								totalItems : $scope.count,
-								pagesLength : 15,
-								perPageOptions : [ 5, 10, 20, 50, 100 ],
-								rememberPerPage : 'perPageItems',
-								onChange : function() {
-									if (this.currentPage != 0) {
-										$scope.ws_send(this.currentPage,
-												this.itemsPerPage, actgroupId);
-									}
-								}
-							}
-							$scope.ws_send($scope.paginationConf.currentPage,
-									$scope.paginationConf.itemsPerPage,
-									actgroupId);
-
-							// 心跳检测重置
-							heartCheck.reset().start();
-						};
-						ws.onmessage = function(evt) {
-							if (JSON.parse(evt.data).piBoxActDateMode != null) {
-								console.log(inivalize);
-								if (inivalize == 0) {
-									$scope.paginationConf.totalItems = JSON
-											.parse(evt.data).piBoxActDateMode.totalRecord;
-									$scope.actDatas = JSON.parse(evt.data).piBoxActDateMode.list;
-									console.log($scope.actDatas);
-									$scope.$apply();
-
-									angular.forEach($scope.actDatas, function(
-											data, index, array) {
-
-										$scope.editable_name(data, 0);
-										if (data.addr_type != 0) {
-											$scope.editable_value(data, 0);
-										} else {
-											$scope.createSwitchState(data);
-										}
-
-									});
-									$("i[name='act_i_state']").tooltip();
-
-								}
-
-							} else {
-								// 下发数据到盒子反馈
-								$scope.resultData = JSON.parse(evt.data).resultData;
-
-								$("#loadingModal").modal("hide");
-								if ($scope.resultData == 0) {
-									alert(JSON.parse(evt.data).resultError);
-									$scope.ws_send(
-											$scope.paginationConf.currentPage,
-											$scope.paginationConf.itemsPerPage,
-											actgroupId);
-								} else {
-									if (inivalize == 1) {
-										alert("数据下发盒子成功！");
-									}
-
-								}
-								inivalize = 0;
-								isclick = false;
-
-								// $scope.ws_send(
-								// $scope.paginationConf.currentPage,
-								// $scope.paginationConf.itemsPerPage,
-								// actgroupId);
-							}
-
-							// 如果获取到消息，心跳检测重置
-							// 拿到任何消息都说明当前连接是正常的
-							heartCheck.reset().start();
-
-						}
-
-					}
-
-					$scope.reconnect = function() {
-						if (lockReconnect)
-							return;
-						lockReconnect = true;
-						// 没连接上会一直重连，设置延迟避免请求过多
-						setTimeout(function() {
-							$scope.createWebSocket();
-							lockReconnect = false;
-						}, 2000);
-					}
-
-					// 心跳检测
-					var heartCheck = {
-						timeout : 60000,// 60秒
-						timeoutObj : null,
-						serverTimeoutObj : null,
-						reset : function() {
-							clearTimeout(this.timeoutObj);
-							clearTimeout(this.serverTimeoutObj);
-							return this;
-						},
-						start : function() {
-							var self = this;
-							this.timeoutObj = setTimeout(function() {
-								// 这里发送一个心跳，后端收到后，返回一个心跳消息，
-								// onmessage拿到返回的心跳就说明连接正常
-								var params = {
-									markid : -1,
-
-								};
-								ws.send(angular.toJson(params));
-								/*
-								 * self.serverTimeoutObj = setTimeout(function ()
-								 * {// 如果超过一定时间还没重置，说明后端主动断开了 ws.close();//
-								 * 如果onclose会执行reconnect，我们执行ws.close()就行了.如果直接执行reconnect //
-								 * 会触发onclose导致重连两次 }, self.timeout)
-								 */
-							}, this.timeout)
-						}
-					}
-					$scope.ws_send = function(pageIndex, pageSize, groupId) {
-						actgroupId = groupId;
-						inivalize = 0;
+					$scope.searchHisData = function(pageIndex, pageSize) {
 						if (pageIndex == 0)
 							pageIndex = 1;
+						// $("#loadingModal").modal("show");
+						$('#loader-wrapper').css("display", "block");
 						var params = {
-							markid : 0,
-							device_id : $scope.deviceid,
-							acc_dir_id : groupId,
+							real_his_cfg_id : $("#monitorid").val(),
+							start_date : $("#startdateid").val(),
+							end_date : $("#enddateid").val(),
 							pageIndex : pageIndex,
 							pageSize : pageSize
 
 						};
-						ws.send(angular.toJson(params));
-					}
-
-					$scope.ws_close = function() {
-						ws.close();
-					}
-					// 下发数据到盒子
-					$scope.putMess = function(model, value) {
-
-						var params = {
-							markid : 1,
-							value : value,
-							addr_id : model.id
-						};
-						ws.send(angular.toJson(params));
-
-					}
-					// 位地址初始化控件
-					$scope.createSwitchState = function(data) {
-						$swithId = $('#mySwitch_' + data.id + ' ' + 'input');
-						$swithId.bootstrapSwitch({
-							onText : "ON",
-							offText : "OFF",
-							onColor : "success",
-							offColor : "danger",
-							size : "small",
-							state : data.re_value == 1 ? true : false
-						}).on(
-								"switchChange.bootstrapSwitch",
-								function(event, state) {
-
-									var model = JSON.parse($(this).attr(
-											"data-bit"));
-
-									if (model.box_state != 1) {
-										alert("检查盒子是否在线！");
-										if (state != false) {
-											$(this).bootstrapSwitch('state',
-													false, true);
-										}
-										if (state != true) {
-											$(this).bootstrapSwitch('state',
-													true, true);
-										}
-										return false;
-
-									} else if (model.state != 0) {
-										alert("条目未下发！");
-										if (state != false) {
-											$(this).bootstrapSwitch('state',
-													false, true);
-										}
-										if (state != true) {
-											$(this).bootstrapSwitch('state',
-													true, true);
-										}
-										return false;
-									} else if (model.re_state != 1) {
-										alert("检查监控点是否在线！");
-										if (state != false) {
-											$(this).bootstrapSwitch('state',
-													false, true);
-										}
-										if (state != true) {
-											$(this).bootstrapSwitch('state',
-													true, true);
-										}
-										return false;
-									}
-									var value = 0;
-									if (state) {
-										value = 1;
-									} else {
-										value = 0;
-									}
-									inivalize = 2;
-									$scope.putMess(model, value);
-
-								});
-
-					}
-
-					// 复制监控点
-					$scope.copymonitor = function(model) {
-						$scope.monitorid = model.id;// 监控点id
-						$scope.alais = model.ref_alais;// 监控点别名
-
-						angular.forEach($scope.dir_list, function(data, index,
-								array) {
-							if (actgroupId == data.id) {
-								$("#nowgroupid").html(data.name);
-								$scope.groupName = data.name;
-							}
-						});
-
-					}
-					// 复制监控点到其他组
-					$scope.copy_monitor_group = function() {
-						if ($('#copymonitorid').val() == actgroupId) {
-							alert("【" + $scope.groupName + "】已经存在该监控点！");
-							return;
-
-						}
-						var params = {
-							monitorid : $scope.monitorid,
-							alais : $scope.alais,
-							acc_dir_id : $('#copymonitorid').val()
-						};
-
 						T.common.ajax
 								.request(
 										"WeconBox",
-										"actDataAction/copyMonitor",
+										"hisDataAction/getHisData",
 										params,
 										function(data, code, msg) {
 											if (code == 200) {
-												$("#copyDataGroup").modal(
-														"hide");
-												$scope
-														.ws_send(
-																$scope.paginationConf.currentPage,
-																$scope.paginationConf.itemsPerPage,
-																actgroupId);
-												alert("复制成功！");
+												$scope.paginationConf.totalItems = data.realHisCfgDataList.totalRecord;
+												$scope.Hisdatas = data.realHisCfgDataList.list;
+												var xval = new Array();
+												var yval = new Array();
+												angular
+														.forEach(
+																data.realHisCfgDataList.list,
+																function(data,
+																		index,
+																		array) {
 
+																	xval
+																			.push($filter(
+																					'date')
+																					(
+																							data.monitor_time,
+																							"yyyy-MM-dd HH:mm:ss"));
+
+																	yval
+																			.push(parseFloat(data.value));
+
+																});
+												angular
+														.forEach(
+																$scope.commonitors,
+																function(data,
+																		index,
+																		array) {
+																	if ($(
+																			"#monitorid")
+																			.val() == data.id) {
+																		$scope.monitorName = data.name;
+																	}
+
+																});
+
+												var chart = new Highcharts.Chart(
+														'original-graph-container',
+														{
+															title : {
+																text : '平均数值',
+																x : -20
+															},
+															subtitle : {
+																text : '数据来源: we-con.com.cn',
+																x : -20
+															},
+															xAxis : {
+																categories : xval
+															},
+															yAxis : {
+																title : {
+																	text : '值'
+																},
+																plotLines : [ {
+																	value : 0,
+																	width : 1,
+																	color : '#808080'
+																} ]
+															},
+															tooltip : {
+																valueSuffix : ''
+															},
+															legend : {
+																layout : 'vertical',
+																align : 'right',
+																verticalAlign : 'middle',
+																borderWidth : 0
+															},
+															series : [ {
+																name : $scope.monitorName,
+																data : yval
+
+															} ]
+														});
+
+												$scope.$apply();
+												$("i[name='his_data_state']")
+														.tooltip();
+// $("#loadingModal")
+// .modal("hide");
+												$('#loader-wrapper').css("display", "none");
 											} else {
+												$('#loader-wrapper').css("display", "none");
 
-												alert(code + "-" + msg);
+											       swal({
+									                    title: code + "-" + msg,
+									                    icon: "error"
+									                });
+													
+// $("#loadingModal")
+// .modal("hide");
+											
 											}
 										}, function() {
 											console.log("ajax error");
 										});
 					}
-					// 移动监控点
-					$scope.movemonitor = function(model) {
-						$scope.moveMonitorid = model.id;// 监控点id
-						$scope.moveAlais = model.ref_alais;// 监控点别名
+					// 原始数据界面，列表视图、曲线视图
+					$scope.showListOrCurves = function(btnId) {
+						var checkType = btnId; // 查看类型
+						$('#btn-list,#btn-curves').attr('class',
+								'btn btn-default');
+						$('#list-view,#curves-view').css('display', 'none');
+						switch (btnId) {
+						case 'btn-list':
+							$('#btn-list').attr('class', 'btn btn-primary');
+							$('#list-view').css('display', 'block');
+							break;
+						case 'btn-curves':
+							$('#btn-curves').attr('class', 'btn btn-primary');
+							$('#curves-view').css('display', 'block');
 
-						angular.forEach($scope.dir_list, function(data, index,
-								array) {
-							if (actgroupId == data.id) {
-								$("#movenowgroupid").html(data.name);
-								$scope.movegroupName = data.name;
-							}
-						});
-
-					}
-					// 移动监控点到其他组
-					$scope.move_monitor_group = function() {
-						if ($('#movemonitorid').val() == actgroupId) {
-							alert("【" + $scope.movegroupName + "】已经存在该监控点！");
-							return;
-
+							break;
+						default:
+						
+						swal({
+		                    title:"视图切换异常！" ,
+		                    icon: "warning"
+		                });
+							break;
 						}
-						var params = {
-							monitorid : $scope.moveMonitorid,
-							alais : $scope.moveAlais,
-							to_acc_dir_id : $('#movemonitorid').val(),
-							from_acc_dir_id : actgroupId
-						};
-
-						T.common.ajax
-								.request(
-										"WeconBox",
-										"actDataAction/moveMonitor",
-										params,
-										function(data, code, msg) {
-											if (code == 200) {
-												$("#moveDataGroup").modal(
-														"hide");
-												$scope
-														.ws_send(
-																$scope.paginationConf.currentPage,
-																$scope.paginationConf.itemsPerPage,
-																actgroupId);
-												alert("移动成功！");
-
-											} else {
-
-												alert(code + "-" + msg);
-											}
-										}, function() {
-											console.log("ajax error");
-										});
 					}
-
-					// 获取移除监控点信息
-					$scope.remonitor = function(model) {
-						$scope.delmonitorid = model.id;// 监控点id
-						$scope.isdelmonitor = 1; // 1.移除监控点 2.删除监控点配置
-						$("#delgroupid").html(
-								"确定要从该分组移除【" + model.ref_alais + "】监控点吗？");
-					}
-					// 获取删除监控点信息
-					$scope.delmonitor = function(model) {
-						$scope.delmonitorid = model.id;// 监控点id
-						$scope.isdelmonitor = 2; // 1.移除监控点 2.删除监控点配置
-						$("#delgroupid").html(
-								"确定要删除【" + model.ref_alais + "】监控点配置吗？");
-					}
-					// 移除监控点
-					$scope.del_monitor_group = function() {
-
-						var params = {
-							monitorid : $scope.delmonitorid,
-							acc_dir_id : actgroupId,
-							isdel : $scope.isdelmonitor
-						};
-
-						T.common.ajax
-								.request(
-										"WeconBox",
-										"actDataAction/delMonitor",
-										params,
-										function(data, code, msg) {
-											if (code == 200) {
-												$("#deletePoint").modal("hide");
-												$scope
-														.ws_send(
-																$scope.paginationConf.currentPage,
-																$scope.paginationConf.itemsPerPage,
-																actgroupId);
-												if ($scope.isdelmonitor == 1) {
-													alert("移除成功！");
-
-												} else {
-													alert("删除成功！");
-												}
-
-											} else {
-
-												alert(code + "-" + msg);
-											}
-										}, function() {
-											console.log("ajax error");
-										});
-					}
-					// 创建分组
-					$scope.add_group = function() {
-						var params = {
-							id : -1,
-							name : $('#newGroupName').val(),
-							type : 1,
-							device_id : $scope.deviceid
-						};
-
-						T.common.ajax
-								.request(
-										"WeconBox",
-										"userdiract/saveuserdir",
-										params,
-										function(data, code, msg) {
-											if (code == 200) {
-
-												var name = $('#newGroupName')
-														.val();
-												var length = $('#monitorTab')
-														.children().length;
-												var lastPosition = length - 2;
-												($("#monitorTab li:eq("
-														+ lastPosition + ")"))
-														.after("<li><a href=\"#data-item-1\" data-toggle=\"tab\">"
-																+ name
-																+ "</a></li>");
-
-												$("#addDataGroup")
-														.modal("hide");
-												$scope.type = 1;
-
-												$scope
-														.act_group($scope.deviceid);
-
-											} else {
-
-												alert(code + "-" + msg);
-											}
-										}, function() {
-											console.log("ajax error");
-										});
-					}
-					$scope.showAddGroup = function() {
-						$('#identifier').modal('show');
-					}
-					// 获取修改分组名称
-					$scope.editGroup = function(model) {
-
-						$("#editid").val(model.name);
-						$scope.editGroupId = model.id;
-
-						$("#editGroupName").modal("show");
-
-					}
-					// 修改分组
-					$scope.edit_group = function() {
-						var params = {
-							id : $scope.editGroupId,
-							name : $('#editid').val(),
-							type : 1,
-							device_id : $scope.deviceid
-						};
-
-						T.common.ajax.request("WeconBox",
-								"userdiract/saveuserdir", params, function(
-										data, code, msg) {
-									if (code == 200) {
-
-										$("#editGroupName").modal("hide");
-										$scope.type = 1;
-
-										$scope.act_group($scope.deviceid);
-
-									} else {
-
-										alert(code + "-" + msg);
-									}
-								}, function() {
-									console.log("ajax error");
-								});
-					}
-					// 获取删除分组名称
-					$scope.delGroup = function(model) {
-						var text = "确定删除【" + model.name + "】分组?"
-						$("#delid").html(text);
-						$scope.delActGroupId = model.id;
-
-						$("#deleteGroup").modal("show");
-
-					}
-					// 删除分组
-					$scope.del_group = function() {
-						var params = {
-							id : $scope.delActGroupId,
-						};
-
-						if ($scope.deviceid > 0) {
-							T.common.ajax.request("WeconBox",
-									"actDataAction/delActGroup", params,
-									function(data, code, msg) {
-										if (code == 200) {
-
-											$("#deleteGroup").modal("hide");
-											$scope.type = 1;
-
-											$scope.act_group($scope.deviceid);
-
-										} else {
-
-											alert(code + "-" + msg);
-										}
-									}, function() {
-										console.log("ajax error");
-									});
-
-						} else {
-							T.common.ajax.request("WeconBox",
-									"userdiract/deluserdir", params, function(
-											data, code, msg) {
-										if (code == 200) {
-
-											$("#deleteGroup").modal("hide");
-											$scope.type = 1;
-
-											$scope.act_group($scope.deviceid);
-
-										} else {
-
-											alert(code + "-" + msg);
-										}
-									}, function() {
-										console.log("ajax error");
-									});
-
-						}
-
-					}
-
-					$scope.editable_name = function(model, index) {
-						if (index == 1) {
-							inivalize = 1;
-							isclick = false;
-						}
-						$act_name = $('#act_name_' + model.id);
-						$act_name.editable({
-							type : "text", // 编辑框的类型。支持text|textarea|select|date|checklist等
-							title : "监控点名称", // 编辑框的标题
-							disabled : false, // 是否禁用编辑
-							emptytext : "空文本", // 空值的默认文本
-							mode : "inline", // 编辑框的模式：支持popup和inline两种模式，默认是popup
-							validate : function(value) { // 字段验证
-								if (!$.trim(value)) {
-									return '不能为空';
-								}
-								$scope.upActcfgName(model, value);
-							}
-						}).click(function() {
-							$(".editable-cancel").click(function() {
-								inivalize = 0;
-							});
-						});
-						$act_name.on('hidden.bs.modal', function() {// 点击空白处的时候触发
-							inivalize = 0;
-						});
-					}
-
-					$scope.editable_value = function(model, index) {
-
-						$act_value = $('#act_value_' + model.id);
-						if (index == 1) {
-							isclick = false;
-							inivalize = 1;
-						}
-						$act_value.editable({
-							type : "text",
-							title : "监控点数值",
-							pk : 1,
-							url : '',
-							disabled : false,
-							emptytext : "0",
-							mode : "inline",
-
-							validate : function(value) {
-								if (!$.trim(value)) {
-									return '不能为空!';
-								}
-								if (model.box_state != 1) {
-									return '检查盒子是否在线！';
-								}
-								if (model.state != 0) {
-									return '条目未下发！';
-								}
-								if (model.re_state != 1) {
-									return '检查监控点是否在线！';
-								}
-								if (value.length > 256) {
-									return '数值长度超出范围！';
-								}
-
-								$("#loadingModal").modal("show");
-								isclick = true;
-								console.log("isclick==" + isclick);
-								$scope.putMess(model, value);
-
-							}
-
-						}).click(function() {
-							$(".editable-cancel").click(function() {
-								inivalize = 0;
-							});
-						});
-						$act_value.on('hidden.bs.modal', function() {// 点击空白处的时候触发
-							console.log("isclick33==" + isclick);
-							if (isclick == false) {
-								inivalize = 0;
-							}
-
-						});
-
-					}
-
-					// 修改监控点名称
-					$scope.upActcfgName = function(model, name) {
-						var params = {
-
-							name : name,
-							id : model.id,
-							actgroupId : actgroupId
-
-						};
-						T.common.ajax
-								.request(
-										"WeconBox",
-										"actDataAction/upActcfgName",
-										params,
-										function(data, code, msg) {
-											if (code == 200) {
-												$scope
-														.ws_send(
-																$scope.paginationConf.currentPage,
-																$scope.paginationConf.itemsPerPage,
-																actgroupId)
-											} else {
-
-												alert(code + "-" + msg);
-											}
-										}, function() {
-											console.log("ajax error");
-										});
-					}
-
-					/*
-					 * 展示所有监控点设置iframe的url属性
-					 */
-					$scope.showRestList = function() {
-						console.log();
-						var path = "viewmanagerpointTable.html?accounttype="
-								+ $scope.accounttype + "&actgroupId="
-								+ actgroupId;
-						$("#myiframe").attr('src', path);
-					}
-
-					/*
-					 * 提交选中的监控点
-					 */
-					$scope.setViewOpint = function() {
-						var rightOption = [];
-						var chk_value = [];
-						$("#myiframe").contents().find(
-								'input[name="cbid"]:checked').each(function() {
-							chk_value.push($(this).val());
-						});
-						var ids = chk_value.join(",");
-						if (chk_value.length == 0) {
-							alert("请选择至少一条监控点");
-
-							return;
-						}
-						var params = {
-							acc_dir_id : actgroupId,
-							selectedId : ids
-						};
-						T.common.ajax
-								.request(
-										"WeconBox",
-										"actDataAction/allotMonitor",
-										params,
-										function(data, code, msg) {
-											if (code == 200) {
-												$("#dispatchpoint").modal(
-														"hide");
-												$scope
-														.ws_send(
-																$scope.paginationConf.currentPage,
-																$scope.paginationConf.itemsPerPage,
-																actgroupId);
-
-												alert("分配监控点成功");
-
-											} else {
-												alert(code + "-" + msg);
-											}
-										}, function() {
-											console.log("ajax error");
-										});
-					};
 					/*
 					 * 盒子下plc配置展示
 					 */
 					var mtype = 0;
 					$scope.showAllPlcConf = function(dealtype) {
+						$scope.getDataType();
 						mtype = dealtype;
 						var params = {
 							device_id : $scope.deviceid
@@ -781,8 +265,25 @@ appModule
 											if (code == 200) {
 												$scope.infoDatas = data.infoDatas;
 												$scope.$apply();
-												if (dealtype == 1) {
 
+												if (dealtype == 0) {
+													$scope.showtype = 0;
+													$("#datatypeid")
+															.val(
+																	$scope.dataTypes[0].value);
+													mid = -1;
+													if (data.infoDatas != "") {
+														$scope
+																.condevice(data.infoDatas[0].plcId);
+														$("#nameid ").val("");
+														$("#addrid").val("");
+														$("#child_addrid").val(
+																"");
+														$("#describeid")
+																.val("");
+
+													}
+												} else {
 													$scope.showtype = 1;
 													$("#nameid ").val(
 															minfo.name);
@@ -793,36 +294,22 @@ appModule
 
 													$("#datatypeid").val(
 															minfo.data_id);
+													$("#hiscycleid").val(
+															minfo.his_cycle);
 													$("#addrid").val(
 															minfo.main_addr);
 													$("#describeid").val(
 															minfo.describe);
 
-												} else {
-													if (dealtype == 0) {
-														$scope.showtype = 0;
-													} else {
-														$scope.showtype = 2;// 批量添加
-													}
-													$("#datatypeid")
-															.val(
-																	$scope.dataTypes[0].value);
-													if (data.infoDatas != "") {
-														$scope
-																.condevice(data.infoDatas[0].plcId);
-														$("#nameid ").val("");
-														$("#addrid").val("");
-														$("#child_addrid").val(
-																"");
-														$("#describeid")
-																.val("");
-													}
-
 												}
 												$scope.datatype();
 
 											} else {
-												alert(code + "-" + msg);
+
+			                                     swal({
+									                    title: code + "-" + msg,
+									                    icon: "error"
+									                });
 											}
 										}, function() {
 											console.log("ajax error");
@@ -839,9 +326,12 @@ appModule
 									if (code == 200) {
 										$scope.dataTypes = data.DataTypeOption;
 										$scope.$apply();
-										$scope.datatype();
 									} else {
-										alert(code + "-" + msg);
+
+	                                     swal({
+							                    title: code + "-" + msg,
+							                    icon: "error"
+							                });
 									}
 								}, function() {
 									console.log("ajax error");
@@ -936,9 +426,7 @@ appModule
 																		'none');
 													}
 													$scope.$apply();
-
 													if (mtype == 1) {
-
 														if (minfo.child_addr != null) {
 															$(
 																	'#child_registeraddr')
@@ -994,7 +482,6 @@ appModule
 															$("#addrtypeid")
 																	.val(
 																			data.allAddr[0].addrkey);
-
 															if ($scope.addrvalues != null) {
 																$("#registerid")
 																		.val(
@@ -1018,27 +505,27 @@ appModule
 															$("#scaleid")
 																	.html(
 																			minfo.main_binary);
-															$("#unitid")
-																	.html(
-																			minfo.ext_unit);
 
 														}
-
 													}
-													// 判断地址，相应的隐藏界面
 													$scope.initbit();
 												}
 
 											} else {
-												alert(code + "-" + msg);
+
+			                                     swal({
+									                    title: code + "-" + msg,
+									                    icon: "error"
+									                });
 											}
 										}, function() {
 											console.log("ajax error");
 										});
 
 					}
+
 					/**
-					 * 地址判断后的操作 0-添加 1-修改
+					 * 地址判断后的操作
 					 */
 					$scope.initbit = function() {
 
@@ -1052,13 +539,12 @@ appModule
 							$("#unitid").val("");
 							$("#stringid").val("");
 						} else {
-							console.log("dsada=" + $("#datatypeid").val());
+
 							$('#divdatatypeid').css('display', 'block');
 							$('#div_unit').css('display', 'block');
 							if (mtype == 1) {
 								$("#unitid").val(minfo.ext_unit);
 							}
-
 							if ($("#datatypeid").val() == 1000) {
 								if (mtype == 1) {
 									$("#stringid").val(minfo.num);
@@ -1154,7 +640,6 @@ appModule
 
 										$('#child_registeraddr').css('display',
 												'none');
-
 										$("#child_rangid").html("");
 										$("#child_scaleid").html("");
 
@@ -1361,6 +846,7 @@ appModule
 							$("#dataid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("disabled", false); // 设置为可编辑
 							$("#decid").attr("placeholder", "0~15");
+							$("#stringid").val("");
 							$('#datadigitid').css('display', 'block');
 							$('#div_stringid').css('display', 'none');
 
@@ -1377,14 +863,12 @@ appModule
 						}
 
 					}
-
 					var mid = -1;
 					var minfo = null;
 					// 获取修改监控点的信息
 					$scope.editmonitor = function(model) {
 						minfo = model;
 						mid = model.id;
-						$('#divbatchid').css('display', 'none');
 						$scope.showAllPlcConf(1);
 
 					}
@@ -1393,17 +877,7 @@ appModule
 						mid = -1;
 						$("#dataid").val("");
 						$("#decid").val("");
-						$('#divbatchid').css('display', 'none');
 						$scope.showAllPlcConf(0);
-
-					}
-					// 批量添加监控点
-					$scope.batchmonitor = function() {
-						mid = -1;
-						$("#dataid").val("");
-						$("#decid").val("");
-						$('#divbatchid').css('display', 'block');
-						$scope.showAllPlcConf(2);
 
 					}
 					// 保存添加/修改监控点
@@ -1420,38 +894,69 @@ appModule
 						if (plcId == undefined
 								|| $("#addrtypeid").val() == undefined
 								|| $("#registerid").val() == undefined) {
-							alert("检查是否配置好通讯口配置！");
+							swal({
+			                    title:"检查是否配置好通讯口配置！" ,
+			                    icon: "warning"
+			                });
 							return;
 						}
-						if ($("#nameid").val() == "" || plcId == ""
-								|| $("addrtypeid").val() == ""
-								|| $("registerid").val() == "") {
-							alert("参数未配置完整！");
+						if ($("#nameid").val() == "") {
+							swal({
+			                    title:"参数未配置完整！" ,
+			                    icon: "warning"
+			                });
 							return;
 						}
 						if ($('#registeraddr').css('display') == 'block') {
 							if ($("#addrid").val() == "") {
-								alert("参数未配置完整！");
+								swal({
+				                    title:"参数未配置完整！" ,
+				                    icon: "warning"
+				                });
 								return;
 							}
 
 						}
 						if ($('#child_registeraddr').css('display') == 'block') {
 							if ($("#child_addrid").val() == "") {
-								alert("参数未配置完整！");
+								swal({
+				                    title:"参数未配置完整！" ,
+				                    icon: "warning"
+				                });
 								return;
 							}
 
 						}
+						var hisreg = /^[1-9]\d*$/;
+						if (!hisreg.test($("#hiscycleid").val())) {
+							swal({
+			                    title:"周期必须是正整数！" ,
+			                    icon: "warning"
+			                });
+							return;
+						}
+						if ($("#hiscycleid").val() < 1
+								|| $("#hiscycleid").val() > 86400) {
+							swal({
+			                    title:"周期必须大于等于1或者小于等于86400的正整数！" ,
+			                    icon: "warning"
+			                });
+							return;
+						}
 						if ($("#nameid").val().length > 50) {
-							alert("名称字符长度不能大于50位！");
+							swal({
+			                    title:"名称字符长度不能大于50位！" ,
+			                    icon: "warning"
+			                });
 							return;
 						}
-						if ($("#describeid").val().length > 64) {
-							alert("描述字符长度不能大于50位！");
+						if ($("#describeid").val().length > 50) {
+							swal({
+			                    title:"描述字符长度不能大于50位！" ,
+			                    icon: "warning"
+			                });
 							return;
 						}
-
 						var display = $('#registeraddr').css('display');
 						if (display == 'block') {
 							var rang, reg;
@@ -1459,14 +964,21 @@ appModule
 								rang = $("#rangid").text().split(" ");
 								reg = /^[0-7]*$/;
 								if (!reg.test($("#addrid").val())) {
-									alert("寄存器地址主编号格式错误");
+									swal({
+					                    title:"寄存器地址主编号格式错误" ,
+					                    icon: "warning"
+					                });
 									return;
 								}
 								if (parseInt($("#addrid").val(), 8) < parseInt(
 										rang[0], 8)
 										|| parseInt($("#addrid").val(), 8) > parseInt(
 												rang[1], 8)) {
-									alert("寄存器地址主编号范围有误");
+									
+									swal({
+					                    title:"寄存器地址主编号范围有误" ,
+					                    icon: "warning"
+					                });
 									return;
 								}
 
@@ -1474,12 +986,18 @@ appModule
 								rang = $("#rangid").text().split(" ");
 								reg = /^0|[1-9]\d*$/;
 								if (!reg.test($("#addrid").val())) {
-									alert("寄存器地址主编号格式错误");
+									swal({
+					                    title:"寄存器地址主编号格式错误" ,
+					                    icon: "warning"
+					                });
 									return;
 								}
 								if ($("#addrid").val() < parseInt(rang[0])
 										|| $("#addrid").val() > parseInt(rang[1])) {
-									alert("寄存器地址主编号范围有误");
+									swal({
+					                    title:"寄存器地址主编号范围有误" ,
+					                    icon: "warning"
+					                });
 									return;
 								}
 
@@ -1487,14 +1005,20 @@ appModule
 								rang = $("#rangid").text().split(" ");
 								reg = /^[0-9a-fA-F]*$/;
 								if (!reg.test($("#addrid").val())) {
-									alert("寄存器地址主编号格式错误");
+									swal({
+					                    title:"寄存器地址主编号格式错误" ,
+					                    icon: "warning"
+					                });
 									return;
 								}
 								if (parseInt($("#addrid").val(), 16) < parseInt(
 										rang[0], 16)
 										|| parseInt($("#addrid").val(), 16) > parseInt(
 												rang[1], 16)) {
-									alert("寄存器地址主编号范围有误");
+									swal({
+					                    title:"寄存器地址主编号范围有误" ,
+					                    icon: "warning"
+					                });
 									return;
 
 								}
@@ -1519,14 +1043,20 @@ appModule
 										" ");
 								child_reg = /^[0-7]*$/;
 								if (!child_reg.test($("#child_addrid").val())) {
-									alert("寄存器地址子编号格式错误");
+									swal({
+					                    title:"寄存器地址子编号格式错误" ,
+					                    icon: "warning"
+					                });
 									return;
 								}
 								if (parseInt($("#child_addrid").val(), 8) < parseInt(
 										child_rang[0], 8)
 										|| parseInt($("#child_addrid").val(), 8) > parseInt(
 												child_rang[1], 8)) {
-									alert("寄存器地址子编号范围有误");
+									swal({
+					                    title:"寄存器地址子编号范围有误" ,
+					                    icon: "warning"
+					                });
 									return;
 								}
 							} else if ($("#child_scaleid").text() == "十进制") {
@@ -1534,12 +1064,18 @@ appModule
 										" ");
 								child_reg = /^0|[1-9]\d*$/;
 								if (!child_reg.test($("#child_addrid").val())) {
-									alert("寄存器地址子编号格式错误");
+									swal({
+					                    title:"寄存器地址子编号格式错误" ,
+					                    icon: "warning"
+					                });
 									return;
 								}
 								if ($("#child_addrid").val() < parseInt(child_rang[0])
 										|| $("#child_addrid").val() > parseInt(child_rang[1])) {
-									alert("寄存器地址子编号范围有误");
+									swal({
+					                    title:"寄存器地址子编号范围有误" ,
+					                    icon: "warning"
+					                });
 									return;
 								}
 							} else if ($("#child_scaleid").text() == "十六进制") {
@@ -1547,7 +1083,10 @@ appModule
 										" ");
 								child_reg = /^[0-9a-fA-F]*$/;
 								if (!child_reg.test($("#child_addrid").val())) {
-									alert("寄存器地址子编号格式错误");
+									swal({
+					                    title:"寄存器地址子编号格式错误" ,
+					                    icon: "warning"
+					                });
 									return;
 								}
 								if (parseInt($("#child_addrid").val(), 16) < parseInt(
@@ -1555,7 +1094,10 @@ appModule
 										|| parseInt($("#child_addrid").val(),
 												16) > parseInt(child_rang[1],
 												16)) {
-									alert("寄存器地址子编号范围有误");
+									swal({
+					                    title:"寄存器地址子编号范围有误" ,
+					                    icon: "warning"
+					                });
 									return;
 								}
 							}
@@ -1577,12 +1119,18 @@ appModule
 								$("#dataid").val("");
 								$("#decid").val("");
 								if (!regnum.test($("#stringid").val())) {
-									alert("操作字符只能输入正整数");
+									swal({
+					                    title:"操作字符只能输入正整数" ,
+					                    icon: "warning"
+					                });
 									return;
 								}
 								if ($("#stringid").val() < 1
 										|| $("#stringid").val() > 256) {
-									alert("操作字符范围是1~256");
+									swal({
+					                    title:"操作字符范围是1~256" ,
+					                    icon: "warning"
+					                });
 									return;
 								}
 								num = $("#stringid").val();
@@ -1594,7 +1142,10 @@ appModule
 										.prop("disabled");
 								if (!datadisabled) {
 									if (!regnum.test($("#dataid").val())) {
-										alert("整数位数格式错误");
+										swal({
+						                    title:"整数位数格式错误" ,
+						                    icon: "warning"
+						                });
 										return;
 									}
 
@@ -1602,7 +1153,10 @@ appModule
 								var decdisabled = $("#decid").prop("disabled");
 								if (!decdisabled) {
 									if (!regnum.test($("#dataid").val())) {
-										alert("小数位数格式错误");
+										swal({
+						                    title:"小数位数格式错误" ,
+						                    icon: "warning"
+						                });
 										return;
 									}
 								}
@@ -1610,39 +1164,57 @@ appModule
 								if ($("#datatypeid").val() == 100) {
 									if ($("#dataid").val() < 1
 											|| $("#dataid").val() > 16) {
-										alert("整数范围有误");
+										swal({
+						                    title:"整数范围有误" ,
+						                    icon: "warning"
+						                });
 										return;
 									}
 
 								} else if ($("#datatypeid").val() == 101) {
 									if ($("#dataid").val() < 1
 											|| $("#dataid").val() > 6) {
-										alert("整数范围有误");
+										swal({
+						                    title:"整数范围有误" ,
+						                    icon: "warning"
+						                });
 										return;
 									}
 
 								} else if ($("#datatypeid").val() == 102) {
 									if ($("#dataid").val() < 1
 											|| $("#dataid").val() > 4) {
-										alert("整数范围有误");
+										swal({
+						                    title:"整数范围有误" ,
+						                    icon: "warning"
+						                });
 										return;
 									}
 
 								} else if ($("#datatypeid").val() == 103) {
 									if ($("#dataid").val() < 0
 											|| $("#dataid").val() > 4) {
-										alert("整数范围有误");
+										swal({
+						                    title:"整数范围有误" ,
+						                    icon: "warning"
+						                });
 										return;
 									}
 									if ($("#decid").val() < 0
 											|| $("#decid").val() > 4) {
-										alert("小数数范围有误");
+										swal({
+						                    title:"小数范围有误" ,
+						                    icon: "warning"
+						                });
 										return;
 									}
 									var totle = parseInt($("#dataid").val())
 											+ parseInt($("#decid").val());
 									if (totle < 1 || totle > 4) {
-										alert("整数位数+小数位数范围是1~4");
+										swal({
+						                    title:"整数位数+小数位数范围是1~4" ,
+						                    icon: "warning"
+						                });
 										return;
 
 									}
@@ -1650,57 +1222,84 @@ appModule
 										|| $("#datatypeid").val() == 105) {
 									if ($("#dataid").val() < 0
 											|| $("#dataid").val() > 5) {
-										alert("整数范围有误");
+										swal({
+						                    title:"整数范围有误" ,
+						                    icon: "warning"
+						                });
 										return;
 									}
 									if ($("#decid").val() < 0
 											|| $("#decid").val() > 5) {
-										alert("小数数范围有误");
+										swal({
+						                    title:"小数数范围有误" ,
+						                    icon: "warning"
+						                });
 										return;
 									}
 									var totle = parseInt($("#dataid").val())
 											+ parseInt($("#decid").val());
 									if (totle < 1 || totle > 5) {
-										alert("整数位数+小数位数范围是1~5");
+										swal({
+						                    title:"整数位数+小数位数范围是1~5" ,
+						                    icon: "warning"
+						                });
 										return;
 
 									}
 								} else if ($("#datatypeid").val() == 200) {
 									if ($("#dataid").val() < 1
 											|| $("#dataid").val() > 32) {
-										alert("整数范围有误");
+										swal({
+						                    title:"整数范围有误" ,
+						                    icon: "warning"
+						                });
 										return;
 									}
 
 								} else if ($("#datatypeid").val() == 201) {
 									if ($("#dataid").val() < 1
 											|| $("#dataid").val() > 11) {
-										alert("整数范围有误");
+										swal({
+						                    title:"整数范围有误" ,
+						                    icon: "warning"
+						                });
 										return;
 									}
 
 								} else if ($("#datatypeid").val() == 202) {
 									if ($("#dataid").val() < 1
 											|| $("#dataid").val() > 8) {
-										alert("整数范围有误");
+										swal({
+						                    title:"整数范围有误" ,
+						                    icon: "warning"
+						                });
 										return;
 									}
 
 								} else if ($("#datatypeid").val() == 203) {
 									if ($("#dataid").val() < 0
 											|| $("#dataid").val() > 8) {
-										alert("整数范围有误");
+										swal({
+						                    title:"整数范围有误" ,
+						                    icon: "warning"
+						                });
 										return;
 									}
 									if ($("#decid").val() < 0
 											|| $("#decid").val() > 8) {
-										alert("小数数范围有误");
+										swal({
+						                    title:"小数范围有误" ,
+						                    icon: "warning"
+						                });
 										return;
 									}
 									var totle = parseInt($("#dataid").val())
 											+ parseInt($("#decid").val());
 									if (totle < 1 || totle > 8) {
-										alert("整数位数+小数位数范围是1~8");
+										swal({
+						                    title:"整数位数+小数位数范围是1~8" ,
+						                    icon: "warning"
+						                });
 										return;
 
 									}
@@ -1709,35 +1308,53 @@ appModule
 										|| $("#datatypeid").val() == 205) {
 									if ($("#dataid").val() < 0
 											|| $("#dataid").val() > 10) {
-										alert("整数范围有误");
+										swal({
+						                    title:"整数范围有误" ,
+						                    icon: "warning"
+						                });
 										return;
 									}
 									if ($("#decid").val() < 0
 											|| $("#decid").val() > 10) {
-										alert("小数数范围有误");
+										swal({
+						                    title:"小数范围有误" ,
+						                    icon: "warning"
+						                });
 										return;
 									}
 									var totle = parseInt($("#dataid").val())
 											+ parseInt($("#decid").val());
 									if (totle < 1 || totle > 10) {
-										alert("整数位数+小数位数范围是1~10");
+										swal({
+						                    title:"整数位数+小数位数范围是1~10" ,
+						                    icon: "warning"
+						                });
 										return;
 
 									} else if ($("#datatypeid").val() == 206) {
 										if ($("#dataid").val() < 0
 												|| $("#dataid").val() > 7) {
-											alert("整数范围有误");
+											swal({
+							                    title:"整数范围有误" ,
+							                    icon: "warning"
+							                });
 											return;
 										}
 										if ($("#decid").val() < 0
 												|| $("#decid").val() > 7) {
-											alert("小数数范围有误");
+											swal({
+							                    title:"小数范围有误" ,
+							                    icon: "warning"
+							                });
 											return;
 										}
 										var totle = parseInt($("#dataid").val())
 												+ parseInt($("#decid").val());
 										if (totle < 1 || totle > 7) {
-											alert("整数位数+小数位数范围是1~7");
+											swal({
+							                    title:"整数位数+小数位数范围是1~7" ,
+							                    icon: "warning"
+							                });
 											return;
 
 										}
@@ -1754,18 +1371,27 @@ appModule
 									} else if ($("#datatypeid").val() == 406) {
 										if ($("#dataid").val() < 0
 												|| $("#dataid").val() > 15) {
-											alert("整数范围有误");
+											swal({
+							                    title:"整数范围有误" ,
+							                    icon: "warning"
+							                });
 											return;
 										}
 										if ($("#decid").val() < 0
 												|| $("#decid").val() > 15) {
-											alert("小数数范围有误");
+											swal({
+							                    title:"小数范围有误" ,
+							                    icon: "warning"
+							                });
 											return;
 										}
 										var totle = parseInt($("#dataid").val())
 												+ parseInt($("#decid").val());
 										if (totle < 1 || totle > 15) {
-											alert("整数位数+小数位数范围是1~15");
+											swal({
+							                    title:"整数位数+小数位数范围是1~15" ,
+							                    icon: "warning"
+							                });
 											return;
 										}
 									}
@@ -1789,49 +1415,10 @@ appModule
 							$("#decid").val("");
 							$("#stringid").val("");
 						}
-
 						var rang_datas = rangs.join(",");
 						var addr_datas = addrs.join(",");
 						var scalie_datas = scalies.join(",");
 						var digs = digit_counts.join(",");
-
-						var divbatchid = $('#divbatchid').css('display');
-						if (divbatchid == 'block') {
-							if ($("#increaseid").val() == "") {
-								alert("请输入增量");
-								return;
-							}
-							var regincrease = /^-?[1-9]\d*$/;
-							if (!regincrease.test($("#increaseid").val())) {
-								alert("请输入增量不为0的整数");
-								return;
-							}
-							if ($("#batchid").val() == "") {
-								alert("请输入批量个数");
-								return;
-							}
-							var regbatchid = /^[1-9]\d*$/;
-							if (!regbatchid.test($("#batchid").val())) {
-								alert("请输入批量个数大于0的正整数");
-								return;
-							}
-							if ($("#batchid").val() > 40) {
-								alert("请输入批量个数大于0小于等于40的正整数");
-								return;
-							}
-
-						}
-						var batchvalue;
-						if (mtype != 2) {
-							batchvalue = "0";
-						} else {
-							batchvalue = $("#batchid").val();
-						}
-						if (mtype == 2) {
-
-							$("#loadingModalid").modal("show");// 批量添加转圈效果
-
-						}
 						var params = {
 							id : mid,
 							plc_id : plcId,
@@ -1845,13 +1432,11 @@ appModule
 							rang : rang_datas,
 							describe : $("#describeid").val(),
 							digit_count : digs,
-							data_type : "0",
-							batch : batchvalue,
-							increase : $("#increaseid").val(),
-							group_id : actgroupId,
+							data_type : "1",
+							his_cycle : $("#hiscycleid").val(),
 							unit : $("#unitid").val()
-
 						};
+
 						T.common.ajax
 								.request(
 										"WeconBox",
@@ -1859,54 +1444,154 @@ appModule
 										params,
 										function(data, code, msg) {
 											if (code == 200) {
-												$("#addpoint").modal("hide");
+												$("#dataRecord").modal("hide");
 												$scope
-														.ws_send(
-																$scope.paginationConf.currentPage,
-																$scope.paginationConf.itemsPerPage,
-																actgroupId);
+														.showhisconf(
+																$scope.paginationConf_register.currentPage,
+																$scope.paginationConf_register.itemsPerPage);
+
 												if (mtype == 0) {
-													alert("添加实时监控点成功");
-												} else if (mtype == 1) {
-													alert("修改实时监控点成功");
+													swal({
+									                    title:"数据登记成功" ,
+									                    icon: "success"
+									                });
 												} else {
-													$("#loadingModalid").modal(
-															"hide");
-													alert("批量添加实时监控点成功");
+													swal({
+									                    title:"修改数据成功" ,
+									                    icon: "success"
+									                });
 												}
 
 											} else {
-												$("#loadingModalid").modal(
-														"hide");
-												alert(code + "-" + msg);
+										        swal({
+								                    title: code + "-" + msg,
+								                    icon: "error"
+								                });
 											}
 										}, function() {
 											console.log("ajax error");
 										});
 
 					}
-					//批量导出实时监控点
+					// 删除监控点
+					$scope.delmonitor = function(model) {
+						$scope.delmonitorid = model.id;// 监控点id
+						swal({
+							  title: "确定要删除【" + model.name + "】数据吗？",
+							  icon: "warning",
+							  buttons: true,
+							  dangerMode: true,
+							})
+							.then((willDelete) => {
+							  if (willDelete) {
+								  $scope.del_monitor_group();
+							  } else {
+							  }
+							});
+					}
+					// 删除监控点
+					$scope.del_monitor_group = function() {
+
+						var params = {
+							monitorid : $scope.delmonitorid,
+						};
+
+						T.common.ajax
+								.request(
+										"WeconBox",
+										"hisDataAction/delHisMonitor",
+										params,
+										function(data, code, msg) {
+											if (code == 200) {
+												$("#deletehispoint").modal(
+														"hide");
+												$scope
+														.showhisconf(
+																$scope.paginationConf_register.currentPage,
+																$scope.paginationConf_register.itemsPerPage);
+												swal({
+								                    title:"删除成功！" ,
+								                    icon: "success"
+								                });
+
+											} else {
+
+											       swal({
+									                    title: code + "-" + msg,
+									                    icon: "error"
+									                });
+													
+											}
+										}, function() {
+											console.log("ajax error");
+										});
+					}
+
+					/**
+					 * 获取历史数据配置信息
+					 */
+					$scope.showhisconf = function(pageIndex, pageSize) {
+						console.log("数据登记显示");
+						if (pageIndex == 0)
+							pageIndex = 1;
+						var params = {
+							device_id : $scope.deviceid,
+							pageIndex : pageIndex,
+							pageSize : pageSize
+
+						};
+						T.common.ajax
+								.request(
+										"WeconBox",
+										"hisDataAction/getHisConfig",
+										params,
+										function(data, code, msg) {
+											if (code == 200) {
+												$scope.paginationConf_register.totalItems = data.HisAllotData.totalRecord;
+												$scope.hisConfs = data.HisAllotData.list;
+												$scope.$apply();
+												$("i[name='his_i_state']")
+														.tooltip();
+
+											} else {
+											       swal({
+									                    title: code + "-" + msg,
+									                    icon: "error"
+									                });
+													
+											}
+										}, function() {
+											console.log("ajax error");
+										});
+
+					}
+
 					$scope.exportExcel = function() {
 						var myform = document.getElementById('myform');
-						var device_id = $scope.deviceid;
+						var real_his_cfg_id = $("#monitorid").val();
+						var start_date = $("#startdateid").val();
+						var end_date = $("#enddateid").val();
 						var pageIndex = $scope.paginationConf.currentPage;
 						pageIndex = 0 == pageIndex ? 1 : pageIndex;
 						var pageSize = $scope.paginationConf.itemsPerPage;
-						myform.innerHTML = '<input type="hidden" name="pageIndex" value="'
+						myform.innerHTML = '<input type="hidden" name="real_his_cfg_id" value="'
+								+ real_his_cfg_id
+								+ '"/>'
+								+ '<input type="hidden" name="start_date" value="'
+								+ start_date
+								+ '"/>'
+								+ '<input type="hidden" name="end_date" value="'
+								+ end_date
+								+ '"/>'
+								+ '<input type="hidden" name="pageIndex" value="'
 								+ pageIndex
 								+ '"/>'
 								+ '<input type="hidden" name="pageSize" value="'
-								+ pageSize
-								+ '"/>'
-								+ '<input type="hidden" name="device_id" value="'
-								+ device_id
-								+ '"/>'
-
+								+ pageSize + '"/>'
 						myform.action = T.common.requestUrl.WeconBox
-								+ 'excelact/filedownloadExportReal';
+								+ 'excelact/filedownloadExportHis';
 
 						myform.submit();
 
 					}
-
 				})

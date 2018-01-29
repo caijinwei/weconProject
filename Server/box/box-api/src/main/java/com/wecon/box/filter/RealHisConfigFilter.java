@@ -22,6 +22,7 @@ public class RealHisConfigFilter {
     public String rid;// 寄存器类型
     public Long dirId;// 分组id
     public String ext_unit;//单位
+    public String dead_set;//死区
 
     @Override
     public String toString() {

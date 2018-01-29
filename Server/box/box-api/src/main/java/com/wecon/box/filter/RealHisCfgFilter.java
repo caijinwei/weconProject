@@ -21,6 +21,7 @@ public class RealHisCfgFilter {
 	public String rid;// 寄存器类型
 	public long dirId;// 分组id
 	public String ext_unit;//单位
+	public String dead_set;
 	public Timestamp create_date;
 	public Timestamp update_date;
 }

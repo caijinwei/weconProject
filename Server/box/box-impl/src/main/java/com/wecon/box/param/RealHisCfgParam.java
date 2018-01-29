@@ -54,6 +54,8 @@ public class RealHisCfgParam {
 	public String increase;
 	@Label("单位")
 	public String unit;
+	@Label("死区")
+	public String dead_set;
 
 	public void setBatch(int batch) {
 		this.batch = batch;
@@ -125,6 +127,10 @@ public class RealHisCfgParam {
 
 	public void setUnit(String unit) {
 		this.unit = unit;
+	}
+
+	public void setDead_set(String dead_set) {
+		this.dead_set = dead_set;
 	}
 
 }

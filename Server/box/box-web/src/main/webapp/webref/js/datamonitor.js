@@ -19,7 +19,6 @@ appModule
 						$scope.type = 0;
 						$scope.getDataType();
 						$scope.act_group($scope.deviceid);
-
 					}
 
 					// 获取分组
@@ -47,7 +46,10 @@ appModule
 
 											} else {
 
-												alert(code + "-" + msg);
+												swal({
+								                    title: code + "-" + msg,
+								                    icon: "error"
+								                });
 											}
 										}, function() {
 											console.log("ajax error");
@@ -92,7 +94,7 @@ appModule
 								totalItems : $scope.count,
 								pagesLength : 15,
 								perPageOptions : [ 5, 10, 20, 50, 100 ],
-								rememberPerPage : 'perPageItems',
+								/*rememberPerPage : 'perPageItems',*/
 								onChange : function() {
 									if (this.currentPage != 0) {
 										$scope.ws_send(this.currentPage,
@@ -109,6 +111,7 @@ appModule
 						};
 						ws.onmessage = function(evt) {
 							if (JSON.parse(evt.data).piBoxActDateMode != null) {
+								$('#loader-wrapper').css("display","none");
 								console.log(inivalize);
 								if (inivalize == 0) {
 									$scope.paginationConf.totalItems = JSON
@@ -136,26 +139,28 @@ appModule
 								// 下发数据到盒子反馈
 								$scope.resultData = JSON.parse(evt.data).resultData;
 
-								$("#loadingModal").modal("hide");
+// $("#loadingModal").modal("hide");
+								$('#loader-wrapper').css("display","none");
 								if ($scope.resultData == 0) {
-									alert(JSON.parse(evt.data).resultError);
+									swal({
+					                    title: JSON.parse(evt.data).resultError,
+					                    icon: "error"
+					                });
 									$scope.ws_send(
 											$scope.paginationConf.currentPage,
 											$scope.paginationConf.itemsPerPage,
 											actgroupId);
 								} else {
 									if (inivalize == 1) {
-										alert("数据下发盒子成功！");
+										swal({
+						                    title: "数据下发盒子成功！",
+						                    icon: "success"
+						                });
 									}
 
 								}
 								inivalize = 0;
 								isclick = false;
-
-								// $scope.ws_send(
-								// $scope.paginationConf.currentPage,
-								// $scope.paginationConf.itemsPerPage,
-								// actgroupId);
 							}
 
 							// 如果获取到消息，心跳检测重置
@@ -254,7 +259,10 @@ appModule
 											"data-bit"));
 
 									if (model.box_state != 1) {
-										alert("检查盒子是否在线！");
+										swal({
+						                    title: "检查盒子是否在线!",
+						                    icon: "warning"
+						                });
 										if (state != false) {
 											$(this).bootstrapSwitch('state',
 													false, true);
@@ -266,7 +274,10 @@ appModule
 										return false;
 
 									} else if (model.state != 0) {
-										alert("条目未下发！");
+										swal({
+						                    title: "条目未下发！",
+						                    icon: "warning"
+						                });
 										if (state != false) {
 											$(this).bootstrapSwitch('state',
 													false, true);
@@ -277,7 +288,10 @@ appModule
 										}
 										return false;
 									} else if (model.re_state != 1) {
-										alert("检查监控点是否在线！");
+										swal({
+						                    title: "检查监控点是否在线！",
+						                    icon: "warning"
+						                });
 										if (state != false) {
 											$(this).bootstrapSwitch('state',
 													false, true);
@@ -318,7 +332,10 @@ appModule
 					// 复制监控点到其他组
 					$scope.copy_monitor_group = function() {
 						if ($('#copymonitorid').val() == actgroupId) {
-							alert("【" + $scope.groupName + "】已经存在该监控点！");
+							swal({
+			                    title: "【" + $scope.groupName + "】已经存在该监控点！",
+			                    icon: "warning"
+			                });
 							return;
 
 						}
@@ -342,11 +359,17 @@ appModule
 																$scope.paginationConf.currentPage,
 																$scope.paginationConf.itemsPerPage,
 																actgroupId);
-												alert("复制成功！");
+												swal({
+								                    title: "复制成功！",
+								                    icon: "success"
+								                });
 
 											} else {
+												swal({
+								                    title: code + "-" + msg,
+								                    icon: "error"
+								                });
 
-												alert(code + "-" + msg);
 											}
 										}, function() {
 											console.log("ajax error");
@@ -369,7 +392,10 @@ appModule
 					// 移动监控点到其他组
 					$scope.move_monitor_group = function() {
 						if ($('#movemonitorid').val() == actgroupId) {
-							alert("【" + $scope.movegroupName + "】已经存在该监控点！");
+							swal({
+			                    title: "【" + $scope.movegroupName + "】已经存在该监控点！",
+			                    icon: "warning"
+			                });
 							return;
 
 						}
@@ -394,11 +420,17 @@ appModule
 																$scope.paginationConf.currentPage,
 																$scope.paginationConf.itemsPerPage,
 																actgroupId);
-												alert("移动成功！");
+												swal({
+								                    title: "移动成功！",
+								                    icon: "success"
+								                });
 
 											} else {
+												swal({
+								                    title:code + "-" + msg,
+								                    icon: "error"
+								                });
 
-												alert(code + "-" + msg);
 											}
 										}, function() {
 											console.log("ajax error");
@@ -409,17 +441,41 @@ appModule
 					$scope.remonitor = function(model) {
 						$scope.delmonitorid = model.id;// 监控点id
 						$scope.isdelmonitor = 1; // 1.移除监控点 2.删除监控点配置
-						$("#delgroupid").html(
-								"确定要从该分组移除【" + model.ref_alais + "】监控点吗？");
+						swal({
+							  title: "确定要从该分组移除【" + model.ref_alais + "】监控点吗？",
+							  icon: "warning",
+							  buttons: true,
+							  dangerMode: true,
+							})
+							.then((willDelete) => {
+							  if (willDelete) {
+								$scope.del_monitor_group();
+							  } else {
+							    console.log("取消删除");
+							  }
+							});
 					}
-					// 获取删除监控点信息
-					$scope.delmonitor = function(model) {
+					// 删除监控点
+					$scope.delmonitor = function(model){
 						$scope.delmonitorid = model.id;// 监控点id
 						$scope.isdelmonitor = 2; // 1.移除监控点 2.删除监控点配置
-						$("#delgroupid").html(
-								"确定要删除【" + model.ref_alais + "】监控点配置吗？");
+						swal({
+						  title: "确定要删除【" + model.ref_alais + "】监控点配置吗？",
+						  icon: "warning",
+						  buttons: true,
+						  dangerMode: true,
+						})
+						.then((willDelete) => {
+						  if (willDelete) {
+							$scope.del_monitor_group();
+						  } else {
+						    console.log("取消删除");
+						  }
+						});
 					}
-					// 移除监控点
+
+					
+					// 移除或删除监控点
 					$scope.del_monitor_group = function() {
 
 						var params = {
@@ -442,15 +498,26 @@ appModule
 																$scope.paginationConf.itemsPerPage,
 																actgroupId);
 												if ($scope.isdelmonitor == 1) {
-													alert("移除成功！");
+													 swal({
+										                    title: "移除成功！",
+										                    icon: "success"
+										                });
+													
 
 												} else {
-													alert("删除成功！");
+													swal({
+									                    title: "删除成功！",
+									                    icon: "success"
+									                });
 												}
 
 											} else {
+												swal({
+								                    title:code + "-" + msg,
+								                    icon: "error"
+								                });
 
-												alert(code + "-" + msg);
+											
 											}
 										}, function() {
 											console.log("ajax error");
@@ -492,8 +559,11 @@ appModule
 														.act_group($scope.deviceid);
 
 											} else {
+												swal({
+								                    title: code + "-" + msg,
+								                    icon: "error"
+								                });
 
-												alert(code + "-" + msg);
 											}
 										}, function() {
 											console.log("ajax error");
@@ -507,8 +577,7 @@ appModule
 
 						$("#editid").val(model.name);
 						$scope.editGroupId = model.id;
-
-						$("#editGroupName").modal("show");
+                        $("#editGroupName").modal("show");
 
 					}
 					// 修改分组
@@ -531,8 +600,10 @@ appModule
 										$scope.act_group($scope.deviceid);
 
 									} else {
-
-										alert(code + "-" + msg);
+										swal({
+						                    title: code + "-" + msg,
+						                    icon: "error"
+						                });
 									}
 								}, function() {
 									console.log("ajax error");
@@ -540,12 +611,20 @@ appModule
 					}
 					// 获取删除分组名称
 					$scope.delGroup = function(model) {
-						var text = "确定删除【" + model.name + "】分组?"
-						$("#delid").html(text);
 						$scope.delActGroupId = model.id;
-
-						$("#deleteGroup").modal("show");
-
+						swal({
+							  title: "确定删除【" + model.name + "】分组?",
+							  icon: "warning",
+							  buttons: true,
+							  dangerMode: true,
+							})
+							.then((willDelete) => {
+							  if (willDelete) {
+								  $scope.del_group();
+							  } else {
+							    console.log("取消删除");
+							  }
+							});
 					}
 					// 删除分组
 					$scope.del_group = function() {
@@ -561,12 +640,14 @@ appModule
 
 											$("#deleteGroup").modal("hide");
 											$scope.type = 1;
-
 											$scope.act_group($scope.deviceid);
 
 										} else {
 
-											alert(code + "-" + msg);
+											swal({
+							                    title: code + "-" + msg,
+							                    icon: "error"
+							                });
 										}
 									}, function() {
 										console.log("ajax error");
@@ -585,7 +666,10 @@ appModule
 
 										} else {
 
-											alert(code + "-" + msg);
+											swal({
+							                    title: code + "-" + msg,
+							                    icon: "error"
+							                });
 										}
 									}, function() {
 										console.log("ajax error");
@@ -656,7 +740,7 @@ appModule
 									return '数值长度超出范围！';
 								}
 
-								$("#loadingModal").modal("show");
+								$('#loader-wrapper').css("display","block");
 								isclick = true;
 								console.log("isclick==" + isclick);
 								$scope.putMess(model, value);
@@ -701,7 +785,10 @@ appModule
 																actgroupId)
 											} else {
 
-												alert(code + "-" + msg);
+												swal({
+								                    title: code + "-" + msg,
+								                    icon: "error"
+								                });
 											}
 										}, function() {
 											console.log("ajax error");
@@ -712,7 +799,6 @@ appModule
 					 * 展示所有监控点设置iframe的url属性
 					 */
 					$scope.showRestList = function() {
-						console.log();
 						var path = "viewmanagerpointTable.html?accounttype="
 								+ $scope.accounttype + "&actgroupId="
 								+ actgroupId;
@@ -731,7 +817,10 @@ appModule
 						});
 						var ids = chk_value.join(",");
 						if (chk_value.length == 0) {
-							alert("请选择至少一条监控点");
+							swal({
+			                    title: "请选择至少一条监控点",
+			                    icon: "warning"
+			                });
 
 							return;
 						}
@@ -753,11 +842,16 @@ appModule
 																$scope.paginationConf.currentPage,
 																$scope.paginationConf.itemsPerPage,
 																actgroupId);
-
-												alert("分配监控点成功");
+												swal({
+								                    title: "分配监控点成功",
+								                    icon: "success"
+								                });
 
 											} else {
-												alert(code + "-" + msg);
+												swal({
+								                    title: code + "-" + msg,
+								                    icon: "error"
+								                });
 											}
 										}, function() {
 											console.log("ajax error");
@@ -822,7 +916,10 @@ appModule
 												$scope.datatype();
 
 											} else {
-												alert(code + "-" + msg);
+												swal({
+								                    title: code + "-" + msg,
+								                    icon: "error"
+								                });
 											}
 										}, function() {
 											console.log("ajax error");
@@ -841,7 +938,10 @@ appModule
 										$scope.$apply();
 										$scope.datatype();
 									} else {
-										alert(code + "-" + msg);
+										swal({
+						                    title: code + "-" + msg,
+						                    icon: "error"
+						                });
 									}
 								}, function() {
 									console.log("ajax error");
@@ -1030,7 +1130,10 @@ appModule
 												}
 
 											} else {
-												alert(code + "-" + msg);
+												swal({
+								                    title: code + "-" + msg,
+								                    icon: "error"
+								                });
 											}
 										}, function() {
 											console.log("ajax error");
@@ -1047,18 +1150,20 @@ appModule
 							$('#datadigitid').css('display', 'none');
 							$('#div_stringid').css('display', 'none');
 							$('#div_unit').css('display', 'none');
+							$('#diediv_id').css('display', 'none');
 							$("#dataid").val("");
 							$("#decid").val("");
 							$("#unitid").val("");
 							$("#stringid").val("");
+							$("#dieid").val("");
 						} else {
 							console.log("dsada=" + $("#datatypeid").val());
 							$('#divdatatypeid').css('display', 'block');
 							$('#div_unit').css('display', 'block');
+						
 							if (mtype == 1) {
 								$("#unitid").val(minfo.ext_unit);
 							}
-
 							if ($("#datatypeid").val() == 1000) {
 								if (mtype == 1) {
 									$("#stringid").val(minfo.num);
@@ -1070,6 +1175,16 @@ appModule
 									$("#decid").val(minfo.dec);
 								}
 								$('#datadigitid').css('display', 'block');
+							}
+							if($("#datatypeid").val()==103||$("#datatypeid").val()==104||$("#datatypeid").val()==105||$("#datatypeid").val()==203
+									||$("#datatypeid").val()==204||$("#datatypeid").val()==205||$("#datatypeid").val()==406){
+								$('#diediv_id').css('display', 'block');
+								if (mtype == 1){
+									$("#dieid").val(minfo.dead_set);
+								}
+							}else{
+								$('#diediv_id').css('display', 'none');
+								$("#dieid").val("");
 							}
 						}
 
@@ -1181,6 +1296,10 @@ appModule
 							$("#stringid").val("");
 							$('#datadigitid').css('display', 'block');
 							$('#div_stringid').css('display', 'none');
+							// 死区设置
+							$("#dieid").val("");
+							$('#diediv_id').css('display', 'none');
+							
 
 						} else if ($("#datatypeid").val() == 101) {
 							$("#dataid").attr("placeholder", "1~6");
@@ -1200,6 +1319,9 @@ appModule
 							$("#stringid").val("");
 							$('#datadigitid').css('display', 'block');
 							$('#div_stringid').css('display', 'none');
+							// 死区设置
+							$("#dieid").val("");
+							$('#diediv_id').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 103) {
 							$("#dataid").attr("placeholder", "0~4");
@@ -1209,6 +1331,8 @@ appModule
 							$("#stringid").val("");
 							$('#datadigitid').css('display', 'block');
 							$('#div_stringid').css('display', 'none');
+							// 死区设置
+							$('#diediv_id').css('display', 'block');
 
 						} else if ($("#datatypeid").val() == 104) {
 							$("#dataid").attr("placeholder", "0~5");
@@ -1218,6 +1342,8 @@ appModule
 							$("#stringid").val("");
 							$('#datadigitid').css('display', 'block');
 							$('#div_stringid').css('display', 'none');
+							// 死区设置
+							$('#diediv_id').css('display', 'block');
 
 						} else if ($("#datatypeid").val() == 105) {
 							$("#dataid").attr("placeholder", "0~5");
@@ -1227,6 +1353,8 @@ appModule
 							$("#stringid").val("");
 							$('#datadigitid').css('display', 'block');
 							$('#div_stringid').css('display', 'none');
+							// 死区设置
+							$('#diediv_id').css('display', 'block');
 						} else if ($("#datatypeid").val() == 200) {
 							$("#dataid").attr("placeholder", "1~32");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
@@ -1236,6 +1364,10 @@ appModule
 							$("#stringid").val("");
 							$('#datadigitid').css('display', 'block');
 							$('#div_stringid').css('display', 'none');
+							// 死区设置
+							$("#dieid").val("");
+							$('#diediv_id').css('display', 'none');
+
 
 						} else if ($("#datatypeid").val() == 201) {
 							$("#dataid").attr("placeholder", "1~11");
@@ -1246,6 +1378,10 @@ appModule
 							$("#stringid").val("");
 							$('#datadigitid').css('display', 'block');
 							$('#div_stringid').css('display', 'none');
+							// 死区设置
+							$("#dieid").val("");
+							$('#diediv_id').css('display', 'none');
+
 						} else if ($("#datatypeid").val() == 202) {
 							$("#dataid").attr("placeholder", "1~8");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
@@ -1255,6 +1391,10 @@ appModule
 							$("#stringid").val("");
 							$('#datadigitid').css('display', 'block');
 							$('#div_stringid').css('display', 'none');
+							// 死区设置
+							$("#dieid").val("");
+							$('#diediv_id').css('display', 'none');
+
 
 						} else if ($("#datatypeid").val() == 203) {
 							$("#dataid").attr("placeholder", "0~8");
@@ -1264,7 +1404,8 @@ appModule
 							$("#stringid").val("");
 							$('#datadigitid').css('display', 'block');
 							$('#div_stringid').css('display', 'none');
-
+							// 死区设置
+							$('#diediv_id').css('display', 'block');
 						} else if ($("#datatypeid").val() == 204) {
 							$("#dataid").attr("placeholder", "0~10");
 							$("#dataid").attr("disabled", false); // 设置为可编辑
@@ -1273,6 +1414,8 @@ appModule
 							$("#stringid").val("");
 							$('#datadigitid').css('display', 'block');
 							$('#div_stringid').css('display', 'none');
+							// 死区设置
+							$('#diediv_id').css('display', 'block');
 
 						} else if ($("#datatypeid").val() == 205) {
 							$("#dataid").attr("placeholder", "0~10");
@@ -1282,6 +1425,8 @@ appModule
 							$("#stringid").val("");
 							$('#datadigitid').css('display', 'block');
 							$('#div_stringid').css('display', 'none');
+							// 死区设置
+							$('#diediv_id').css('display', 'block');
 
 						} else if ($("#datatypeid").val() == 206) {
 							$("#dataid").attr("placeholder", "0~7");
@@ -1291,6 +1436,9 @@ appModule
 							$("#stringid").val("");
 							$('#datadigitid').css('display', 'block');
 							$('#div_stringid').css('display', 'none');
+							// 死区设置
+							$("#dieid").val("");
+							$('#diediv_id').css('display', 'none');
 						} else if ($("#datatypeid").val() == 400) {
 							$("#dataid").attr("placeholder", "暂时没用");
 							$("#decid").attr("placeholder", "暂时没用");
@@ -1301,6 +1449,9 @@ appModule
 							$("#stringid").val("");
 							$('#datadigitid').css('display', 'block');
 							$('#div_stringid').css('display', 'none');
+							// 死区设置
+							$("#dieid").val("");
+							$('#diediv_id').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 401) {
 							$("#dataid").attr("placeholder", "暂时没用");
@@ -1312,6 +1463,9 @@ appModule
 							$("#stringid").val("");
 							$('#datadigitid').css('display', 'block');
 							$('#div_stringid').css('display', 'none');
+							// 死区设置
+							$("#dieid").val("");
+							$('#diediv_id').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 402) {
 							$("#dataid").attr("placeholder", "暂时没用");
@@ -1323,6 +1477,9 @@ appModule
 							$("#stringid").val("");
 							$('#datadigitid').css('display', 'block');
 							$('#div_stringid').css('display', 'none');
+							// 死区设置
+							$("#dieid").val("");
+							$('#diediv_id').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 403) {
 							$("#dataid").attr("placeholder", "暂时没用");
@@ -1334,6 +1491,9 @@ appModule
 							$("#stringid").val("");
 							$('#datadigitid').css('display', 'block');
 							$('#div_stringid').css('display', 'none');
+							// 死区设置
+							$("#dieid").val("");
+							$('#diediv_id').css('display', 'none');
 						} else if ($("#datatypeid").val() == 404) {
 							$("#dataid").attr("placeholder", "暂时没用");
 							$("#decid").attr("placeholder", "暂时没用");
@@ -1344,6 +1504,9 @@ appModule
 							$("#stringid").val("");
 							$('#datadigitid').css('display', 'block');
 							$('#div_stringid').css('display', 'none');
+							// 死区设置
+							$("#dieid").val("");
+							$('#diediv_id').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 405) {
 							$("#dataid").attr("placeholder", "暂时没用");
@@ -1355,6 +1518,9 @@ appModule
 							$("#stringid").val("");
 							$('#datadigitid').css('display', 'block');
 							$('#div_stringid').css('display', 'none');
+							// 死区设置
+							$("#dieid").val("");
+							$('#diediv_id').css('display', 'none');
 
 						} else if ($("#datatypeid").val() == 406) {
 							$("#dataid").attr("placeholder", "0~15");
@@ -1363,6 +1529,8 @@ appModule
 							$("#decid").attr("placeholder", "0~15");
 							$('#datadigitid').css('display', 'block');
 							$('#div_stringid').css('display', 'none');
+							// 死区设置
+							$('#diediv_id').css('display', 'block');
 
 						} else if ($("#datatypeid").val() == 1000) {
 							$("#dataid").attr("placeholder", "无整数");
@@ -1373,6 +1541,9 @@ appModule
 							$("#decid").val("");
 							$('#datadigitid').css('display', 'none');
 							$('#div_stringid').css('display', 'block');
+							// 死区设置
+							$("#dieid").val("");
+							$('#diediv_id').css('display', 'none');
 
 						}
 
@@ -1420,35 +1591,53 @@ appModule
 						if (plcId == undefined
 								|| $("#addrtypeid").val() == undefined
 								|| $("#registerid").val() == undefined) {
-							alert("检查是否配置好通讯口配置！");
+							swal({
+			                    title: "检查是否配置好通讯口配置！",
+			                    icon: "warning"
+			                });
 							return;
 						}
 						if ($("#nameid").val() == "" || plcId == ""
 								|| $("addrtypeid").val() == ""
 								|| $("registerid").val() == "") {
-							alert("参数未配置完整！");
+							swal({
+			                    title: "参数未配置完整！",
+			                    icon: "warning"
+			                });
 							return;
 						}
 						if ($('#registeraddr').css('display') == 'block') {
 							if ($("#addrid").val() == "") {
-								alert("参数未配置完整！");
+								swal({
+				                    title: "参数未配置完整！",
+				                    icon: "warning"
+				                });
 								return;
 							}
 
 						}
 						if ($('#child_registeraddr').css('display') == 'block') {
 							if ($("#child_addrid").val() == "") {
-								alert("参数未配置完整！");
+								swal({
+				                    title: "参数未配置完整！",
+				                    icon: "warning"
+				                });
 								return;
 							}
 
 						}
 						if ($("#nameid").val().length > 50) {
-							alert("名称字符长度不能大于50位！");
+							swal({
+			                    title: "名称字符长度不能大于50位！",
+			                    icon: "warning"
+			                });
 							return;
 						}
 						if ($("#describeid").val().length > 64) {
-							alert("描述字符长度不能大于50位！");
+							swal({
+			                    title: "描述字符长度不能大于50位！",
+			                    icon: "warning"
+			                });
 							return;
 						}
 
@@ -1459,14 +1648,20 @@ appModule
 								rang = $("#rangid").text().split(" ");
 								reg = /^[0-7]*$/;
 								if (!reg.test($("#addrid").val())) {
-									alert("寄存器地址主编号格式错误");
+									swal({
+					                    title: "寄存器地址主编号格式错误",
+					                    icon: "warning"
+					                });
 									return;
 								}
 								if (parseInt($("#addrid").val(), 8) < parseInt(
 										rang[0], 8)
 										|| parseInt($("#addrid").val(), 8) > parseInt(
 												rang[1], 8)) {
-									alert("寄存器地址主编号范围有误");
+									swal({
+					                    title: "寄存器地址主编号范围有误",
+					                    icon: "warning"
+					                });
 									return;
 								}
 
@@ -1474,12 +1669,18 @@ appModule
 								rang = $("#rangid").text().split(" ");
 								reg = /^0|[1-9]\d*$/;
 								if (!reg.test($("#addrid").val())) {
-									alert("寄存器地址主编号格式错误");
+									swal({
+					                    title: "寄存器地址主编号格式错误",
+					                    icon: "warning"
+					                });
 									return;
 								}
 								if ($("#addrid").val() < parseInt(rang[0])
 										|| $("#addrid").val() > parseInt(rang[1])) {
-									alert("寄存器地址主编号范围有误");
+									swal({
+					                    title: "寄存器地址主编号范围有误",
+					                    icon: "warning"
+					                });
 									return;
 								}
 
@@ -1487,14 +1688,20 @@ appModule
 								rang = $("#rangid").text().split(" ");
 								reg = /^[0-9a-fA-F]*$/;
 								if (!reg.test($("#addrid").val())) {
-									alert("寄存器地址主编号格式错误");
+									swal({
+					                    title: "寄存器地址主编号格式错误",
+					                    icon: "warning"
+					                });
 									return;
 								}
 								if (parseInt($("#addrid").val(), 16) < parseInt(
 										rang[0], 16)
 										|| parseInt($("#addrid").val(), 16) > parseInt(
 												rang[1], 16)) {
-									alert("寄存器地址主编号范围有误");
+									swal({
+					                    title: "寄存器地址主编号范围有误",
+					                    icon: "warning"
+					                });
 									return;
 
 								}
@@ -1519,14 +1726,20 @@ appModule
 										" ");
 								child_reg = /^[0-7]*$/;
 								if (!child_reg.test($("#child_addrid").val())) {
-									alert("寄存器地址子编号格式错误");
+									swal({
+					                    title: "寄存器地址子编号格式错误",
+					                    icon: "warning"
+					                });
 									return;
 								}
 								if (parseInt($("#child_addrid").val(), 8) < parseInt(
 										child_rang[0], 8)
 										|| parseInt($("#child_addrid").val(), 8) > parseInt(
 												child_rang[1], 8)) {
-									alert("寄存器地址子编号范围有误");
+									swal({
+					                    title: "寄存器地址子编号范围有误",
+					                    icon: "warning"
+					                });
 									return;
 								}
 							} else if ($("#child_scaleid").text() == "十进制") {
@@ -1534,12 +1747,18 @@ appModule
 										" ");
 								child_reg = /^0|[1-9]\d*$/;
 								if (!child_reg.test($("#child_addrid").val())) {
-									alert("寄存器地址子编号格式错误");
+									swal({
+					                    title: "寄存器地址子编号格式错误",
+					                    icon: "warning"
+					                });
 									return;
 								}
 								if ($("#child_addrid").val() < parseInt(child_rang[0])
 										|| $("#child_addrid").val() > parseInt(child_rang[1])) {
-									alert("寄存器地址子编号范围有误");
+									swal({
+					                    title: "寄存器地址子编号范围有误",
+					                    icon: "warning"
+					                });
 									return;
 								}
 							} else if ($("#child_scaleid").text() == "十六进制") {
@@ -1547,7 +1766,10 @@ appModule
 										" ");
 								child_reg = /^[0-9a-fA-F]*$/;
 								if (!child_reg.test($("#child_addrid").val())) {
-									alert("寄存器地址子编号格式错误");
+									swal({
+					                    title: "寄存器地址子编号格式错误",
+					                    icon: "warning"
+					                });
 									return;
 								}
 								if (parseInt($("#child_addrid").val(), 16) < parseInt(
@@ -1555,7 +1777,10 @@ appModule
 										|| parseInt($("#child_addrid").val(),
 												16) > parseInt(child_rang[1],
 												16)) {
-									alert("寄存器地址子编号范围有误");
+									swal({
+					                    title: "寄存器地址子编号范围有误",
+					                    icon: "warning"
+					                });
 									return;
 								}
 							}
@@ -1576,13 +1801,20 @@ appModule
 							if ($("#datatypeid").val() == 1000) {
 								$("#dataid").val("");
 								$("#decid").val("");
+								$("#dieid").val("");
 								if (!regnum.test($("#stringid").val())) {
-									alert("操作字符只能输入正整数");
+									swal({
+					                    title: "操作字符只能输入正整数",
+					                    icon: "warning"
+					                });
 									return;
 								}
 								if ($("#stringid").val() < 1
 										|| $("#stringid").val() > 256) {
-									alert("操作字符范围是1~256");
+									swal({
+					                    title: "操作字符范围是1~256",
+					                    icon: "warning"
+					                });
 									return;
 								}
 								num = $("#stringid").val();
@@ -1594,7 +1826,10 @@ appModule
 										.prop("disabled");
 								if (!datadisabled) {
 									if (!regnum.test($("#dataid").val())) {
-										alert("整数位数格式错误");
+										swal({
+						                    title: "整数位数格式错误",
+						                    icon: "warning"
+						                });
 										return;
 									}
 
@@ -1602,7 +1837,10 @@ appModule
 								var decdisabled = $("#decid").prop("disabled");
 								if (!decdisabled) {
 									if (!regnum.test($("#dataid").val())) {
-										alert("小数位数格式错误");
+										swal({
+						                    title: "小数位数格式错误",
+						                    icon: "warning"
+						                });
 										return;
 									}
 								}
@@ -1610,39 +1848,57 @@ appModule
 								if ($("#datatypeid").val() == 100) {
 									if ($("#dataid").val() < 1
 											|| $("#dataid").val() > 16) {
-										alert("整数范围有误");
+										swal({
+						                    title: "整数范围有误",
+						                    icon: "warning"
+						                });
 										return;
 									}
 
 								} else if ($("#datatypeid").val() == 101) {
 									if ($("#dataid").val() < 1
 											|| $("#dataid").val() > 6) {
-										alert("整数范围有误");
+										swal({
+						                    title: "整数范围有误",
+						                    icon: "warning"
+						                });
 										return;
 									}
 
 								} else if ($("#datatypeid").val() == 102) {
 									if ($("#dataid").val() < 1
 											|| $("#dataid").val() > 4) {
-										alert("整数范围有误");
+										swal({
+						                    title: "整数范围有误",
+						                    icon: "warning"
+						                });
 										return;
 									}
 
 								} else if ($("#datatypeid").val() == 103) {
 									if ($("#dataid").val() < 0
 											|| $("#dataid").val() > 4) {
-										alert("整数范围有误");
+										swal({
+						                    title: "整数范围有误",
+						                    icon: "warning"
+						                });
 										return;
 									}
 									if ($("#decid").val() < 0
 											|| $("#decid").val() > 4) {
-										alert("小数数范围有误");
+										swal({
+						                    title: "小数范围有误",
+						                    icon: "warning"
+						                });
 										return;
 									}
 									var totle = parseInt($("#dataid").val())
 											+ parseInt($("#decid").val());
 									if (totle < 1 || totle > 4) {
-										alert("整数位数+小数位数范围是1~4");
+										swal({
+						                    title: "整数位数+小数位数范围是1~4",
+						                    icon: "warning"
+						                });
 										return;
 
 									}
@@ -1650,57 +1906,84 @@ appModule
 										|| $("#datatypeid").val() == 105) {
 									if ($("#dataid").val() < 0
 											|| $("#dataid").val() > 5) {
-										alert("整数范围有误");
+										swal({
+						                    title: "整数范围有误",
+						                    icon: "warning"
+						                });
 										return;
 									}
 									if ($("#decid").val() < 0
 											|| $("#decid").val() > 5) {
-										alert("小数数范围有误");
+										swal({
+						                    title: "小数范围有误",
+						                    icon: "warning"
+						                });
 										return;
 									}
 									var totle = parseInt($("#dataid").val())
 											+ parseInt($("#decid").val());
 									if (totle < 1 || totle > 5) {
-										alert("整数位数+小数位数范围是1~5");
+										swal({
+						                    title: "整数位数+小数位数范围是1~5",
+						                    icon: "warning"
+						                });
 										return;
 
 									}
 								} else if ($("#datatypeid").val() == 200) {
 									if ($("#dataid").val() < 1
 											|| $("#dataid").val() > 32) {
-										alert("整数范围有误");
+										swal({
+						                    title: "整数范围有误",
+						                    icon: "warning"
+						                });
 										return;
 									}
 
 								} else if ($("#datatypeid").val() == 201) {
 									if ($("#dataid").val() < 1
 											|| $("#dataid").val() > 11) {
-										alert("整数范围有误");
+										swal({
+						                    title: "整数范围有误",
+						                    icon: "warning"
+						                });
 										return;
 									}
 
 								} else if ($("#datatypeid").val() == 202) {
 									if ($("#dataid").val() < 1
 											|| $("#dataid").val() > 8) {
-										alert("整数范围有误");
+										swal({
+						                    title: "整数范围有误",
+						                    icon: "warning"
+						                });
 										return;
 									}
 
 								} else if ($("#datatypeid").val() == 203) {
 									if ($("#dataid").val() < 0
 											|| $("#dataid").val() > 8) {
-										alert("整数范围有误");
+										swal({
+						                    title: "整数范围有误",
+						                    icon: "warning"
+						                });
 										return;
 									}
 									if ($("#decid").val() < 0
 											|| $("#decid").val() > 8) {
-										alert("小数数范围有误");
+										swal({
+						                    title: "小数范围有误",
+						                    icon: "warning"
+						                });
 										return;
 									}
 									var totle = parseInt($("#dataid").val())
 											+ parseInt($("#decid").val());
 									if (totle < 1 || totle > 8) {
-										alert("整数位数+小数位数范围是1~8");
+										swal({
+						                    title: "整数位数+小数位数范围是1~8",
+						                    icon: "warning"
+						                });
 										return;
 
 									}
@@ -1709,35 +1992,53 @@ appModule
 										|| $("#datatypeid").val() == 205) {
 									if ($("#dataid").val() < 0
 											|| $("#dataid").val() > 10) {
-										alert("整数范围有误");
+										swal({
+						                    title: "整数范围有误",
+						                    icon: "warning"
+						                });
 										return;
 									}
 									if ($("#decid").val() < 0
 											|| $("#decid").val() > 10) {
-										alert("小数数范围有误");
+										swal({
+						                    title: "小数数范围有误",
+						                    icon: "warning"
+						                });
 										return;
 									}
 									var totle = parseInt($("#dataid").val())
 											+ parseInt($("#decid").val());
 									if (totle < 1 || totle > 10) {
-										alert("整数位数+小数位数范围是1~10");
+										swal({
+						                    title: "整数位数+小数位数范围是1~10",
+						                    icon: "warning"
+						                });
 										return;
 
 									} else if ($("#datatypeid").val() == 206) {
 										if ($("#dataid").val() < 0
 												|| $("#dataid").val() > 7) {
-											alert("整数范围有误");
+											swal({
+							                    title: "整数范围有误",
+							                    icon: "warning"
+							                });
 											return;
 										}
 										if ($("#decid").val() < 0
 												|| $("#decid").val() > 7) {
-											alert("小数数范围有误");
+											swal({
+							                    title: "小数范围有误",
+							                    icon: "warning"
+							                });
 											return;
 										}
 										var totle = parseInt($("#dataid").val())
 												+ parseInt($("#decid").val());
 										if (totle < 1 || totle > 7) {
-											alert("整数位数+小数位数范围是1~7");
+											swal({
+							                    title: "整数位数+小数位数范围是1~7",
+							                    icon: "warning"
+							                });
 											return;
 
 										}
@@ -1754,22 +2055,126 @@ appModule
 									} else if ($("#datatypeid").val() == 406) {
 										if ($("#dataid").val() < 0
 												|| $("#dataid").val() > 15) {
-											alert("整数范围有误");
+											swal({
+							                    title: "整数范围有误",
+							                    icon: "warning"
+							                });
 											return;
 										}
 										if ($("#decid").val() < 0
 												|| $("#decid").val() > 15) {
-											alert("小数数范围有误");
+											swal({
+							                    title: "小数范围有误",
+							                    icon: "warning"
+							                });
 											return;
 										}
 										var totle = parseInt($("#dataid").val())
 												+ parseInt($("#decid").val());
 										if (totle < 1 || totle > 15) {
-											alert("整数位数+小数位数范围是1~15");
+											swal({
+							                    title: "整数位数+小数位数范围是1~15",
+							                    icon: "warning"
+							                });
 											return;
 										}
 									}
 
+								}
+								// 当数据类型是这些的时候设置死区
+								if($("#datatypeid").val()==103
+										||$("#datatypeid").val()==104
+										||$("#datatypeid").val()==105
+										||$("#datatypeid").val()==203
+										||$("#datatypeid").val()==204
+										||$("#datatypeid").val()==205
+										||$("#datatypeid").val()==406){
+									var dievalue=$("#dieid").val();
+									if(dievalue!=""){
+										var regdie = /^(([1-9]\d*)|0)(\.\d{1,15})?$/;										
+										if(!regdie.test(dievalue)){
+											swal({
+							                    title: "死区设置值格式错误",
+							                    icon: "warning"
+							                });
+											return;
+										}
+										
+										var inter=$("#dataid").val();// 整数部分
+										
+										var dec= $("#decid").val();// 小数部分
+
+										var dies=dievalue.split(".");
+										
+									    if(dies.length==1){// 只有整数部分
+									    	if(dec!=""&&dec>0){
+									    		swal({
+								                    title: "死区设置值小数部分未设置",
+								                    icon: "warning"
+								                });
+												return;
+									    		
+									    	}
+									    	if(inter==""||inter==0){
+									    		swal({
+								                    title: "死区设置值整数部分设置错误",
+								                    icon: "warning"
+								                });
+												return;
+									    		
+									    	}
+									    	if(dies[0].length!=inter){
+									    		swal({
+								                    title: "死区设置值整数部分设置错误",
+								                    icon: "warning"
+								                });
+												return;
+									    		
+									    	}
+									    	
+									    	
+									    }
+									    if(dies.length==2){// 整数小数部分
+									    	if(inter==""||inter==0){
+									    		swal({
+								                    title: "死区设置值整数部分设置错误",
+								                    icon: "warning"
+								                });
+												return;
+									    		
+									    	}
+									    	if(dec==""||dec==0){
+									    		swal({
+								                    title: "死区设置值小数部分设置错误",
+								                    icon: "warning"
+								                });
+												return;
+									    		
+									    	}
+									    	if(dies[0].length!=inter){
+									    		console.log("dies[0].length=="+dies[0].length);
+									    		console.log("inter.length=="+inter.length);
+									    		swal({
+								                    title: "死区设置值整数部分设置错误",
+								                    icon: "warning"
+								                });
+												return;
+									    		
+									    	}
+									    	if(dies[1].length!=dec){
+									    		swal({
+								                    title: "死区设置值小数部分设置错误",
+								                    icon: "warning"
+								                });
+												return;
+									    		
+									    	}
+	
+									    }
+		
+										
+									}
+									
 								}
 								if (!$("#dataid").prop("disabled")) {
 									num = $("#dataid").val();
@@ -1785,9 +2190,11 @@ appModule
 							$('#divdatatypeid').css('display', 'none');
 							$('#datadigitid').css('display', 'none');
 							$('#div_stringid').css('display', 'none');
+							$('#diediv_id').css('display', 'none');
 							$("#dataid").val("");
 							$("#decid").val("");
 							$("#stringid").val("");
+							$("#dieid").val("");
 						}
 
 						var rang_datas = rangs.join(",");
@@ -1798,25 +2205,40 @@ appModule
 						var divbatchid = $('#divbatchid').css('display');
 						if (divbatchid == 'block') {
 							if ($("#increaseid").val() == "") {
-								alert("请输入增量");
+								swal({
+				                    title: "请输入增量",
+				                    icon: "warning"
+				                });
 								return;
 							}
 							var regincrease = /^-?[1-9]\d*$/;
 							if (!regincrease.test($("#increaseid").val())) {
-								alert("请输入增量不为0的整数");
+								swal({
+				                    title: "请输入增量不为0的整数",
+				                    icon: "warning"
+				                });
 								return;
 							}
 							if ($("#batchid").val() == "") {
-								alert("请输入批量个数");
+								swal({
+				                    title: "请输入批量个数",
+				                    icon: "warning"
+				                });
 								return;
 							}
 							var regbatchid = /^[1-9]\d*$/;
 							if (!regbatchid.test($("#batchid").val())) {
-								alert("请输入批量个数大于0的正整数");
+								swal({
+				                    title: "请输入批量个数大于0的正整数",
+				                    icon: "warning"
+				                });
 								return;
 							}
 							if ($("#batchid").val() > 40) {
-								alert("请输入批量个数大于0小于等于40的正整数");
+								swal({
+				                    title: "请输入批量个数大于0小于等于40的正整数",
+				                    icon: "warning"
+				                });
 								return;
 							}
 
@@ -1829,7 +2251,8 @@ appModule
 						}
 						if (mtype == 2) {
 
-							$("#loadingModalid").modal("show");// 批量添加转圈效果
+							// $("#loadingModalid").modal("show");// 批量添加转圈效果
+							$('#loader-wrapper').css("display","block");// 批量添加转圈效果
 
 						}
 						var params = {
@@ -1849,6 +2272,7 @@ appModule
 							batch : batchvalue,
 							increase : $("#increaseid").val(),
 							group_id : actgroupId,
+							dead_set:$("#dieid").val(),
 							unit : $("#unitid").val()
 
 						};
@@ -1866,26 +2290,44 @@ appModule
 																$scope.paginationConf.itemsPerPage,
 																actgroupId);
 												if (mtype == 0) {
-													alert("添加实时监控点成功");
+													swal({
+									                    title: "添加实时监控点成功",
+									                    icon: "success"
+									                });
 												} else if (mtype == 1) {
-													alert("修改实时监控点成功");
+													swal({
+									                    title: "修改实时监控点成功",
+									                    icon: "success"
+									                });
 												} else {
-													$("#loadingModalid").modal(
-															"hide");
-													alert("批量添加实时监控点成功");
+													/*
+													 * $("#loadingModalid").modal(
+													 * "hide");
+													 */
+													$('#loader-wrapper').css("display","none");
+													swal({
+									                    title: "批量添加实时监控点成功",
+									                    icon: "success"
+									                });
 												}
 
 											} else {
-												$("#loadingModalid").modal(
-														"hide");
-												alert(code + "-" + msg);
+												/*
+												 * $("#loadingModalid").modal(
+												 * "hide");
+												 */
+												$('#loader-wrapper').css("display","none");
+												swal({
+								                    title: code + "-" + msg,
+								                    icon: "error"
+								                });
 											}
 										}, function() {
 											console.log("ajax error");
 										});
 
 					}
-					//批量导出实时监控点
+					// 批量导出实时监控点
 					$scope.exportExcel = function() {
 						var myform = document.getElementById('myform');
 						var device_id = $scope.deviceid;
