@@ -47,11 +47,8 @@
 			<li><a href="#group-setting" data-toggle="tab"> <span
 					class="glyphicon glyphicon-cog"></span> 分组设置
 			</a></li>
-			<!-- <li><a href="#global-setting" data-toggle="tab"
-				ng-click=""> <span class="glyphicon glyphicon-globe"></span>
-					全局设置
-			</a></li> -->
 		</ul>
+		<form method="post" id="myform"></form>
 		<div id="monitorContent" class="tab-content">
 			<!--数据分组-->
 			<div class="tab-pane active" id="data-item-1">
@@ -75,6 +72,18 @@
 								data-target="#addpoint" ng-click="batchmonitor();">
 								<span class="glyphicon glyphicon-list"
 									style="margin-left: 15px;"></span> 批量添加
+							</button>
+
+							 <button type="button" class="btn btn-primary" data-toggle="modal"
+								ng-click="exportExcel();">
+								<span class="glyphicon glyphicon-import"
+									style="margin-left: 15px;"></span> 数据导入
+							</button>
+
+							<button type="button" class="btn btn-primary" data-toggle="modal"
+								ng-click="exportExcel();">
+								<span class="glyphicon glyphicon-export"
+									style="margin-left: 15px;"></span> 数据导出
 							</button>
 						</caption>
 						<thead>

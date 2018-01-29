@@ -101,6 +101,7 @@ public enum ErrorCodeOption {
     RealCfg_Is_Empty("待复制的实时配置为空！",30044),
     HisCfg_Is_Empty("待复制的历史配置为空！",30045),
     ComConfig_IsNot_Del("删除通讯口指令下发，通讯口配置复制失败！",30046),
+    Word_To_Long("名称或描述不能超过50位字符",30047),
 
 
     Get_Groupid_Error("获取数组ID错误",50001),

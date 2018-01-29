@@ -663,9 +663,11 @@ public class ActDataAction {
 				realHisCfg.addr_type = realHisCfgParam.addr_type;
 				realHisCfg.data_id = realHisCfgParam.data_id;
 				realHisCfg.ext_unit = realHisCfgParam.unit;
-				if (realHisCfgParam.name.length() > 64) {
-					realHisCfg.name = realHisCfgParam.name.substring(0, 64);
-				} else {
+				if (!CommonUtils.isNullOrEmpty(realHisCfgParam.name)) {
+					if (realHisCfgParam.name.length() > 64) {
+						throw new BusinessException(ErrorCodeOption.Word_To_Long.key,
+								ErrorCodeOption.Word_To_Long.value);
+					}
 					realHisCfg.name = realHisCfgParam.name;
 				}
 
@@ -677,15 +679,15 @@ public class ActDataAction {
 				realHisCfg.digit_binary = realHisCfgParam.digit_binary;
 				if (!CommonUtils.isNullOrEmpty(realHisCfgParam.describe)) {
 					if (realHisCfgParam.describe.length() > 64) {
-						realHisCfg.describe = realHisCfgParam.describe.substring(0, 64);
-					} else {
-						realHisCfg.describe = realHisCfgParam.describe;
+						throw new BusinessException(ErrorCodeOption.Word_To_Long.key,
+								ErrorCodeOption.Word_To_Long.value);
 					}
-
+					realHisCfg.describe = realHisCfgParam.describe;
 				}
 				realHisCfg.plc_id = realHisCfgParam.plc_id;
 				realHisCfg.data_type = realHisCfgParam.data_type;
 				if (realHisCfgParam.data_type == 0) {
+					realHisCfg.dead_set = realHisCfgParam.dead_set;// 死区设置
 					if (realHisCfgParam.group_id < 1) {
 
 						throw new BusinessException(ErrorCodeOption.Get_Groupid_Error.key,
@@ -752,17 +754,17 @@ public class ActDataAction {
 				realHisCfg.state = 1;// 0：已同步给盒子1：新增配置2：更新配置3：删除配置，如果同步成功再做物理删除，同时需要删除监控点绑定和权限的分配，和其他相关数据
 				if (!CommonUtils.isNullOrEmpty(realHisCfgParam.describe)) {
 					if (realHisCfgParam.describe.length() > 64) {
-						realHisCfg.describe = realHisCfgParam.describe.substring(0, 64);
-					} else {
-						realHisCfg.describe = realHisCfgParam.describe;
+						throw new BusinessException(ErrorCodeOption.Word_To_Long.key,
+								ErrorCodeOption.Word_To_Long.value);
 					}
-
+					realHisCfg.describe = realHisCfgParam.describe;
 				}
 				realHisCfg.plc_id = realHisCfgParam.plc_id;
 				realHisCfg.data_type = realHisCfgParam.data_type;
 				List<RealHisCfgDevice> realHisCfgDeviceList = new ArrayList<RealHisCfgDevice>();
 				RealHisCfgFilter realHisCfgFilter = new RealHisCfgFilter();
 				if (realHisCfgParam.data_type == 0) {
+					realHisCfg.dead_set = realHisCfgParam.dead_set;// 死区设置
 					if (realHisCfgParam.group_id < 1) {
 
 						throw new BusinessException(ErrorCodeOption.Get_Groupid_Error.key,
@@ -982,26 +984,37 @@ public class ActDataAction {
 
 							}
 							if (i > 0) {
-								if (realHisCfgParam.name.length() > 50) {
-									realHisCfg.name = realHisCfgParam.name.substring(0, 46) + "_" + i;
-								} else {
+
+								if (!CommonUtils.isNullOrEmpty(realHisCfgParam.name)) {
 									realHisCfg.name = realHisCfgParam.name + "_" + i;
+									if (realHisCfg.name.length() > 50) {
+										throw new BusinessException(ErrorCodeOption.Word_To_Long.key,
+												ErrorCodeOption.Word_To_Long.value);
+									}
+
 								}
 							} else {
-								if (realHisCfgParam.name.length() > 50) {
-									realHisCfg.name = realHisCfgParam.name.substring(0, 50);
-								} else {
+
+								if (!CommonUtils.isNullOrEmpty(realHisCfgParam.name)) {
 									realHisCfg.name = realHisCfgParam.name;
+									if (realHisCfg.name.length() > 50) {
+										throw new BusinessException(ErrorCodeOption.Word_To_Long.key,
+												ErrorCodeOption.Word_To_Long.value);
+									}
+
 								}
 							}
 
-							RealHisCfg rename = realHisCfgApi.getRealHisCfg(realHisCfgParam.device_id, realHisCfg.name);
-							if (rename != null) {
-								realHisCfg.name = realHisCfgParam.name + "_" + new Date().getTime();
-							}
+							// RealHisCfg rename =
+							// realHisCfgApi.getRealHisCfg(realHisCfgParam.device_id,
+							// realHisCfg.name);
+							// if (rename != null) {
+							// realHisCfg.name = realHisCfgParam.name + "_" +
+							// new Date().getTime();
+							// }
 
 							long id = realHisCfgApi.saveRealHisCfg(realHisCfg);
-							
+
 							if (id > 0) {
 								if (realHisCfg.data_type == 0) {// 实时数据配置
 									dbLogUtil.addOperateLog(OpTypeOption.AddAct, ResTypeOption.Act, realHisCfg.id,
@@ -1033,10 +1046,13 @@ public class ActDataAction {
 
 				} else {
 
-					if (realHisCfgParam.name.length() > 50) {
-						realHisCfg.name = realHisCfgParam.name.substring(0, 50);
-					} else {
+					if (!CommonUtils.isNullOrEmpty(realHisCfgParam.name)) {
 						realHisCfg.name = realHisCfgParam.name;
+						if (realHisCfg.name.length() > 50) {
+							throw new BusinessException(ErrorCodeOption.Word_To_Long.key,
+									ErrorCodeOption.Word_To_Long.value);
+						}
+
 					}
 					realHisCfg.addr = realHisCfgParam.addr;
 					long reid = realHisCfgApi.saveRealHisCfg(realHisCfg);
