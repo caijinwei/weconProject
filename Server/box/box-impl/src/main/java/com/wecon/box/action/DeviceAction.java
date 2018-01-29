@@ -530,6 +530,7 @@ public class DeviceAction {
                 filter.start_date = start_date;
                 filter.end_date = end_date;
                 filter.state = -1;
+                filter.grade_id=-1;
                 alarmCfgDataAlarmCfgList = alarmCfgDataApi.getRealHisCfgDataList(filter, pageNum, pageSize);
                 json.put("allData", alarmCfgDataAlarmCfgList);
 
