@@ -183,7 +183,8 @@
                        href="web/html/baseinfo.html?device_id={{y.deviceId}}&device_name={{y.deviceName}}"
                        data_devid="{{y.deviceId}}" draggable="true" ondragstart="drag(event)"
                        ng-click="selectbox(y.deviceId)" class="list-group-item"
-                       ng-repeat="y in x.deviceList"><i name="i_box" class="fa  fa-circle"
+                       ng-repeat="y in x.deviceList">
+                                                <i name="i_box" class="fa  fa-circle"
                                                         ng-class="{true:'onlineIcon',false:'offlineIcon'}[y.deviceState==1]"
                                                         data-toggle="tooltip"
                                                         title="{{y.deviceState==1?'在线':'离线'}}"></i>{{y.deviceName}}</a>

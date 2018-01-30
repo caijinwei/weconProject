@@ -379,6 +379,8 @@ function drop(ev) {
     // 调用后台方法
     var appElement = document.querySelector('[ng-controller=infoController]');
     var $scope = angular.element(appElement).scope();
+
+
     $scope.dragToUpdateDir($('#' + data).parent().attr("sid"), $('#' + data)
         .attr("data_devid"), fromDirId, $('#' + data).attr("data_devid"));
 }

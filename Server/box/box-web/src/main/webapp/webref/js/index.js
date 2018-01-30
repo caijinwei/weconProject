@@ -290,14 +290,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      */
     $scope.dragToUpdateDir = function (target_acc_dir_id, target_ref_id,
                                        from_acc_dir_id, from_ref_id) {
-
         var params = {
             target_acc_dir_id: target_acc_dir_id,
             target_ref_id: target_ref_id,
             from_acc_dir_id: from_acc_dir_id,
             from_ref_id: from_ref_id
         }
-        console.log(params);
         T.common.ajax.request("WeconBox", "baseInfoAction/dragToUpdateDir",
             params, function (data, code, msg) {
                 if (code == 200) {
@@ -411,7 +409,7 @@ function allowDrop(ev) {
 
 function drag(ev) {
     ev.dataTransfer.setData("Text", ev.target.id);
-    fromDirId = $(ev.target).parent().attr("sid");
+    fromDirId = $(ev.target).parent().parent().attr("sid");
 }
 function drop(ev) {
 
@@ -420,14 +418,17 @@ function drop(ev) {
     // 先获取到ev.target的父节点，即分组a
     var parent = $(ev.target).parent();
     // 再获取到父节点的兄弟节点，即子分组ul
-    var next = $(parent).next();
+    var next = $(parent).children().next();
     // 再往子分组ul中追加拖放的元素
-    next.append($(document.getElementById(data)));
+    next.append($(document.getElementById(data)).parent());
 
     // 调用后台方法
     var appElement = document.querySelector('[ng-controller=infoController]');
     var $scope = angular.element(appElement).scope();
-    $scope.dragToUpdateDir($('#' + data).parent().attr("sid"), $('#' + data)
+
+
+
+    $scope.dragToUpdateDir($('#' + data).parent().parent().attr("sid"), $('#' + data)
         .attr("data_devid"), fromDirId, $('#' + data).attr("data_devid"));
 }
 

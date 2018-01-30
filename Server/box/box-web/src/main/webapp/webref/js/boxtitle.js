@@ -9,7 +9,9 @@ appModule
 					$scope.onInit = function() {
 						$scope.deviceid = T.common.util
 						.getParameter("device_id");
-						  console.log($scope.deviceid);
+						$scope.deviceName = T.common.util.getParameter("device_name");
+
+						$("#myiframe").attr("src","baseinfo.html?device_id="+$scope.deviceid+"&device_name="+$scope.deviceName);
 					}
 
 					
