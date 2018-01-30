@@ -261,10 +261,11 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 	}
 
 	@Override
-	public List<AlarmCfgExtend> getAlarmCfgExtendListByState(Object... state) {
+	public List<AlarmCfgExtend> getAlarmCfgExtendListByState(Long id, Object... state) {
 		String sql = "select a.alarmcfg_id,a.plc_id,a.data_id,a.account_id,a.name,a.addr,a.addr_type,a.text,a.condition_type,a.state,a.create_date,a.update_date,a.rid,a.data_limit,a.digit_count,a.digit_binary,a.alarm_level,d.machine_code"
 				+ " from alarm_cfg a ,device d where a.device_id=d.device_id and d.state=1 ";
 		String triSql = "select at.alarmcfg_id,at.type, at.value from alarm_trigger at, alarm_cfg a where at.alarmcfg_id=a.alarmcfg_id";
+		Object[] params = null;
 		if (null != state && state.length > 0) {
 			sql += " and a.state in (";
 			triSql += " and a.state in (";
@@ -276,10 +277,15 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			triSql += inSb.substring(1);
 			sql += ")";
 			triSql += ")";
+			params = state;
+		}else{
+			sql += " and a.alarmcfg_id = ?";
+			triSql += " and a.alarmcfg_id = ?";
+			params = new Object[]{id};
 		}
 		sql += " order by a.update_date";
-		List<AlarmCfgExtend> alarmCfgExtendLst = jdbcTemplate.query(sql, state, new DefaultAlarmCfgExtendRowMapper());
-		List<AlarmTrigger> alarmCfgTriggerLst = jdbcTemplate.query(triSql, state, new DefaultAlarmTriggerRowMapper());
+		List<AlarmCfgExtend> alarmCfgExtendLst = jdbcTemplate.query(sql, params, new DefaultAlarmCfgExtendRowMapper());
+		List<AlarmTrigger> alarmCfgTriggerLst = jdbcTemplate.query(triSql, params, new DefaultAlarmTriggerRowMapper());
 
 		if (null != alarmCfgExtendLst && null != alarmCfgTriggerLst) {
 			for (AlarmCfgExtend ae : alarmCfgExtendLst) {

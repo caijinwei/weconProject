@@ -678,6 +678,15 @@ public class RealHisCfgImpl implements RealHisCfgApi {
 	}
 
 	@Override
+	public List<RealHisCfgExtend> getRealHisCfgListById(long id) {
+		String sql = "select " + SEL_COL
+				+ ",r.dead_set,d.machine_code from real_his_cfg r ,device d where d.device_id=r.device_id and d.state=1 and r.id = ? order by r.update_date";
+
+		List<RealHisCfgExtend> list = jdbcTemplate.query(sql, new Object[]{id}, new DefaultRealCfgExtendRowMapper());
+		return list;
+	}
+
+	@Override
 	public List<RealHisCfgExtend> getRealHisCfgListByState(Object... state) {
 		String sql = "select " + SEL_COL
 				+ ",r.dead_set,d.machine_code from real_his_cfg r ,device d where d.device_id=r.device_id and d.state=1 ";

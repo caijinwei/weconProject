@@ -1,8 +1,5 @@
 package com.wecon.box.entity;
 
-
-import java.sql.Timestamp;
-
 /**
  * @author whp
  */

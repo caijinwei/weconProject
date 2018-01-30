@@ -1,6 +1,9 @@
 package com.wecon.box.entity;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author lanpenghui
  * 2017年8月1日
@@ -47,6 +50,12 @@ public class RealHisCfg {
 	public String dead_set;//死区设置(只有实时数据) 16位无符号 16位有符号 32位无符号 32位有符号 16位BCD 32位BCD--整型  64位双精度--浮点型
 	public Timestamp create_date;
 	public Timestamp update_date;
-	
-
+	public static Map<String, Boolean> operCache = new HashMap<String, Boolean>();
+public static void main(String[] a){
+	operCache.put("1030", false);
+	if(null !=operCache.get(1030+"")){
+		operCache.put(1030+"", true);
+	}
+	System.out.print(operCache);
+}
 }

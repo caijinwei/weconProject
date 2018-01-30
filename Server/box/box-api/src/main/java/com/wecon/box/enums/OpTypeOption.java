@@ -73,8 +73,15 @@ public enum OpTypeOption implements EnumVal {
     //驱动管理
     BatchDriver("批量新增驱动", 1200),
     UpdDriver("修改驱动", 1201),
-    DelDriver("删除驱动", 1202);
-	
+    DelDriver("删除驱动", 1202),
+
+    //后台操作类型
+    UpdPlcInfo("通讯口更新", 10),
+    DelPlcInfo("通讯口删除", 11),
+    UpdRealHisCfg("实时历史监控点更新", 20),
+    DelRealHisCfg("实时历史监控点删除", 21),
+    UpdAlarmCfg("报警监控点更新", 30),
+    DelAlarmCfg("报警监控点删除", 31);
 
     private String key;
 

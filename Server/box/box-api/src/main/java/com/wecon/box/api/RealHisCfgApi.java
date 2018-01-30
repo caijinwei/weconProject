@@ -122,6 +122,8 @@ public interface RealHisCfgApi {
      */
 	Map getRealCfgDetail(long id);
 
+	List<RealHisCfgExtend> getRealHisCfgListById(long id);
+
 	/**
 	 * 根据状态获取历史（实时）数据配置信息列表
 	 * @param state

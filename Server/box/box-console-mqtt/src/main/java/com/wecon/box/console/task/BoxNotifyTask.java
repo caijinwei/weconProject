@@ -10,6 +10,7 @@ import com.wecon.box.console.util.SpringContextHolder;
 import com.wecon.box.constant.ConstKey;
 import com.wecon.box.constant.Constant;
 import com.wecon.box.entity.*;
+import com.wecon.box.enums.OpTypeOption;
 import com.wecon.box.util.Converter;
 import com.wecon.box.util.GroupOp;
 import com.wecon.common.redis.RedisManager;
@@ -74,22 +75,27 @@ public class BoxNotifyTask extends Thread {
 	 * 通知盒子操作
 	 */
 	private void notifyHandle() {
-		updatePlcCfgHandle();
-		updateRealHisCfgHandle();
-		updateAlarmCfgHandle();
-		deleteAllCfgHandle();
-		deletePlcCfgHandle();
+		updatePlcCfgHandle(null);
+		updateRealHisCfgHandle(null);
+		updateAlarmCfgHandle(null);
+		deleteAllCfgHandle(0, null);
+		deletePlcCfgHandle(null);
 	}
 
 	/**
 	 * 更新通讯口配置通知盒子
 	 */
-	private synchronized void updatePlcCfgHandle() {
+	public synchronized void updatePlcCfgHandle(Long opId) {
 		try {
 			logger.info("updatePlcCfgHandle，开始从DB获取数据");
 			PlcInfoApi plcInfoApi = SpringContextHolder.getBean(PlcInfoApi.class);
-			List<PlcExtend> plcExtendLst = plcInfoApi.getPlcExtendListByState(Constant.State.STATE_UPDATE_CONFIG,
-					Constant.State.STATE_NEW_CONFIG);
+			List<PlcExtend> plcExtendLst;
+			if(null == opId){
+				plcExtendLst = plcInfoApi.getPlcExtendListByState(Constant.State.STATE_UPDATE_CONFIG,
+						Constant.State.STATE_NEW_CONFIG);
+			}else{
+				plcExtendLst = plcInfoApi.getPlcExtendListById(opId);
+			}
 			logger.info("updatePlcCfgHandle，获取更新条数：" + (null == plcExtendLst ? "0" : plcExtendLst.size()));
 			if (null != plcExtendLst) {
 				putPlcCache(plcExtendLst);
@@ -125,12 +131,17 @@ public class BoxNotifyTask extends Thread {
 	/**
 	 * 更新实时和历史监控点配置
 	 */
-	private synchronized void updateRealHisCfgHandle() {
+	public synchronized void updateRealHisCfgHandle(Long id) {
 		try {
 			logger.info("updateRealHisCfgHandle，开始从DB获取数据");
 			RealHisCfgApi realHisCfgApi = SpringContextHolder.getBean(RealHisCfgApi.class);
-			List<RealHisCfgExtend> realHisCfgList = realHisCfgApi
-					.getRealHisCfgListByState(Constant.State.STATE_UPDATE_CONFIG, Constant.State.STATE_NEW_CONFIG);
+			List<RealHisCfgExtend> realHisCfgList;
+			if(null == id){
+				realHisCfgList = realHisCfgApi.getRealHisCfgListByState(Constant.State.STATE_UPDATE_CONFIG, Constant.State.STATE_NEW_CONFIG);
+			}else{
+				realHisCfgList = realHisCfgApi.getRealHisCfgListById(id);
+			}
+
 			logger.info("updateRealHisCfgHandle，获取更新条数：" + (null == realHisCfgList ? "0" : realHisCfgList.size()));
 			if (null != realHisCfgList && realHisCfgList.size() > 0) {
 				RedisManager.publish(ConstKey.REDIS_GROUP_NAME, "update_realcfg", JSON.toJSONString(realHisCfgList));
@@ -173,12 +184,12 @@ public class BoxNotifyTask extends Thread {
 	/**
 	 * 更新报警数据配置
 	 */
-	private synchronized void updateAlarmCfgHandle() {
+	public synchronized void updateAlarmCfgHandle(Long id) {
 		try {
 			logger.info("updateAlarmCfgHandle，开始从DB获取数据");
 			AlarmCfgApi alarmCfgApi = SpringContextHolder.getBean(AlarmCfgApi.class);
 			List<AlarmCfgExtend> alarmCfgExtendList = alarmCfgApi
-					.getAlarmCfgExtendListByState(Constant.State.STATE_UPDATE_CONFIG, Constant.State.STATE_NEW_CONFIG);
+					.getAlarmCfgExtendListByState(id, Constant.State.STATE_UPDATE_CONFIG, Constant.State.STATE_NEW_CONFIG);
 			logger.info(
 					"updateAlarmCfgHandle，获取更新条数：" + (null == alarmCfgExtendList ? "0" : alarmCfgExtendList.size()));
 			if (null != alarmCfgExtendList) {
@@ -222,15 +233,23 @@ public class BoxNotifyTask extends Thread {
 	/**
 	 * 删除监控点配置
 	 */
-	private synchronized void deleteAllCfgHandle() {
+	public synchronized void deleteAllCfgHandle(int opType, Long id) {
 		try {
 			logger.info("deleteAllCfgHandle，开始从DB获取数据");
 			RealHisCfgApi realHisCfgApi = SpringContextHolder.getBean(RealHisCfgApi.class);
 			AlarmCfgApi alarmCfgApi = SpringContextHolder.getBean(AlarmCfgApi.class);
-			List<RealHisCfgExtend> realHisCfgList = realHisCfgApi
-					.getRealHisCfgListByState(Constant.State.STATE_DELETE_CONFIG);
-			List<AlarmCfgExtend> alarmCfgExtendList = alarmCfgApi
-					.getAlarmCfgExtendListByState(Constant.State.STATE_DELETE_CONFIG);
+			List<RealHisCfgExtend> realHisCfgList = null;
+			List<AlarmCfgExtend> alarmCfgExtendList = null;
+			if(null != id){
+				if(OpTypeOption.DelRealHisCfg.getValue() == opType){
+					realHisCfgList = realHisCfgApi.getRealHisCfgListById(id);
+				}else if(OpTypeOption.DelAlarmCfg.getValue() == opType){
+					alarmCfgExtendList = alarmCfgApi.getAlarmCfgExtendListByState(id, null);
+				}
+			}else{
+				realHisCfgList = realHisCfgApi.getRealHisCfgListByState(Constant.State.STATE_DELETE_CONFIG);
+				alarmCfgExtendList = alarmCfgApi.getAlarmCfgExtendListByState(null, Constant.State.STATE_DELETE_CONFIG);
+			}
 			if (null != realHisCfgList && realHisCfgList.size() > 0) {
 				List<RealHisCfgDevice> realCfgList = new ArrayList<RealHisCfgDevice>();
 				List<RealHisCfgDevice> hisCfgList = new ArrayList<RealHisCfgDevice>();
@@ -296,11 +315,17 @@ public class BoxNotifyTask extends Thread {
 	/**
 	 * 删除通讯口配置
 	 */
-	private synchronized void deletePlcCfgHandle() {
+	public synchronized void deletePlcCfgHandle(Long id) {
 		try {
 			logger.info("deletePlcCfgHandle，开始从DB获取数据");
 			PlcInfoApi plcInfoApi = SpringContextHolder.getBean(PlcInfoApi.class);
-			List<PlcExtend> plcExtendLst = plcInfoApi.getPlcExtendListByState(Constant.State.STATE_DELETE_CONFIG);
+			List<PlcExtend> plcExtendLst;
+			if(null == id){
+				plcExtendLst = plcInfoApi.getPlcExtendListByState(Constant.State.STATE_DELETE_CONFIG);
+			}else{
+				plcExtendLst = plcInfoApi.getPlcExtendListById(id);
+			}
+
 			logger.info("deletePlcCfgHandle，获取删除条数：" + (null == plcExtendLst ? "0" : plcExtendLst.size()));
 			if (null != plcExtendLst) {
 				Map<String, List<Map>> groupPlcExtends = GroupOp

@@ -1,6 +1,7 @@
 package com.wecon.box.console.main;
 
 import com.wecon.box.console.task.DBDataClearTask;
+import com.wecon.box.console.task.SubscribeTask;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -27,8 +28,10 @@ public class MqttManager {
 		notifyTask.start();
 		MonitorTask monitorTask = new MonitorTask();
 		monitorTask.start();
-		DBDataClearTask task = new DBDataClearTask();
-		task.start();
+		DBDataClearTask dbDataClearTask = new DBDataClearTask();
+		dbDataClearTask.start();
+		SubscribeTask subscribeTask = new SubscribeTask();
+		subscribeTask.start();
 		// GetPublishClient
 		// getPublishClient=applicationContext.getBean(GetPublishClient.class);
 		// MqttClient client=getPublishClient.conMqtt();

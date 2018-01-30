@@ -60,6 +60,8 @@ public interface PlcInfoApi {
 	* */
 	public List<PlcInfo> showAllPlcInfoByDeviceId(Integer deviceId);
 
+	List<PlcExtend> getPlcExtendListById(long id);
+
 	/**
 	 * 根据状态获取PlcExtend列表
 	 * @param state
