@@ -6,7 +6,7 @@ package com.wecon.common.util;
  * <bean id="confighelper" class="ConfigHelper">
  * <property name="thumbnailImageCryptKey" value="123456789123456789"></property>
  * </bean>
- * Created by fengbing_dian91 on 2015/12/24.
+ * Created by fengbing on 2015/12/24.
  */
 public class ConfigHelper
 {

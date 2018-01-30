@@ -3,7 +3,7 @@ package com.wecon.common.util;
 import java.util.regex.Pattern;
 
 /**
- * Created by fengbing_dian91 on 2015/12/7.
+ * Created by fengbing on 2015/12/7.
  */
 public class Version
 {

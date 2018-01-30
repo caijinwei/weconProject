@@ -7,7 +7,7 @@ package com.wecon.common.enums;
 
 /**
  * 壁纸标签类别 
- * @author zengzhipeng_dian91
+ * @author zengzhipeng
  */
 public enum PicTagPropertyOption {
 

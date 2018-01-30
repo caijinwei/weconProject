@@ -2,7 +2,7 @@ package com.wecon.common.enums;
 
 /**
  * 纯客户端动作定义
- * Created by fengbing_dian91 on 2016/1/6.
+ * Created by fengbing on 2016/1/6.
  */
 public enum ClientActOption
 {

@@ -8,7 +8,7 @@ package com.wecon.common.enums;
 /**
  * 手机适配设备类型
  *
- * @author zengzhipeng_dian91
+ * @author zengzhipeng
  */
 public enum PadTypeOption {
 

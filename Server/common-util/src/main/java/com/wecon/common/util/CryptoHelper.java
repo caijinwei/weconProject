@@ -17,7 +17,7 @@ import java.security.spec.InvalidKeySpecException;
 
 /**
  * 加密、解密方法封装
- * Created by fengbing_dian91 on 2015/12/14.
+ * Created by fengbing on 2015/12/14.
  */
 public class CryptoHelper
 {

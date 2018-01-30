@@ -4,7 +4,7 @@ import com.wecon.common.util.Version;
 import org.junit.Test;
 
 /**
- * Created by fengbing_dian91 on 2016/6/14.
+ * Created by fengbing on 2016/6/14.
  */
 public class VersionTest
 {

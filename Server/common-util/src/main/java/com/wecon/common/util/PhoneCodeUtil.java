@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 /**
  * 手机号码校验的工具类
- * Created by fengbing_dian91 on 2015/12/1.
+ * Created by fengbing on 2015/12/1.
  */
 public class PhoneCodeUtil
 {

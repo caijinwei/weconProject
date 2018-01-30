@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * xml节点值的读取方法
- * Created by fengbing_dian91 on 2015/12/16.
+ * Created by fengbing on 2015/12/16.
  */
 public class XmlUtil
 {

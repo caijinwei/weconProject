@@ -2,7 +2,6 @@ package com.wecon.common.web;
 
 /**
  * IP地址的帮助类
- * Created by fengbing_dian91 on 2015/12/18.
  */
 public class IpAddrHelper
 {

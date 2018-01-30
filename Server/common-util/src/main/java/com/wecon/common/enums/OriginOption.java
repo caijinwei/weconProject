@@ -8,7 +8,7 @@ package com.wecon.common.enums;
 /**
  * 软件来源枚举
  *
- * @author zengzhipeng_dian91
+ * @author zengzhipeng
  */
 public enum OriginOption {
 

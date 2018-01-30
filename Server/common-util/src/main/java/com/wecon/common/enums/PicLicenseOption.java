@@ -7,7 +7,7 @@ package com.wecon.common.enums;
 
 /**
  *
- * @author zengzhipeng_dian91
+ * @author zengzhipeng
  */
 public enum PicLicenseOption {
 

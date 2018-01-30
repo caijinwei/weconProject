@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * Created by fengbing_dian91 on 2015/12/8.
+ * Created by fengbing on 2015/12/8.
  */
 public class TestCacheLoader implements CacheLoader
 {

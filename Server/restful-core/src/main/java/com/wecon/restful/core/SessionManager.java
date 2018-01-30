@@ -33,7 +33,7 @@ public class SessionManager {
             //手机端和网页端可以同时登录，手机端和网页分别只能只有一种设备登录
             //1.根据userid获取所有在线的sessionid
             Set<String> sessionids = RedisManager.smembers(RedisGroupName, userSidGroupRedisKey);
-            //2.遍历sessionid。如果productid(对应客记端上传的pid，只有两种，1.pc,2.手机)，相同就干掉session
+            //2.遍历sessionid。如果productid(对应客记端上传的pid，只有两种，1.pc,2.手机,3.opc)，相同就干掉session
             for (String it : sessionids) {
                 byte[] value = RedisManager.get(RedisGroupName, it.getBytes());
                 if (value != null) {

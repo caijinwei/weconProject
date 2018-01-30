@@ -7,7 +7,7 @@ package com.wecon.common.enums;
 
 /**
  *
- * @author zengzhipeng_dian91
+ * @author zengzhipeng
  */
 public enum PicTagRankOption {
     Unknown("未知", 0),

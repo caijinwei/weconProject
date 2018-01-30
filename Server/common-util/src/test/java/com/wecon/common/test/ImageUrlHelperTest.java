@@ -11,7 +11,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Created by fengbing_dian91 on 2015/12/23.
+ * Created by fengbing on 2015/12/23.
  */
 public class ImageUrlHelperTest
 {

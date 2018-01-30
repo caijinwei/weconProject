@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 /**
  * 固件转化枚举
- * Created by fengbing_dian91 on 2015/12/3.
+ * Created by fengbing on 2015/12/3.
  */
 public class FwVersionHelper
 {

@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * 枚举处理类
- * Created by fengbing_dian91 on 2016/1/8.
+ * Created by fengbing on 2016/1/8.
  */
 public class EnumUtil
 {

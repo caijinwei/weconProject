@@ -1,7 +1,7 @@
 package com.wecon.common.util;
 
 /**
- * Created by linkaixun_dian91 on 2015/12/21.
+ * Created by linkaixun on 2015/12/21.
  */
 public class CountriesUtil
 {

@@ -5,7 +5,7 @@ import com.wecon.common.util.CommonOptionUtil;
 import org.junit.Test;
 
 /**
- * Created by fengbing_dian91 on 2016/4/1.
+ * Created by fengbing on 2016/4/1.
  */
 public class CommonOptionUtilTest
 {

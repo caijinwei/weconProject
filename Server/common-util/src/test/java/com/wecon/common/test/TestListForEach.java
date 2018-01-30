@@ -3,7 +3,7 @@ package com.wecon.common.test;
 import java.util.function.Consumer;
 
 /**
- * Created by fengbing_dian91 on 2015/12/8.
+ * Created by fengbing on 2015/12/8.
  */
 public class TestListForEach<T> implements Consumer<T>
 {
