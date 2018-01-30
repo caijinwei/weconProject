@@ -258,6 +258,17 @@ public class PlcInfoImpl implements PlcInfoApi {
     }
 
     @Override
+    public List<PlcExtend> getPlcExtendListById(long id) {
+        String sql = "select p.*, d.machine_code, r.file_md5 as f_md5  from device d, plc_info p left join  driver r on p.driver = r.driver " +
+                "where p.device_id = d.device_id and d.state=1 and p.plc_id = ? order by p.update_date";
+        List<PlcExtend> list = jdbcTemplate.query(sql, new Object[]{id}, new DefaultPlcExtendRowMapper());
+        if (!list.isEmpty()) {
+            return list;
+        }
+        return null;
+    }
+
+    @Override
     public List<PlcExtend> getPlcExtendListByState(Object... state) {
         String sql = "select p.*, d.machine_code, r.file_md5 as f_md5  from device d, plc_info p left join  driver r on p.driver = r.driver where p.device_id = d.device_id and d.state=1 ";
         if (null != state && state.length > 0) {

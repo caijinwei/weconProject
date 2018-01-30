@@ -51,12 +51,13 @@ public interface AlarmCfgApi {
 	public AlarmCfg getAlarmcfg(long device_id, String name);
 
 	/**
-	 * 根据状态获取报警数据配置
+	 * 根据状态或ID获取报警数据配置
 	 *
+	 * @param id
 	 * @param state
 	 * @return
 	 */
-	List<AlarmCfgExtend> getAlarmCfgExtendListByState(Object... state);
+	List<AlarmCfgExtend> getAlarmCfgExtendListByState(Long id, Object... state);
 
 	public boolean upAlarmCfg(AlarmCfg alarmCfg);
 
