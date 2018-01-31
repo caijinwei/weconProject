@@ -2,7 +2,7 @@ package com.wecon.common.enums;
 
 /**
  * 项目类型枚举
- * Created by fengbing_dian91 on 2015/12/3.
+ * Created by fengbing on 2015/12/3.
  */
 public enum ProjectOption implements EnumVal
 {

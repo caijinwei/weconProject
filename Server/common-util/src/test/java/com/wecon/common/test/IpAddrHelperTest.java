@@ -3,7 +3,7 @@ package com.wecon.common.test;
 import com.wecon.common.web.IpAddrHelper;
 
 /**
- * Created by fengbing_dian91 on 2015/12/18.
+ * Created by fengbing on 2015/12/18.
  */
 public class IpAddrHelperTest
 {

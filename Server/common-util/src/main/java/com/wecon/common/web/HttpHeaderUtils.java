@@ -7,7 +7,6 @@ import java.util.UUID;
 
 /**
  * getHeader 参数不区分大小写
- * Created by fengbing_dian91 on 2017/3/20.
  */
 public final class HttpHeaderUtils
 {

@@ -6,7 +6,7 @@ import org.dom4j.dom.DOMElement;
 
 /**
  * 对XmlUtil类的测试方法
- * Created by fengbing_dian91 on 2015/12/17.
+ * Created by fengbing on 2015/12/17.
  */
 public class XmlUtilTest
 {

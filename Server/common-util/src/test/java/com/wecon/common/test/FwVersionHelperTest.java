@@ -5,7 +5,7 @@ import com.wecon.common.enums.MobileOption;
 import com.wecon.common.util.FwVersionHelper;
 
 /**
- * Created by fengbing_dian91 on 2015/12/14.
+ * Created by fengbing on 2015/12/14.
  */
 public class FwVersionHelperTest
 {

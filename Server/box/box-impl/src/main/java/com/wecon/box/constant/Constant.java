@@ -88,19 +88,4 @@ public class Constant {
 		 */
 		public static final int DATA_TYPE_ALARM = 2;
 	}
-
-	public class AddNum {
-		/**
-		 * 实时数据配置上限
-		 */
-		public static final int ACT_SET_NUM = 500;
-		/**
-		 * 历史数据配置上限
-		 */
-		public static final int HIS_SET_NUM = 100;
-		/**
-		 * 报警数据配置上限
-		 */
-		public static final int ALARM_SET_NUM = 200;
-	}
 }

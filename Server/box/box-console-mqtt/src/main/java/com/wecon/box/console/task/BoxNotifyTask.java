@@ -426,7 +426,7 @@ public class BoxNotifyTask extends Thread {
 						}
 					}
 					List<String[]> fUpdArgs = getFeedbackUpdArgs(updComList, "com");
-					plcInfoApi.batchUpdateState(fUpdArgs);
+					plcInfoApi.batchUpdateStateAndSync(fUpdArgs);
 					plcInfoApi.batchUpdateFileMd5(fUpdArgs);
 
 					// 更新失败的状态

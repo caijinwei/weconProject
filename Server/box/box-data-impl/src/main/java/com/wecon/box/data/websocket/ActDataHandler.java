@@ -86,6 +86,7 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 					Set<String> channelSet = new HashSet<>();
 					channelSet.add("update_realcfg");
 					channelSet.add("delete_realcfg");
+					channelSet.add("upd_device_cfg");
 					subscribeRealData(session, channelSet);
 				}else if("2".equals(markId)){
 					paramMap.put(session.getId(), params);
@@ -265,14 +266,27 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 				}else if("3".equals(bParams.get("markId").toString())){
 					try {
 						Client client = clientMap.get(session.getId());
-						List<RealHisCfgExtend> realHisCfgList = JSON.parseArray(message, RealHisCfgExtend.class);
+						List<RealHisCfgExtend> realHisCfgList = null;
+						int opType = 0;
+						if("upd_device_cfg".equals(channel)){
+							Map<String, Object> param = JSON.parseObject(message, new TypeReference<Map<String, Object>>() {});
+							opType = Integer.parseInt(param.get("op_type").toString());
+							long opId = Long.parseLong(param.get("op_id").toString());
+							if(OpTypeOption.UpdRealHisCfg.getValue() == opType || OpTypeOption.DelRealHisCfg.getValue() == opType){
+								realHisCfgList = realHisCfgApi.getRealHisCfgListById(opId);
+							}
+						}else if("update_realcfg".equals(channel) || "delete_realcfg".equals(channel)){
+							realHisCfgList = JSON.parseArray(message, RealHisCfgExtend.class);
+						}
+
 						if(null != realHisCfgList && realHisCfgList.size() > 0){
 							JSONObject list = new JSONObject();
 							JSONArray arr = new JSONArray();
 							int operType = 0;
 							for(RealHisCfgExtend cfg : realHisCfgList){
 								JSONObject data = new JSONObject();
-								if("update_realcfg".equals(channel)){
+								if("update_realcfg".equals(channel)
+										|| ("upd_device_cfg".equals(channel) && OpTypeOption.UpdRealHisCfg.getValue() == opType)){
 									data.put("monitorId", cfg.id);
 									data.put("monitorName", CommonUtils.isNullOrEmpty(cfg.ref_alais) ? cfg.name
 											: cfg.ref_alais);
@@ -285,7 +299,8 @@ public class ActDataHandler extends AbstractWebSocketHandler {
 									data.put("dataLimit", cfg.data_limit);
 									data.put("rid", cfg.rid);
 									data.put("roleType", client.userInfo.getUserType() == 1 ? 3 : cfg.role_type);
-								}else if("delete_realcfg".equals(channel)){
+								}else if("delete_realcfg".equals(channel)
+										|| ("upd_device_cfg".equals(channel) && OpTypeOption.DelRealHisCfg.getValue() == opType)){
 									data.put("monitorId", cfg.id);
 								}
 								operType = cfg.state;

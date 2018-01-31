@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by linkaixun_dian91 on 2016/1/7.
+ * Created by linkaixun on 2016/1/7.
  */
 public class PagedList<T> //extends ICollection<T>
 {

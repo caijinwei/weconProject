@@ -1,7 +1,7 @@
 package com.wecon.common.container;
 
 /**
- * Created by linkaixun_dian91 on 2015/12/7.
+ * Created by linkaixun on 2015/12/7.
  */
 public class Container<T1, T2>
 {

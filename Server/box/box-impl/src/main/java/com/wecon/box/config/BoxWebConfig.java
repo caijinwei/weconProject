@@ -21,6 +21,21 @@ public class BoxWebConfig {
 
     private String mqttPwd;
 
+    /**
+     * 实时数据最大配置数，-1表示无限制
+     */
+    private Integer actSetNum;
+
+    /**
+     * 历史数据最大配置数，-1表示无限制
+     */
+    private Integer hisSetNum;
+
+    /**
+     * 告警数据最大配置数，-1表示无限制
+     */
+    private Integer alarmSetNum;
+
     public String getMqttHost() {
         return mqttHost;
     }
@@ -59,5 +74,29 @@ public class BoxWebConfig {
 
     public void setFileDownloadUrl(String fileDownloadUrl) {
         this.fileDownloadUrl = fileDownloadUrl;
+    }
+
+    public Integer getActSetNum() {
+        return actSetNum;
+    }
+
+    public void setActSetNum(Integer actSetNum) {
+        this.actSetNum = actSetNum;
+    }
+
+    public Integer getHisSetNum() {
+        return hisSetNum;
+    }
+
+    public void setHisSetNum(Integer hisSetNum) {
+        this.hisSetNum = hisSetNum;
+    }
+
+    public Integer getAlarmSetNum() {
+        return alarmSetNum;
+    }
+
+    public void setAlarmSetNum(Integer alarmSetNum) {
+        this.alarmSetNum = alarmSetNum;
     }
 }

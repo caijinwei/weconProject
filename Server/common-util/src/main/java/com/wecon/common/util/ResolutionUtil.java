@@ -2,7 +2,7 @@ package com.wecon.common.util;
 
 /**
  * 客户端分辨率的拆解计算方法
- * Created by fengbing_dian91 on 2016/9/22.
+ * Created by fengbing on 2016/9/22.
  */
 public class ResolutionUtil
 {

@@ -13,6 +13,7 @@ import com.wecon.box.filter.DevBindUserFilter;
 import com.wecon.box.param.AlarmCfgParam;
 import com.wecon.box.param.AlarmDataParam;
 import com.wecon.box.redis.RedisUpdDeviceCfg;
+import com.wecon.box.util.BoxWebConfigContext;
 import com.wecon.box.util.DbLogUtil;
 import com.wecon.box.util.OptionUtil;
 import com.wecon.common.util.CommonUtils;
@@ -496,7 +497,7 @@ public class AlarmDataAction {
 				}
 				// 判断报警配置是否达到上限
 				List<AlarmCfg> listAlarmCfg = alarmCfgApi.getAlarmCfg(account_id, alarmCfgParam.device_id);
-				if (listAlarmCfg != null && listAlarmCfg.size() >= Constant.AddNum.ALARM_SET_NUM) {
+				if (BoxWebConfigContext.boxWebConfig.getAlarmSetNum() > -1 && listAlarmCfg != null && listAlarmCfg.size() >= BoxWebConfigContext.boxWebConfig.getAlarmSetNum()) {
 					throw new BusinessException(ErrorCodeOption.Alarm_add_Beyond.key,
 							ErrorCodeOption.Alarm_add_Beyond.value);
 				}

@@ -21,7 +21,6 @@ import java.util.*;
 
 /**
  * 网页接口请求类
- * Created by fengbing_dian91 on 2015/11/23.
  */
 public final class WebHelper
 {

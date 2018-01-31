@@ -8,7 +8,7 @@ package com.wecon.common.enums;
 /**
  * APK软件包支持的cpu类型枚举
  *
- * @author zengzhipeng_dian91
+ * @author zengzhipeng
  */
 public enum APKCpuOption {
 

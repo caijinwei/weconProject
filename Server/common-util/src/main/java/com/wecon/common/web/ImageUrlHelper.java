@@ -9,7 +9,6 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * 图片服务器地址生成帮助类
- * Created by fengbing_dian91 on 2015/12/23.
  */
 public class ImageUrlHelper
 {

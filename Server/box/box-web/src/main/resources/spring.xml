@@ -33,6 +33,9 @@
         <property name="mqttHost" value="${mqtt.host}"/>
         <property name="mqttUsername" value="${mqtt.username}"/>
         <property name="mqttPwd" value="${mqtt.password}"/>
+        <property name="actSetNum" value="${actSetNum}"/>
+        <property name="hisSetNum" value="${hisSetNum}"/>
+        <property name="alarmSetNum" value="${alarmSetNum}"/>
     </bean>
     <bean id="boxWebContext" class="com.wecon.box.util.BoxWebConfigContext">
         <property name="boxWebConfig" ref="boxWebConfig"/>

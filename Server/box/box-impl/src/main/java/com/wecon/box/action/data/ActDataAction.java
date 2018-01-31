@@ -16,10 +16,7 @@ import com.wecon.box.filter.RealHisCfgFilter;
 import com.wecon.box.filter.ViewAccountRoleFilter;
 import com.wecon.box.param.RealHisCfgParam;
 import com.wecon.box.redis.RedisUpdDeviceCfg;
-import com.wecon.box.util.DbLogUtil;
-import com.wecon.box.util.OptionUtil;
-import com.wecon.box.util.PlcTypeParser;
-import com.wecon.box.util.PlcTypeQuerier;
+import com.wecon.box.util.*;
 import com.wecon.common.util.CommonUtils;
 import com.wecon.restful.annotation.WebApi;
 import com.wecon.restful.core.AppContext;
@@ -780,7 +777,7 @@ public class ActDataAction {
 					realHisCfgFilter.device_id = realHisCfgParam.device_id;
 
 					realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(realHisCfgFilter);
-					if (realHisCfgDeviceList.size() >= Constant.AddNum.ACT_SET_NUM) {
+					if (BoxWebConfigContext.boxWebConfig.getActSetNum() > -1 && realHisCfgDeviceList.size() >= BoxWebConfigContext.boxWebConfig.getActSetNum()) {
 						throw new BusinessException(ErrorCodeOption.Act_add_Beyond.key,
 								ErrorCodeOption.Act_add_Beyond.value);
 					}
@@ -798,7 +795,7 @@ public class ActDataAction {
 					realHisCfgFilter.device_id = realHisCfgParam.device_id;
 
 					realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(realHisCfgFilter);
-					if (realHisCfgDeviceList.size() >= Constant.AddNum.HIS_SET_NUM) {
+					if (BoxWebConfigContext.boxWebConfig.getHisSetNum() > -1 && realHisCfgDeviceList.size() >= BoxWebConfigContext.boxWebConfig.getHisSetNum()) {
 						throw new BusinessException(ErrorCodeOption.His_add_Beyond.key,
 								ErrorCodeOption.His_add_Beyond.value);
 					}
@@ -813,7 +810,7 @@ public class ActDataAction {
 						for (int i = 0; i < realHisCfgParam.batch; i++) {
 							if (realHisCfgParam.data_type == 0) {
 								realHisCfgDeviceList = realHisCfgApi.getRealHisCfg(realHisCfgFilter);
-								if (realHisCfgDeviceList.size() >= Constant.AddNum.ACT_SET_NUM) {
+								if (BoxWebConfigContext.boxWebConfig.getActSetNum() > -1 && realHisCfgDeviceList.size() >= BoxWebConfigContext.boxWebConfig.getActSetNum()) {
 									break;
 								}
 							}

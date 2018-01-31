@@ -1,7 +1,7 @@
 package com.wecon.common.enums;
 
 /**
- * Created by linkaixun_dian91 on 2016/3/8.
+ * Created by linkaixun on 2016/3/8.
  */
 public enum StatTypeOption implements EnumVal
 {

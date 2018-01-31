@@ -16,7 +16,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 
 /**
- * Created by fengbing_dian91 on 2015/12/15.
+ * Created by fengbing on 2015/12/15.
  */
 public class CryptoHelperTest
 {

@@ -7,7 +7,7 @@ package com.wecon.common.enums;
 
 /**
  *
- * @author zengzhipeng_dian91
+ * @author zengzhipeng
  */
 public enum PicDisplayStateOption {
     All("所有状态", -1),
