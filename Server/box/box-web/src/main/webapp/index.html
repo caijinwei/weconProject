@@ -13,9 +13,10 @@
     <link rel="stylesheet" type="text/css" href="webref/lib/animate.min.css"/>
     <link rel="stylesheet" type="text/css" href="webref/lib/base.css"/>
     <link rel="stylesheet" type="text/css" href="webref/css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="webref/lib/jquery/context/css/context.standalone.css">
     <!--低版本浏览器识别HTML5标签--><!--低版本浏览器支持CSS媒体查询--><!--[if lt IE 9]>
-    <script type="text/javascript" src="lib/html5shiv/html5shiv-printshiv.min.js"></script>
-    <script type="text/javascript" src="lib/respond/respond.min.js"></script>
+    <script type="text/javascript" src="webref/lib/html5shiv/html5shiv-printshiv.min.js"></script>
+    <script type="text/javascript" src="webref/lib/respond/respond.min.js"></script>
     <![endif]-->
     <style>
         [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak,
@@ -81,7 +82,7 @@
                             </a>
                             <a title="添加盒子">
                                 <button class="nav-btn btn-circle btn-primary main-list" type="button"
-                                        data-toggle="modal" data-target="#addPIBox"><i class="fa fa-plus-square"></i>
+                                        data-toggle="modal" ng-click="getRefList()"  data-target="#addPIBox"><i class="fa fa-plus-square"></i>
                                 </button>
                             </a>
                             <a class="J_menuItem" href="webref/html/user/viewaccountmgr.html" target="content_frame"
@@ -112,18 +113,18 @@
                         <span class="fa arrow"></span>
                     </a>
                     <ul class="nav nav-second-level" id="dir_ul_{{x.accountdirId}}" sid="{{x.accountdirId}}">
-                        <li>
+                        <li  ng-repeat="y in x.deviceList">
                             <a class="J_menuItem" id="box_{{y.deviceId}}" target="content_frame" map="{{y.deviceMap}}"
                                href="webref/html/boxtitle.html?device_id={{y.deviceId}}&device_name={{y.deviceName}}"
                                data_devid="{{y.deviceId}}" draggable="true" ondragstart="drag(event)"
-                               ng-click="selectbox(y.deviceId)" class="list-group-item"
-                               ng-repeat="y in x.deviceList"><i name="i_box"
+                               ng-click="selectbox(y.deviceId)" class="list-group-item"><i name="i_box"
                                                                 ng-class="{true:'fa fa-circle using-icon',false:'fa fa-ban unusing-icon'}[y.deviceState==1]"
                                                                 data-toggle="tooltip"
                                                                 title="{{y.deviceState==1?'在线':'离线'}}"></i>{{y.deviceName}}</a>
                         </li>
                     </ul>
                 </li>
+
                 </ul>
 
                 <ul class="nav leftmenu" role="tablist"
@@ -181,7 +182,7 @@
     </div>
 
 </div>
-<!--模态框-->
+<!--添加V-Box模态框-->
 <div class="modal inmodal fade" id="addPIBox" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
@@ -195,14 +196,14 @@
                     <div class="row">
                         <div class="form-group">
                             <i class="fa fa-code icon"></i>
-                            <input type="text" class="form-control form-pading" placeholder="PIBox序列号"
+                            <input type="text" class="form-control form-pading" placeholder="V-BOX机器码"
                                    id="machine_code"/>
                         </div>
                     </div>
                     <div class="row">
                         <div class="form-group">
                             <i class="fa fa-lock icon"></i>
-                            <input type="password" class="form-control form-pading" placeholder="PIBox密码"
+                            <input type="password" class="form-control form-pading" placeholder="V-BOX密码"
                                    id="dev_password"/>
                         </div>
                     </div>
@@ -214,45 +215,25 @@
                     </div>
                     <div class="row" style="margin-top: 20px;">
                         <select id="acc_dir_id" class="form-control form-inline">
-                            <option>默认分组</option>
-                            <option>分组1</option>
-                            <option>分组2</option>
-                            <option>分组3</option>
+                            <option ng-repeat="x in refList" value="{{x.id}}">{{x.name}}</option>
                         </select>
                     </div>
                     <div class="row">
                         <select class="form-control" id="deviceUse" name="deviceUse"
-                                value="[{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:1,&quot;useName&quot;:&quot;智能家居&quot;},{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:2,&quot;useName&quot;:&quot;车联网&quot;},{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:3,&quot;useName&quot;:&quot;智能安防&quot;},{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:4,&quot;useName&quot;:&quot;智能电网&quot;},{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:5,&quot;useName&quot;:&quot;智能交通&quot;},{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:6,&quot;useName&quot;:&quot;智能工业&quot;},{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:7,&quot;useName&quot;:&quot;智能农业&quot;},{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:8,&quot;useName&quot;:&quot;智能物流&quot;},{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:9,&quot;useName&quot;:&quot;人工智能&quot;},{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:10,&quot;useName&quot;:&quot;节能环保市场&quot;},{&quot;deviceId&quot;:0,&quot;otherUseName&quot;:null,&quot;useCode&quot;:999,&quot;useName&quot;:&quot;其他行业&quot;}]">
-                            <!-- ngRepeat: use in deviceUseOptions -->
-                            <option ng-repeat="use in deviceUseOptions" value="1" class="ng-binding ng-scope">智能家居
-                            </option><!-- end ngRepeat: use in deviceUseOptions -->
-                            <option ng-repeat="use in deviceUseOptions" value="2" class="ng-binding ng-scope">车联网
-                            </option><!-- end ngRepeat: use in deviceUseOptions -->
-                            <option ng-repeat="use in deviceUseOptions" value="3" class="ng-binding ng-scope">智能安防
-                            </option><!-- end ngRepeat: use in deviceUseOptions -->
-                            <option ng-repeat="use in deviceUseOptions" value="4" class="ng-binding ng-scope">智能电网
-                            </option><!-- end ngRepeat: use in deviceUseOptions -->
-                            <option ng-repeat="use in deviceUseOptions" value="5" class="ng-binding ng-scope">智能交通
-                            </option><!-- end ngRepeat: use in deviceUseOptions -->
-                            <option ng-repeat="use in deviceUseOptions" value="6" class="ng-binding ng-scope">智能工业
-                            </option><!-- end ngRepeat: use in deviceUseOptions -->
-                            <option ng-repeat="use in deviceUseOptions" value="7" class="ng-binding ng-scope">智能农业
-                            </option><!-- end ngRepeat: use in deviceUseOptions -->
-                            <option ng-repeat="use in deviceUseOptions" value="8" class="ng-binding ng-scope">智能物流
-                            </option><!-- end ngRepeat: use in deviceUseOptions -->
-                            <option ng-repeat="use in deviceUseOptions" value="9" class="ng-binding ng-scope">人工智能
-                            </option><!-- end ngRepeat: use in deviceUseOptions -->
-                            <option ng-repeat="use in deviceUseOptions" value="10" class="ng-binding ng-scope">节能环保市场
-                            </option><!-- end ngRepeat: use in deviceUseOptions -->
-                            <option ng-repeat="use in deviceUseOptions" value="999" class="ng-binding ng-scope">其他行业
-                            </option><!-- end ngRepeat: use in deviceUseOptions -->
+                                value="{{deviceUseOptions}}" onchange="isOtherOption()">
+                            <option ng-repeat="use in deviceUseOptions" value="{{use.useCode}}">{{use.useName}}
+                            </option>
                         </select>
+                    </div>
+                    <div class="row" >
+                        <input type="text" class="form-control form-pading" placeholder="其他行业"
+                               type="text" id="otherDeviceUseName" name="otherDeviceUseName"maxlength="15" />
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary">保存</button>
+                <button type="button" class="btn btn-white" data-dismiss="modal" ng-click="clearInput()">关闭</button>
+                <button type="button" class="btn btn-primary" ng-click="boundBox()">保存</button>
             </div>
         </div>
     </div>

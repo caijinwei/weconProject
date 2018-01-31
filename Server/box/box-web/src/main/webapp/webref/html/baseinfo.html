@@ -176,7 +176,7 @@
                                             <label class="col-sm-2 control-label">高级功能</label>
 
                                             <div class="col-sm-4 ">
-                                                <button class="btn btn-danger" type="button" ng-click="deletePIBox()">
+                                                <button class="btn btn-danger" type="button" ng-click="deletePIBox(infoData.device_id)">
                                                     解绑V-Box
                                                 </button>
                                                 <button class="btn btn-primary" type="button"
@@ -814,9 +814,9 @@
 <!--end 配置复制提示modal -->
 
 <!--begin 地位地图modal-->
-<div class="modal fade" id="showRestOpint" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+<div class="modal fade" id="localMapModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
      aria-hidden="true">
-    <div class="modal-dialog" id="modal-content-id">
+    <div class="modal-dialog" id="modal-content-id" style="width: 1600px;">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
@@ -826,15 +826,14 @@
                     定位
                 </h4>
             </div>
-            <div class="modal-body " style="height: 450px;" id="model-body-id">
-                <iframe id="map"
-                        frameborder="0" marginheight="0"
-                        marginwidth="0" width="100%" height="100%"></iframe>
+            <div class="modal-body " style="height:500px;" id="model-body-id">
+                <iframe class="J_iframe"  width="100%" height="100%" frameborder="0"
+                         id="mapIframe" src="user/testMap.html"></iframe>
             </div>
             <div class="modal-footer">
                 <button type="button" id="btn_cancelSetOption" class="btn btn-default" data-dismiss="modal">关闭
                 </button>
-                <button type="button" id="btn_setViewOpint" class="btn btn-primary" ng-click="">
+                <button type="button" id="btn_setViewOpint" class="btn btn-primary">
                     确定
                 </button>
             </div>
@@ -852,6 +851,8 @@
 <script src="../lib/wecon-common.js"></script>
 <script src="../lib/jquery.dataTables.min.js"></script>
 <script src="../js/baseinfo.js?v=1"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=22nCxldLGEbsQ3gXBNTwhF4Te4UDzECE"></script>
+
 <script>
     $(function () {
         $("#tables").sortable({
@@ -885,6 +886,25 @@
         $(".i-checks").iCheck({checkboxClass: "icheckbox_square-green", radioClass: "iradio_square-green",})
     });
 
+//    var initMap1 = function () {
+//        console.log("有执行到么");
+//        // 百度地图API功能
+//        var map = new BMap.Map("allmap");    // 创建Map实例
+//        map.centerAndZoom(new BMap.Point(116.404, 39.915), 11);  // 初始化地图,设置中心点坐标和地图级别
+//        //添加地图类型控件
+//        map.addControl(new BMap.MapTypeControl({
+//            mapTypes: [
+//                BMAP_NORMAL_MAP,
+//                BMAP_HYBRID_MAP
+//            ]
+//        }));
+//        map.setCurrentCity("北京");          // 设置地图显示的城市 此项是必须设置的
+//        map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+//    }
+//
+//    var initMap = function(){
+//        setTimeout('initMap1()', 1000);
+//    }
 
 </script>
 </body>

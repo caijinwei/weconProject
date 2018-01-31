@@ -426,8 +426,6 @@ function drop(ev) {
     var appElement = document.querySelector('[ng-controller=infoController]');
     var $scope = angular.element(appElement).scope();
 
-
-
     $scope.dragToUpdateDir($('#' + data).parent().parent().attr("sid"), $('#' + data)
         .attr("data_devid"), fromDirId, $('#' + data).attr("data_devid"));
 }

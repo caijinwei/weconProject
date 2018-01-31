@@ -57,7 +57,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             }
             else {
 
-                swal(code+ '-' + msg,"","error");
+                swal(code + '-' + msg, "", "error");
             }
         }, function () {
             console.log("ajax error");
@@ -76,7 +76,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $scope.$apply();
             }
             else {
-                swal(code + "-" + msg,"","error");
+                swal(code + "-" + msg, "", "error");
             }
         }, function () {
             console.log("ajax error");
@@ -87,7 +87,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      *   盒子与账户解除绑定提示
      *   sweetalart
      * */
-    $scope.deletePIBox = function () {
+    $scope.deletePIBox = function (device_id) {
         var infoDataName = $scope.infoData.name;
         swal({
             title: "确定解绑盒子:" + infoDataName + "?",
@@ -112,14 +112,14 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         T.common.ajax.request("WeconBox", "baseInfoAction/deletePIBox", parmas, function (data, code, msg) {
             if (code == 200) {
                 $("#deletePIBox").modal('hide');
-                swal("解除绑定成功！","","success");
+                swal("解除绑定成功！", "", "success");
                 if (self != top) {
-                    window.parent.reloadBoxList();
+                    window.parent.parent.reloadBoxList();
                 }
-                window.location.href = "overview.html";
+                window.parent.location.href = "overview.html";
             }
             else {
-                swal(code + "-" + msg,"","error");
+                swal(code + "-" + msg, "", "error");
             }
         }, function () {
             console.log("ajax error");
@@ -137,7 +137,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $("#copyConfigModal").modal("show");
             }
             else {
-                swal(code + "-" + msg,"","error");
+                swal(code + "-" + msg, "", "error");
             }
         }, function () {
             console.log("ajax error");
@@ -160,34 +160,40 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             isCopyHis: isHisSelCheck,
             isCopyAlarm: isAlarmSelCheck
         };
-        /*
-         * isCopyBaseInfo='null', isCopyCom='null', isCopyReal='null', isCopyHis='null', isCopyAlarm='null'
-         * */
-        T.common.ajax.request("WeconBox", "baseInfoAction/copyDeviceConfig", params, function (data, code, msg) {
-            if (code == 200) {
-                var alarmMes = "";
-                $("#copyConfigModal").modal("hide");
 
-                $scope.copyMessage = data.data;
-                $.each(data.data, function (name, value) {
-                    if (value == "成功") {
-                        alarmMes += name + "&nbsp;&nbsp;&nbsp;&nbsp;<span  style='color: green;'>" + value + "</span></br>";
+        if(fromDeviceId == undefined || fromDeviceId == ""){
+            swal("参数不完整","","error");
+        }else {
 
-                    } else {
-                        alarmMes += name + "&nbsp;&nbsp;&nbsp;&nbsp;<span  style='color: red;'>" + value + "</span></br>";
-                    }
-                });
-                $("#noticeMessage").empty();
-                $("#noticeMessage").append(alarmMes);
-                console.log("消息是:   " + alarmMes);
-                $("#noticeCopy").modal("show");
-            }
-            else {
-                swal(code + "-" + msg,"","error");
-            }
-        }, function () {
-            console.log("ajax error");
-        });
+            /*
+             * isCopyBaseInfo='null', isCopyCom='null', isCopyReal='null', isCopyHis='null', isCopyAlarm='null'
+             * */
+            T.common.ajax.request("WeconBox", "baseInfoAction/copyDeviceConfig", params, function (data, code, msg) {
+                if (code == 200) {
+                    var alarmMes = "";
+                    $("#copyConfigModal").modal("hide");
+
+                    $scope.copyMessage = data.data;
+                    $.each(data.data, function (name, value) {
+                        if (value == "成功") {
+                            alarmMes += name + "&nbsp;&nbsp;&nbsp;&nbsp;<span  style='color: green;'>" + value + "</span></br>";
+
+                        } else {
+                            alarmMes += name + "&nbsp;&nbsp;&nbsp;&nbsp;<span  style='color: red;'>" + value + "</span></br>";
+                        }
+                    });
+                    $("#noticeMessage").empty();
+                    $("#noticeMessage").append(alarmMes);
+                    console.log("消息是:   " + alarmMes);
+                    $("#noticeCopy").modal("show");
+                }
+                else {
+                    swal(code + "-" + msg, "", "error");
+                }
+            }, function () {
+                console.log("ajax error");
+            });
+        }
 
     }
 
@@ -220,7 +226,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $scope.$apply();
             }
             else {
-                swal(code + "-" + msg,"","error");
+                swal(code + "-" + msg, "", "error");
             }
         }, function () {
             console.log("ajax error");
@@ -305,7 +311,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $scope.$apply();
             }
             else {
-                swal(code + "-" + msg,"","","error");
+                swal(code + "-" + msg, "", "", "error");
             }
         }, function () {
             console.log("ajax error");
@@ -376,17 +382,17 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         var selectport = $("#port").val();
         if (params.device_id == "" || params.type == "" || $scope.selectedType == "" || $scope.selectedPtype == "" || $("#ptype").val() == "" || params.driver == "" || params.box_stat_no == "" || params.plc_stat_no == "" || params.port == "" || params.retry_times == ""
             || params.wait_timeout == "" || params.rev_timeout == "" || params.com_stepinterval == "" || params.com_iodelaytime == "" || params.retry_timeout == "") {
-            swal("配置参数未填写","","warning");
+            swal("配置参数未填写", "", "warning");
             $("#btn_plcInfo_submit").removeAttr("disabled");
             return;
         }
         if (selectport == 'Ethernet') {
             if (params.net_port == "" || params.net_type == "" || params.net_isbroadcast == "" || params.net_broadcastaddr == "" || params.net_ipaddr == "") {
-                swal("配置参数未填写","","warning");
+                swal("配置参数未填写", "", "warning");
                 $("#btn_plcInfo_submit").removeAttr("disabled");
                 return;
                 if (isValidIP(params.net_ipaddr) != true) {
-                    swal("情输入正确的IP地址","","warning");
+                    swal("情输入正确的IP地址", "", "warning");
                     $("#btn_plcInfo_submit").removeAttr("disabled");
                     return;
                 }
@@ -426,14 +432,14 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
          * */
         T.common.ajax.request("WeconBox", "plcInfoAction/savePlcInfo", params, function (data, code, msg) {
             if (code == 200) {
-                swal("操作成功","","success");
+                swal("操作成功", "", "success");
                 $("#addConfig").modal("hide");
                 $("#btn_plcInfo_submit").removeAttr("disabled");
                 $scope.showPlcList();
                 $scope.$apply();
             }
             else {
-                swal(code + "-" + msg,"","error");
+                swal(code + "-" + msg, "", "error");
                 $("#btn_plcInfo_submit").removeAttr("disabled");
             }
         }, function () {
@@ -472,7 +478,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 $scope.$apply();
             }
             else {
-                swal(code + "-" + msg,"","error");
+                swal(code + "-" + msg, "", "error");
             }
         }, function () {
             console.log("ajax error");
@@ -565,10 +571,10 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             $('#net_broadcastaddr').val(type[0].net_broadcastaddr);
             //默认设置
 
-            if($("#net_isbroadcast").val() == 1){
-                $("#net_isbroadcast").attr("checked","true");
-            }else{
-                $("#net_isbroadcast").attr("checked","false");
+            if ($("#net_isbroadcast").val() == 1) {
+                $("#net_isbroadcast").attr("checked", "true");
+            } else {
+                $("#net_isbroadcast").attr("checked", "false");
             }
             $scope.isBroadcast();
         } else if ($('#port').val() == 'COM1' || $('#port').val() == "COM2") {
@@ -596,22 +602,22 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         var maxHisDataCount = $("#maxHisDataCount").val();
         var regMaxHisCount = /^[1-9]{1}[0-9]{0,4}$/
         if (!regMaxHisCount.test(maxHisDataCount) || maxHisDataCount > 50000) {
-            swal("历史数据最多保存条数设置错误,请输入1-50000","","error");
+            swal("历史数据最多保存条数设置错误,请输入1-50000", "", "error");
             return;
         }
         if (map_a != "" || map_o != "") {
             if (isNaN(map_a) || isNaN(map_o)) {
-                swal("地图坐标格式错误","","error");
+                swal("地图坐标格式错误", "", "error");
                 return;
             }
             var reg_a = /^[\-\+]?(0|0\.\d{1,6}|\d{1}|\d{1}\.\d{1,6}|[1-9]{1}\d{1}|[1-9]{1}\d{1}\.\d{1,6}|1[0-7]{1}\d{1}\.\d{1,6}|1[0-7]{1}\d{1}|180\.[0]{1,6}|180)$/;
             if (!reg_a.test(map_a)) {
-                swal("经度输入错误，请输入经度-180.000000~180.000000的数!","","error");
+                swal("经度输入错误，请输入经度-180.000000~180.000000的数!", "", "error");
                 return;
             }
             var reg_o = /^[\-\+]?(0|0\.\d{1,6}|\d{1}|\d{1}\.\d{1,6}|[1-8]\d{1}|[1-8]\d{1}\.\d{1,6}|90|90\.[0]{1,6})$/;
             if (!reg_o.test(map_o)) {
-                swal("纬度输入错误，请输入纬度-90.000000~90.000000的数!","","error");
+                swal("纬度输入错误，请输入纬度-90.000000~90.000000的数!", "", "error");
                 return;
             }
         }
@@ -642,12 +648,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         }
         T.common.ajax.request("WeconBox", "baseInfoAction/chgPiboxInFoName", params, function (data, code, msg) {
             if (code == 200) {
-                swal("保存成功！","","success");
-                window.parent.reloadBoxList();
+                swal("保存成功！", "", "success");
+                window.parent.parent.reloadBoxList();
                 //$scope.$apply();
             }
             else {
-                swal(code + "-" + msg,"","error");
+                swal(code + "-" + msg, "", "error");
             }
         }, function () {
             console.log("ajax error");
@@ -680,7 +686,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             }
             else {
                 $("#deletePlc").modal("hide");
-                swal(code + "-" + msg,"","error");
+                swal(code + "-" + msg, "", "error");
             }
         }, function () {
             console.log("ajax error");
@@ -761,7 +767,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 //}
     $scope.openGetDeviceDebugInfo = function (machine_code, state) {
         if (state != 1) {
-            swal("盒子已经离线","","warning");
+            swal("盒子已经离线", "", "warning");
             return;
         }
         if (ws == "" || ws == undefined) {
@@ -787,7 +793,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             }
             else {
                 $("#deletePlc").modal("hide");
-                swal(code + "-" + msg,"","error");
+                swal(code + "-" + msg, "", "error");
             }
         }, function () {
             console.log("ajax error");
@@ -799,16 +805,16 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         var localVersionCode = $scope.localVersionCode;
         var dev_model = $scope.dev_model;
         if (dev_model == "" || dev_model == undefined) {
-            swal("无法获取可更新设备类型","","error");
+            swal("无法获取可更新设备类型", "", "error");
             return;
         }
         if (localVersionCode == "" || localVersionCode == undefined) {
-            swal("无法获取本地版本号","","error");
+            swal("无法获取本地版本号", "", "error");
             return;
         }
         var device_id = $scope.device_id;
         if (device_id == "" || device_id == undefined) {
-            swal("系统忙，稍后操作","","warning");
+            swal("系统忙，稍后操作", "", "warning");
             return;
         }
         var params = {
@@ -839,7 +845,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 }
             }
             else {
-                swal(code+ '-' + msg,"","error");
+                swal(code + '-' + msg, "", "error");
             }
         }, function () {
             console.log("ajax error");
@@ -888,7 +894,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 }
             }
             else {
-                swal(code+ '-' + msg,"","error");
+                swal(code + '-' + msg, "", "error");
             }
         }, function () {
             console.log("ajax error");
@@ -918,7 +924,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 }
             }
             else {
-                swal(code+ "-" + msg ,"","error");
+                swal(code + "-" + msg, "", "error");
             }
         }, function () {
             console.log("ajax error");
@@ -928,7 +934,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     $scope.updateAllDriver = function (machine_code) {
         var device_id = $scope.device_id;
         if (device_id == "" || device_id == undefined) {
-            swal("系统忙，稍后操作","","warning");
+            swal("系统忙，稍后操作", "", "warning");
             return;
         }
         var params = {
@@ -937,10 +943,10 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         }
         T.common.ajax.request("WeconBox", "driveraction/updateAllDriver", params, function (data, code, msg) {
             if (code == 200) {
-                swal("指令下盒子成功！","","success");
+                swal("指令下盒子成功！", "", "success");
             }
             else {
-                swal(code+ '-' + msg,"","error");
+                swal(code + '-' + msg, "", "error");
 
             }
         }, function () {
@@ -953,7 +959,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         var localVersionCode = $scope.localVersionCode;
         var dev_model = $scope.dev_model;
         if (dev_model == "" || dev_model == undefined || localVersionCode == "" || localVersionCode == undefined) {
-            swal("系统错误","error");
+            swal("系统错误", "error");
             return;
         }
         var params = {
@@ -979,7 +985,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             }
             else {
                 $("#deletePlc").modal("hide");
-                swal(code + "-" + msg,"error");
+                swal(code + "-" + msg, "error");
             }
         }, function () {
             console.log("ajax error");
@@ -998,11 +1004,11 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         }
         if (machine_code == "" || machine_code == undefined || versionName == "" || versionName == undefined || version_code == "" || version_code == undefined || file_id == "" || file_id == undefined) {
             $("#checkUpdateFir").modal("hide");
-            swal("系统忙，稍后操作！","","warning");
+            swal("系统忙，稍后操作！", "", "warning");
         }
         T.common.ajax.request("WeconBox", "dirFirmAction/updateFirmFile", params, function (data, code, msg) {
             $("#checkUpdateFir").modal("hide");
-            swal("指令已下发盒子成功！","","success");
+            swal("指令已下发盒子成功！", "", "success");
         }, function () {
             console.log("ajax error");
         });
@@ -1034,7 +1040,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 
     $scope.wsf_close = function (state) {
         if (state != 1) {
-            swal("盒子已经离线！","","warning");
+            swal("盒子已经离线！", "", "warning");
             return;
         }
         wsf.close();
@@ -1064,7 +1070,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 
                 //离线判断
                 if (jsonResult.errorMsg != undefined) {
-                    swal("盒子已经离线！","","warning");
+                    swal("盒子已经离线！", "", "warning");
                     $("#loadingModal").modal("hide");
                     wsf.onclose();
                     return;
@@ -1103,150 +1109,15 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      *                      地图测试
      * */
     $scope.mapShow = function () {
-        console.log($("#map_body").css("display"));
-        if ($("#map_body").css("display") == "none") {
-            $("#btn_map_show").text("关闭地图");
-            $("#map_body")[0].style.display = "block";
-            $("#map_input")[0].style.display = "block";
-            // 百度地图API功能
-            $scope.$map = new BMap.Map("allmap");
-            var map = $scope.$map;
-            map.enableScrollWheelZoom(true);
-
-            /*
-             * 根据盒子经纬度定位为中心
-             * */
-            var map_a = $("#map_a").val();
-            var map_o = $("#map_o").val();
-            if (map_a == "" && map_o == "") {
-                map.centerAndZoom(new BMap.Point(119.310369, 26.082246), 11);
-            } else if (map_a == "") {
-                map_a = 0;
-                map.centerAndZoom(new BMap.Point(map_a, map_o), 11);
-            } else if (map_o == "") {
-                map_o = 0;
-                map.centerAndZoom(new BMap.Point(map_a, map_o), 11);
-            } else {
-                map.centerAndZoom(new BMap.Point(map_a, map_o), 11);
-            }
-            /*
-             * 设置标注点
-             * */
-            var boxTag = new BMap.Point(map_a, map_o);
-            //var label = new BMap.Label($scope.device_name,{offset:new BMap.Size(20,-10)});
-            var marker = new BMap.Marker(boxTag);
-            map.addOverlay(marker);
-            //marker.setLabel(label);
-            /*
-             * 地图搜索功能
-             * */
-            var ac = new BMap.Autocomplete(    //建立一个自动完成的对象
-                {
-                    "input": "suggestId",
-                    "location": $scope.$map
-                });
-            ac.addEventListener("onhighlight", function (e) {  //鼠标放在下拉列表上的事件
-                var str = "";
-                var _value = e.fromitem.value;
-                var value = "";
-                if (e.fromitem.index > -1) {
-                    value = _value.province + _value.city + _value.district + _value.street + _value.business;
-                }
-                str = "FromItem<br />index = " + e.fromitem.index + "<br />value = " + value;
-                value = "";
-                if (e.toitem.index > -1) {
-                    _value = e.toitem.value;
-                    value = _value.province + _value.city + _value.district + _value.street + _value.business;
-                }
-                str += "<br />ToItem<br />index = " + e.toitem.index + "<br />value = " + value + "style='z-index:999;'position:'fixed'";
-                G("searchResultPanel").innerHTML = str;
-            });
-            var myValue;
-            ac.addEventListener("onconfirm", function (e) {    //鼠标点击下拉列表后的事件
-                var _value = e.item.value;
-                myValue = _value.province + _value.city + _value.district + _value.street + _value.business;
-                G("searchResultPanel").innerHTML = "onconfirm<br />index = " + e.item.index + "<br />myValue = " + myValue;
-                setPlace();
-            });
-            function setPlace() {
-                map.clearOverlays();    //清除地图上所有覆盖物
-                function myFun() {
-                    var pp = local.getResults().getPoi(0).point;    //获取第一个智能搜索的结果
-                    map.centerAndZoom(pp, 18);
-                    map.addOverlay(new BMap.Marker(pp));    //添加标注
-                }
-
-                var local = new BMap.LocalSearch(map, { //智能搜索
-                    onSearchComplete: myFun
-                });
-                local.search(myValue);
-            }
-
-            function G(id) {
-                return document.getElementById(id);
-            }
-
-
-            /*
-             * 添加右键功能
-             * */
-            var s;//经度
-            var w;//纬度
-            map.addEventListener("rightclick", function (e) {
-                if (e.overlay) {//判断右键单击的是否是marker
-                } else {
-                    s = e.point.lng;//经度
-                    w = e.point.lat;//维度
-                    RightClick();//右键单击map出现右键菜单事件
-                }
-            });
-            //右键单击map出现右键菜单事件
-            function RightClick() {
-                //alert('你点击的是地图');
-                var createMarker = function (map) {//右键更新站名
-                    if (true) {
-                        $scope.mapinfoModalShow(s, w);
-                    }
-                };
-                var markerMenu = new BMap.ContextMenu();
-                markerMenu.addItem(new BMap.MenuItem('盒子位置', createMarker.bind(map)));
-                map.addContextMenu(markerMenu);//给标记添加右键菜单
-            }
-        } else {
-            $("#btn_map_show").text("定位");
-            $("#map_body").css("display", "none");
-            $("#map_input")[0].style.display = "none";
-        }
+        $("#localMapModal").modal("show");
+        $("#mapIframe")[0].contentWindow.init();
     }
-    $scope.mapinfoModalShow = function (s, w) {
-        $("#mapinfo").modal("show");
-        //var strMaps=s.toString();
-        //var strMapw= w.toString();
-        //var reg=/[\-\+]?\d{1,}\.\d{1,3}/;
-        //s=reg.exec(strMaps);
-        //w=reg.exec(strMapw);
-        $scope.map_s = s;
-        $scope.map_w = w;
-        $scope.$apply();
-    }
-    $scope.mapinfo = function () {
-        $("#mapinfo").modal("hide");
-        $("#map_a").val($scope.map_s);
-        $("#map_o").val($scope.map_w);
-    }
-    /*
-     * 结果版面
-     * */
-    $scope.mapSearchCommit = function () {
 
-        var local = new BMap.LocalSearch($scope.$map, {
-            renderOptions: {map: $scope.$map, panel: "r-result"}
-        });
-        local.search($("#suggestId").val());
-    }
-})
-;
 
+
+
+
+});
 /*
  * 是否选择了其他行业;
  *   是  展示input框
@@ -1273,6 +1144,7 @@ $('#comSelCheck').on('ifClicked', function (event) {
         $("tr[name='otherSel']").css("display","none");
     }
 
+
 });
 
 
@@ -1288,10 +1160,11 @@ $('#comSelCheck').on('ifClicked', function (event) {
 //    }
 //}
 
+var localMapModalHide = function (){
+    $("#localMapModal").modal("hide");
+}
 
-$("#comSelCheck").change(function() {
-    alert("checked");
-});
+
 
 
 
