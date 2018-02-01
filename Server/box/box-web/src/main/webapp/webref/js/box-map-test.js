@@ -30,6 +30,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     //初始化地图
     $scope.initMap = function() {
         var mapStr = T.common.util.getParameter("map");
+        // alert(mapStr);
         //初始化地图
         var geolocation = new BMap.Geolocation();
         geolocation.getCurrentPosition(function(r) {
@@ -53,6 +54,9 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         var marker;
         console.log("将要产生标注点");
         $scope.showalarm = T.common.util.getParameter("showalarm");
+        if($scope.showalarm == 1){
+            $(".devicetype").val("0");
+        }
         angular.forEach($scope.boxsGroup, function(value, key) {
             angular.forEach(value.boxList, function(box, boxkey) {
                 var isAlarm = box.isAlarm;
@@ -147,9 +151,9 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         // 添加到地图当中
         map.addControl(myZoomCtrl);
         var searchbox = document.getElementById("searchbox");
-        searchbox.innerHTML = "<div class='input-group'><input type='text' id='boxid' class='form-control' placeholder='请输入搜索内容'><span class='input-group-btn'><button type='button' class='btn btn-primary' onclick='search()'><i class='glyphicon glyphicon-search'></i></button></span></div><select class='form-control devicetype'><option>选择类型</option><option value='1'>所有设备</option><option value='0'>报警设备</option></select><div id='searchResultPanel' style='width:160px;height:auto;display:none;'></div>";
+        searchbox.innerHTML = "<div class='input-group'><input type='text' id='boxid' class='form-control' placeholder='搜索：V-BOX名称'><span class='input-group-btn'><button type='button' class='btn btn-primary' onclick='search()'><i class='glyphicon glyphicon-search'></i></button></span></div><select class='form-control devicetype'><option value='1'>所有设备</option><option value='0'>报警设备</option></select><div id='searchResultPanel' style='width:160px;height:auto;max-height:400px;overflow-y: scroll;display:none;'></div>";
 
-        //选择框重新加载事件
+        //选择框重新加载页面事件
         $(".devicetype").bind("change",function(){
             var dataname = $(this).val();
             if(dataname == 1){
@@ -157,7 +161,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             }else{
                 window.location.href="box-map-test.html?showalarm=1";
             }
-
         });
 
 
@@ -171,6 +174,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 angular.forEach(value.boxList, function(box, boxkey) {
                     var positionStr = box.map;
                     var boxName = box.boxName;
+                    var isAlarm = box.isAlarm;
+                    if($scope.showalarm == 1){
+                        if(isAlarm == 0){
+                            return true;
+                        }
+                    }
                     if(that.val() != "" && boxName.indexOf(that.val())>-1){
                         strHTML += "<li class='searchitem'><i class='glyphicon glyphicon-search'></i><span id='name'>"+boxName+"</span><span id='position'>"+positionStr+"</span></li>";
                     }
@@ -203,6 +212,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                 angular.forEach(value.boxList, function(box, boxkey) {
                     var positionStr = box.map;
                     var boxName = box.boxName;
+                    var isAlarm = box.isAlarm;
+                    if($scope.showalarm == 1){
+                        if(ifAlarm == 0){
+                            return true;
+                        }
+                    }
                     if(boxName == name){
                         $("#searchResultPanel").css("display","none");
                         $('#boxid').val("");
