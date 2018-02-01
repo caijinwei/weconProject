@@ -220,6 +220,26 @@ public class RedisManager {
         }
     }
 
+    /**
+     * 获取key的累计数，主要用于统计一段时间内相同key的数量
+     *
+     * @param group
+     * @param key
+     * @param seconds
+     * @return
+     */
+    public static long incrCount(String group, String key, int seconds) {
+        long count = 0L;
+        Jedis jedis = null;
+        jedis = getJedis(group);
+        count = jedis.incr(key);
+        // 如果该key不存在，则从0开始计算，并且当count为1的时候，设置过期时间
+        if (count == 1 && seconds > 0) {
+            jedis.expire(key, seconds);
+        }
+        return count;
+    }
+
     public static boolean expire(String group, String key, int seconds) {
         Jedis jedis = null;
         try {
