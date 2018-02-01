@@ -113,7 +113,7 @@
                         <span class="fa arrow"></span>
                     </a>
                     <ul class="nav nav-second-level" id="dir_ul_{{x.accountdirId}}" sid="{{x.accountdirId}}">
-                        <li  ng-repeat="y in x.deviceList">
+                        <li ng-repeat="y in x.deviceList">
                             <a class="J_menuItem" id="box_{{y.deviceId}}" target="content_frame" map="{{y.deviceMap}}"
                                href="webref/html/boxtitle.html?device_id={{y.deviceId}}&device_name={{y.deviceName}}"
                                data_devid="{{y.deviceId}}" draggable="true" ondragstart="drag(event)"
@@ -271,7 +271,7 @@
         function attachContext(selector, map) {
             context.attach(selector, [{
                 text: "地图定位",
-                href: 'web/html/box-map.html?map=' + map,
+                href: 'web/html/box-map-test.html?map=' + map,
                 action: function () {
                     alert("menu for " + map);
                 }

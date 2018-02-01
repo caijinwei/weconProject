@@ -48,12 +48,19 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         }, {
             enableHighAccuracy: true
         })
-        //产生搜索框
+        //产生搜索框选择框
         $scope.createSearch();
         var marker;
         console.log("将要产生标注点");
+        $scope.showalarm = T.common.util.getParameter("showalarm");
         angular.forEach($scope.boxsGroup, function(value, key) {
             angular.forEach(value.boxList, function(box, boxkey) {
+                var isAlarm = box.isAlarm;
+                if($scope.showalarm == 1){
+                    if(isAlarm == 0){
+                        return true;
+                    }
+                }
                 var positionStr = box.map;
                 var boxName = box.boxName;
                 var boxId = box.boxId;
@@ -65,13 +72,13 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                         console.log("经度：" + $scope.positions[0] + "纬度：" + $scope.positions[1]);
                         var boxTag = new BMap.Point($scope.positions[0], $scope.positions[1]);
                         var label = new BMap.Label(boxName, {
-                            offset: new BMap.Size(20, -10)
+                            offset: new BMap.Size(23, -10)
                         });
                         label.setStyle({
                             fontSize: "14px",
                             backgroundColor: "white",
                             position:"relative",
-                            border:"0",
+                            border:"1px solid red",
                             padding:"5px",
                         });
                         var myIcon = new BMap.Icon("../img/"+(1==state?"biaozhu3Dgreen.png":"biaozhu3Dgrey.png"), new BMap.Size(23, 33),{
@@ -84,24 +91,30 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                         marker.setLabel(label);
                         //文字描述信息
                         var sContent =
-                            "<h4 style='margin:0 0 5px 0;padding:0.2em 0'>富昌维控</h4>" +
-                            "<img style='float:right;margin:4px' id='imgDemo' src='../img/wecon.png' width='139' height='104' title='天安门'/>" +
-                            "<p style='margin:0;line-height:1.5;font-size:13px;text-indent:2em'>维控坐落在中国福州市中心,故宫的南侧,与天安门广场隔长安街相望,是清朝皇城的大门...</p>" +
-                            "<button onclick='javascript:window.top.redirect(\"http://localhost:8080/box-web/webref/html/boxtitle.html?device_id="+boxId+"&device_name="+boxName+"\")'>跳转</button>"+"</div>";
+                            "<table class='table boxInfo'><thead><tr><th>" +value.groupName+
+                            "</th><th></th></tr></thead>"+
+                            "<tbody><tr><td>盒子名称</td><td>"+box.boxName+"</td></tr></tbody>"+
+                            "<tbody><tr><td>机器码</td><td>"+box.machineCode+"</td></tr></tbody>"+
+                            "<tbody><tr><td>设备型号</td><td>"+box.devModel+"</td></tr></tbody>"+"</table>"+
+                            "<button class='btn btn-primary dim' onclick='javascript:window.top.redirect(\"" +
+                            "webref/html/boxtitle.html?type=0&device_id="+boxId+"&device_name="+boxName+"\")'>数据监控</button>"+
+                            "<button class='btn btn-warning dim' onclick='javascript:window.top.redirect(\"" +
+                            "webref/html/boxtitle.html?type=1&device_id="+boxId+"&device_name="+boxName+"\")'>报警记录</button>"+
+                            "<button class='btn btn-success dim' onclick='javascript:window.top.redirect(\"" +
+                            "webref/html/boxtitle.html?type=2&device_id="+boxId+"&device_name="+boxName+"\")'>历史数据</button>"+
+                            "<button class='btn btn-info dim' onclick='javascript:window.top.redirect(\"" +
+                            "webref/html/boxtitle.html?type=3&device_id="+boxId+"&device_name="+boxName+"\")'>基本配置</button>";
                         var infoWindow = new BMap.InfoWindow(sContent);  // 创建信息窗口对象
-                        // marker.addEventListener('click', function() {
-                        //     $state.go("box", {
-                        //         box: angular.toJson(box)
-                        //     });
-                        // });
-
                         marker.addEventListener('click', function() {
                             this.openInfoWindow(infoWindow);
                             //图片加载完毕重绘infowindow
-                            document.getElementById('imgDemo').onload = function () {
-                                infoWindow.redraw();   //防止在网速较慢，图片未加载时，生成的信息框高度比图片的总高度小，导致图片部分被隐藏
-                            }
+
                         });
+
+                        //报警跳动
+                        if(isAlarm){
+                            marker.setAnimation(BMAP_ANIMATION_BOUNCE);
+                        }
                     }
                 }
             })
@@ -114,7 +127,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         function ZoomControl(){
             // 默认停靠位置和偏移量
             this.defaultAnchor = BMAP_ANCHOR_TOP_LEFT;
-            this.defaultOffset = new BMap.Size(10, 52);
+            this.defaultOffset = new BMap.Size(10, 22);
         }
         // 通过JavaScript的prototype属性继承于BMap.Control
         ZoomControl.prototype = new BMap.Control();
@@ -134,7 +147,19 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         // 添加到地图当中
         map.addControl(myZoomCtrl);
         var searchbox = document.getElementById("searchbox");
-        searchbox.innerHTML = "<div class='input-group'><input type='text' id='boxid' class='form-control' placeholder='请输入搜索内容'><span class='input-group-btn'><button type='button' class='btn btn-default' onclick='search()'><i class='glyphicon glyphicon-search'></i></button></span></div><div id='searchResultPanel' style='width:142px;height:auto;display:none;'></div>";
+        searchbox.innerHTML = "<div class='input-group'><input type='text' id='boxid' class='form-control' placeholder='请输入搜索内容'><span class='input-group-btn'><button type='button' class='btn btn-primary' onclick='search()'><i class='glyphicon glyphicon-search'></i></button></span></div><select class='form-control devicetype'><option>选择类型</option><option value='1'>所有设备</option><option value='0'>报警设备</option></select><div id='searchResultPanel' style='width:160px;height:auto;display:none;'></div>";
+
+        //选择框重新加载事件
+        $(".devicetype").bind("change",function(){
+            var dataname = $(this).val();
+            if(dataname == 1){
+                window.location.href="box-map-test.html?showalarm=0";
+            }else{
+                window.location.href="box-map-test.html?showalarm=1";
+            }
+
+        });
+
 
         // //搜索框的数据改变事件
         $('#boxid').bind('input propertychange', function() {
@@ -154,7 +179,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 
             searchResultPanel.innerHTML = "<ul>"+strHTML+"</ul>";
         });
-        //
+
         // //点击搜索框列表的事件
         $(document).on("click","#searchResultPanel ul li.searchitem", function() {
             var searchtext =  $(this).children("#name").text();
@@ -166,33 +191,33 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         })
         //
         // //点击搜索按钮触发的事件
-        // search = function(){
-        //     var name = $('#boxid').val();
-        //     locationonfocus(name,"btn");
-        // }
+        search = function(){
+            var name = $('#boxid').val();
+            locationonfocus(name);
+        }
         //
         // //搜索点
-        // function locationonfocus(name,type){
-        //     for(i = 0; i < boxdata.length; i++){
-        //         if(type == "btn"){
-        //             if(boxdata[i].name == name){
-        //                 $("#searchResultPanel").css("display","none");
-        //                 $('#boxid').val("");
-        //                 moveCenter(boxdata[i].lng,boxdata[i].lat);
-        //                 break;
-        //             }
-        //         }
-        //         else{
-        //             if(boxdata[i].name.indexOf(name)>-1){
-        //                 moveCenter(boxdata[i].lng,boxdata[i].lat);
-        //                 break;
-        //             }
-        //         }
-        //     }
-        //     if(i == boxdata.length){
-        //         alert("未找到您搜索的盒子");
-        //     }
-        // }
+        function locationonfocus(name){
+            var ifExist = false;
+            angular.forEach($scope.boxsGroup, function(value, key) {
+                angular.forEach(value.boxList, function(box, boxkey) {
+                    var positionStr = box.map;
+                    var boxName = box.boxName;
+                    if(boxName == name){
+                        $("#searchResultPanel").css("display","none");
+                        $('#boxid').val("");
+                        var positions = positionStr.split(",");
+                        moveCenter(positions[0],positions[1]);
+                        ifExist = true;
+                        return true;
+                    }
+                })
+
+            })
+            if(!ifExist) {
+                alert("未找到您搜索的盒子");
+            }
+        }
         //
         // //移动中心点
         function moveCenter(lng,lat){
