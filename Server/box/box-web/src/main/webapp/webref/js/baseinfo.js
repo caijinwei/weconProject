@@ -184,7 +184,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                     });
                     $("#noticeMessage").empty();
                     $("#noticeMessage").append(alarmMes);
-                    console.log("消息是:   " + alarmMes);
                     $("#noticeCopy").modal("show");
                 }
                 else {

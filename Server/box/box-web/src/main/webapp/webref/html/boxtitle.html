@@ -47,14 +47,8 @@
 	<div class="row border-bottom navbar-fixed-top">
 		<div class="menu-item">
 			<ul class="menu-item-list">
-				<li><a class="active top-menu-item" href="baseinfo.html?device_id={{deviceid}}&device_name={{deviceName}}"
-					target="iframebox">
-						<div>
-							<i class="fa fa-cog"></i>
-						</div>
-						<div class="menu-item-text">基本配置</div>
-				</a></li>
-				<li><a class="top-menu-item" target="iframebox"
+
+				<li><a class="active top-menu-item" target="iframebox"
 					href="datamonitor.html?device_id={{deviceid}}">
 						<div>
 							<i class="fa fa-building-o"></i>
@@ -75,19 +69,26 @@
 						</div>
 						<div class="menu-item-text">历史数据</div>
 				</a></li>
+				<li><a class="top-menu-item" href="baseinfo.html?device_id={{deviceid}}&device_name={{deviceName}}"
+					   target="iframebox">
+					<div>
+						<i class="fa fa-cog"></i>
+					</div>
+					<div class="menu-item-text">基本配置</div>
+				</a></li>
 
 			</ul>
 		</div>
 	</div>
 
 	<div class="wrapper wrapper-content">
-		<div class="row" style="padding-top:90px">
+		<div class="row" style="padding-top:80px">
 
 			<div class="col-sm-12 animated fadeInRight">
 				<!--引入文件-->
 				<iframe id="myiframe" class="J_iframe" onload="iframeLoad()"
 						name="iframebox" width="100%" height="100%"
-						style="min-height: 700px;" src="baseinfo.html" scrolling="no"
+						style="min-height: 700px;" src="datamonitor.html" scrolling="no"
 						frameborder="0" seamless> </iframe>
 				<!--/结束引入-->
 			</div>

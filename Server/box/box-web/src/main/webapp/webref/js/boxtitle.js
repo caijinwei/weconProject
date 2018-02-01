@@ -11,7 +11,7 @@ appModule
 						.getParameter("device_id");
 						$scope.deviceName = T.common.util.getParameter("device_name");
 
-						$("#myiframe").attr("src","baseinfo.html?device_id="+$scope.deviceid+"&device_name="+$scope.deviceName);
+						$("#myiframe").attr("src","datamonitor.html?device_id="+$scope.deviceid);
 					}
 
 					
