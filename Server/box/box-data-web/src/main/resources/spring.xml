@@ -40,6 +40,12 @@
             </map>
         </property>
     </bean>
+    <bean id="reqlimit" class="com.wecon.restful.core.RequestLimitCfg">
+        <property name="timeRange" value="10"/>
+        <property name="reqUserLimitNum" value="200"/>
+        <property name="reqIpLimitNum" value="2000"/>
+        <property name="reqComLimitNum" value="200"/>
+    </bean>
 
     <bean id="authority" class="com.wecon.restful.authotiry.RightsHelper">
         <property name="sysMap">

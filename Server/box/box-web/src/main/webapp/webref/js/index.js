@@ -450,3 +450,8 @@ var isOtherOption = function () {
         $("#otherDeviceUseName").hide();
     }
 }
+
+function redirect(url){
+    var iframe = document.getElementById("ifmain");
+    iframe.src=url;
+}

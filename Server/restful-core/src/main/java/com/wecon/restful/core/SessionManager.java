@@ -135,4 +135,15 @@ public class SessionManager {
         }
         return null;
     }
+
+    /**
+     * 新增当前请求（ip或者用户）的数量,并返回当前总量
+     *
+     * @param redisKey
+     * @param seconds
+     * @return
+     */
+    public static long addCurrentReqCount(String redisKey, int seconds) {
+        return RedisManager.incrCount(RedisGroupName, redisKey, seconds);//数量加1
+    }
 }

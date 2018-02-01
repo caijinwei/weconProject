@@ -281,6 +281,11 @@ public class Session {
         } else {
             throw new DeniedException("ts is time out");
         }
+
+        //同帐号 请求频率限制
+        if (client.userId > 0) {
+            RequestLimitCfg.userLimit(client.userId);
+        }
     }
 
     /**

@@ -59,6 +59,13 @@ public class SpringExceptionHandler
 			output.code = 405;
 			output.msg = be.getMessage();
 		}
+		// 请求太频繁
+		else if (ex instanceof RequestLimitException)
+		{
+			RequestLimitException be = (RequestLimitException) ex;
+			output.code = 406;
+			output.msg = be.getMessage();
+		}
 		// 系统异常
 		else
 		{
