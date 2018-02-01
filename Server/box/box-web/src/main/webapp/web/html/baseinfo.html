@@ -428,7 +428,7 @@
                         </tr>
 <!--plc状态删除展示-->
 
-                        <tr ng-repeat="x in delinfoDatas" style="background-color: gainsboro">
+                        <tr ng-repeat="x in delinfoDatas" style="background-color:#EDEDED">
                             <td>
                                 <span ng-switch="{{x.state}}">
                                     <i name="act_i_state" ng-switch-when="0">
@@ -457,9 +457,9 @@
 
                                 </span>
                             </td>
-                            <td>{{x.port}}</td>
-                            <td>{{x.comtype==0?'RS232':(x.comtype==1?'RS485':'RS422')}}</td>
-                            <td>{{x.type}}</td>
+                            <td><del>{{x.port}}</del></td>
+                            <td><del>{{x.comtype==0?'RS232':(x.comtype==1?'RS485':'RS422')}}</del></td>
+                            <td><del>{{x.type}}</del></td>
                             <td>
                                 <span>待删除状态</span>
                             </td>

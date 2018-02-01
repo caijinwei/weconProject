@@ -12,6 +12,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      * */
     $scope.onInit = function () {
 
+
         $scope.device_id = T.common.util.getParameter("device_id");
         $scope.device_name = T.common.util.getParameter("device_name");
         $scope.showBaseInfo();
@@ -219,9 +220,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             if (code == 200) {
                 $scope.infoDatas = data.infoDatas;
                 $scope.delinfoDatas = data.delInfoDatas;
-                $(function () {
-                    $("[data-toggle='tooltip']").tooltip();
-                });
                 $scope.$apply();
             }
             else {
@@ -604,6 +602,10 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             swal("历史数据最多保存条数设置错误,请输入1-50000", "", "error");
             return;
         }
+        if(piBoxName == undefined || piBoxName == "" ){
+            swal("V-Box名称不能为空！","","error");
+            return;
+        }
         if (map_a != "" || map_o != "") {
             if (isNaN(map_a) || isNaN(map_o)) {
                 swal("地图坐标格式错误", "", "error");
@@ -648,7 +650,9 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         T.common.ajax.request("WeconBox", "baseInfoAction/chgPiboxInFoName", params, function (data, code, msg) {
             if (code == 200) {
                 swal("保存成功！", "", "success");
-                window.parent.parent.reloadBoxList();
+                if($scope.infoData.name == undefined || $scope.infoData.name != piBoxName ){
+                    window.parent.parent.reloadBoxList();
+                }
                 //$scope.$apply();
             }
             else {

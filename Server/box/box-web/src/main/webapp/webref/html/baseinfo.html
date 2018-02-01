@@ -229,7 +229,6 @@
                                 <tr ng-repeat="x in infoDatas">
                                     <td>
                                         <span ng-switch="{{x.state}}">
-
                                     <i name="act_i_state" ng-switch-when="0">
                                     </i>
                                     <i name="act_i_state" ng-switch-when="1" class="fa  fa-circle"
@@ -281,7 +280,7 @@
                                 </tr>
 
                                 <!--plc删除状态展示-->
-                                <tr ng-repeat="x in delinfoDatas" style="background-color: gainsboro">
+                                <tr ng-repeat="x in delinfoDatas" style="background-color: #EDEDED">
                                     <td>
                                         <span ng-switch="{{x.state}}">
 
@@ -312,9 +311,9 @@
                                 </span>
                                         &nbsp; {{$index + 1}}
                                     </td>
-                                    <td ng-bind="x.port"></td>
-                                    <td ng-bind="x.comtype==0?'RS232':(x.comtype==1?'RS485':'RS422')"></td>
-                                    <td ng-bind="x.type"></td>
+                                    <td><del style="background-color: inherit">{{x.port}}</del></td>
+                                    <td><del style="background-color: inherit">{{x.comtype==0?'RS232':(x.comtype==1?'RS485':'RS422')}}</del></td>
+                                    <td><del style="background-color: inherit">{{x.type}}</del></td>
                                     <td>
                                         <span>待删除状态</span>
                                     </td>
@@ -855,6 +854,8 @@
 
 <script>
     $(function () {
+        $("i[name='act_i_state']").tooltip();
+        console.log("1111", $("#testTool").css("color","red"));
         $("#tables").sortable({
             cursor: "move",
             items: ".drag-item",
