@@ -3,7 +3,6 @@ package com.wecon.box.action.data;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.wecon.box.api.*;
-import com.wecon.box.constant.Constant;
 import com.wecon.box.entity.*;
 import com.wecon.box.entity.plcdom.AddrDom;
 import com.wecon.box.entity.plcdom.Plc;
@@ -30,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
