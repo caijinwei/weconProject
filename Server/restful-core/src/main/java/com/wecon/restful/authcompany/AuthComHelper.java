@@ -1,5 +1,6 @@
 package com.wecon.restful.authcompany;
 
+import com.wecon.restful.core.RequestLimitCfg;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,6 +28,8 @@ public class AuthComHelper {
             return true;
         }
         if (comMap.containsKey(comid) && comMap.get(comid).equals(compvtkey)) {
+            //同comid/compvtkey 请求频率限制
+            RequestLimitCfg.comLimit(comid, compvtkey);
             return true;
         } else {
             return false;
