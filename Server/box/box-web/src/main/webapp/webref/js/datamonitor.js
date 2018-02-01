@@ -13,7 +13,6 @@ appModule
 								new Object(), function(data, code, msg) {
 									$scope.accounttype = data.type;
 									$scope.$apply();
-									$("body").css("display", "block");
 								});
 
 						$scope.type = 0;

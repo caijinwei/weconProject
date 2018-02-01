@@ -21,12 +21,6 @@
 <link rel="stylesheet"
 	href="../lib/bootstrap/bootstrap-switch/css/bootstrap-switch.min.css">
 <script src="../lib/jquery/jquery.min.js"></script>
-<script type="text/javascript">
-	// 等待所有加载
-	$(window).load(function() {
-		$('#loader-wrapper').css("display", "block");
-	});
-</script>
 <!--低版本浏览器识别HTML5标签-->
 <!--低版本浏览器支持CSS媒体查询-->
 <!--[if lt IE 9]>
@@ -34,12 +28,13 @@
 	    	<script type="text/javascript" src="lib/respond/respond.min.js" ></script>
 	    <![endif]-->
 </head>
-<div id="loader-wrapper" style="display: none">
+<div id="loader-wrapper">
 	<div id="loader"></div>
 	<div class="loader-section section-left"></div>
 	<div class="loader-section section-right"></div>
 	<div class="load_title">正在加载....</div>
 </div>
+
 <body ng-controller="infoController" ng-init="onInit()">
 	<!-- Nav tabs -->
 	<ul class="nav nav-tabs" role="tablist" id="monitorTab"
@@ -56,6 +51,7 @@
 				class="glyphicon glyphicon-cog"></span> 分组设置
 		</a></li>
 	</ul>
+
 
 	<!-- Tab panes -->
 	<form method="post" id="myform"></form>

@@ -423,11 +423,14 @@ public class AlarmDataAction {
 					alarmCfg.plc_id = alarmCfgParam.plc_id;
 					alarmCfg.alarm_level = alarmCfgParam.alarm_level;
 					alarmCfg.rid = alarmCfgParam.rid;
-					if (alarmCfgParam.name.length() > 50) {
-						alarmCfg.name = alarmCfgParam.name.substring(0, 50);
-					} else {
+					if (!CommonUtils.isNullOrEmpty(alarmCfgParam.name)) {
+						if (alarmCfgParam.name.length() > 64) {
+							throw new BusinessException(ErrorCodeOption.Word_To_Long.key,
+									ErrorCodeOption.Word_To_Long.value);
+						}
 						alarmCfg.name = alarmCfgParam.name;
 					}
+					
 					if (alarmCfgParam.text.length() > 249) {
 						alarmCfg.text = alarmCfgParam.text.substring(0, 249);
 					} else {
@@ -456,9 +459,11 @@ public class AlarmDataAction {
 							AccountDirRel dirRel = new AccountDirRel();
 							dirRel.acc_dir_id = alarmCfgParam.group_id;
 							dirRel.ref_id = alarmCfgParam.alarmcfg_id;
-							if (alarmCfgParam.name.length() > 64) {
-								accountDirRel.ref_alais = alarmCfgParam.name.substring(0, 64);
-							} else {
+							if (!CommonUtils.isNullOrEmpty(alarmCfgParam.name)) {
+								if (alarmCfgParam.name.length() > 64) {
+									throw new BusinessException(ErrorCodeOption.Word_To_Long.key,
+											ErrorCodeOption.Word_To_Long.value);
+								}
 								accountDirRel.ref_alais = alarmCfgParam.name;
 							}
 							accountDirRelApi.saveAccountDirRel(dirRel);
@@ -510,9 +515,11 @@ public class AlarmDataAction {
 				alarmCfg.plc_id = alarmCfgParam.plc_id;
 				alarmCfg.alarm_level = alarmCfgParam.alarm_level;
 				alarmCfg.rid = alarmCfgParam.rid;
-				if (alarmCfgParam.name.length() > 50) {
-					alarmCfg.name = alarmCfgParam.name.substring(0, 50);
-				} else {
+				if (!CommonUtils.isNullOrEmpty(alarmCfgParam.name)) {
+					if (alarmCfgParam.name.length() > 64) {
+						throw new BusinessException(ErrorCodeOption.Word_To_Long.key,
+								ErrorCodeOption.Word_To_Long.value);
+					}
 					alarmCfg.name = alarmCfgParam.name;
 				}
 				if (alarmCfgParam.text.length() > 249) {
@@ -534,9 +541,11 @@ public class AlarmDataAction {
 					AccountDirRel accountDirRel = new AccountDirRel();
 					accountDirRel.acc_dir_id = alarmCfgParam.group_id;
 					accountDirRel.ref_id = alarm.alarmcfg_id;
-					if (alarmCfgParam.name.length() > 50) {
-						accountDirRel.ref_alais = alarmCfgParam.name.substring(0, 50);
-					} else {
+					if (!CommonUtils.isNullOrEmpty(alarmCfgParam.name)) {
+						if (alarmCfgParam.name.length() > 64) {
+							throw new BusinessException(ErrorCodeOption.Word_To_Long.key,
+									ErrorCodeOption.Word_To_Long.value);
+						}
 						accountDirRel.ref_alais = alarmCfgParam.name;
 					}
 					accountDirRelApi.saveAccountDirRel(accountDirRel);
