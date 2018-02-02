@@ -24,7 +24,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             }, function() {
                 alert("ajax error");
             });
-
     }
 
     //初始化地图
@@ -124,6 +123,9 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             })
         })
         console.log("已经产生标注点");
+        map.addEventListener("tilesloaded",function(){
+            $("#loader-wrapper").css("display","none");
+        });
     }
 
     $scope.createSearch = function(){

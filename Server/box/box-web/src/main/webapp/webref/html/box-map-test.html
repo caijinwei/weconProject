@@ -5,6 +5,7 @@
     <title></title>
     <link href="../lib/bootstrap/css/bootstrap.css" rel="stylesheet">
     <link href="../lib/base.css" rel="stylesheet">
+    <link href="../lib/loader.css" rel="stylesheet">
     <style>
         #allmap{
             width: 100%;
@@ -81,6 +82,12 @@
     </style>
 </head>
 <body ng-controller="infoController">
+<div id="loader-wrapper">
+    <div id="loader"></div>
+    <div class="loader-section section-left"></div>
+    <div class="loader-section section-right"></div>
+    <div class="load_title" style="color:black">正在加载地图....</div>
+</div>
 <div id="allmap">
 </div>
 <script type="text/javascript" src="../lib/jquery/jquery.min.js"></script>
