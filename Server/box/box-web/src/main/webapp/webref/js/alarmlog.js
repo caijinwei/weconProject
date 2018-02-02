@@ -23,7 +23,7 @@ appModule
 							totalItems : $scope.count,
 							pagesLength : 15,
 							perPageOptions : [ 5, 10, 20, 50, 100 ],
-							/*rememberPerPage : 'perPageItems',*/
+							/* rememberPerPage : 'perPageItems', */
 							onChange : function() {
 								if (this.currentPage != 0) {
 
@@ -39,7 +39,7 @@ appModule
 							totalItems : $scope.count,
 							pagesLength : 15,
 							perPageOptions : [ 5, 10, 20, 50, 100 ],
-						/*	rememberPerPage : 'perPageItems',*/
+						/* rememberPerPage : 'perPageItems', */
 							onChange : function() {
 								if (this.currentPage != 0) {
 
@@ -108,7 +108,7 @@ appModule
 					 * 提交当前报警接口请求
 					 */
 					$scope.alarm_submit = function(pageIndex, pageSize) {
-						//$("#loadingModal").modal("show");
+						// $("#loadingModal").modal("show");
 						$('#loader-wrapper').css("display", "block");
 						if (pageIndex == 0)
 							pageIndex = 1;
@@ -133,13 +133,15 @@ appModule
 
 												$scope.$apply();
 
-//												$("#loadingModal")
-//														.modal("hide");
+// $("#loadingModal")
+// .modal("hide");
 												$('#loader-wrapper').css("display", "none");
 
 											} else {
-											/*	$("#loadingModal")
-														.modal("hide");*/
+											/*
+											 * $("#loadingModal")
+											 * .modal("hide");
+											 */
 												$('#loader-wrapper').css("display", "none");
 											     swal({
 									                    title: code + "-" + msg,
@@ -147,7 +149,7 @@ appModule
 									                });
 											}
 										}, function() {
-											//$("#loadingModal").modal("hide");
+											// $("#loadingModal").modal("hide");
 											$('#loader-wrapper').css("display", "none");
 											console.log("ajax error");
 										});
@@ -167,7 +169,7 @@ appModule
 								return;
 							}
 						}
-						//$("#loadingModal").modal("show");
+						// $("#loadingModal").modal("show");
 						$('#loader-wrapper').css("display", "block");
 						if (pageIndex == 0)
 							pageIndex = 1;
@@ -196,13 +198,13 @@ appModule
 												$scope.accounttype = data.type;
 												$scope.paginationConf_history.totalItems = data.alarmHisData.totalRecord;
 												$scope.$apply();
-//												$("#loadingModal")
-//														.modal("hide");
+// $("#loadingModal")
+// .modal("hide");
 												$('#loader-wrapper').css("display", "none");
 
 											} else {
-//												$("#loadingModal")
-//														.modal("hide");
+// $("#loadingModal")
+// .modal("hide");
 												$('#loader-wrapper').css("display", "none");
 												 swal({
 									                    title: code + "-" + msg,
@@ -210,7 +212,7 @@ appModule
 									                });
 											}
 										}, function() {
-											//$("#loadingModal").modal("hide");
+											// $("#loadingModal").modal("hide");
 											$('#loader-wrapper').css("display", "none");
 											console.log("ajax error");
 										});
@@ -252,7 +254,10 @@ appModule
 													pagesLength : 15,
 													perPageOptions : [ 5, 10,
 															20, 50, 100 ],
-													/*rememberPerPage : 'perPageItems',*/
+													/*
+													 * rememberPerPage :
+													 * 'perPageItems',
+													 */
 													onChange : function() {
 														if (this.currentPage != 0) {
 
@@ -638,52 +643,8 @@ appModule
 																		'none');
 													}
 													$scope.$apply();
-													if ($("#addrtypeid").val() == 0) {// 如果是位地址隐藏
-														$('#datadigitid').css(
-																'display',
-																'none');
-													} else {
-														$('#datadigitid').css(
-																'display',
-																'block');
-													}
-													if (mtype == 0) {
-														if ($("#addrtypeid")
-																.val() == 0) {// 如果是位地址隐藏
-															$('#divdatatypeid')
-																	.css(
-																			'display',
-																			'none');
-															$('#datadigitid')
-																	.css(
-																			'display',
-																			'none');
-															$('#div_stringid')
-																	.css(
-																			'display',
-																			'none');
-														} else {
-															$('#divdatatypeid')
-																	.css(
-																			'display',
-																			'block');
-															if ($("#datatypeid")
-																	.val() == 1000) {
-																$(
-																		'#div_stringid')
-																		.css(
-																				'display',
-																				'block');
-															} else {
-																$(
-																		'#datadigitid')
-																		.css(
-																				'display',
-																				'block');
-															}
-														}
-													} else {
-														if (alarmfo.child_addr != null) {
+												if(mtype==1){// 编辑
+													if (alarmfo.child_addr != null) {
 															$(
 																	'#child_registeraddr')
 																	.css(
@@ -733,48 +694,7 @@ appModule
 																alarmfo.rid);
 														if ($("#registerid")
 																.val() == null) {
-															$("#addrtypeid")
-																	.val(
-																			data.allAddr[0].addrkey);
-															if ($("#addrtypeid")
-																	.val() == 0) {// 如果是位地址隐藏
-																$(
-																		'#divdatatypeid')
-																		.css(
-																				'display',
-																				'none');
-																$(
-																		'#datadigitid')
-																		.css(
-																				'display',
-																				'none');
-																$(
-																		'#div_stringid')
-																		.css(
-																				'display',
-																				'none');
-															} else {
-																$(
-																		'#divdatatypeid')
-																		.css(
-																				'display',
-																				'block');
-																if ($(
-																		"#datatypeid")
-																		.val() == 1000) {
-																	$(
-																			'#div_stringid')
-																			.css(
-																					'display',
-																					'block');
-																} else {
-																	$(
-																			'#datadigitid')
-																			.css(
-																					'display',
-																					'block');
-																}
-															}
+															
 
 															if ($scope.addrvalues != null) {
 																$("#registerid")
@@ -799,193 +719,11 @@ appModule
 																	.html(
 																			alarmfo.main_binary);
 
-															if ($("#addrtypeid")
-																	.val() == 0) {
-																$(
-																		'#divdatatypeid')
-																		.css(
-																				'display',
-																				'none');
-
-																$(
-																		'#datadigitid')
-																		.css(
-																				'display',
-																				'none');
-																$(
-																		'#div_stringid')
-																		.css(
-																				'display',
-																				'none');
-
-																$(
-																		'#firstCondition')
-																		.css(
-																				'display',
-																				'none');
-																$('#bitsetting')
-																		.css(
-																				'display',
-																				'block');
-																$(
-																		'#secondCondition')
-																		.css(
-																				'display',
-																				'none');
-
-																$('#selectWith')
-																		.val(0);
-																if (alarmfo.triggerValue == "ON") {
-																	$(
-																			"input[name='bitsetting'][value=6]")
-																			.attr(
-																					"checked",
-																					true);
-																	$(
-																			"input[name='bitsetting'][value=7]")
-																			.attr(
-																					"checked",
-																					false);
-																} else {
-																	$(
-																			"input[name='bitsetting'][value=7]")
-																			.attr(
-																					"checked",
-																					true);
-																	$(
-																			"input[name='bitsetting'][value=6]")
-																			.attr(
-																					"checked",
-																					false);
-																}
-
-															} else {
-																$(
-																		'#divdatatypeid')
-																		.css(
-																				'display',
-																				'block');
-
-																if ($(
-																		"#datatypeid")
-																		.val() == 1000) {
-																	$(
-																			'#div_stringid')
-																			.css(
-																					'display',
-																					'block');
-																} else {
-																	$(
-																			'#datadigitid')
-																			.css(
-																					'display',
-																					'block');
-																}
-																$(
-																		'#firstCondition')
-																		.css(
-																				'display',
-																				'block');
-																if (alarmfo.condition_type == 0) {
-																	$(
-																			'#bitsetting')
-																			.css(
-																					'display',
-																					'none');
-																	$(
-																			'#secondCondition')
-																			.css(
-																					'display',
-																					'none');
-																	$(
-																			'#selectWith')
-																			.val(
-																					0);
-																	$(
-																			'#conditiononeid')
-																			.val(
-																					alarmfo.listAlarmTrigger[0].type);
-																	$(
-																			'#onenumid')
-																			.val(
-																					alarmfo.listAlarmTrigger[0].value);
-
-																} else if (alarmfo.condition_type == 1) {
-
-																	$(
-																			'#bitsetting')
-																			.css(
-																					'display',
-																					'none');
-																	$(
-																			'#secondCondition')
-																			.css(
-																					'display',
-																					'block');
-
-																	$(
-																			'#selectWith')
-																			.val(
-																					1);
-																	$(
-																			'#conditiononeid')
-																			.val(
-																					alarmfo.listAlarmTrigger[0].type);
-																	$(
-																			'#onenumid')
-																			.val(
-																					alarmfo.listAlarmTrigger[0].value);
-																	$(
-																			'#conditiontwoid')
-																			.val(
-																					alarmfo.listAlarmTrigger[1].type);
-																	$(
-																			'#twonumid')
-																			.val(
-																					alarmfo.listAlarmTrigger[1].value);
-
-																} else if (alarmfo.condition_type == 2) {
-																	$(
-																			'#bitsetting')
-																			.css(
-																					'display',
-																					'none');
-																	$(
-																			'#secondCondition')
-																			.css(
-																					'display',
-																					'block');
-
-																	$(
-																			'#selectWith')
-																			.val(
-																					2);
-																	$(
-																			'#conditiononeid')
-																			.val(
-																					alarmfo.listAlarmTrigger[0].type);
-																	$(
-																			'#onenumid')
-																			.val(
-																					alarmfo.listAlarmTrigger[0].value);
-																	$(
-																			'#conditiontwoid')
-																			.val(
-																					alarmfo.listAlarmTrigger[1].type);
-																	$(
-																			'#twonumid')
-																			.val(
-																					alarmfo.listAlarmTrigger[1].value);
-																}
-
-															}
-
-															$("#rangid")
-																	.val(
-																			alarmfo.data_limit);
 
 														}
-													}
+												}
+														$scope.initbit();// 初始化位地址类型
+
 												}
 
 											} else {
@@ -1001,20 +739,56 @@ appModule
 					}
 					// 地址类型点击
 					$("#addrtypeid").change(function() {
-						if ($("#addrtypeid").val() == 0) {
+						$scope.changeaddrtype($("#addrtypeid").val());
+						$scope.initbit();
+					});
+					
+					
+					
+					/**
+					 * 地址判断后的操作
+					 */
+					$scope.initbit = function() {
+
+						if ($("#addrtypeid").val() == 0) {// 如果是位地址隐藏
+							
 							$('#firstCondition').css('display', 'none');
 							$('#bitsetting').css('display', 'block');
 							$('#secondCondition').css('display', 'none');
 							$('#selectWith').val(0);
 							$('#divdatatypeid').css('display', 'none');
 							$('#datadigitid').css('display', 'none');
-							$('#datadigitid').css('display', 'none');
 							$('#div_stringid').css('display', 'none');
 							$("#dataid").val("");
 							$("#decid").val("");
 							$("#stringid").val("");
+	                        if(mtype == 1){
+	                        	if (alarmfo.triggerValue == "ON") {
+									$(
+											"input[name='bitsetting'][value=6]")
+											.attr(
+													"checked",
+													true);
+									$(
+											"input[name='bitsetting'][value=7]")
+											.attr(
+													"checked",
+													false);
+								} else {
+									$(
+											"input[name='bitsetting'][value=7]")
+											.attr(
+													"checked",
+													true);
+									$(
+											"input[name='bitsetting'][value=6]")
+											.attr(
+													"checked",
+													false);
+								}
+	                        }
+						
 						} else {
-
 							$('#firstCondition').css('display', 'block');
 							$('#bitsetting').css('display', 'none');
 							$('#secondCondition').css('display', 'none');
@@ -1022,13 +796,112 @@ appModule
 							$('#divdatatypeid').css('display', 'block');
 							if ($("#datatypeid").val() == 1000) {
 								$('#div_stringid').css('display', 'block');
+								if (mtype == 1) {
+									$("#stringid").val(alarmfo.num);
+								}
 							} else {
 								$('#datadigitid').css('display', 'block');
+								if (mtype == 1) {
+									$("#dataid").val(alarmfo.num);
+									$("#decid").val(alarmfo.dec);
+								}
+							}
+							if (mtype == 1) {// 编辑赋值
+								if (alarmfo.condition_type == 0) {
+									$(
+											'#bitsetting')
+											.css(
+													'display',
+													'none');
+									$(
+											'#secondCondition')
+											.css(
+													'display',
+													'none');
+									$(
+											'#selectWith')
+											.val(
+													0);
+									$(
+											'#conditiononeid')
+											.val(
+													alarmfo.listAlarmTrigger[0].type);
+									$(
+											'#onenumid')
+											.val(
+													alarmfo.listAlarmTrigger[0].value);
+
+								} else if (alarmfo.condition_type == 1) {
+
+									$(
+											'#bitsetting')
+											.css(
+													'display',
+													'none');
+									$(
+											'#secondCondition')
+											.css(
+													'display',
+													'block');
+
+									$(
+											'#selectWith')
+											.val(
+													1);
+									$(
+											'#conditiononeid')
+											.val(
+													alarmfo.listAlarmTrigger[0].type);
+									$(
+											'#onenumid')
+											.val(
+													alarmfo.listAlarmTrigger[0].value);
+									$(
+											'#conditiontwoid')
+											.val(
+													alarmfo.listAlarmTrigger[1].type);
+									$(
+											'#twonumid')
+											.val(
+													alarmfo.listAlarmTrigger[1].value);
+
+								} else if (alarmfo.condition_type == 2) {
+									$(
+											'#bitsetting')
+											.css(
+													'display',
+													'none');
+									$(
+											'#secondCondition')
+											.css(
+													'display',
+													'block');
+
+									$(
+											'#selectWith')
+											.val(
+													2);
+									$(
+											'#conditiononeid')
+											.val(
+													alarmfo.listAlarmTrigger[0].type);
+									$(
+											'#onenumid')
+											.val(
+													alarmfo.listAlarmTrigger[0].value);
+									$(
+											'#conditiontwoid')
+											.val(
+													alarmfo.listAlarmTrigger[1].type);
+									$(
+											'#twonumid')
+											.val(
+													alarmfo.listAlarmTrigger[1].value);
+								}
 							}
 						}
-						$scope.changeaddrtype($("#addrtypeid").val());
 
-					});
+					}
 					$scope.changeaddrtype = function(value) {
 						angular
 								.forEach(
@@ -1140,6 +1013,7 @@ appModule
 										"alarmDataAction/getAlarmCfg",
 										params,
 										function(data, code, msg) {
+											$('#loader-wrapper').css("display","none");// 关闭转圈圈
 											if (code == 200) {
 												$scope.paginationConf_alarmcfg.totalItems = data.listalrmCfgTrigger.totalRecord;
 												$scope.listalrmCfgTrigger = data.listalrmCfgTrigger.list;
@@ -2018,6 +1892,7 @@ appModule
 						}
 						var alarmtypes = types.join(",");
 						var alarmvalues = values.join(",");
+						$('#loader-wrapper').css("display","block");// 添加转圈效果
 						var params = {
 							alarmcfg_id : alarmid,
 							plc_id : plcId,
@@ -2048,6 +1923,7 @@ appModule
 											if (code == 200) {
 												$("#addAlarmRecord").modal(
 														"hide");
+											
 												$("#dataGroupSelect")
 														.val(
 																$(
@@ -2072,6 +1948,7 @@ appModule
 												}
 
 											} else {
+												$('#loader-wrapper').css("display","none");// 关闭转圈圈
 												 swal({
 									                    title: code + "-" + msg,
 									                    icon: "error"

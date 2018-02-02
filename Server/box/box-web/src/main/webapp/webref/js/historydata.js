@@ -31,7 +31,7 @@ appModule
 					 */
 					$scope.commointor_submit = function() {
 						// $("#loadingModal").modal("show");
-						$('#loader-wrapper').css("display", "block");
+// $('#loader-wrapper').css("display", "block");
 						var params = {
 							device_id : $scope.deviceid
 
@@ -1418,6 +1418,7 @@ appModule
 						var addr_datas = addrs.join(",");
 						var scalie_datas = scalies.join(",");
 						var digs = digit_counts.join(",");
+						$('#loader-wrapper').css("display","block");// 添加转圈效果
 						var params = {
 							id : mid,
 							plc_id : plcId,
@@ -1442,12 +1443,15 @@ appModule
 										"actDataAction/addUpdataMonitor",
 										params,
 										function(data, code, msg) {
+										
 											if (code == 200) {
 												$("#dataRecord").modal("hide");
+											
 												$scope
 														.showhisconf(
 																$scope.paginationConf_register.currentPage,
 																$scope.paginationConf_register.itemsPerPage);
+											
 
 												if (mtype == 0) {
 													swal({
@@ -1462,6 +1466,7 @@ appModule
 												}
 
 											} else {
+												$('#loader-wrapper').css("display","none");// 关闭转圈圈
 										        swal({
 								                    title: code + "-" + msg,
 								                    icon: "error"
@@ -1545,6 +1550,7 @@ appModule
 										"hisDataAction/getHisConfig",
 										params,
 										function(data, code, msg) {
+                                		$('#loader-wrapper').css("display","none");// 关闭转圈圈
 											if (code == 200) {
 												$scope.paginationConf_register.totalItems = data.HisAllotData.totalRecord;
 												$scope.hisConfs = data.HisAllotData.list;

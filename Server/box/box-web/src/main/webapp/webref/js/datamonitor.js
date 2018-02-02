@@ -64,6 +64,7 @@ appModule
 					var lockReconnect = false;// 避免重复连接
 					var inivalize = 0;
 					var isclick = false;// 下发数据是否点击确定键
+					var isoperation=false;// 如果在操作则锁定，不让它更新数据
 
 					$scope.createWebSocket = function() {
 						try {
@@ -93,7 +94,7 @@ appModule
 								totalItems : $scope.count,
 								pagesLength : 15,
 								perPageOptions : [ 5, 10, 20, 50, 100 ],
-								/*rememberPerPage : 'perPageItems',*/
+								/* rememberPerPage : 'perPageItems', */
 								onChange : function() {
 									if (this.currentPage != 0) {
 										$scope.ws_send(this.currentPage,
@@ -109,9 +110,12 @@ appModule
 							heartCheck.reset().start();
 						};
 						ws.onmessage = function(evt) {
+							if(isoperation==true){// 锁定状态不接收任何信息
+								return;
+							
+							}
 							if (JSON.parse(evt.data).piBoxActDateMode != null) {
 								$('#loader-wrapper').css("display","none");
-								console.log(inivalize);
 								if (inivalize == 0) {
 									$scope.paginationConf.totalItems = JSON
 											.parse(evt.data).piBoxActDateMode.totalRecord;
@@ -138,7 +142,6 @@ appModule
 								// 下发数据到盒子反馈
 								$scope.resultData = JSON.parse(evt.data).resultData;
 
-// $("#loadingModal").modal("hide");
 								$('#loader-wrapper').css("display","none");
 								if ($scope.resultData == 0) {
 									swal({
@@ -619,6 +622,7 @@ appModule
 							})
 							.then((willDelete) => {
 							  if (willDelete) {
+								 isoperation=true;
 								  $scope.del_group();
 							  } else {
 							    console.log("取消删除");
@@ -627,6 +631,7 @@ appModule
 					}
 					// 删除分组
 					$scope.del_group = function() {
+						$('#loader-wrapper').css("display","block");
 						var params = {
 							id : $scope.delActGroupId,
 						};
@@ -635,6 +640,7 @@ appModule
 							T.common.ajax.request("WeconBox",
 									"actDataAction/delActGroup", params,
 									function(data, code, msg) {
+								   isoperation=false;
 										if (code == 200) {
 
 											$("#deleteGroup").modal("hide");
@@ -642,13 +648,15 @@ appModule
 											$scope.act_group($scope.deviceid);
 
 										} else {
-
+											$('#loader-wrapper').css("display","none");
 											swal({
 							                    title: code + "-" + msg,
 							                    icon: "error"
 							                });
 										}
 									}, function() {
+										isoperation=false;
+										$('#loader-wrapper').css("display","none");
 										console.log("ajax error");
 									});
 
@@ -656,6 +664,7 @@ appModule
 							T.common.ajax.request("WeconBox",
 									"userdiract/deluserdir", params, function(
 											data, code, msg) {
+								        isoperation=false;
 										if (code == 200) {
 
 											$("#deleteGroup").modal("hide");
@@ -671,6 +680,7 @@ appModule
 							                });
 										}
 									}, function() {
+										isoperation=false;
 										console.log("ajax error");
 									});
 
@@ -2248,12 +2258,9 @@ appModule
 						} else {
 							batchvalue = $("#batchid").val();
 						}
-						if (mtype == 2) {
+						$('#loader-wrapper').css("display","block");// 添加转圈效果
+						isoperation=true;// 锁定界面展示
 
-							// $("#loadingModalid").modal("show");// 批量添加转圈效果
-							$('#loader-wrapper').css("display","block");// 批量添加转圈效果
-
-						}
 						var params = {
 							id : mid,
 							plc_id : plcId,
@@ -2281,6 +2288,7 @@ appModule
 										"actDataAction/addUpdataMonitor",
 										params,
 										function(data, code, msg) {
+											isoperation=false;
 											if (code == 200) {
 												$("#addpoint").modal("hide");
 												$scope
@@ -2288,6 +2296,7 @@ appModule
 																$scope.paginationConf.currentPage,
 																$scope.paginationConf.itemsPerPage,
 																actgroupId);
+												
 												if (mtype == 0) {
 													swal({
 									                    title: "添加实时监控点成功",
@@ -2299,11 +2308,7 @@ appModule
 									                    icon: "success"
 									                });
 												} else {
-													/*
-													 * $("#loadingModalid").modal(
-													 * "hide");
-													 */
-													$('#loader-wrapper').css("display","none");
+												
 													swal({
 									                    title: "批量添加实时监控点成功",
 									                    icon: "success"
@@ -2311,10 +2316,6 @@ appModule
 												}
 
 											} else {
-												/*
-												 * $("#loadingModalid").modal(
-												 * "hide");
-												 */
 												$('#loader-wrapper').css("display","none");
 												swal({
 								                    title: code + "-" + msg,
@@ -2322,6 +2323,7 @@ appModule
 								                });
 											}
 										}, function() {
+											isoperation=false;
 											console.log("ajax error");
 										});
 

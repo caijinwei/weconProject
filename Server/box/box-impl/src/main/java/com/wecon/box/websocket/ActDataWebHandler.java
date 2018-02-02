@@ -165,8 +165,6 @@ public class ActDataWebHandler extends AbstractWebSocketHandler {
 			ViewAccountRoleFilter viewAccountRoleFilter = new ViewAccountRoleFilter();
 			Client client = clients.get(session.getId());
 			Map<String, Object> bParams = paramMaps.get(session.getId());
-			logger.debug("显示client==" + client.userInfo.toString());
-			logger.debug("显示session.getId()==" + session.getId());
 			if (client != null) {
 				Page<RealHisCfgDevice> realHisCfgDeviceList = null;
 				if (client.userInfo.getUserType() == 1) {
