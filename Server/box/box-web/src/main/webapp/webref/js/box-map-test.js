@@ -11,11 +11,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             params = {selAlarm: selAlarm};
         }
 
-        // var data = "{\"code\":200,\"msg\":\"ok\",\"reqId\":\"1517541491260\",\"result\":{\"list\":[{\"groupName\":\"默认组\",\"boxList\":[{\"machineCode\":\"137001170928113b5d817101102\",\"devModel\":\"VBOX\",\"isAlarm\":0,\"boxName\":\"1102\",\"remark\":\"\",\"state\":\"0\",\"map\":\"118.464668,26.061996\",\"boxId\":\"2\"},{\"machineCode\":\"V02001171018005027a249d4b9f\",\"devModel\":\"V-BOX S-4G\",\"isAlarm\":0,\"boxName\":\"4b9f\",\"remark\":\"\",\"state\":\"0\",\"map\":\"119.328766,25.949253\",\"boxId\":\"3\"},{\"machineCode\":\"V02001171023997d2db2a945f29\",\"devModel\":\"V-BOX S-4G\",\"isAlarm\":1,\"boxName\":\"1111\",\"remark\":\"\",\"state\":\"0\",\"map\":\"119.23448,26.053167\",\"boxId\":\"8\"},{\"machineCode\":\"V02001171119999d2db2a945cbf\",\"devModel\":\"V-BOX S-4G\",\"isAlarm\":0,\"boxName\":\"1119\",\"remark\":null,\"state\":\"0\",\"map\":null,\"boxId\":\"20\"},{\"machineCode\":\"V02001171130990d2db2a94421f\",\"devModel\":\"V-BOX S-4G\",\"isAlarm\":0,\"boxName\":\"4421f\",\"remark\":null,\"state\":\"0\",\"map\":null,\"boxId\":\"35\"},{\"machineCode\":\"1870011603240285dd4dc845X0013\",\"devModel\":\"VBOX\",\"isAlarm\":1,\"boxName\":\"模拟1\",\"remark\":null,\"state\":\"0\",\"map\":null,\"boxId\":\"36\"},{\"machineCode\":\"1870011603240285dd4dc845X0014\",\"devModel\":\"VBOX\",\"isAlarm\":0,\"boxName\":\"模拟2\",\"remark\":null,\"state\":\"0\",\"map\":null,\"boxId\":\"37\"},{\"machineCode\":\"3870011603240285dd4dc845X0013\",\"devModel\":\"VBOX\",\"isAlarm\":0,\"boxName\":\"123\",\"remark\":\"\",\"state\":\"1\",\"map\":\"119.307396,26.079561\",\"boxId\":\"40\"},{\"machineCode\":\"3870011603240285dd4dc845X0099\",\"devModel\":\"VBOX\",\"isAlarm\":0,\"boxName\":\"test1\",\"remark\":null,\"state\":\"0\",\"map\":null,\"boxId\":\"41\"},{\"machineCode\":\"3870011603240285dd4dc845X0115\",\"devModel\":\"VBOX\",\"isAlarm\":0,\"boxName\":\"x0115\",\"remark\":null,\"state\":\"0\",\"map\":null,\"boxId\":\"49\"},{\"machineCode\":\"3870011603240285dd4dc845X0116\",\"devModel\":\"VBOX\",\"isAlarm\":0,\"boxName\":\"X0116\",\"remark\":null,\"state\":\"0\",\"map\":null,\"boxId\":\"50\"},{\"machineCode\":\"3870011603240285dd4dc845X0117\",\"devModel\":\"VBOX\",\"isAlarm\":0,\"boxName\":\"X0117\",\"remark\":null,\"state\":\"0\",\"map\":null,\"boxId\":\"51\"},{\"machineCode\":\"3870011603240285dd4dc845X0118\",\"devModel\":\"VBOX\",\"isAlarm\":0,\"boxName\":\"X0118\",\"remark\":null,\"state\":\"0\",\"map\":null,\"boxId\":\"52\"},{\"machineCode\":\"3870011603240285dd4dc845X0119\",\"devModel\":\"VBOX\",\"isAlarm\":0,\"boxName\":\"X0119\",\"remark\":null,\"state\":\"0\",\"map\":null,\"boxId\":\"53\"},{\"machineCode\":\"3870011603240285dd4dc845X0120\",\"devModel\":\"VBOX\",\"isAlarm\":0,\"boxName\":\"X0120\",\"remark\":null,\"state\":\"0\",\"map\":null,\"boxId\":\"54\"},{\"machineCode\":\"3870011603240285dd4dc845X0121\",\"devModel\":\"VBOX\",\"isAlarm\":0,\"boxName\":\"X0121\",\"remark\":null,\"state\":\"0\",\"map\":null,\"boxId\":\"55\"},{\"machineCode\":\"3870011603240285dd4dc845X0122\",\"devModel\":\"VBOX\",\"isAlarm\":0,\"boxName\":\"X0122\",\"remark\":null,\"state\":\"0\",\"map\":null,\"boxId\":\"56\"},{\"machineCode\":\"3870011603240285dd4dc845X0123\",\"devModel\":\"VBOX\",\"isAlarm\":0,\"boxName\":\"X0123\",\"remark\":null,\"state\":\"0\",\"map\":null,\"boxId\":\"57\"},{\"machineCode\":\"3870011603240285dd4dc845X0124\",\"devModel\":\"VBOX\",\"isAlarm\":0,\"boxName\":\"X0124\",\"remark\":null,\"state\":\"0\",\"map\":null,\"boxId\":\"58\"},{\"machineCode\":\"3870011603240285dd4dc845X0299\",\"devModel\":\"VBOX\",\"isAlarm\":0,\"boxName\":\"X0299\",\"remark\":null,\"state\":\"0\",\"map\":null,\"boxId\":\"59\"}]},{\"groupName\":\"新分组1\",\"boxList\":[]}]}}";
-        // var result = JSON.parse(data);
-        // $scope.boxsGroup = result.result.list;
-        // $scope.$apply();
-        // $scope.initMap();
         T.common.ajax.request("WeconBox",
             "data/boxs", params, function(
                 data, code, msg) {
@@ -40,6 +35,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         var mapStr = T.common.util.getParameter("map");
         // alert(mapStr);
         //初始化地图
+        //判断是否有传参数
         if(mapStr != null && mapStr !="") {
             $scope.mapArray = mapStr.split(",");
             var mPoint = new BMap.Point($scope.mapArray[0],$scope.mapArray[1]);
@@ -50,23 +46,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             var myCity = new BMap.LocalCity();
             myCity.get(myFun);
         }
-        // var geolocation = new BMap.Geolocation();
-        // geolocation.getCurrentPosition(function(r) {
-        //     if(this.getStatus() == BMAP_STATUS_SUCCESS) {
-        //         var mk = new BMap.Marker(r.point);
-        //         if(mapStr != null && mapStr !="") {
-        //             $scope.mapArray = mapStr.split(",");
-        //             var mPoint = new BMap.Point($scope.mapArray[0],$scope.mapArray[1]);
-        //             map.centerAndZoom(mPoint, 12) //标注当前位置
-        //         }else{
-        //             map.centerAndZoom(r.point, 12) //标注当前位置
-        //         }
-        //     } else {
-        //         alert('failed' + this.getStatus());
-        //     }
-        // }, {
-        //     enableHighAccuracy: true
-        // })
+
         //产生搜索框选择框
         $scope.createSearch();
         var marker;
