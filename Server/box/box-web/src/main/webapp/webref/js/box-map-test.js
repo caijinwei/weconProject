@@ -30,7 +30,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     $scope.initMap = function() {
         function myFun(result){
             var cityName = result.name;
-            map.setCenter(cityName);
+            map.centerAndZoom(cityName,12);
         }
         var mapStr = T.common.util.getParameter("map");
         // alert(mapStr);
@@ -40,11 +40,20 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             $scope.mapArray = mapStr.split(",");
             var mPoint = new BMap.Point($scope.mapArray[0],$scope.mapArray[1]);
             map.centerAndZoom(mPoint, 12) //标注当前位置
+
         }else{
-            var point = new BMap.Point(116.331398,39.897445);
-            map.centerAndZoom(point,12);
-            var myCity = new BMap.LocalCity();
-            myCity.get(myFun);
+            var firstboxPos = $scope.boxsGroup[0].boxList[0].map;
+            if(firstboxPos != null && firstboxPos !=""){
+                var positions = firstboxPos.split(",");
+                var point = new BMap.Point(positions[0],positions[1]);
+                map.centerAndZoom(point,12);
+            }else{
+                //var point = new BMap.Point(116.331398,39.897445);
+                //map.centerAndZoom(point,12);
+                var myCity = new BMap.LocalCity();
+                myCity.get(myFun);
+            }
+
         }
 
         //产生搜索框选择框
