@@ -98,7 +98,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
     $scope.boundBox = function () {
         if ($("#acc_dir_id").val() == "" || $("#machine_code").val() == ""
             || $("#dev_password").val() == "" || $("#dev_name").val() == "") {
-            alert("必填参数没有填写完整");
+            swal("必填参数没有填写完整","","error");
             return false;
         }
 
@@ -110,7 +110,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         if (deviceUseCode == 999) {
             deviceUseName = $("#otherDeviceUseName").val();
             if (deviceUseName == "" || deviceUseName == undefined) {
-                alert("其他行业参数未填写！");
+                swal("其他行业参数未填写！","","error");
                 return false;
             }
         } else {
@@ -128,12 +128,12 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         T.common.ajax.request('WeconBox', "baseInfoAction/boundBox", params,
             function (data, code, msg) {
                 if (code == 200) {
-                    alert("PIBox绑定成功");
+                    swal("PIBox绑定成功","","success");
                     $("#addPIBox").modal("hide");
                     $scope.searchbox();
                     $scope.clearInput();
                 } else {
-                    alert(code + "-" + msg);
+                    swal(code + "-" + msg,"","error");
                 }
             }, function () {
                 console.log("ajax error");
@@ -181,7 +181,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 
                 } else {
 
-                    alert(code + "-" + msg);
+                    swal(code + "-" + msg,"","error");
                 }
             }, function () {
                 console.log("ajax error");
@@ -260,7 +260,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
      * 绑定PIBox表单中展示几个分组
      */
     $scope.getRefList = function () {
-        $("#otherDeviceUseName").hide();
+        $("#otherDeviceUseName").parent().hide();
         var params = {
             type: "0"
         }
@@ -271,7 +271,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
                     $scope.refList = data.list;
                     $scope.$apply();
                 } else {
-                    alert(code + " " + msg);
+                    swal(code + " " + msg,"","error");
                 }
             }, function () {
                 console.log("ajax error");
@@ -301,7 +301,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             params, function (data, code, msg) {
                 if (code == 200) {
                 } else {
-                    alert(code + " " + msg);
+                    swal(code + " " + msg,"","error");
                 }
             }, function () {
                 console.log("ajax error");
@@ -446,9 +446,9 @@ function reloadBoxList() {
  * */
 var isOtherOption = function () {
     if ($("#deviceUse").val() == 999) {
-        $("#otherDeviceUseName").show();
+        $("#otherDeviceUseName").parent().show();
     } else {
-        $("#otherDeviceUseName").hide();
+        $("#otherDeviceUseName").parent().hide();
     }
 }
 
