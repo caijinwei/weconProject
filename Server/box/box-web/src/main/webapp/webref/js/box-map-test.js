@@ -28,20 +28,33 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
 
     //初始化地图
     $scope.initMap = function() {
+        $scope.showalarm = T.common.util.getParameter("showalarm");
         function myFun(result){
             var cityName = result.name;
             map.centerAndZoom(cityName,12);
         }
         var mapStr = T.common.util.getParameter("map");
         // alert(mapStr);
-        //初始化地图
+        //初始化地图,选择中心点
         //判断是否有传参数
         if(mapStr != null && mapStr !="") {
             $scope.mapArray = mapStr.split(",");
             var mPoint = new BMap.Point($scope.mapArray[0],$scope.mapArray[1]);
             map.centerAndZoom(mPoint, 12) //标注当前位置
-
         }else{
+            //判断是否显示报警
+            if($scope.showalarm == 1){
+                var i = 0;
+                // whlie(i<=$scope.boxsGroup[0].boxList[0].length)
+                // {
+                //     var isAlarm = $scope.boxsGroup[0].boxList[0].isAlarm;
+                //     if(isAlarm == 1){
+                //         var firstboxPos = $scope.boxsGroup[0].boxList[0].map;
+                //         i = $scope.boxsGroup[0].boxList[0].length;
+                //     }
+                //     i++;
+                // }
+            }
             var firstboxPos = $scope.boxsGroup[0].boxList[0].map;
             if(firstboxPos != null && firstboxPos !=""){
                 var positions = firstboxPos.split(",");
@@ -60,7 +73,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         $scope.createSearch();
         var marker;
         console.log("将要产生标注点");
-        $scope.showalarm = T.common.util.getParameter("showalarm");
         if($scope.showalarm == 1){
             $(".devicetype").val("0");
         }angular.forEach($scope.boxsGroup, function(value, key) {
