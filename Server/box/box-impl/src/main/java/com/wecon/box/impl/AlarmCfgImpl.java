@@ -49,7 +49,6 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 	@Autowired
 	public PlatformTransactionManager transactionManager;
 
-
 	private final String SEL_COL = "alarmcfg_id,data_id,account_id,name,addr,addr_type,text,condition_type,state,plc_id,device_id,rid,data_limit,digit_count,digit_binary,alarm_level,bind_state,create_date,update_date";
 
 	@Override
@@ -108,7 +107,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 	@SuppressWarnings("unchecked")
 	@Override
 	public Page<AlarmCfgTrigger> getAlarmCfgDataList(long account_id, long groupId, long device_id, long bind_state,
-													 int pageIndex, int pageSize) {
+			int pageIndex, int pageSize) {
 		String sqlCount = "select count(0) from `alarm_cfg` ac,`account_dir` ad,`account_dir_rel` adr where 1=1 and ac.`alarmcfg_id`=adr.`ref_id` and ad.`id`=adr.`acc_dir_id` and ad.`type`=3 and ac.`account_id`=ad.`account_id` AND  ac.`device_id`=ad.`device_id` ";
 
 		String sql = " select ac.alarmcfg_id,ac.data_id,ac.account_id,ac.name,ac.addr,ac.addr_type,ac.text,ac.condition_type,ac.state,ac.device_id,ac.rid,ac.bind_state,ac.plc_id,ac.data_limit,ac.digit_count,ac.digit_binary,ac.alarm_level,ac.create_date,ac.update_date,adr.`ref_alais`,ad.`name` dirname,ad.`id` from `alarm_cfg` ac,`account_dir` ad,`account_dir_rel` adr where 1=1 and ac.`alarmcfg_id`=adr.`ref_id` and ad.`id`=adr.`acc_dir_id` and ad.`type`=3 and ac.`account_id`=ad.`account_id` and  ac.`device_id`=ad.`device_id`";
@@ -239,7 +238,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 	@Override
 	public AlarmCfg getAlarmcfg(long alarmcfg_id) {
 		String sql = "select " + SEL_COL + " from alarm_cfg a where alarmcfg_id=?";
-		List<AlarmCfg> list = jdbcTemplate.query(sql, new Object[]{alarmcfg_id}, new DefaultAlarmCfgRowMapper());
+		List<AlarmCfg> list = jdbcTemplate.query(sql, new Object[] { alarmcfg_id }, new DefaultAlarmCfgRowMapper());
 		if (!list.isEmpty()) {
 			return list.get(0);
 		}
@@ -251,7 +250,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 	@Override
 	public AlarmCfg getAlarmcfg(long device_id, String name) {
 		String sql = "select " + SEL_COL + " from alarm_cfg a where state!=3 and device_id=? and name=?";
-		List<AlarmCfg> list = jdbcTemplate.query(sql, new Object[]{device_id, name}, new DefaultAlarmCfgRowMapper());
+		List<AlarmCfg> list = jdbcTemplate.query(sql, new Object[] { device_id, name }, new DefaultAlarmCfgRowMapper());
 		if (!list.isEmpty()) {
 			return list.get(0);
 		}
@@ -278,10 +277,10 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			sql += ")";
 			triSql += ")";
 			params = state;
-		}else{
+		} else {
 			sql += " and a.alarmcfg_id = ?";
 			triSql += " and a.alarmcfg_id = ?";
-			params = new Object[]{id};
+			params = new Object[] { id };
 		}
 		sql += " order by a.update_date";
 		List<AlarmCfgExtend> alarmCfgExtendLst = jdbcTemplate.query(sql, params, new DefaultAlarmCfgExtendRowMapper());
@@ -309,10 +308,10 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 		String sql = "update alarm_cfg set data_id = ?, account_id=?,name=?,addr=?,addr_type=?,text=?,condition_type=?,state=?,update_date=current_timestamp(),bind_state=?,plc_id=?,device_id=?,rid=? ,data_limit=?,digit_count=?, digit_binary=?,alarm_level=? where alarmcfg_id = ?";
 
 		jdbcTemplate.update(sql,
-				new Object[]{alarmCfg.data_id, alarmCfg.account_id, alarmCfg.name, alarmCfg.addr, alarmCfg.addr_type,
+				new Object[] { alarmCfg.data_id, alarmCfg.account_id, alarmCfg.name, alarmCfg.addr, alarmCfg.addr_type,
 						alarmCfg.text, alarmCfg.condition_type, alarmCfg.state, alarmCfg.bind_state, alarmCfg.plc_id,
 						alarmCfg.device_id, alarmCfg.rid, alarmCfg.data_limit, alarmCfg.digit_count,
-						alarmCfg.digit_binary, alarmCfg.alarm_level, alarmCfg.alarmcfg_id});
+						alarmCfg.digit_binary, alarmCfg.alarm_level, alarmCfg.alarmcfg_id });
 		return true;
 	}
 
@@ -376,7 +375,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 
 	@Override
 	public int getAlamBxo(long account_id) {
-		String sql = "select  count(distinct ac.`device_id`) from `alarm_cfg` ac where ac.`alarmcfg_id`= any(select  distinct  acd.`alarm_cfg_id`  from `alarm_cfg_data` acd,alarm_cfg ac  where  acd.`alarm_cfg_id`=ac.`alarmcfg_id` and ac.account_id=? and acd.`state`=1) and ac.`bind_state`=1";
+		String sql = "select  count(distinct ac.`device_id`) from `alarm_cfg` ac,`plc_info` pli where pli.`plc_id`=ac.plc_id and ac.`alarmcfg_id`= any(select  distinct  acd.`alarm_cfg_id`  from `alarm_cfg_data` acd,alarm_cfg ac  where  acd.`alarm_cfg_id`=ac.`alarmcfg_id` and ac.account_id=? and acd.`state`=1) and ac.`bind_state`=1";
 		if (account_id < 0) {
 			return 0;
 		}
@@ -520,10 +519,10 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 	}
 
 	/*
-     * 查询盒子下的监控点
-     */
+	 * 查询盒子下的监控点
+	 */
 	public ArrayList<Integer> findAlarmCfgIdSBydevice_id(Integer device_id) {
-		Object[] args = new Object[]{device_id};
+		Object[] args = new Object[] { device_id };
 		String sql = "SELECT alarmcfg_id FROM alarm_cfg WHERE device_id=?";
 		ArrayList<Integer> list = null;
 		list = (ArrayList<Integer>) jdbcTemplate.query(sql, args, new RowMapper<Integer>() {
@@ -537,17 +536,17 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 	}
 
 	/*
-     * 设置bind_state=0 解绑
-     */
+	 * 设置bind_state=0 解绑
+	 */
 	public void setBind_state(int device_id, Integer state) {
 		String sql = "UPDATE alarm_cfg SET bind_state=? where device_id=?";
-		Object args = new Object[]{state, device_id};
+		Object args = new Object[] { state, device_id };
 		jdbcTemplate.update(sql, args);
 	}
 
 	public boolean updatePointAccAndState(long accountId, long deviceId, int bind_state) {
 
-		Object[] args = new Object[]{accountId, bind_state, deviceId};
+		Object[] args = new Object[] { accountId, bind_state, deviceId };
 		String sql = "UPDATE alarm_cfg a SET a.account_id = ?, a.bind_state = ? WHERE a.device_id = ?";
 		Integer count = jdbcTemplate.update(sql, args);
 		if (count <= 0) {
@@ -558,7 +557,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 
 	@Override
 	public void updateAlarmCfgState(long plc_id, int state, int bindstate) {
-		Object[] args = new Object[]{state, bindstate, plc_id};
+		Object[] args = new Object[] { state, bindstate, plc_id };
 		String sql = "UPDATE alarm_cfg a SET a.state = ? , bind_state = ? WHERE a.plc_id=?";
 		jdbcTemplate.update(sql, args);
 	}
@@ -568,7 +567,7 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			return null;
 		}
 		String sql = "select " + SEL_COL + " from alarm_cfg a where plc_id=?";
-		List<AlarmCfg> list = jdbcTemplate.query(sql, new Object[]{plc_id}, new DefaultAlarmCfgRowMapper());
+		List<AlarmCfg> list = jdbcTemplate.query(sql, new Object[] { plc_id }, new DefaultAlarmCfgRowMapper());
 		return list;
 	}
 
@@ -603,20 +602,20 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 
 	@Override
 	public Map<Long, Long> copyAlarmCfg(Long accId, Long toDeviceId, Map<Long, Long> fromtoPlcIdMap) {
-        /*
-		* 已存在报警配置  不能复制配置
-		* */
+		/*
+		 * 已存在报警配置 不能复制配置
+		 */
 		List<AlarmCfg> toAlarmCfgs = getAlarmCfg(accId, toDeviceId);
 
 		if (toAlarmCfgs != null) {
 			for (AlarmCfg alarmCfg : toAlarmCfgs) {
 				if (alarmCfg.state != 3) {
-					throw new BusinessException(ErrorCodeOption.AlarmConfig_Is_Exist.key, ErrorCodeOption.AlarmConfig_Is_Exist.value);
+					throw new BusinessException(ErrorCodeOption.AlarmConfig_Is_Exist.key,
+							ErrorCodeOption.AlarmConfig_Is_Exist.value);
 				}
 			}
 		}
 		Map<Long, Long> resultMap = new HashMap<Long, Long>();
-
 
 		for (Map.Entry<Long, Long> entry : fromtoPlcIdMap.entrySet()) {
 			List<AlarmCfg> fromAlarmCfgList = getAlarmByPlcId(entry.getKey());
@@ -639,18 +638,19 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 		return null;
 	}
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public void copyAlarm(final Long accountId, final Long fromDeviceId, final Long toDeviceId, final Map<Long, Long> fromtoPlcIdMap) {
+	public void copyAlarm(final Long accountId, final Long fromDeviceId, final Long toDeviceId,
+			final Map<Long, Long> fromtoPlcIdMap) {
 		/*
-		* 分组type   报警类型为: 3
-		* */
+		 * 分组type 报警类型为: 3
+		 */
 		final int TYPE = 3;
 		TransactionTemplate tt = new TransactionTemplate(transactionManager);
 
-		 /*
-            * 先删除 目标设备的默认分组
-            * */
+		/*
+		 * 先删除 目标设备的默认分组
+		 */
 		List<AccountDir> toAccountDir = accountDirApi.getAccountDirList(accountId, TYPE, toDeviceId);
 		for (AccountDir accountDir : toAccountDir) {
 			if (accountDir.name.equals("默认组")) {
@@ -666,7 +666,8 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 					if (fromtoPlcIdMap != null) {
 						fromtoAlarmCfgIdMap = copyAlarmCfg(accountId, toDeviceId, fromtoPlcIdMap);
 					}
-					Map<Long, Long> fromtoAccountDirMap = accountDirApi.copyAccountDir(accountId, fromDeviceId, toDeviceId, TYPE);
+					Map<Long, Long> fromtoAccountDirMap = accountDirApi.copyAccountDir(accountId, fromDeviceId,
+							toDeviceId, TYPE);
 					if (fromtoAlarmCfgIdMap != null && fromtoAlarmCfgIdMap.size() > 0) {
 						accountDirRelApi.copyAccDeviceRel(fromtoAlarmCfgIdMap, fromtoAccountDirMap);
 						alarmTriggerApi.copyAlarmTrigger(fromtoAlarmCfgIdMap);
@@ -676,7 +677,8 @@ public class AlarmCfgImpl implements AlarmCfgApi {
 			});
 		} catch (Exception e) {
 			Logger.getLogger(AccountImpl.class.getName()).log(Level.SEVERE, null, e);
-			throw new BusinessException(ErrorCodeOption.AlarmCfg_Copy_Faile.key, ErrorCodeOption.AlarmCfg_Copy_Faile.value);
+			throw new BusinessException(ErrorCodeOption.AlarmCfg_Copy_Faile.key,
+					ErrorCodeOption.AlarmCfg_Copy_Faile.value);
 		}
 
 	}
