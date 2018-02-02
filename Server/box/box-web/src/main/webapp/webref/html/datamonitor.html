@@ -27,6 +27,11 @@
 	    	<script type="text/javascript" src="lib/html5shiv/html5shiv-printshiv.min.js" ></script>
 	    	<script type="text/javascript" src="lib/respond/respond.min.js" ></script>
 	    <![endif]-->
+	<style>
+        table tbody tr td p{
+            margin: 0px;
+        }
+	</style>
 </head>
 <div id="loader-wrapper">
 	<div id="loader"></div>
@@ -72,7 +77,7 @@
 									<button type="button" class="btn btn-primary"
 										data-toggle="modal" ng-cloak
 										ng-if="(accounttype==1 && deviceid==-100)||(accounttype==2 && deviceid==-200)"
-										data-target="#dispatchpoint" ng-click="showRestList()">
+										data-target="#dispatchpoint" ng-click="showRestList()" style="margin-right: 15px; margin-left: 15px;">
 										<span class="fa fa-indent"></span> &nbsp;分配监控点
 									</button>
 									<button type="button" class="btn btn-primary"
@@ -162,31 +167,31 @@
 												ng-if="accounttype==1&& deviceid>0"
 												ng-click="editmonitor(x);"> <span
 													class="glyphicon glyphicon-edit"
-													style="font-size: 16px; color: #32a696; margin: 10px;"></span>
+													style="font-size: 16px; color: #32a696; margin-left: 10px;"></span>
 													编辑
 											</a> <a href="" title="复制" data-toggle="modal"
 												data-target="#copyDataGroup" ng-cloak ng-if="deviceid<0"
 												ng-click="copymonitor(x);"> <span
 													class="glyphicon glyphicon-file"
-													style="font-size: 16px; color: #32a696; margin: 10px;"></span>
+													style="font-size: 16px; color: #32a696; margin: 10px;margin-right: 3px;"></span>
 													复制
 											</a> <a href="" title="移动分组" data-toggle="modal"
 												data-target="#moveDataGroup" ng-click="movemonitor(x);">
 													<span class="glyphicon glyphicon-resize-horizontal"
-													style="font-size: 16px; color: #32a696; margin: 10px;"></span>
+													style="font-size: 16px; color: #32a696; margin: 10px;margin-right: 3px;"></span>
 													移动
 											</a> <a href="" title="移除" data-toggle="modal" ng-cloak
 												ng-if="deviceid<0" data-target="#deletePoint"
 												ng-click="remonitor(x);"> <span
 													class="glyphicon glyphicon-trash"
-													style="font-size: 16px; color: #32a696; margin: 10px;"></span>
+													style="font-size: 16px; color: #32a696;margin: 10px;margin-right: 3px;"></span>
 													移除
 											</a> <a href="" title="删除" data-toggle="modal"
 												data-target="#deletePoint" ng-cloak
 												ng-if="accounttype==1&& deviceid>0"
 												ng-click="delmonitor(x);"> <span
 													class="glyphicon glyphicon-trash"
-													style="font-size: 16px; color: #32a696; margin: 10px;"></span>
+													style="font-size: 16px; color: #32a696; margin: 10px;margin-right: 3px;"></span>
 													删除
 											</a></td>
 										</tr>
@@ -229,10 +234,10 @@
 											<td><a href=""> <span
 													class="glyphicon glyphicon-edit" data-toggle="modal"
 													ng-click="editGroup(x)"
-													style="color: #2889d0; margin: 10px;"></span>
+													style="font-size: 16px; color: #32a696; margin: 10px;"></span>
 											</a> <a href=""> <span class="glyphicon glyphicon-trash"
 													data-toggle="modal" ng-click="delGroup(x)"
-													style="color: #2889d0; margin: 10px;"></span>
+													style="font-size: 16px; color: #32a696; margin: 10px;"></span>
 											</a></td>
 										</tr>
 									</tbody>
