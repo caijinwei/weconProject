@@ -43,18 +43,6 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             map.centerAndZoom(mPoint, 12) //标注当前位置
         }else{
             //判断是否显示报警
-            if($scope.showalarm == 1){
-                var i = 0;
-                // whlie(i<=$scope.boxsGroup[0].boxList[0].length)
-                // {
-                //     var isAlarm = $scope.boxsGroup[0].boxList[0].isAlarm;
-                //     if(isAlarm == 1){
-                //         var firstboxPos = $scope.boxsGroup[0].boxList[0].map;
-                //         i = $scope.boxsGroup[0].boxList[0].length;
-                //     }
-                //     i++;
-                // }
-            }
             var firstboxPos = $scope.boxsGroup[0].boxList[0].map;
             if(firstboxPos != null && firstboxPos !=""){
                 var positions = firstboxPos.split(",");
@@ -77,16 +65,29 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             $(".devicetype").val("0");
         }angular.forEach($scope.boxsGroup, function(value, key) {
             angular.forEach(value.boxList, function(box, boxkey) {
-                var isAlarm = box.isAlarm;
-                if($scope.showalarm == 1){
-                    if(isAlarm == 0){
-                        return true;
-                    }
-                }
                 var positionStr = box.map;
                 var boxName = box.boxName;
                 var boxId = box.boxId;
                 var state = box.state;
+                //判断报警信息相关数据
+                var firstalarmbox = 0;
+                var isAlarm = box.isAlarm;
+                if($scope.showalarm == 1){
+                    if(isAlarm == 0) {//如果显示报警盒子直接跳出当前循环
+                        return true;
+                    }
+                    else{
+                        if(firstalarmbox == 0){//获取第一个报警盒子信息然后定位
+                            if(positionStr != null) {
+                                $scope.positions = positionStr.split(",");
+                                var point = new BMap.Point($scope.positions[0], $scope.positions[1]);
+                                map.centerAndZoom(point, 12);
+                            }
+                        }
+                        firstalarmbox = 1;
+                    }
+                }
+                //////////////////////////////////////////////////////////
                 console.log("盒子的位置信息：" + positionStr);
                 if(positionStr != null) {
                     $scope.positions = positionStr.split(",");
@@ -141,6 +142,18 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
             })
         })
 
+        //删除景点
+        map.setMapStyle({
+            styleJson:[
+                {
+                    "featureType": "scenicspotslabel",
+                    "elementType": "all",
+                    "stylers": {
+                        "visibility": "off"
+                    }
+                }
+            ]
+        });
         console.log("已经产生标注点");
         map.addEventListener("tilesloaded",function(){
             // $("#loader-wrapper").css("display","none");
