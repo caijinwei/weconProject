@@ -124,7 +124,7 @@ appModule.controller("infoController", function ($scope, $http, $compile) {
         })
         console.log("已经产生标注点");
         map.addEventListener("tilesloaded",function(){
-            $("#loader-wrapper").css("display","none");
+            // $("#loader-wrapper").css("display","none");
         });
     }
 
