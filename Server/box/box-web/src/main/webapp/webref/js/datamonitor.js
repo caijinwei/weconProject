@@ -33,6 +33,7 @@ appModule
 										params,
 										function(data, code, msg) {
 											if (code == 200) {
+												$('#loader-wrapper').css("display","none");
 												$scope.dir_list = data.ActGroup;
 												$scope.$apply();
 												if (data.ActGroup != null
